@@ -1,0 +1,5 @@
+run{
+    delete archivelog until time 'sysdate -&1';
+    crosscheck archivelog all;
+    delete expired archivelog all;
+}
