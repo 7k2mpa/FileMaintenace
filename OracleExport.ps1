@@ -2,17 +2,18 @@
 
 Param(
 
-[String]$ExecUser = 'system',
-[String]$ExecUserPassword = 'secmanager',
-[parameter(mandatory=$true , HelpMessage = 'Oracle(ex. MCDB) 全てのHelpはGet-Help FileMaintenance.ps1')][String]$OracleService ,
-#[String]$OracleService = 'MCF',
+[String]$ExecUser = 'arcserve',
+[String]$ExecUserPassword = 'ArcServe0p',
+#[parameter(mandatory=$true , HelpMessage = 'Oracle(ex. MCDB) 全てのHelpはGet-Help FileMaintenance.ps1')][String]$OracleService ,
+[String]$OracleService = 'MCDB',
 
-[parameter(mandatory=$true)][String]$Schema  ,
-#[parameter(mandatory=$true)][String]$Schema = 'SECMCF' ,
+#[parameter(mandatory=$true)][String]$Schema  ,
+[String]$Schema = 'SECMCF' ,
 
 [String]$HostName = $Env:COMPUTERNAME,
 
-[String]$DumpDirectoryObject='TEMP_PUMP_DIR' ,
+[String]$DumpDirectoryObject='MCFDATA_PUMP_DIR' ,
+
 
 [String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
 
@@ -28,7 +29,7 @@ Param(
 [String]$ProviderName = "Infra",
 [String][ValidateSet("Application")]$EventLogLogName = 'Application',
 
-[boolean]$Log2Console = $TRUE,
+[boolean]$Log2Console =$TRUE,
 [Switch]$NoLog2Console,
 [boolean]$Log2File = $False,
 [Switch]$NoLog2File,
@@ -96,14 +97,13 @@ function Initialize {
    CheckContainer -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
 
 
+        
 
-#    $CheckOracleService = "CDPSvc"
-#debug用のstoppedになっているサービス
+#対象のOracleがサービス起動しているか確認
 
     $TargetOracleService = "OracleService"+$OracleService
 
-    $ServiceStatus = ServiceStatusCheck -ServiceName $TargetOracleService -Health Running
-
+    $ServiceStatus = CheckServiceStatus -ServiceName $TargetOracleService -Health Running
 
     IF (-NOT($ServiceStatus)){
 
@@ -113,8 +113,7 @@ function Initialize {
         }else{
         Logging -EventID $InfoEventID -EventType Information -EventMessage "対象のOracle Serviceは正常に起動しています"
         }
-       
-
+     
 
 #処理開始メッセージ出力
 
@@ -155,25 +154,62 @@ ${Version} = '0.9.13'
 
 . Initialize
 
-$DumpFile = $HostName+"_"+$Schema+"_PUMP"+$FormattedDate+".dmp"
-$LogFile = $HostName+"_"+$Schema+"_PUMP"+$FormattedDate+".log"
+#$DumpFile = $HostName+"_"+$Schema+"_PUMP"+$FormattedDate+".dmp"
+#$LogFile = $HostName+"_"+$Schema+"_PUMP"+$FormattedDate+".log"
 
-Push-Location $OracleHomeBinPath
+$DumpFile = $HostName+"_"+$Schema+"_PUMP.dmp"
+$LogFile  = $HostName+"_"+$Schema+"_PUMP.log"
+
+
 
     IF ($PasswordAuthorization){
 
-    expdp directory=$DumpDirectoryObject schemas=$Schema dumpfile=$DumpFile logfile=$LogFile reuse_dumpfiles=y 2>&1 >$Null
-   
+        $ExecCommand = $ExecUser+"/"+$ExecUserPassword+"@"+$OracleService+" Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y"
+    
+
+
+# $ExecCommand = ".\expdp "+$ExecUser+"/"+$ExecUserPassword+"@"+$OracleService+" Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y"
+    
+
     }else{
-    expdp $ExecUser/$ExecUserPassword@$OracleSerivce directory=$DumpDirectoryObject schemas=$Schema dumpfile=$DumpFile logfile=$LogFile reuse_dumpfiles=y 2>&1 >$Null
+
+#   expdp directory=$DumpDirectoryObject schemas=$Schema dumpfile=$DumpFile logfile=$LogFile reuse_dumpfiles=y
+ 
+#$ExecCommand = "`' / as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
+
+        $ExecCommand = "`' /@"+$OracleService+" as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
+
     }
 
-IF ($LastExitCode -eq 0){
+#echo $ExecCommand
 
-Logging -EventID $SuccessEventID -EventType Success -EventMessage "Oracle Data Pumpに成功しました"
-Finalize $NormalReturnCode
 
-      } else {
+#$ExecCommand = [ScriptBlock]::Create($ExecCommand)
+
+#exit
+
+# Invoke-NativeApplication -ScriptBlock $ExecCommand
+
+Push-Location $OracleHomeBinPath
+
+$Process = Start-Process .\expdp -ArgumentList $ExecCommand -Wait -NoNewWindow -PassThru 
+
+#Invoke-NativeApplicationSafe -ScriptBlock $ExecCommand
+
+
+IF ($Process.ExitCode -ne 0){
+
+
+#IF ($LastExitCode -ne 0){
+
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "Oracle Data Pumpに失敗しました"
-        Finalize $ErrorReturnCode
+	    Finalize $ErrorReturnCode
+
+
+
+        }else{
+        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Oracle Data Pumpに成功しました"
+        Finalize $NormalReturnCode
         }
+                   
+
