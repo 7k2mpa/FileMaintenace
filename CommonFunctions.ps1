@@ -2,15 +2,15 @@
 
 
 
-#ãƒ­ã‚°ç­‰ã®å¤‰æ•°ã‚’ä¸€æ‹¬è¨­å®šã—ãŸã„å ´åˆã¯ä»¥ä¸‹ã‚’åˆ©ç”¨ã—ã¦ä¸‹ã•ã„ã€‚
+#ƒƒO“™‚Ì•Ï”‚ğˆêŠ‡İ’è‚µ‚½‚¢ê‡‚ÍˆÈ‰º‚ğ—˜—p‚µ‚Ä‰º‚³‚¢B
 #
-#å„ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®Paramå¤‰æ•°è¨­å®šã€ã‚³ãƒãƒ³ãƒ‰ã®å¼•æ•°ã€CommonFunctions.ps1ã®å¤‰æ•°è¨­å®š
-#ä¸Šè¨˜ã®é †åºã§ã€å¾Œè€…ã®è¨­å®šãŒå„ªå…ˆã•ã‚Œã¾ã™ã€‚
+#ŠeƒvƒƒOƒ‰ƒ€‚ÌParam•Ï”İ’èAƒRƒ}ƒ“ƒh‚Ìˆø”ACommonFunctions.ps1‚Ì•Ï”İ’è
+#ã‹L‚Ì‡˜‚ÅAŒãÒ‚Ìİ’è‚ª—Dæ‚³‚ê‚Ü‚·B
 #
-#$LogPathç­‰ã¯ã“ã¡ã‚‰ã§è¨­å®šã™ã‚‹æ–¹ãŒæ¥½ã‹ã‚‚
+#$LogPath“™‚Í‚±‚¿‚ç‚Åİ’è‚·‚é•û‚ªŠy‚©‚à
 #
-#å…¥åŠ›å€¤ã¯æ¥µåŠ›validationã—ã¦ã„ã¾ã™ãŒã€Paramã‚»ã‚¯ã‚·ãƒ§ãƒ³ã§æ˜ç¤ºçš„ã«æŒ‡å®šã™ã‚‹å ´åˆã¯validationã•ã‚Œã¾ã›ã‚“
-#èª¤ã£ãŸå€¤ã‚’æŒ‡å®šã—ãªã„ã‚ˆã†ã«ç•™æ„ã—ã¦ãã ã•ã„
+#“ü—Í’l‚Í‹É—Ívalidation‚µ‚Ä‚¢‚Ü‚·‚ªAParamƒZƒNƒVƒ‡ƒ“‚Å–¾¦“I‚Éw’è‚·‚éê‡‚Ívalidation‚³‚ê‚Ü‚¹‚ñ
+#Œë‚Á‚½’l‚ğw’è‚µ‚È‚¢‚æ‚¤‚É—¯ˆÓ‚µ‚Ä‚­‚¾‚³‚¢
 
 
 #[boolean]$Log2EventLog = $TRUE,
@@ -44,7 +44,7 @@
 
 
 
-#ãƒ­ã‚°å‡ºåŠ›
+#ƒƒOo—Í
 
 function Logging{
 
@@ -77,8 +77,8 @@ function Logging{
 }
 
 
-#ã‚¤ãƒ™ãƒ³ãƒˆã‚½ãƒ¼ã‚¹æœªè¨­å®šæ™‚ã®å‡¦ç†
-#ã“ã®ç¢ºèªãŒçµ‚ã‚ã‚‹ã¾ã§ã¯Function Loggingã®ãƒ­ã‚°å‡ºåŠ›å¯èƒ½ã‹ç¢ºå®šã—ãªã„ã®ã§ã€ç•°å¸¸æ™‚ã¯Exitã§æŠœã‘ã‚‹
+#ƒCƒxƒ“ƒgƒ\[ƒX–¢İ’è‚Ìˆ—
+#‚±‚ÌŠm”F‚ªI‚í‚é‚Ü‚Å‚ÍFunction Logging‚ÌƒƒOo—Í‰Â”\‚©Šm’è‚µ‚È‚¢‚Ì‚ÅAˆÙí‚ÍExit‚Å”²‚¯‚é
 
 function CheckEventLogSource{
 
@@ -86,25 +86,25 @@ function CheckEventLogSource{
 
            
         If ([System.Diagnostics.Eventlog]::SourceExists($ProviderName) -eq $false){
-        #æ–°è¦ã‚¤ãƒ™ãƒ³ãƒˆã‚½ãƒ¼ã‚¹ã‚’è¨­å®š
+        #V‹KƒCƒxƒ“ƒgƒ\[ƒX‚ğİ’è
 
            
             New-EventLog -LogName $EventLogLogName -Source $ProviderName  -ErrorAction Stop
-            Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Information -EventId $InfoEventID -Message "[$($SHELLNAME)] æ–°è¦ã‚¤ãƒ™ãƒ³ãƒˆã‚½ãƒ¼ã‚¹[$(ProviderName)]ã‚’[$($EventLogLogName)]ã¸ç™»éŒ²ã—ã¾ã—ãŸ"
+            Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Information -EventId $InfoEventID -Message "[$($SHELLNAME)] V‹KƒCƒxƒ“ƒgƒ\[ƒX[$(ProviderName)]‚ğ[$($EventLogLogName)]‚Ö“o˜^‚µ‚Ü‚µ‚½"
             }
        
     }
     Catch [Exception]{
-    Write-Output "EventLogã«Souce $($ProviderName)ãŒå­˜åœ¨ã—ãªã„ãŸã‚ã€æ–°è¦ä½œæˆã‚’è©¦ã¿ã¾ã—ãŸãŒå¤±æ•—ã—ã¾ã—ãŸã€‚æ–°è¦Sourceã®ä½œæˆã¯å®Ÿè¡Œãƒ¦ãƒ¼ã‚¶ãŒç®¡ç†è€…æ¨©é™ã‚’ä¿æœ‰ã—ã¦ã„ã‚‹å¿…è¦ãŒã‚ã‚Šã¾ã™ã€‚ä¸€åº¦Powershellã‚’ç®¡ç†è€…æ¨©é™ã§é–‹ã„ã¦æ‰‹å‹•ã§ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’å®Ÿè¡Œã—ã¦ãã ã•ã„ã€‚"
-    Write-Output "èµ·å‹•æ™‚ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ : $Error[0]"
+    Write-Output "EventLog‚ÉSouce $($ProviderName)‚ª‘¶İ‚µ‚È‚¢‚½‚ßAV‹Kì¬‚ğ‚İ‚Ü‚µ‚½‚ª¸”s‚µ‚Ü‚µ‚½BV‹KSource‚Ìì¬‚ÍÀsƒ†[ƒU‚ªŠÇ—ÒŒ ŒÀ‚ğ•Û—L‚µ‚Ä‚¢‚é•K—v‚ª‚ ‚è‚Ü‚·Bˆê“xPowershell‚ğŠÇ—ÒŒ ŒÀ‚ÅŠJ‚¢‚Äè“®‚Å‚±‚ÌƒvƒƒOƒ‰ƒ€‚ğÀs‚µ‚Ä‚­‚¾‚³‚¢B"
+    Write-Output "‹N“®ƒGƒ‰[ƒƒbƒZ[ƒW : $Error[0]"
     Exit $ErrorReturnCode
     }
        
 }
 
 
-#ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›å…ˆç¢ºèª
-#ã“ã®ç¢ºèªãŒçµ‚ã‚ã‚‹ã¾ã§ã¯Function Loggingã®ãƒ­ã‚°å‡ºåŠ›å¯èƒ½ã‹ç¢ºå®šã—ãªã„ã®ã§ã€ç•°å¸¸æ™‚ã¯Exitã§æŠœã‘ã‚‹
+#ƒƒOƒtƒ@ƒCƒ‹o—ÍæŠm”F
+#‚±‚ÌŠm”F‚ªI‚í‚é‚Ü‚Å‚ÍFunction Logging‚ÌƒƒOo—Í‰Â”\‚©Šm’è‚µ‚È‚¢‚Ì‚ÅAˆÙí‚ÍExit‚Å”²‚¯‚é
 
 function CheckLogFilePath{
 
@@ -118,8 +118,8 @@ function CheckLogFilePath{
 
     IF(-NOT(Test-Path -Path $LogPath -IsValid)){
 
-       Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($LogPath)]ã¯æœ‰åŠ¹ãªãƒ‘ã‚¹è¡¨è¨˜ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚NTFSã«ä½¿ç”¨ã§ããªã„æ–‡å­—åˆ—ãŒå«ã¾ã‚Œã¦ãªã„ã‹ç­‰ã‚’ç¢ºèªã—ã¦ä¸‹ã•ã„"
-       Write-Output  "[$($LogPath)]ã¯æœ‰åŠ¹ãªãƒ‘ã‚¹è¡¨è¨˜ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚NTFSã«ä½¿ç”¨ã§ããªã„æ–‡å­—åˆ—ãŒå«ã¾ã‚Œã¦ãªã„ã‹ç­‰ã‚’ç¢ºèªã—ã¦ä¸‹ã•ã„"
+       Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($LogPath)]‚Í—LŒø‚ÈƒpƒX•\‹L‚Å‚Í‚ ‚è‚Ü‚¹‚ñBNTFS‚Ég—p‚Å‚«‚È‚¢•¶š—ñ‚ªŠÜ‚Ü‚ê‚Ä‚È‚¢‚©“™‚ğŠm”F‚µ‚Ä‰º‚³‚¢"
+       Write-Output  "[$($LogPath)]‚Í—LŒø‚ÈƒpƒX•\‹L‚Å‚Í‚ ‚è‚Ü‚¹‚ñBNTFS‚Ég—p‚Å‚«‚È‚¢•¶š—ñ‚ªŠÜ‚Ü‚ê‚Ä‚È‚¢‚©“™‚ğŠm”F‚µ‚Ä‰º‚³‚¢"
        Exit $ErrorReturnCode  
 
     }
@@ -128,9 +128,9 @@ function CheckLogFilePath{
 
         IF ([String]::IsNullOrEmpty($LogPath)){
            
-            Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($SHELLNAME)] -Log2File[$($Log2File)]ã‚’æŒ‡å®šã—ãŸæ™‚ã€ãƒ­ã‚°å‡ºåŠ›å…ˆ -LogPathã®æŒ‡å®šãŒå¿…è¦ã§ã™"
+            Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($SHELLNAME)] -Log2File[$($Log2File)]‚ğw’è‚µ‚½AƒƒOo—Íæ -LogPath‚Ìw’è‚ª•K—v‚Å‚·"
            
-            Write-Output "-Log2File[$($Log2File)]ã‚’æŒ‡å®šã—ãŸæ™‚ã€ãƒ­ã‚°å‡ºåŠ›å…ˆ -LogPathã®æŒ‡å®šãŒå¿…è¦ã§ã™"
+            Write-Output "-Log2File[$($Log2File)]‚ğw’è‚µ‚½AƒƒOo—Íæ -LogPath‚Ìw’è‚ª•K—v‚Å‚·"
            
             Exit $ErrorReturnCode
             }
@@ -138,7 +138,7 @@ function CheckLogFilePath{
 
 
 
-                #ãƒ­ã‚°å‡ºåŠ›å…ˆæŒ‡å®šãŒç›¸å¯¾ãƒ‘ã‚¹&ã‚«ãƒ¬ãƒ³ãƒˆãƒ‘ã‚¹ãŒã‚¹ã‚¯ãƒªãƒ—ãƒˆé…ç½®å…ˆã§ã¯ãªã„å¯èƒ½æ€§ã‚’è€ƒæ…®ã—ã¦ã€ç›¸å¯¾ãƒ‘ã‚¹æŒ‡å®šã¯ã‚¹ã‚¯ãƒªãƒ—ãƒˆé…ç½®å…ˆã‚’åŸºæº–ã«ã—ãŸãƒ‘ã‚¹ã«å¤‰æ›ã™ã‚‹
+                #ƒƒOo—Íæw’è‚ª‘Š‘ÎƒpƒX&ƒJƒŒƒ“ƒgƒpƒX‚ªƒXƒNƒŠƒvƒg”z’uæ‚Å‚Í‚È‚¢‰Â”\«‚ğl—¶‚µ‚ÄA‘Š‘ÎƒpƒXw’è‚ÍƒXƒNƒŠƒvƒg”z’uæ‚ğŠî€‚É‚µ‚½ƒpƒX‚É•ÏŠ·‚·‚é
 
     Switch -Regex ($LogPath){
 
@@ -154,32 +154,32 @@ function CheckLogFilePath{
       
         Default{
        
-            Write-Output "-LogPath [-LogPath $($LogPath)]ã¯ç›¸å¯¾ãƒ‘ã‚¹ã€çµ¶å¯¾ãƒ‘ã‚¹è¡¨è¨˜ã§ã¯ã‚ã‚Šã¾ã›ã‚“"
+            Write-Output "-LogPath [-LogPath $($LogPath)]‚Í‘Š‘ÎƒpƒXAâ‘ÎƒpƒX•\‹L‚Å‚Í‚ ‚è‚Ü‚¹‚ñ"
             Exit $ErrorReturnCode
             }
     }
 
 
         IF(Test-Path -Path $LogPath -PathType Container){
-                   Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($SHELLNAME)] ãƒ­ã‚°å‡ºåŠ›å…ˆãƒ•ã‚¡ã‚¤ãƒ«æŒ‡å®šå…ˆã«åŒä¸€åç§°ã®ãƒ•ã‚©ãƒ«ãƒ€ãŒå­˜åœ¨ã—ã¦ã„ã¾ã™ã€‚"      
-                   Write-Output "[$($SHELLNAME)] ãƒ­ã‚°å‡ºåŠ›å…ˆãƒ•ã‚¡ã‚¤ãƒ«æŒ‡å®šå…ˆã«åŒä¸€åç§°ã®ãƒ•ã‚©ãƒ«ãƒ€ãŒå­˜åœ¨ã—ã¦ã„ã¾ã™ã€‚"      
+                   Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($SHELLNAME)] ƒƒOo—Íæƒtƒ@ƒCƒ‹w’èæ‚É“¯ˆê–¼Ì‚ÌƒtƒHƒ‹ƒ_‚ª‘¶İ‚µ‚Ä‚¢‚Ü‚·B"      
+                   Write-Output "[$($SHELLNAME)] ƒƒOo—Íæƒtƒ@ƒCƒ‹w’èæ‚É“¯ˆê–¼Ì‚ÌƒtƒHƒ‹ƒ_‚ª‘¶İ‚µ‚Ä‚¢‚Ü‚·B"      
                   
                    Exit $ErrorReturnCode
 
-                    #ã“ã®æ™‚ç‚¹ã§$LogPathã«ã¯åŒåãƒ•ã‚©ãƒ«ãƒ€ã¯å­˜åœ¨ã—ãªã„ã®ã§ã€åŒåãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã™ã‚‹ã‹ã‚’ç¢ºèªã™ã‚‹
+                    #‚±‚Ì“_‚Å$LogPath‚É‚Í“¯–¼ƒtƒHƒ‹ƒ_‚Í‘¶İ‚µ‚È‚¢‚Ì‚ÅA“¯–¼ƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é‚©‚ğŠm”F‚·‚é
                     }elseif(-NOT(TEST-Path -Path $LogPath -PathType Leaf) ){
                    
                         Try{
                             New-Item $LogPath -ItemType File > $NULL  -ErrorAction Stop
 
-                            #æ–°è¦ä½œæˆã«æˆåŠŸã™ã‚Œã°ã€LoggingãŒä½¿ãˆã‚‹
-                            Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($SHELLNAME)] ãƒ­ã‚°å‡ºåŠ›å…ˆãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ã¾ã›ã‚“ã€‚$($LogPath)ã‚’æ–°è¦ä½œæˆã—ã¾ã™"
+                            #V‹Kì¬‚É¬Œ÷‚·‚ê‚ÎALogging‚ªg‚¦‚é
+                            Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($SHELLNAME)] ƒƒOo—Íæƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚Ü‚¹‚ñB$($LogPath)‚ğV‹Kì¬‚µ‚Ü‚·"
                         }
        
                         catch [Exception]{
-                        Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($SHELLNAME)] ãƒ­ã‚°å‡ºåŠ›å…ˆãƒ•ã‚¡ã‚¤ãƒ«$($LogPath)ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚ä½œæˆå…ˆãƒ•ã‚©ãƒ«ãƒ€ãŒå­˜åœ¨ã—ãªã„ã‹ã€æ¨©é™ãŒä¸è¶³ã—ã¦ã„ã¾ã™"
-                        Write-Output "ãƒ­ã‚°å‡ºåŠ›å…ˆãƒ•ã‚¡ã‚¤ãƒ«$($LogPath)ã®ä½œæˆã«å¤±æ•—ã—ã¾ã—ãŸã€‚ä½œæˆå…ˆãƒ•ã‚©ãƒ«ãƒ€ãŒå­˜åœ¨ã—ãªã„ã‹ã€æ¨©é™ãŒä¸è¶³ã—ã¦ã„ã¾ã™"
-                        Write-Output "èµ·å‹•æ™‚ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ : $Error[0]"
+                        Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($SHELLNAME)] ƒƒOo—Íæƒtƒ@ƒCƒ‹$($LogPath)‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½Bì¬æƒtƒHƒ‹ƒ_‚ª‘¶İ‚µ‚È‚¢‚©AŒ ŒÀ‚ª•s‘«‚µ‚Ä‚¢‚Ü‚·"
+                        Write-Output "ƒƒOo—Íæƒtƒ@ƒCƒ‹$($LogPath)‚Ìì¬‚É¸”s‚µ‚Ü‚µ‚½Bì¬æƒtƒHƒ‹ƒ_‚ª‘¶İ‚µ‚È‚¢‚©AŒ ŒÀ‚ª•s‘«‚µ‚Ä‚¢‚Ü‚·"
+                        Write-Output "‹N“®ƒGƒ‰[ƒƒbƒZ[ƒW : $Error[0]"
                         Exit $ErrorReturnCode
                         }
                     }
@@ -189,15 +189,15 @@ function CheckLogFilePath{
 
 
 
-#ReturnCodeå¤§å°é–¢ä¿‚ç¢ºèª
-#$ErrorReturnCode = 0è¨­å®šç­‰ã‚’è€ƒæ…®ã—ã¦ç•°å¸¸æ™‚ã¯Exit 1ã§æŠœã‘ã‚‹
+#ReturnCode‘å¬ŠÖŒWŠm”F
+#$ErrorReturnCode = 0İ’è“™‚ğl—¶‚µ‚ÄˆÙí‚ÍExit 1‚Å”²‚¯‚é
 
 function CheckReturnCode {
 
     IF(-NOT(($InternalErrorReturnCode -ge $WarningReturnCode) -AND ($ErrorReturnCode -ge $WarningReturnCode) -AND ($WarningReturnCode -ge $NormalReturnCode))){
 
-    Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID "ReturnCodeã®å¤§å°é–¢ä¿‚ãŒæ­£ã—ãè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚"
-    Write-Output "ReturnCodeã®å¤§å°é–¢ä¿‚ãŒæ­£ã—ãè¨­å®šã•ã‚Œã¦ã„ã¾ã›ã‚“ã€‚"
+    Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID "ReturnCode‚Ì‘å¬ŠÖŒW‚ª³‚µ‚­İ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB"
+    Write-Output "ReturnCode‚Ì‘å¬ŠÖŒW‚ª³‚µ‚­İ’è‚³‚ê‚Ä‚¢‚Ü‚¹‚ñB"
     Exit 1
     }
 }
@@ -220,7 +220,7 @@ function TryAction {
 
     IF (-NOT($ActionType -match "^(Delete|NullClear|MakeNewFolder)$" ) -and ($Null -eq $ActionTo)){
 
-    Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Function TryActionå†…éƒ¨ã‚¨ãƒ©ãƒ¼ã€‚${ActionType}ã§ã¯$'$ActionTo'ã®æŒ‡å®šãŒå¿…è¦ã§ã™"
+    Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Function TryAction“à•”ƒGƒ‰[B${ActionType}‚Å‚Í$'$ActionTo'‚Ìw’è‚ª•K—v‚Å‚·"
     Finalize $InternalErrorReturnCode
     }
 
@@ -269,7 +269,7 @@ function TryAction {
                                            
         Default                                 
             {
-            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Function TryActionå†…éƒ¨ã‚¨ãƒ©ãƒ¼ã€‚åˆ¤å®šå¼ã«bugãŒã‚ã‚Šã¾ã™"
+            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Function TryAction“à•”ƒGƒ‰[B”»’è®‚Ébug‚ª‚ ‚è‚Ü‚·"
             Finalize $InternalErrorReturnCode
             }
       }       
@@ -279,27 +279,27 @@ function TryAction {
     }   
     catch [Exception]{
        
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "${ActionError}ã®[${ActionType}]ã«å¤±æ•—ã—ã¾ã—ãŸ"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "${ActionError}‚Ì[${ActionType}]‚É¸”s‚µ‚Ü‚µ‚½"
         $ErrorDetail = $Error[0] | Out-String
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "èµ·å‹•æ™‚ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ : $ErrorDetail"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "‹N“®ƒGƒ‰[ƒƒbƒZ[ƒW : $ErrorDetail"
         $Script:ErrorFlag = $TRUE
 
         If(($Continue) -AND (-NOT($NoContinueOverRide))){
-            Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]ã®ãŸã‚å‡¦ç†ã‚’ç¶™ç¶šã—ã¾ã™ã€‚"
+            Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]‚Ì‚½‚ßˆ—‚ğŒp‘±‚µ‚Ü‚·B"
             $Script:WarningFlag = $TRUE
             $Script:ContinueFlag = $TRUE
 
-            #Continueã®å ´åˆã€å‡¦ç†ç¶™ç¶šã¯ã™ã‚‹ãŒã€å‡¦ç†ã¯å¤±æ•—ã—ã¦ã„ã‚‹ã®ã§FALSEã‚’è¿”ã™
+            #Continue‚Ìê‡Aˆ—Œp‘±‚Í‚·‚é‚ªAˆ—‚Í¸”s‚µ‚Ä‚¢‚é‚Ì‚ÅFALSE‚ğ•Ô‚·
             Return $Flase
             }
 
-        #Continueã—ãªã„å ´åˆã¯çµ‚äº†å‡¦ç†ã¸é€²ã‚€
+        #Continue‚µ‚È‚¢ê‡‚ÍI—¹ˆ—‚Öi‚Ş
         Finalize $ErrorReturnCode   
     }
 
 
    
-    Logging -EventID $SuccessEventID -EventType Success -EventMessage "${ActionError}ã®[${ActionType}]ã«æˆåŠŸã—ã¾ã—ãŸ"
+    Logging -EventID $SuccessEventID -EventType Success -EventMessage "${ActionError}‚Ì[${ActionType}]‚É¬Œ÷‚µ‚Ü‚µ‚½"
    
 
 }
@@ -307,7 +307,7 @@ function TryAction {
 
 
 
-#ç›¸å¯¾ãƒ‘ã‚¹ã‹ã‚‰çµ¶å¯¾ãƒ‘ã‚¹ã¸å¤‰æ›
+#‘Š‘ÎƒpƒX‚©‚çâ‘ÎƒpƒX‚Ö•ÏŠ·
 
 Function ConvertToAbsolutePath {
 
@@ -318,10 +318,10 @@ Param(
 )
 
     IF(Test-Path -Path $CheckPath -IsValid){
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]ã¯æœ‰åŠ¹ãªãƒ‘ã‚¹è¡¨è¨˜ã§ã™"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]‚Í—LŒø‚ÈƒpƒX•\‹L‚Å‚·"
    
     }else{
-       Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]ã¯æœ‰åŠ¹ãªãƒ‘ã‚¹è¡¨è¨˜ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚NTFSã«ä½¿ç”¨ã§ããªã„æ–‡å­—åˆ—ãŒå«ã¾ã‚Œã¦ãªã„ã‹ç­‰ã‚’ç¢ºèªã—ã¦ä¸‹ã•ã„"
+       Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]‚Í—LŒø‚ÈƒpƒX•\‹L‚Å‚Í‚ ‚è‚Ü‚¹‚ñBNTFS‚Ég—p‚Å‚«‚È‚¢•¶š—ñ‚ªŠÜ‚Ü‚ê‚Ä‚È‚¢‚©“™‚ğŠm”F‚µ‚Ä‰º‚³‚¢"
        Finalize $ErrorReturnCode  
 
     }
@@ -331,9 +331,9 @@ Param(
 
     "^\.+\\.*"{
        
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]ã¯ç›¸å¯¾ãƒ‘ã‚¹è¡¨è¨˜ã§ã™"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]‚Í‘Š‘ÎƒpƒX•\‹L‚Å‚·"
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "ã‚¹ã‚¯ãƒªãƒ—ãƒˆãŒé…ç½®ã•ã‚Œã¦ã„ã‚‹ãƒ•ã‚©ãƒ«ãƒ€[${THIS_PATH}]ã€[$($CheckPath)]ã¨çµåˆã—ãŸãƒ‘ã‚¹ã«å¤‰æ›ã—ã¾ã™"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒXƒNƒŠƒvƒg‚ª”z’u‚³‚ê‚Ä‚¢‚éƒtƒHƒ‹ƒ_[${THIS_PATH}]A[$($CheckPath)]‚ÆŒ‹‡‚µ‚½ƒpƒX‚É•ÏŠ·‚µ‚Ü‚·"
 
         Return Join-Path ${THIS_PATH} $CheckPath
 
@@ -341,14 +341,14 @@ Param(
 
         "^[c-zC-Z]:\\.*"{
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]ã¯çµ¶å¯¾ãƒ‘ã‚¹è¡¨è¨˜ã§ã™"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]‚Íâ‘ÎƒpƒX•\‹L‚Å‚·"
 
         Return $CheckPath
 
         }
        Default{
       
-       Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]ã¯ç›¸å¯¾ãƒ‘ã‚¹ã€çµ¶å¯¾ãƒ‘ã‚¹è¡¨è¨˜ã§ã¯ã‚ã‚Šã¾ã›ã‚“"
+       Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]‚Í‘Š‘ÎƒpƒXAâ‘ÎƒpƒX•\‹L‚Å‚Í‚ ‚è‚Ü‚¹‚ñ"
        Finalize $ErrorReturnCode
        }
     }
@@ -359,7 +359,7 @@ Param(
 
 
 
-#çµ‚äº†
+#I—¹
 
 function EndingProcess{
 
@@ -370,39 +370,39 @@ Param(
     IF(($ErrorCount -gt 0) -OR ($ReturnCode -ge $ErrorReturnCode)){
 
         IF($ErrorAsWarning){
-            Logging -EventID $WarningEventID -EventType Warning -EventMessage "ç•°å¸¸çµ‚äº†ãŒç™ºç”Ÿã—ã¾ã—ãŸãŒã€-ErrorAsWarning[$($ErrorAsWarning)]ãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹ãŸã‚çµ‚äº†ã‚³ãƒ¼ãƒ‰ã¯[$($WarningReturnCode)]ã§ã™"  
+            Logging -EventID $WarningEventID -EventType Warning -EventMessage "ˆÙíI—¹‚ª”­¶‚µ‚Ü‚µ‚½‚ªA-ErrorAsWarning[$($ErrorAsWarning)]‚ªw’è‚³‚ê‚Ä‚¢‚é‚½‚ßI—¹ƒR[ƒh‚Í[$($WarningReturnCode)]‚Å‚·"  
             $ReturnCode = $WarningReturnCode
            
             }else{
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "ç•°å¸¸çµ‚äº†ãŒç™ºç”Ÿã—ãŸãŸã‚çµ‚äº†ã‚³ãƒ¼ãƒ‰ã¯[$($ErrorReturnCode)]ã§ã™"
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "ˆÙíI—¹‚ª”­¶‚µ‚½‚½‚ßI—¹ƒR[ƒh‚Í[$($ErrorReturnCode)]‚Å‚·"
             $ReturnCode = $ErrorReturnCode
             }
 
         }elseIF(($WarningCount -gt 0) -OR ($ReturnCode -ge $WarningReturnCode)){
 
             IF($WarningAsNormal){
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "è­¦å‘Šçµ‚äº†ãŒç™ºç”Ÿã—ã¾ã—ãŸãŒã€-WarningAsNormal[$($WarningAsNormal)]ãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹ãŸã‚çµ‚äº†ã‚³ãƒ¼ãƒ‰ã¯[$($NormalReturnCode)]ã§ã™" 
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "ŒxI—¹‚ª”­¶‚µ‚Ü‚µ‚½‚ªA-WarningAsNormal[$($WarningAsNormal)]‚ªw’è‚³‚ê‚Ä‚¢‚é‚½‚ßI—¹ƒR[ƒh‚Í[$($NormalReturnCode)]‚Å‚·" 
                 $ReturnCode = $NormalReturnCode
            
                 }else{
-                Logging -EventID $WarningEventID -EventType Warning -EventMessage "è­¦å‘Šçµ‚äº†ãŒç™ºç”Ÿã—ãŸãŸã‚çµ‚äº†ã‚³ãƒ¼ãƒ‰ã¯[$($WarningReturnCode)]ã§ã™"
+                Logging -EventID $WarningEventID -EventType Warning -EventMessage "ŒxI—¹‚ª”­¶‚µ‚½‚½‚ßI—¹ƒR[ƒh‚Í[$($WarningReturnCode)]‚Å‚·"
                 $ReturnCode = $WarningReturnCode
                 }
         
         }else{
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "æ­£å¸¸çµ‚äº†ã—ã¾ã—ãŸã€‚çµ‚äº†ã‚³ãƒ¼ãƒ‰ã¯[$($NormalReturnCode)]ã§ã™"
+        Logging -EventID $SuccessEventID -EventType Success -EventMessage "³íI—¹‚µ‚Ü‚µ‚½BI—¹ƒR[ƒh‚Í[$($NormalReturnCode)]‚Å‚·"
         $ReturnCode = $NormalReturnCode
                
         }
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "${SHELLNAME} Version $($Version)ã‚’çµ‚äº†ã—ã¾ã™"
+    Logging -EventID $InfoEventID -EventType Information -EventMessage "${SHELLNAME} Version $($Version)‚ğI—¹‚µ‚Ü‚·"
 
 Exit $ReturnCode
 
 }
 
 
-#ã‚µãƒ¼ãƒ“ã‚¹å­˜åœ¨ç¢ºèª
+#ƒT[ƒrƒX‘¶İŠm”F
 
 
 function CheckServiceExist {
@@ -413,24 +413,24 @@ Param(
 )
 
 
-# ã‚µãƒ¼ãƒ“ã‚¹çŠ¶æ…‹å–å¾—
+# ƒT[ƒrƒXó‘Ôæ“¾
 
     $Service = Get-Service | Where-Object {$_.Name -eq $serviceName}
 
 
     IF($Service.Status -Match "^$"){
-        IF(-NOT($NoMessage)){Logging -EventID $InfoEventID -EventType Information -EventMessage "ã‚µãƒ¼ãƒ“ã‚¹[$($ServiceName)]ãŒå­˜åœ¨ã—ã¾ã›ã‚“"}
+        IF(-NOT($NoMessage)){Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒT[ƒrƒX[$($ServiceName)]‚ª‘¶İ‚µ‚Ü‚¹‚ñ"}
         Return $False
 
         }else{
 
-        IF(-NOT($NoMessage)){Logging -EventID $InfoEventID -EventType Information -EventMessage "ã‚µãƒ¼ãƒ“ã‚¹[$($ServiceName)]ã¯å­˜åœ¨ã—ã¾ã™"}
+        IF(-NOT($NoMessage)){Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒT[ƒrƒX[$($ServiceName)]‚Í‘¶İ‚µ‚Ü‚·"}
         Return $TRUE
         }
 }
 
 
-#ã‚µãƒ¼ãƒ“ã‚¹çŠ¶æ…‹ç¢ºèª
+#ƒT[ƒrƒXó‘ÔŠm”F
 
 
 function CheckServiceStatus {
@@ -443,47 +443,47 @@ Param(
 )
 
 
-# ã‚«ã‚¦ãƒ³ãƒˆç”¨å¤‰æ•°åˆæœŸåŒ–
+# ƒJƒEƒ“ƒg—p•Ï”‰Šú‰»
 $Counter = 0
 
 
-    # ç„¡é™ãƒ«ãƒ¼ãƒ—
+    # –³ŒÀƒ‹[ƒv
     While ($true) {
 
-      # ãƒã‚§ãƒƒã‚¯å›æ•°ã‚«ã‚¦ãƒ³ãƒˆã‚¢ãƒƒãƒ—
+      # ƒ`ƒFƒbƒN‰ñ”ƒJƒEƒ“ƒgƒAƒbƒv
       $Counter++
 
-      # ã‚µãƒ¼ãƒ“ã‚¹å­˜åœ¨ç¢ºèª
+      # ƒT[ƒrƒX‘¶İŠm”F
       IF(-NOT(CheckServiceExist $ServiceName -NoMessage)){
       Return $False
       }
 
       $Service = Get-Service | Where-Object {$_.Name -eq $ServiceName}
 
-      # ã‚µãƒ¼ãƒ“ã‚¹çŠ¶æ…‹åˆ¤å®š
+      # ƒT[ƒrƒXó‘Ô”»’è
       IF ($Service.Status -eq $Health) {
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "ã‚µãƒ¼ãƒ“ã‚¹[$($ServiceName)]ã¯å­˜åœ¨ã—ã¾ã™ã€‚Status[$($Service.Status)]"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒT[ƒrƒX[$($ServiceName)]‚Í‘¶İ‚µ‚Ü‚·BStatus[$($Service.Status)]"
         Return $true
        
         }elseif ($Counter -eq $Upto){
 
             IF(($SPAN -eq 0) -AND ($UpTo -eq 1)){
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "ã‚µãƒ¼ãƒ“ã‚¹[$($ServiceName)]ã¯å­˜åœ¨ã—ã¾ã™ã€‚Status[$($Service.Status)]"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒT[ƒrƒX[$($ServiceName)]‚Í‘¶İ‚µ‚Ü‚·BStatus[$($Service.Status)]"
                 Return $False
                 }else{
 
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "ã‚µãƒ¼ãƒ“ã‚¹[$($ServiceName)]ã¯å­˜åœ¨ã—ã¾ã™ã€‚æŒ‡å®šæœŸé–“ã€å›æ•°ãŒçµŒéã—ã¾ã—ãŸãŒStatus[$($Health)]ã«ã¯é·ç§»ã—ã¾ã›ã‚“ã§ã—ãŸã€‚"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒT[ƒrƒX[$($ServiceName)]‚Í‘¶İ‚µ‚Ü‚·Bw’èŠúŠÔA‰ñ”‚ªŒo‰ß‚µ‚Ü‚µ‚½‚ªStatus[$($Health)]‚É‚Í‘JˆÚ‚µ‚Ü‚¹‚ñ‚Å‚µ‚½B"
                 return $false
                 }
         }
      
 
-      # æœŸå¾…å€¤ã§ãªãã€ãƒã‚§ãƒƒã‚¯å›æ•°ã®ä¸Šé™ã«é”ã—ã¦ã„ãªã„å ´åˆã¯ã€æŒ‡å®šé–“éš”(ç§’)å¾…æ©Ÿ
+      # Šú‘Ò’l‚Å‚È‚­Aƒ`ƒFƒbƒN‰ñ”‚ÌãŒÀ‚É’B‚µ‚Ä‚¢‚È‚¢ê‡‚ÍAw’èŠÔŠu(•b)‘Ò‹@
 
-      Logging -EventID $InfoEventID -EventType Information -EventMessage "ã‚µãƒ¼ãƒ“ã‚¹[$($ServiceName)]ã¯å­˜åœ¨ã—ã¾ã™ã€‚Status[$($Health)]ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚$($SPAN)ç§’å¾…æ©Ÿã—ã¾ã™ã€‚"
+      Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒT[ƒrƒX[$($ServiceName)]‚Í‘¶İ‚µ‚Ü‚·BStatus[$($Health)]‚Å‚Í‚ ‚è‚Ü‚¹‚ñB$($SPAN)•b‘Ò‹@‚µ‚Ü‚·B"
       sleep $Span
 
-      # ç„¡é™ãƒ«ãƒ¼ãƒ—ã«æˆ»ã‚‹
+      # –³ŒÀƒ‹[ƒv‚É–ß‚é
 
     }
 
@@ -509,7 +509,7 @@ Param(
 
                     IF($IfNullOrEmptyFinalize){
            
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) ã®æŒ‡å®šã¯å¿…é ˆã§ã™"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) ‚Ìw’è‚Í•K{‚Å‚·"
                     Finalize $ErrorReturnCode
                     }
                
@@ -532,14 +532,14 @@ Param(
 
             If (Test-Path -Path $CheckPath -PathType Container){
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]ã¯å­˜åœ¨ã—ã¾ã™"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]‚Í‘¶İ‚µ‚Ü‚·"
             Return $true
 
             }else{
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]ã¯å­˜åœ¨ã—ã¾ã›ã‚“"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]‚Í‘¶İ‚µ‚Ü‚¹‚ñ"
                 IF($IfNoExistFinalize){
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) ã®æŒ‡å®šã¯å¿…é ˆã§ã™"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) ‚Ìw’è‚Í•K{‚Å‚·"
                     Finalize $ErrorReturnCode
                     }else{
                     Return $false
@@ -560,14 +560,14 @@ Param(
 
             If (Test-Path -Path $CheckPath -PathType Leaf){
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]ã¯å­˜åœ¨ã—ã¾ã™"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]‚Í‘¶İ‚µ‚Ü‚·"
             Return $true
 
             }else{
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]ã¯å­˜åœ¨ã—ã¾ã›ã‚“"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]‚Í‘¶İ‚µ‚Ü‚¹‚ñ"
                 IF($IfNoExistFinalize){
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) ã®æŒ‡å®šã¯å¿…é ˆã§ã™"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) ‚Ìw’è‚Í•K{‚Å‚·"
                     Finalize $ErrorReturnCode
                     }else{
                     Return $false
@@ -593,7 +593,7 @@ Param(
             }
 
         catch [Exception]{
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($CheckPath)ã«å¿…è¦ãªæ¨©é™ãŒä»˜ä¸ã•ã‚Œã¦ã„ã¾ã›ã‚“"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($CheckPath)‚É•K—v‚ÈŒ ŒÀ‚ª•t—^‚³‚ê‚Ä‚¢‚Ü‚¹‚ñ"
         Return $false
         }
 
@@ -606,10 +606,10 @@ function CheckExecUser {
 
     $Script:ScriptExecUser = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "å®Ÿè¡Œãƒ¦ãƒ¼ã‚¶ã¯$($ScriptExecUser.Name)ã§ã™"
+    Logging -EventID $InfoEventID -EventType Information -EventMessage "Àsƒ†[ƒU‚Í$($ScriptExecUser.Name)‚Å‚·"
 
     IF(-NOT($ScriptExecUser.Name -match $ExecutableUser)){
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "å®Ÿè¡Œè¨±å¯ã•ã‚Œã¦ã„ãªã„ãƒ¦ãƒ¼ã‚¶ã§èµ·å‹•ã—ã¦ã„ã¾ã™ã€‚"
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "Às‹–‰Â‚³‚ê‚Ä‚¢‚È‚¢ƒ†[ƒU‚Å‹N“®‚µ‚Ä‚¢‚Ü‚·B"
                 Finalize $ErrorReturnCode
                 }
 
@@ -622,32 +622,32 @@ function PreInitialize {
 $error.clear()
 
 
-#ã‚¤ãƒ™ãƒ³ãƒˆã‚½ãƒ¼ã‚¹æœªè¨­å®šæ™‚ã®å‡¦ç†
+#ƒCƒxƒ“ƒgƒ\[ƒX–¢İ’è‚Ìˆ—
 
 . CheckEventLogSource
 
 
-#ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›å…ˆç¢ºèª
+#ƒƒOƒtƒ@ƒCƒ‹o—ÍæŠm”F
 
 . CheckLogFilePath
 
 
-#ReturnCodeç¢ºèª
+#ReturnCodeŠm”F
 
 . CheckReturnCode
 
-#ã“ã“ã¯functionãªã®ã§å¤‰æ•°ã¯functionå†…ã§ã®ã‚‚ã®ã¨ãªã‚‹ã€‚ã‚¹ã‚¯ãƒªãƒ—ãƒˆå…¨ä½“ã«åæ˜ ã™ã‚‹ã«ã¯ã‚¹ã‚³ãƒ¼ãƒ—ã‚’æ˜ç¤ºçš„ã«$Script:å¤‰æ•°åã¨ã™ã‚‹
+#‚±‚±‚Ífunction‚È‚Ì‚Å•Ï”‚Ífunction“à‚Å‚Ì‚à‚Ì‚Æ‚È‚éBƒXƒNƒŠƒvƒg‘S‘Ì‚É”½‰f‚·‚é‚É‚ÍƒXƒR[ƒv‚ğ–¾¦“I‚É$Script:•Ï”–¼‚Æ‚·‚é
 
-#ãƒ­ã‚°æŠ‘æ­¢ãƒ•ãƒ©ã‚°å‡¦ç†
+#ƒƒO—}~ƒtƒ‰ƒOˆ—
 
 IF($NoLog2EventLog){[boolean]$Script:Log2EventLog = $False}
 IF($NoLog2Console){[boolean]$Script:Log2Console = $False}
 IF($NoLog2File){[boolean]$Script:Log2File = $False}
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "${SHELLNAME} Version $($Version)ã‚’èµ·å‹•ã—ã¾ã™"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "${SHELLNAME} Version $($Version)‚ğ‹N“®‚µ‚Ü‚·"
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®ç¢ºèªã‚’é–‹å§‹ã—ã¾ã™"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒpƒ‰ƒ[ƒ^‚ÌŠm”F‚ğŠJn‚µ‚Ü‚·"
 
 . CheckExecUser
 
@@ -708,11 +708,11 @@ Pop-Location
 
     IF ($LastExitCode -eq 0){
 
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "SQL Command[$($SQLName)]å®Ÿè¡Œã«æˆåŠŸã—ã¾ã—ãŸ"
+        Logging -EventID $SuccessEventID -EventType Success -EventMessage "SQL Command[$($SQLName)]Às‚É¬Œ÷‚µ‚Ü‚µ‚½"
         Return $True
 
         }else{
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "SQL Command[$($SQLName)]å®Ÿè¡Œã«å¤±æ•—ã—ã¾ã—ãŸ"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "SQL Command[$($SQLName)]Às‚É¸”s‚µ‚Ü‚µ‚½"
    
             IF($IfErrorFinalize){
             Finalize $ErrorReturnCode
@@ -731,11 +731,11 @@ Pop-Location
 function CheckOracleBackUpMode {
 
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "BackUpStatusã‚’å–å¾—ã—ã¦ã€BackUp/Normalã©ã¡ã‚‰ã®ãƒ¢ãƒ¼ãƒ‰ã‹åˆ¤å®šã—ã¾ã™ã€‚Activeã®è¡Œã¯BackUpãƒ¢ãƒ¼ãƒ‰ã§ã™"
+    Logging -EventID $InfoEventID -EventType Information -EventMessage "BackUpStatus‚ğæ“¾‚µ‚ÄABackUp/Normal‚Ç‚¿‚ç‚Ìƒ‚[ƒh‚©”»’è‚µ‚Ü‚·BActive‚Ìs‚ÍBackUpƒ‚[ƒh‚Å‚·"
   . ExecSQL -SQLCommand $DBCheckBackUpMode -SQLName "DBCheckBackUpMode" -SQLLogPath $SQLLogPath > $Null
 
    
-    #æ–‡å­—åˆ—é…åˆ—ã«å¤‰æ›ã™ã‚‹
+    #•¶š—ñ”z—ñ‚É•ÏŠ·‚·‚é
     $SQLLog = $SQLLog -replace "`r",""
     $SQLLog = $SQLLog -split "`n"
 
@@ -749,19 +749,19 @@ function CheckOracleBackUpMode {
 
             IF ($Line -match 'NOT ACTIVE'){
             $NormalModeCount ++
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "[$Line][$i]è¡Œç›® Normal Mode"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "[$Line][$i]s–Ú Normal Mode"
  
  
             }elseIF ($Line -match 'ACTIVE'){
             $BackUpModeCount ++
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "[$Line][$i]è¡Œç›® BackUp Mode"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "[$Line][$i]s–Ú BackUp Mode"
             }
  
     $i ++
     }
 
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "ç¾åœ¨ã®Oracle Databaseã®å‹•ä½œãƒ¢ãƒ¼ãƒ‰...."
+    Logging -EventID $InfoEventID -EventType Information -EventMessage "Œ»İ‚ÌOracle Database‚Ì“®ìƒ‚[ƒh...."
 
     IF (($BackUpModeCount -eq 0) -and ($NormalModeCount -gt 0)) {
  
@@ -789,6 +789,23 @@ function CheckOracleBackUpMode {
 
 }
 
+
+function AddTimeStampToFileName{
+
+    Param
+    (
+    [String]$TimeStampFormat,
+    [String]$TargetFileName
+    )
+
+
+    $FormattedDate = (Get-Date).ToString($TimeStampFormat)
+    $ExtensionString = [System.IO.Path]::GetExtension($TargetFileName)
+    $FileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension($TargetFileName)
+
+    Return $FileNameWithOutExtentionString+$FormattedDate+$ExtensionString
+
+}
 
 
 #https://github.com/mnaoumov/Invoke-NativeApplication

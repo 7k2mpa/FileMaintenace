@@ -2,26 +2,29 @@
 
 Param(
 
-[String]$ExecUser = 'arcserve',
-[String]$ExecUserPassword = 'ArcServe0p',
-#[parameter(mandatory=$true , HelpMessage = 'Oracle(ex. MCDB) å…¨ã¦ã®Helpã¯Get-Help FileMaintenance.ps1')][String]$OracleService ,
-[String]$OracleService = 'MCDB',
+[String]$ExecUser = 'foo',
+[String]$ExecUserPassword = 'hogehoge',
+[parameter(mandatory=$true , HelpMessage = 'Oracle Service(ex. MCDB) ‘S‚Ä‚ÌHelp‚ÍGet-Help FileMaintenance.ps1')][String]$OracleService ,
+#[String]$OracleService = 'MCDB',
 
 #[parameter(mandatory=$true)][String]$Schema  ,
-[String]$Schema = 'SECMCF' ,
+[String]$Schema = 'MCFRAME' ,
 
 [String]$HostName = $Env:COMPUTERNAME,
 
 [String]$DumpDirectoryObject='MCFDATA_PUMP_DIR' ,
 
-
+#[String]$OracleHomeBinPath = 'D:\TEST' ,
 [String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
 
 [Switch]$PasswordAuthorization ,
 
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss',
 
+[String]$DumpFile = $HostName+"_"+$Schema+"_PUMP.dmp",
+[String]$LogFile  = $HostName+"_"+$Schema+"_PUMP.log",
 
+[Switch]$AddtimeStamp,
 
 
 [boolean]$Log2EventLog = $TRUE,
@@ -58,37 +61,37 @@ Param(
 
 Try{
 
-    #CommonFunctions.ps1ã®é…ç½®å…ˆã‚’å¤‰æ›´ã—ãŸå ´åˆã¯ã€ã“ã“ã‚’å¤‰æ›´ã€‚åŒä¸€ãƒ•ã‚©ãƒ«ãƒ€ã«é…ç½®å‰æ
+    #CommonFunctions.ps1‚Ì”z’uæ‚ğ•ÏX‚µ‚½ê‡‚ÍA‚±‚±‚ğ•ÏXB“¯ˆêƒtƒHƒ‹ƒ_‚É”z’u‘O’ñ
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
-    Write-Output "CommonFunctions.ps1 ã®Loadã«å¤±æ•—ã—ã¾ã—ãŸã€‚CommonFunctions.ps1ãŒã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¨åŒä¸€ãƒ•ã‚©ãƒ«ãƒ€ã«å­˜åœ¨ã™ã‚‹ã‹ç¢ºèªã—ã¦ãã ã•ã„"
+    Write-Output "CommonFunctions.ps1 ‚ÌLoad‚É¸”s‚µ‚Ü‚µ‚½BCommonFunctions.ps1‚ª‚±‚Ìƒtƒ@ƒCƒ‹‚Æ“¯ˆêƒtƒHƒ‹ƒ_‚É‘¶İ‚·‚é‚©Šm”F‚µ‚Ä‚­‚¾‚³‚¢"
     Exit 1
     }
 
 
-################ è¨­å®šãŒå¿…è¦ãªã®ã¯ã“ã“ã¾ã§ ##################
+################ İ’è‚ª•K—v‚È‚Ì‚Í‚±‚±‚Ü‚Å ##################
 
-################# å…±é€šéƒ¨å“ã€é–¢æ•°  #######################
+################# ‹¤’Ê•”•iAŠÖ”  #######################
 
 
 function Initialize {
 
 
-#ã‚¤ãƒ™ãƒ³ãƒˆã‚½ãƒ¼ã‚¹æœªè¨­å®šæ™‚ã®å‡¦ç†
-#ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›å…ˆç¢ºèª
-#ReturnCodeç¢ºèª
-#å®Ÿè¡Œãƒ¦ãƒ¼ã‚¶ç¢ºèª
-#ãƒ—ãƒ­ã‚°ãƒ©ãƒ èµ·å‹•ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+#ƒCƒxƒ“ƒgƒ\[ƒX–¢İ’è‚Ìˆ—
+#ƒƒOƒtƒ@ƒCƒ‹o—ÍæŠm”F
+#ReturnCodeŠm”F
+#Àsƒ†[ƒUŠm”F
+#ƒvƒƒOƒ‰ƒ€‹N“®ƒƒbƒZ[ƒW
 
 . PreInitialize
 
-#ã“ã“ã¾ã§å®Œäº†ã™ã‚Œã°æ¥­å‹™çš„ãªãƒ­ã‚¸ãƒƒã‚¯ã®ã¿ã‚’ç¢ºèªã™ã‚Œã°è‰¯ã„
+#‚±‚±‚Ü‚ÅŠ®—¹‚·‚ê‚Î‹Æ–±“I‚ÈƒƒWƒbƒN‚Ì‚İ‚ğŠm”F‚·‚ê‚Î—Ç‚¢
 
 
-#ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®ç¢ºèª
+#ƒpƒ‰ƒ[ƒ^‚ÌŠm”F
 
-#æŒ‡å®šãƒ•ã‚©ãƒ«ãƒ€ã®æœ‰ç„¡ã‚’ç¢ºèª
+#w’èƒtƒHƒ‹ƒ_‚Ì—L–³‚ğŠm”F
 
    $OracleHomeBinPath = ConvertToAbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
 
@@ -99,7 +102,7 @@ function Initialize {
 
         
 
-#å¯¾è±¡ã®OracleãŒã‚µãƒ¼ãƒ“ã‚¹èµ·å‹•ã—ã¦ã„ã‚‹ã‹ç¢ºèª
+#‘ÎÛ‚ÌOracle‚ªƒT[ƒrƒX‹N“®‚µ‚Ä‚¢‚é‚©Šm”F
 
     $TargetOracleService = "OracleService"+$OracleService
 
@@ -108,19 +111,19 @@ function Initialize {
     IF (-NOT($ServiceStatus)){
 
 
-        Logging -EventType Error -EventID $ErrorEventID -EventMessage "å¯¾è±¡ã®OracleServiceãŒèµ·å‹•ã—ã¦ã„ã¾ã›ã‚“ã€‚"
+        Logging -EventType Error -EventID $ErrorEventID -EventMessage "‘ÎÛ‚ÌOracleService‚ª‹N“®‚µ‚Ä‚¢‚Ü‚¹‚ñB"
         Finalize $ErrorReturnCode
         }else{
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "å¯¾è±¡ã®Oracle Serviceã¯æ­£å¸¸ã«èµ·å‹•ã—ã¦ã„ã¾ã™"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "‘ÎÛ‚ÌOracle Service‚Í³í‚É‹N“®‚µ‚Ä‚¢‚Ü‚·"
         }
      
 
-#å‡¦ç†é–‹å§‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡ºåŠ›
+#ˆ—ŠJnƒƒbƒZ[ƒWo—Í
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¯æ­£å¸¸ã§ã™"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒpƒ‰ƒ[ƒ^‚Í³í‚Å‚·"
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "DB Dumpã‚’å‡ºåŠ›ã—ã¾ã™"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle Data Pump‚ğŠJn‚µ‚Ü‚·"
 
 }
 
@@ -137,28 +140,30 @@ EndingProcess $ReturnCode
 
 }
 
-#####################   ã“ã“ã‹ã‚‰æœ¬ä½“  ######################
+#####################   ‚±‚±‚©‚ç–{‘Ì  ######################
 
 
-${THIS_FILE}=$MyInvocation.MyCommand.Path       ã€€ã€€                    #ãƒ•ãƒ«ãƒ‘ã‚¹
-${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹
-${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ã‚·ã‚§ãƒ«å
-
+${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒX
+${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
+${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
 $FormattedDate = (Get-Date).ToString($TimeStampFormat)
 
-${Version} = '0.9.13'
+${Version} = '0.9.15'
 
 
-#åˆæœŸè¨­å®šã€ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç¢ºèªã€èµ·å‹•ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡ºåŠ›
+#‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
 
 . Initialize
 
-#$DumpFile = $HostName+"_"+$Schema+"_PUMP"+$FormattedDate+".dmp"
-#$LogFile = $HostName+"_"+$Schema+"_PUMP"+$FormattedDate+".log"
 
-$DumpFile = $HostName+"_"+$Schema+"_PUMP.dmp"
-$LogFile  = $HostName+"_"+$Schema+"_PUMP.log"
+
+    IF($AddTimeStamp){
+
+        $DumpFile = AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $DumpFile
+        $LogFile = AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $LogFile
+
+    }
 
 
 
@@ -166,16 +171,7 @@ $LogFile  = $HostName+"_"+$Schema+"_PUMP.log"
 
         $ExecCommand = $ExecUser+"/"+$ExecUserPassword+"@"+$OracleService+" Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y"
     
-
-
-# $ExecCommand = ".\expdp "+$ExecUser+"/"+$ExecUserPassword+"@"+$OracleService+" Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y"
-    
-
     }else{
-
-#   expdp directory=$DumpDirectoryObject schemas=$Schema dumpfile=$DumpFile logfile=$LogFile reuse_dumpfiles=y
- 
-#$ExecCommand = "`' / as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
 
         $ExecCommand = "`' /@"+$OracleService+" as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
 
@@ -202,13 +198,13 @@ IF ($Process.ExitCode -ne 0){
 
 #IF ($LastExitCode -ne 0){
 
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Oracle Data Pumpã«å¤±æ•—ã—ã¾ã—ãŸ"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Oracle Data Pump‚É¸”s‚µ‚Ü‚µ‚½"
 	    Finalize $ErrorReturnCode
 
 
 
         }else{
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Oracle Data Pumpã«æˆåŠŸã—ã¾ã—ãŸ"
+        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Oracle Data Pump‚É¬Œ÷‚µ‚Ü‚µ‚½"
         Finalize $NormalReturnCode
         }
                    
