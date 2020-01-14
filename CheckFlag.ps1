@@ -1,25 +1,24 @@
-
 #Requires -Version 3.0
 
 <#
 .SYNOPSIS
-バックアップ中等のフラグファイルを確認、作成するスクリプトです。
-フラグファイルが存在すると警告終了Falseを、存在しないと正常終了Trueを返します。
--CreateFlagを指定するとフラグファイルを生成します。
+�o�b�N�A�b�v�����̃t���O�t�@�C�����m�F�A�쐬����X�N���v�g�ł��B
+�t���O�t�@�C�������݂���ƌx���I��False���A���݂��Ȃ��Ɛ���I��True��Ԃ��܂��B
+-CreateFlag���w�肷��ƃt���O�t�@�C���𐶐����܂��B
 
-はサポートしていません
+<Common Parameters>�̓T�|�[�g���Ă��܂���
 
 .DESCRIPTION
-バックアップ中等のフラグファイルを確認、作成するスクリプトです。
-フラグファイルが存在すると警告終了Falseを、存在しないと正常終了Trueを返します。
--CreateFlagを指定するとフラグファイルを生成します。
+�o�b�N�A�b�v�����̃t���O�t�@�C�����m�F�A�쐬����X�N���v�g�ł��B
+�t���O�t�@�C�������݂���ƌx���I��False���A���݂��Ȃ��Ɛ���I��True��Ԃ��܂��B
+-CreateFlag���w�肷��ƃt���O�t�@�C���𐶐����܂��B
 
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
+���O�o�͐��[Windows EventLog][�R���\�[��][���O�t�@�C��]���I���\�ł��B���ꂼ��o�́A�}�~���w��ł��܂��B
 
-フラグファイルの削除は同時に開発しているFileMaintenance.ps1をご利用ください。
+�t���O�t�@�C���̍폜�͓����ɊJ�����Ă���FileMaintenance.ps1�������p���������B
 
 
-配置例
+�z�u��
 
 
 .\CheckFlag.ps1
@@ -31,111 +30,111 @@
 .EXAMPLE
 .\CheckFlag -FlagFolder ..\Lock -FlagFile BackUp.Flg
 
-..\LockフォルダにBackUp.Flgファイルの有無を確認します。
-フラグファイルが存在すると警告終了Falseを、存在しないと正常終了Trueを返します。
+..\Lock�t�H���_��BackUp.Flg�t�@�C���̗L�����m�F���܂��B
+�t���O�t�@�C�������݂���ƌx���I��False���A���݂��Ȃ��Ɛ���I��True��Ԃ��܂��B
 
 
 .EXAMPLE
 .\CheckFlag -FlagFolder ..\Lock -FlagFile BackUp.Flg -CreateFlag
 
-..\LockフォルダにBackUp.Flgファイルの有無を確認します。
-ファイルが存在すると警告終了Falseを返します。
-ファイルが存在しないとBackUp.Flgファイルの生成を試みます。ファイル生成に成功すると正常終了Trueを返します。生成に失敗すると異常終了Flaseを返します。
+..\Lock�t�H���_��BackUp.Flg�t�@�C���̗L�����m�F���܂��B
+�t�@�C�������݂���ƌx���I��False��Ԃ��܂��B
+�t�@�C�������݂��Ȃ���BackUp.Flg�t�@�C���̐��������݂܂��B�t�@�C�������ɐ�������Ɛ���I��True��Ԃ��܂��B�����Ɏ��s����ƈُ�I��Flase��Ԃ��܂��B
 
 
 
 .PARAMETER FlagFolder
 
-フラグファイルを確認、配置するフォルダを指定します。
-相対パス、絶対パスでの指定が可能です。
+�t���O�t�@�C�����m�F�A�z�u����t�H���_���w�肵�܂��B
+���΃p�X�A��΃p�X�ł̎w�肪�\�ł��B
 
 .PARAMETER FlagFile
 
-フラグファイル名を指定します。
+�t���O�t�@�C�������w�肵�܂��B
 
 .PARAMETER CreateFlag
 
-フラグファイルが存在しない場合、フラグファイルを生成します。
-フラグファイルの中身はシェル名+時刻となります。
+�t���O�t�@�C�������݂��Ȃ��ꍇ�A�t���O�t�@�C���𐶐����܂��B
+�t���O�t�@�C���̒��g�̓V�F����+�����ƂȂ�܂��B
 
 
 
 .PARAMETER Log2EventLog
-　Windows Event Logへの出力を制御します。
-デフォルトは$TRUEでEvent Log出力します。
+�@Windows Event Log�ւ̏o�͂𐧌䂵�܂��B
+�f�t�H���g��$TRUE��Event Log�o�͂��܂��B
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $Falseと等価です。
-Log2EventLogより優先します。
+�@Event Log�o�͂�}�~���܂��B-Log2EventLog $False�Ɠ����ł��B
+Log2EventLog���D�悵�܂��B
 
 .PARAMETER ProviderName
-　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
+�@Windows Event Log�o�͂̃v���o�C�_�����w�肵�܂��B�f�t�H���g��[Infra]�ł��B
 
 .PARAMETER EventLogLogName
-　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
+�@Windows Event Log�o�͂̃��O�������Ă��܂��B�f�t�H���g��[Application]�ł��B
 
-.PARAMETER Log2Console
-　コンソールへのログ出力を制御します。
-デフォルトは$TRUEでコンソール出力します。
+.PARAMETER Log2Console 
+�@�R���\�[���ւ̃��O�o�͂𐧌䂵�܂��B
+�f�t�H���g��$TRUE�ŃR���\�[���o�͂��܂��B
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $Falseと等価です。
-Log2Consoleより優先します。
+�@�R���\�[�����O�o�͂�}�~���܂��B-Log2Console $False�Ɠ����ł��B
+Log2Console���D�悵�܂��B
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$Falseでログファイル出力しません。
+�@���O�t�B���ւ̏o�͂𐧌䂵�܂��B�f�t�H���g��$False�Ń��O�t�@�C���o�͂��܂���B
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $Falseと等価です。
-Log2Fileより優先します。
+�@���O�t�@�C���o�͂�}�~���܂��B-Log2File $False�Ɠ����ł��B
+Log2File���D�悵�܂��B
 
 .PARAMETER LogPath
-　ログファイル出力パスを指定します。デフォルトは$NULLです。
-相対、絶対パスで指定可能です。
-ファイルが存在しない場合は新規作成します。
-ファイルが既存の場合は追記します。
+�@���O�t�@�C���o�̓p�X���w�肵�܂��B�f�t�H���g��$NULL�ł��B
+���΁A��΃p�X�Ŏw��\�ł��B
+�t�@�C�������݂��Ȃ��ꍇ�͐V�K�쐬���܂��B
+�t�@�C���������̏ꍇ�͒ǋL���܂��B
 
 .PARAMETER LogDateFormat
-　ログファイル出力に含まれる日時表示フォーマットを指定します。デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
+�@���O�t�@�C���o�͂Ɋ܂܂������\���t�H�[�}�b�g���w�肵�܂��B�f�t�H���g��[yyyy-MM-dd-HH:mm:ss]�`���ł��B
 
 .PARAMETER NormalReturnCode
-　正常終了時のリターンコードを指定します。デフォルトは0です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@����I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��0�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER WarningReturnCode
-　警告終了時のリターンコードを指定します。デフォルトは1です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�x���I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��1�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER ErrorReturnCode
-　異常終了時のリターンコードを指定します。デフォルトは8です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�ُ�I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��8�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER InternalErrorReturnCode
-　プログラム内部異常終了時のリターンコードを指定します。デフォルトは16です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�v���O���������ُ�I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��16�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER InfoEventID
-　Event Log出力でInformationに対するEvent IDを指定します。デフォルトは1です。
+�@Event Log�o�͂�Information�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��1�ł��B
 
 .PARAMETER WarningEventID
-　Event Log出力でWarningに対するEvent IDを指定します。デフォルトは10です。
+�@Event Log�o�͂�Warning�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��10�ł��B
 
 .PARAMETER SuccessErrorEventID
-　Event Log出力でSuccessに対するEvent IDを指定します。デフォルトは73です。
+�@Event Log�o�͂�Success�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��73�ł��B
 
 .PARAMETER InternalErrorEventID
-　Event Log出力でInternal Errorに対するEvent IDを指定します。デフォルトは99です。
+�@Event Log�o�͂�Internal Error�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��99�ł��B
 
 .PARAMETER ErrorEventID
-　Event Log出力でErrorに対するEvent IDを指定します。デフォルトは100です。
+�@Event Log�o�͂�Error�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��100�ł��B
 
 .PARAMETER ErrorAsWarning
-　異常終了しても警告終了のReturnCodeを返します。
+�@�ُ�I�����Ă��x���I����ReturnCode��Ԃ��܂��B
 
 .PARAMETER WarningAsNormal
-　警告終了しても正常終了のReturnCodeを返します。
+�@�x���I�����Ă�����I����ReturnCode��Ԃ��܂��B
 
 .PARAMETER ExecutableUser
-　このプログラムを実行可能なユーザを正規表現で指定します。
-デフォルトは[.*]で全てのユーザが実行可能です。　
-記述はシングルクオーテーションで括って下さい。
-正規表現のため、ドメインのバックスラッシュは[domain\\.*]の様にバックスラッシュでエスケープして下さい。　
+�@���̃v���O���������s�\�ȃ��[�U�𐳋K�\���Ŏw�肵�܂��B
+�f�t�H���g��[.*]�őS�Ẵ��[�U�����s�\�ł��B�@
+�L�q�̓V���O���N�I�[�e�[�V�����Ŋ����ĉ������B
+���K�\���̂��߁A�h���C���̃o�b�N�X���b�V����[domain\\.*]�̗l�Ƀo�b�N�X���b�V���ŃG�X�P�[�v���ĉ������B�@
 
 
 
@@ -145,7 +144,7 @@ Log2Fileより優先します。
 Param(
 
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$FlagFolder = '.\',
-#[parameter(mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder,
+#[parameter(mandatory=$true , HelpMessage = '�����Ώۂ̃t�H���_���w��(ex. D:\Logs) �S�Ă�Help��Get-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder,
 
 
 [String][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
@@ -189,19 +188,19 @@ Param(
 
 Try{
 
-    #CommonFunctions.ps1の配置先を変更した場合は、ここを変更。同一フォルダに配置前提
+    #CommonFunctions.ps1�̔z�u���ύX�����ꍇ�́A������ύX�B����t�H���_�ɔz�u�O��
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
-    Write-Output "CommonFunctions.ps1 のLoadに失敗しました。CommonFunctions.ps1がこのファイルと同一フォルダに存在するか確認してください"
+    Write-Output "CommonFunctions.ps1 ��Load�Ɏ��s���܂����BCommonFunctions.ps1�����̃t�@�C���Ɠ���t�H���_�ɑ��݂��邩�m�F���Ă�������"
     Exit 1
     }
 
 
-################ 設定が必要なのはここまで ##################
+################ �ݒ肪�K�v�Ȃ̂͂����܂� ##################
 
 
-################# 共通部品、関数  #######################
+################# ���ʕ��i�A�֐�  #######################
 
 
 
@@ -209,48 +208,46 @@ function Initialize {
 
 
 
-#イベントソース未設定時の処理
-#ログファイル出力先確認
-#ReturnCode確認
-#実行ユーザ確認
-#プログラム起動メッセージ
+#�C�x���g�\�[�X���ݒ莞�̏���
+#���O�t�@�C���o�͐�m�F
+#ReturnCode�m�F
+#���s���[�U�m�F
+#�v���O�����N�����b�Z�[�W
 
 . PreInitialize
 
-#ここまで完了すれば業務的なロジックのみを確認すれば良い
+#�����܂Ŋ�������΋Ɩ��I�ȃ��W�b�N�݂̂��m�F����Ηǂ�
 
 
 
-#パラメータの確認
+#�p�����[�^�̊m�F
 
 
-#フラグフォルダの有無を確認
-#このfunctionは$True,$Falseが戻値なので$Nullへ捨てる。捨てないとコンソール出力される
-
-#   CheckNullOrEmpty -CheckPath $TargetFolder -ObjectName '指定フォルダ-TargetFolder' -IfNullOrEmptyFinalize > $NULL
-
-    $FlagFolder = ConvertToAbsolutePath -CheckPath $FlagFolder -ObjectName  'Flagフォルダ-FlagFolder'
-
-   CheckContainer -CheckPath $FlagFolder -ObjectName 'FLagフォルダ-FlagFolder' -IfNoExistFinalize > $NULL
+#�t���O�t�H���_�̗L�����m�F
 
 
+    $FlagFolder = ConvertToAbsolutePath -CheckPath $FlagFolder -ObjectName  'Flag�t�H���_-FlagFolder'
 
+   CheckContainer -CheckPath $FlagFolder -ObjectName 'FLag�t�H���_-FlagFolder' -IfNoExistFinalize > $NULL
+
+
+#�t���O�t�@�C������Validation
 
 
     IF ($FlagFile -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
-   
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "-FlagFileにNTFSで使用できない文字を指定しています"
-                Finalize $ErrorReturnCode
+    
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "-FlagFile��NTFS�Ŏg�p�ł��Ȃ��������w�肵�Ă��܂�"
+				Finalize $ErrorReturnCode
                 }
 
 
 
-#処理開始メッセージ出力
+#�����J�n���b�Z�[�W�o��
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは正常です"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "�p�����[�^�͐���ł�"
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "フラグファイル[$($FlagFile)]の有無確認を開始します"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "�t���O�t�@�C��[$($FlagFile)]�̗L���m�F���J�n���܂�"
 
 }
 
@@ -272,43 +269,44 @@ EndingProcess $ReturnCode
 
 
 
-#####################   ここから本体  ######################
+#####################   ��������{��  ######################
 
 
-${THIS_FILE}=$MyInvocation.MyCommand.Path       　　                    #フルパス
-${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
-${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
+${THIS_FILE}=$MyInvocation.MyCommand.Path       �@�@                    #�t���p�X
+${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #���̃t�@�C���̃p�X
+${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # �V�F����
 
 ${Version} = '0.9.0'
 
 
-#初期設定、パラメータ確認、起動メッセージ出力
+#�����ݒ�A�p�����[�^�m�F�A�N�����b�Z�[�W�o��
 
 . Initialize
 
 [String]$FlagValue = ${SHELLNAME} + (Get-Date).ToString($LogDateFormat)
 [String]$FlagPath = Join-Path -Path $FlagFolder -ChildPath $FlagFile
 
-    IF(CheckLeaf -CheckPath $FlagPath -ObjectName 'フラグファイル'){
+    IF(CheckLeaf -CheckPath $FlagPath -ObjectName '�t���O�t�@�C��'){
 
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "フラグファイル[$($FlagPath)]が存在するため警告終了扱いにします"
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "�t���O�t�@�C��[$($FlagPath)]�����݂��邽�ߌx���I�������ɂ��܂�"
         Finalize $WarningReturnCode
-   
+    
         }else{
-      
+       
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "フラグファイル[$($FlagPath)]が存在しないため正常終了扱いにします"
-               
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "�t���O�t�@�C��[$($FlagPath)]�����݂��Ȃ����ߐ���I�������ɂ��܂�"
+                
             IF($CreateFlag){
-   
+    
                 TryAction -ActionType MakeNewFileWithValue -ActionFrom $FlagPath -ActionError $FlagPath -FileValue $FlagValue
-                Logging -EventID $SuccessEventID -EventType Success -EventMessage "フラグファイル[$($FlagPath)]の生成に成功しました"
-   
+                Logging -EventID $SuccessEventID -EventType Success -EventMessage "�t���O�t�@�C��[$($FlagPath)]�̐����ɐ������܂���"
+    
                 }
         }
 
 
 
-#終了メッセージ出力
+#�I�����b�Z�[�W�o��
 
 Finalize $NormalReturnCode
+

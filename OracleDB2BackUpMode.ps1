@@ -1,10 +1,10 @@
-#Requires -Version 3.0
+﻿#Requires -Version 3.0
 
 <#
 .SYNOPSIS
 Oracle Databaseをバックアップ前にバックアップモードへ切替するスクリプトです。
 
-はサポートしていません
+<Common Parameters>はサポートしていません
 
 .DESCRIPTION
 Oracle Databaseをバックアップするには、予めデータベースの停止、またはバックアップモードへ切替が必要です。
@@ -107,7 +107,7 @@ Log2EventLogより優先します。
 .PARAMETER EventLogLogName
 　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
 
-.PARAMETER Log2Console
+.PARAMETER Log2Console 
 　コンソールへのログ出力を制御します。
 デフォルトは$TRUEでコンソール出力します。
 
@@ -182,10 +182,12 @@ Param(
 
 [String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
 
-[String]$SQLLogPath = '..\Log\SQL.log',
-[String]$BackUpFlagPath = '..\Lock\BkUpDB.flg',
+[String]$SQLLogPath = '.\SC_Logs\SQL.log',
+[String]$BackUpFlagPath = '.\Lock\BkUpDB.flg',
 
-[String]$SQLCommandsPath = '..\SQL\SQLs.ps1',
+[Switch]$NoCheckBackUpFlag ,
+
+[String]$SQLCommandsPath = '.\SQL\SQLs.ps1',
 
 [String]$ExecUser = 'hogehoge',
 [String]$ExecUserPassword = 'hogehoge',
@@ -197,7 +199,7 @@ Param(
 [Switch]$NoChangeToBackUpMode,
 [Switch]$NoStopListener,
 
-
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
 
 
 
@@ -264,33 +266,44 @@ function Initialize {
 
 #OracleBINフォルダの指定、存在確認
 
-    CheckNullOrEmpty -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNullOrEmptyFinalize > $NULL
+    $OracleHomeBinPath = ConvertToAbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
 
     CheckContainer -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
 
 
+#BackUpFlagフォルダの指定、存在確認
+
+
+    IF(-NOT($NoCheckBackUpFlag)){
+
+        $BackUpFlagPath = ConvertToAbsolutePath -CheckPath $BackUpFlagPath -ObjectName  '-BackUpFlagPath'
+
+        Split-Path $BackUpFlagPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName '-BackUpFlagPathのParentフォルダ' -IfNoExistFinalize > $NULL}
+
+        }
+
+
 #SQLLogファイルの指定、存在、書き込み権限確認
 
+    $SQLLogPath = ConvertToAbsolutePath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath'
 
-#    CheckNullOrEmpty -CheckPath $SQLLogPath -ObjectName '-SQLLogPath' -IfNullOrEmptyFinalize > $NULL
+    Split-Path $SQLLogPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName '-SQLLogPathのParentフォルダ' -IfNoExistFinalize > $NULL}
 
-        $SQLLogPath = ConvertToAbsolutePath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath'
-
-    If(Test-Path -Path $SQLLogPath -PathType Leaf){
+    If(Test-Path -Literalath $SQLLogPath -PathType Leaf){
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLLogPathの書込権限を確認します"
         $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" Write Permission Check"
-       
+        
 
         Try{
-            Write-Output $LogWrite | Out-File -FilePath $SQLLogPath -Append
+            Write-Output $LogWrite | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
             Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLLogPathの書込に成功しました"
             }
         Catch [Exception]{
             Logging -EventType Error -EventID $ErrorEventID -EventMessage  "-SQLLogPathへの書込に失敗しました"
             Finalize $ErrorReturnCode
             }
-    
+     
      }else{
             TryAction -ActionType MakeNewFileWithValue -ActionFrom $SQLLogPath -ActionError $SQLLogPath -FileValue $Null
             }
@@ -305,6 +318,7 @@ function Initialize {
     Try{
 
         . $SQLCommandsPath
+        Logging -EventID $SuccessEventID -EventType Success -EventMessage "-SQLCommandsPathに指定されたSQL群のLoadに成功しました"
         }
         Catch [Exception]{
         Logging -EventType Error -EventID $ErrorEventID -EventMessage  "-SQLCommandsPathに指定されたSQL群のLoadに失敗しました"
@@ -355,12 +369,20 @@ EndingProcess $ReturnCode
 #####################   ここから本体  ######################
 
 
+[boolean]$ErrorFlag = $False
+[boolean]$WarningFlag = $False
+[boolean]$ContinueFlag = $False
+[int][ValidateRange(0,2147483647)]$ErrorCount = 0
+[int][ValidateRange(0,2147483647)]$WarningCount = 0
+[int][ValidateRange(0,2147483647)]$NormalCount = 0
+[int][ValidateRange(0,2147483647)]$OverRideCount = 0
+[int][ValidateRange(0,2147483647)]$ContinueCount = 0
 
 ${THIS_FILE}=$MyInvocation.MyCommand.Path       　　                    #フルパス
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
 
-${Version} = '0.9.14'
+${Version} = '0.9.16'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
@@ -375,26 +397,32 @@ ${Version} = '0.9.14'
 #バックアップ実行中かを確認
 
 
-  IF(CheckLeaf -CheckPath $BackUpFlagPath -ObjectName 'バックアップ実行中フラグ'){
+    IF ($NoCheckBackUpFlag){
 
-   Logging -EventID $ErrorEventID -EventType Error -EventMessage "Back Up実行中です。重複実行は出来ません"
-   Finalize $ErrorReturnCode
-   }
-   
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "-NoCheckBackUpFlagが指定されているため、バックアップフラグを用いた状態確認はしません"
+        
+        
+        }elseIF(CheckLeaf -CheckPath $BackUpFlagPath -ObjectName 'バックアップ実行中フラグ'){
+
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Back Up実行中です。重複実行は出来ません"
+            Finalize $ErrorReturnCode
+            }
+    
 
 #セッション情報を出力
 
     Logging -EventID $InfoEventID -EventType Information -EventMessage "Export Session Info"
 
-    ExecSQL -SQLCommand $SessionCheck -SQLName "Check Sessions" -SQLLogPath $SQLLogPath > $Null
+    $ExecSQLReturnCode =  . ExecSQL -SQLCommand $SessionCheck -SQLName "Check Sessions" -SQLLogPath $SQLLogPath
+ 
+    IF($ExecSQLReturnCode){
 
-    IF ($LastExitCode -ne 0){
-
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Export Session Infoに失敗しました"
-
-        Finalize $ErrorReturnCode
-        }else{
         Logging -EventID $SuccessEventID -EventType Success -EventMessage "Export Session Infoに成功しました"
+
+        }else{
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Export Session Infoに失敗しました"
+	    Finalize $ErrorReturnCode
+        
         }
 
 
@@ -402,14 +430,17 @@ ${Version} = '0.9.14'
 
   Logging -EventID $InfoEventID -EventType Information -EventMessage "Export Redo Log"
 
-  . ExecSQL -SQLCommand $ExportRedoLog -SQLName "Export Redo Log" -SQLLogPath $SQLLogPath > $Null
+    $ExecSQLReturnCode = . ExecSQL -SQLCommand $ExportRedoLog -SQLName "Export Redo Log" -SQLLogPath $SQLLogPath
 
-      IF ($LastExitCode -ne 0){
+      IF ($ExecSQLReturnCode){
 
+        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Export Redo Logに成功しました"
+        
+        }else{
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "Export Redo Logに失敗しました"
+	    Finalize $ErrorReturnCode
 
-        Finalize $ErrorReturnCode
-        }else{ Logging -EventID $SuccessEventID -EventType Success -EventMessage "Export Redo Logに成功しました"}
+        }
 
 
 
@@ -424,21 +455,23 @@ ${Version} = '0.9.14'
       IF ($LastExitCode -ne 0){
 
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "Check Back Up Modeに失敗しました"
-
-        Finalize $ErrorReturnCode
-        }else{ Logging -EventID $SuccessEventID -EventType Success -EventMessage "Check Back Up Modeに成功しました"}
+	    Finalize $ErrorReturnCode
+        
+        }else{
+        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Check Back Up Modeに成功しました"
+        }
 
 
 
 
     IF(($BackUpModeFlag) -and (-NOT($NormalModeFlag))){
-
+ 
         Logging -EventID $WarningEventID -EventType Warning -EventMessage "既にバックアップモードです"
-
-
-
+        $WarningCount ++
+ 
+ 
         }elseif(-NOT  (($BackUpModeFlag) -xor ($NormalModeFlag))){
-
+ 
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "状態が不明です"
             Finalize $ErrorReturnCode
             }
@@ -446,7 +479,7 @@ ${Version} = '0.9.14'
 
 
     IF(-NOT($BackUpModeFlag) -and ($NormalModeFlag)){
-
+ 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "通常モードです"
 
 
@@ -462,17 +495,18 @@ ${Version} = '0.9.14'
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "Change to Back Up Mode"
 
-      . ExecSQL -SQLCommand $DBBackUpModeOn -SQLName "Change to Back Up Mode" -SQLLogPath $SQLLogPath >$Null
+       $ExecSQLReturnCode = . ExecSQL -SQLCommand $DBBackUpModeOn -SQLName "Change to Back Up Mode" -SQLLogPath $SQLLogPath
 
 
-        IF ($LastExitCode -ne 0){
+        IF ($ExecSQLReturnCode){
 
+            Logging -EventID $SuccessEventID -EventType Success -EventMessage "Change to Back Up Modeに成功しました"
+            
+            }else{
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "Change to Back Up Modeに失敗しました"
 
-            Finalize $ErrorReturnCode
-           
-            }else{
-            Logging -EventID $SuccessEventID -EventType Success -EventMessage "Change to Back Up Modeに成功しました"
+	        Finalize $ErrorReturnCode
+            
             }
 
     }
@@ -482,13 +516,14 @@ ${Version} = '0.9.14'
 
 #Listner停止
 
-$ReturnMessage = lsnrctl status  2>&1
+    $ReturnMessage = lsnrctl status  2>&1
 
-[String]$ListenerStatus = $ReturnMessage
+    [String]$ListenerStatus = $ReturnMessage
 
-Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
+    Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
 
-    Switch -Regex ($ListenerStatus){
+
+    Switch -Regex ($ListenerStatus){ 
 
         'インスタンスがあります'{
 
@@ -499,13 +534,13 @@ Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
         'リスナーがありません'{
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Listenerは停止中"
             $NeedToStopListener = $False
-            }  
+            }   
 
         Default{
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "Listenerの状態は不明"
             $NeedToStopListener = $TRUE
             }
-    
+     
      }
 
 
@@ -519,9 +554,9 @@ Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
         IF($NeedToStopListener){
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Stop Listener"
-            $ReturnMessage = LSNRCTL STOP 2>&1
+            $ReturnMessage = LSNRCTL STOP 2>&1 
 
-            Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
+            Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
 
             IF ($LastExitCode -ne 0){
 
@@ -536,4 +571,4 @@ Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
     }
 
 
-Finalize $NormalReturnCode                  
+Finalize $NormalReturnCode                   

@@ -95,8 +95,6 @@ function Initialize {
 
    $OracleHomeBinPath = ConvertToAbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
 
-#   CheckNullOrEmpty -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNullOrEmptyFinalize > $NULL
-
    CheckContainer -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
 
 

@@ -1,4 +1,4 @@
-#Requires -Version 3.0
+﻿#Requires -Version 3.0
 
 
 <#
@@ -7,7 +7,7 @@
 実行にはCommonFunctions.ps1が必要です。
 セットで開発しているFileMaintenance.ps1と併用すると複数のサービスを一括起動できます。
 
-はサポートしていません
+<Common Parameters>はサポートしていません
 
 .DESCRIPTION
 
@@ -69,7 +69,7 @@ StartService.ps1 -Service Spooler -RetrySpanSec 5 -RetryTimes 5 -WarningAsNormal
 .PARAMETER EventLogLogName
 　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
 
-.PARAMETER Log2Console
+.PARAMETER Log2Console 
 　コンソールへのログ出力を制御します。
 デフォルトは$TRUEでコンソール出力します。
 
@@ -218,8 +218,8 @@ function Initialize {
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "サービス[$($Service)]が存在しません"
         Finalize $ErrorReturnCode
         }
+        
        
-      
 
     $ServiceStatus = CheckServiceStatus -ServiceName $Service -Health Running -Span 0 -UpTo 1
 
@@ -228,7 +228,7 @@ function Initialize {
         Logging -EventID $WarningEventID -EventType Warning -EventMessage "サービス[$($Service)]は既に起動しています"
         Finalize $WarningReturnCode
         }
-       
+        
 
 
 #処理開始メッセージ出力
@@ -263,9 +263,9 @@ ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェ
 
 ${Version} = '0.9.13'
 
-[String]$Computer = "localhost"
-[String]$Class = "win32_service"
-[Object]$WmiService = Get-Wmiobject -Class $Class -computer $Computer -filter "name = '$Service'"
+[String]$Computer = "localhost" 
+[String]$Class = "win32_service" 
+[Object]$WmiService = Get-Wmiobject -Class $Class -computer $Computer -filter "name = '$Service'" 
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
@@ -294,16 +294,16 @@ $Counter = 0
 
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "WMIService.startServiceでサービス[$($Service)]の起動を開始します..."
-       
-        $Return = $WMIService.startService()
+        
+        $Return = $WMIService.startService() 
 
 
            Switch ($Return.returnvalue)  {
-       
+        
                 0{
                 $ServiceStatus = CheckServiceStatus -ServiceName $Service -Health Running -Span $RetrySpanSec -UpTo $RetryTimes
 
-                   
+                    
                     IF ($ServiceStatus){
                     Logging -EventID $SuccessEventID -EventType Success -EventMessage "サービス[$($Service)]は正常に起動しました"
                     Finalize $NormalReturnCode
@@ -318,21 +318,21 @@ $Counter = 0
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($Service)]から「アクセスが許可されていない」とレポートが出力されました"
                 }
 
-                5 {
+                5 { 
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($Service)]は現在制御を受付しません"
-                }
-           
+                } 
+            
                 10 {
                 Logging -EventID $WarningEventID -EventType Warning -EventMessage "サービス[$($Service)]は既に起動しています"
-                Finalize $WarningErrorReport
+                Finalize $WarningErrorCode
                 }
-             
+              
                 DEFAULT {
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($Service)]から以下のレポートが出力されました。ERROR $($Return.returnValue)"
-                }
-            } 
-   
-   
+                } 
+            }  
+    
+    
 
 
 
@@ -351,3 +351,4 @@ $Counter = 0
       # 無限ループに戻る
 
     }
+

@@ -1,13 +1,12 @@
-
-#Requires -Version 3.0
+﻿#Requires -Version 3.0
 
 <#
 .SYNOPSIS
 指定日以前のOracle Archive Logを削除するツールです。
 Oracleの仕様上、Oracleから古いArchive Logは認識されなくなりますが、ファイルシステム上のファイルは削除されません。
-別途、OSコマンドやFileMaintenance.ps1でファイルを削除してください。
+別途、OSコマンドやFileMaintenance.ps1でファイルを削除してください。 
 
-はサポートしていません
+<Common Parameters>はサポートしていません
 
 .DESCRIPTION
 指定日以前のOracle Archive Logを削除するツールです。
@@ -108,7 +107,7 @@ OS認証が使えない時に使用する事を推奨します。
 .PARAMETER EventLogLogName
 　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
 
-.PARAMETER Log2Console
+.PARAMETER Log2Console 
 　コンソールへのログ出力を制御します。
 デフォルトは$TRUEでコンソール出力します。
 
@@ -260,14 +259,14 @@ function Initialize {
 
 #OracleBINフォルダの指定、存在確認
 
-    CheckNullOrEmpty -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNullOrEmptyFinalize > $NULL
+
+    $OracleHomeBinPath = ConvertToAbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
 
     CheckContainer -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
 
-
 #OracleRmanLogファイルの指定、存在、書き込み権限確認
 
-#    CheckNullOrEmpty -CheckPath $OracleRmanLogPath -ObjectName '-OracleRmanLogPath' -IfNullOrEmptyFinalize > $NULL
+
 
     $OracleRmanLogPath = ConvertToAbsolutePath -CheckPath $OracleRmanLogPath -ObjectName '-OracleRmanLogPath'
 
@@ -278,7 +277,7 @@ function Initialize {
 
 
 #実行するRMANファイルの存在確認
-  
+   
     $ExecRmanPath = ConvertToAbsolutePath -CheckPath $ExecRmanPath -ObjectName '-ExecRmanPath'
 
 
@@ -299,7 +298,7 @@ function Initialize {
         }else{
         Logging -EventID $InfoEventID -EventType Information -EventMessage "対象のOracle Serviceは正常に起動しています"
         }
-    
+     
 
 
 
@@ -333,7 +332,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       　　                    #フ�
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
 
-${Version} = '0.9.14'
+${Version} = '0.9.15'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
@@ -357,11 +356,12 @@ ${Version} = '0.9.14'
 
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($DAYS)日前のArchiveLog削除に失敗しました"
 
-        Finalize $ErrorReturnCode
+	    Finalize $ErrorReturnCode
         }
 
 
 Logging -EventID $InfoEventID -EventType Information -EventMessage "$($DAYS)日前のArchiveLog削除に成功しました。なお、この削除はOracleから認識されなくする処理です。実ファイル削除は別途必要です"
 
 
-    Finalize $NormalReturnCode                  
+    Finalize $NormalReturnCode                   
+

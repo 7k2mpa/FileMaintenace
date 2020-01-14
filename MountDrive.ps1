@@ -1,4 +1,4 @@
-#Requires -Version 3.0
+﻿#Requires -Version 3.0
 
 <#
 .SYNOPSIS
@@ -6,7 +6,7 @@
 実行にはCommonFunctions.ps1が必要です。
 セットで開発しているWrapper.ps1と併用すると複数のサービスを一括起動できます。
 
-はサポートしていません
+<Common Parameters>はサポートしていません
 
 .DESCRIPTION
 
@@ -44,7 +44,7 @@ StopService.ps1 -MountedDrive F:
 .PARAMETER EventLogLogName
 　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
 
-.PARAMETER Log2Console
+.PARAMETER Log2Console 
 　コンソールへのログ出力を制御します。
 デフォルトは$TRUEでコンソール出力します。
 
@@ -111,10 +111,10 @@ StopService.ps1 -MountedDrive F:
 
 Param(
 
-[parameter(mandatory=$true , HelpMessage = 'UNC Pathを指定(ex. \\FileServer\Share) 全てのHelpはGet-Help MountDrive.ps1')][String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,                                                                         
+[parameter(mandatory=$true , HelpMessage = 'UNC Pathを指定(ex. \\FileServer\Share) 全てのHelpはGet-Help MountDrive.ps1')][String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,                                                                          
 [parameter(mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help MountDrive.ps1')][String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive,
 
-#[String][validatePattern("^\\\\\w+\\\w+")]$TargetPath="\\KBCSG01\kog-al-prd-bkt-fgw",                                                                         
+#[String][validatePattern("^\\\\\w+\\\w+")]$TargetPath="\\KBCSG01\kog-al-prd-bkt-fgw",                                                                          
 #[String][ValidatePattern("^[d-z]:$")]$MountDrive= 'F:',
 
 
@@ -203,10 +203,10 @@ function Initialize {
 #UNCパスが存在するか
 
 
-    IF(Test-Path FileSystem::$TargetPath){
-       
+    IF(Test-Path -LiteralPath FileSystem::$TargetPath){
+        
         Logging -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath$($TargetPath)は存在します"
-       
+        
         }else{
         Logging -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath$($TargetPath)は存在しません"
         Finalize $ErrorReturnCode
@@ -244,7 +244,7 @@ ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェ
 
 ${Version} = '0.9.15'
 
-$psDrive = $MountDrive -replace ":"
+$psDrive = $MountDrive -replace ":" 
 
 #初期設定、パラメータ確認、起動メッセージ出力
 
@@ -260,10 +260,10 @@ Try{
     $ErrorDetail = $Error[0] | Out-String
     Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $ErrorDetail"
     Logging -EventID $ErrorEventID -EventType Error -EventMessage "ドライブ${MountDrive}のマウントに失敗しました"
-    Finalize $ErrorReturnCode
+	Finalize $ErrorReturnCode
     }
 
-
+ 
 
 Logging -EventID $SuccessEventID -EventType Success -EventMessage "ドライブ${MountDrive}のマウントに成功しました"
 Finalize $NormalReturnCode

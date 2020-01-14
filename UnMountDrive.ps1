@@ -1,4 +1,4 @@
-#Requires -Version 3.0
+﻿#Requires -Version 3.0
 
 <#
 .SYNOPSIS
@@ -6,7 +6,7 @@
 実行にはCommonFunctions.ps1が必要です。
 セットで開発しているWrapper.ps1と併用すると複数のサービスを一括起動できます。
 
-はサポートしていません
+<Common Parameters>はサポートしていません
 
 .DESCRIPTION
 
@@ -44,7 +44,7 @@ StopService.ps1 -MountedDrive F:
 .PARAMETER EventLogLogName
 　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
 
-.PARAMETER Log2Console
+.PARAMETER Log2Console 
 　コンソールへのログ出力を制御します。
 デフォルトは$TRUEでコンソール出力します。
 
@@ -240,7 +240,7 @@ ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェ
 
 ${Version} = '0.9.13'
 
-$psDrive = $MountedDrive -replace ":"
+$psDrive = $MountedDrive -replace ":" 
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
@@ -261,7 +261,7 @@ Try{
     $ErrorDetail = $Error[0] | Out-String
     Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $ErrorDetail"
     Logging -EventID $ErrorEventID -EventType Error -EventMessage "ドライブ${MountedDrive}のアンマウントに失敗しました"
-    Finalize $ErrorReturnCode
+	Finalize $ErrorReturnCode
     }
 
 
@@ -269,3 +269,5 @@ Try{
 
 Logging -EventID $SuccessEventID -EventType Success -EventMessage "ドライブ${MountedDrive}のアンマウントに成功しました"
 Finalize $NormalReturnCode
+
+         

@@ -2,30 +2,30 @@
 
 <#
 .SYNOPSIS
-æŒ‡å®šã—ãŸãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã«æ›¸ã‹ã‚ŒãŸãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚“ã§ã€é †æ¬¡å‘¼ã³å‡ºã™ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã§ã™ã€‚
-å®Ÿè¡Œã«ã¯CommonFunctions.ps1ãŒå¿…è¦ã§ã™ã€‚
-ã‚»ãƒƒãƒˆã§é–‹ç™ºã—ã¦ã„ã‚‹FileMaintenance.ps1ã¨ä½µç”¨ã™ã‚‹ã¨è¤‡æ•°ã®ãƒ­ã‚°å‡¦ç†ã‚’ä¸€æ‹¬å®Ÿè¡Œã§ãã¾ã™ã€‚
+w’è‚µ‚½ƒvƒƒOƒ‰ƒ€‚ğİ’èƒtƒ@ƒCƒ‹‚É‘‚©‚ê‚½ƒpƒ‰ƒ[ƒ^‚ğ“Ç‚İ‚ñ‚ÅA‡ŸŒÄ‚Ño‚·ƒvƒƒOƒ‰ƒ€‚Å‚·B
+Às‚É‚ÍCommonFunctions.ps1‚ª•K—v‚Å‚·B
+ƒZƒbƒg‚ÅŠJ”­‚µ‚Ä‚¢‚éFileMaintenance.ps1‚Æ•¹—p‚·‚é‚Æ•¡”‚ÌƒƒOˆ—‚ğˆêŠ‡Às‚Å‚«‚Ü‚·B
 
-ã¯ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ã¾ã›ã‚“
+<Common Parameters>‚ÍƒTƒ|[ƒg‚µ‚Ä‚¢‚Ü‚¹‚ñ
 
 .DESCRIPTION
-è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰1è¡Œã¥ã¤ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã¿ã€æŒ‡å®šã—ãŸãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«é †æ¬¡å®Ÿè¡Œã•ã›ã¾ã™ã€‚
+İ’èƒtƒ@ƒCƒ‹‚©‚ç1s‚Ã‚Âƒpƒ‰ƒ[ƒ^‚ğ“Ç‚İ‚İAw’è‚µ‚½ƒvƒƒOƒ‰ƒ€‚É‡ŸÀs‚³‚¹‚Ü‚·B
 
-è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã¯ä»»æ„ã«è¨­å®šå¯èƒ½ã§ã™ã€‚
-è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®è¡Œé ­ã‚’#ã¨ã™ã‚‹ã¨å½“è©²è¡Œã¯ã‚³ãƒ¡ãƒ³ãƒˆã¨ã—ã¦å‡¦ç†ã•ã‚Œã¾ã™ã€‚
-è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ã®ç©ºç™½è¡Œã¯ã‚¹ã‚­ãƒƒãƒ—ã—ã¾ã™ã€‚
+İ’èƒtƒ@ƒCƒ‹‚Í”CˆÓ‚Éİ’è‰Â”\‚Å‚·B
+İ’èƒtƒ@ƒCƒ‹‚Ìs“ª‚ğ#‚Æ‚·‚é‚Æ“–ŠYs‚ÍƒRƒƒ“ƒg‚Æ‚µ‚Äˆ—‚³‚ê‚Ü‚·B
+İ’èƒtƒ@ƒCƒ‹‚Ì‹ó”’s‚ÍƒXƒLƒbƒv‚µ‚Ü‚·B
 
-ãƒ­ã‚°å‡ºåŠ›å…ˆã¯[Windows EventLog][ã‚³ãƒ³ã‚½ãƒ¼ãƒ«][ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«]ãŒé¸æŠå¯èƒ½ã§ã™ã€‚ãã‚Œãã‚Œå‡ºåŠ›ã€æŠ‘æ­¢ãŒæŒ‡å®šã§ãã¾ã™ã€‚
+ƒƒOo—Íæ‚Í[Windows EventLog][ƒRƒ“ƒ\[ƒ‹][ƒƒOƒtƒ@ƒCƒ‹]‚ª‘I‘ğ‰Â”\‚Å‚·B‚»‚ê‚¼‚êo—ÍA—}~‚ªw’è‚Å‚«‚Ü‚·B
 
 
 
-è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«ä¾‹ã§ã™ã€‚ä¾‹ãˆã°ä»¥ä¸‹ã‚’DailyMaintenance.txtã«ä¿å­˜ã—ã¦-CommandFile .\DailyMaintenance.txtã¨æŒ‡å®šã—ã¦ä¸‹ã•ã„ã€‚
+İ’èƒtƒ@ƒCƒ‹—á‚Å‚·B—á‚¦‚ÎˆÈ‰º‚ğDailyMaintenance.txt‚É•Û‘¶‚µ‚Ä-CommandFile .\DailyMaintenance.txt‚Æw’è‚µ‚Ä‰º‚³‚¢B
 
 ---
-#14æ—¥çµŒéã—ãŸ.logã§çµ‚ã‚ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‰Šé™¤
+#14“úŒo‰ß‚µ‚½.log‚ÅI‚í‚éƒtƒ@ƒCƒ‹‚ğíœ
 -TargetFolder D:\IIS\LOG -RegularExpression '^.*\.log$' -Action Delete -Days 14
 
-#7æ—¥çµŒéã—ãŸã‚¢ã‚¯ã‚»ã‚¹ãƒ­ã‚°ã‚’Old_Logã¸é€€é¿
+#7“úŒo‰ß‚µ‚½ƒAƒNƒZƒXƒƒO‚ğOld_Log‚Ö‘Ş”ğ
 -TargetFolder D:\AccessLog -MoveToFolder .\Old_Log -Days 7
 ---
 
@@ -34,126 +34,126 @@
 .EXAMPLE
 
 Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt
-ã€€ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¨åŒä¸€ãƒ•ã‚©ãƒ«ãƒ€ã«å­˜åœ¨ã™ã‚‹FileMaintenance.ps1ã‚’èµ·å‹•ã—ã¾ã™ã€‚
-èµ·å‹•ã™ã‚‹éš›ã«æ¸¡ã™ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¯è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«Comman.txtã‚’1è¡Œã¥ã¤èª­ã¿è¾¼ã¿ã€é †æ¬¡å®Ÿè¡Œã—ã¾ã™ã€‚
+@‚±‚ÌƒvƒƒOƒ‰ƒ€‚Æ“¯ˆêƒtƒHƒ‹ƒ_‚É‘¶İ‚·‚éFileMaintenance.ps1‚ğ‹N“®‚µ‚Ü‚·B
+‹N“®‚·‚éÛ‚É“n‚·ƒpƒ‰ƒ[ƒ^‚Íİ’èƒtƒ@ƒCƒ‹Comman.txt‚ğ1s‚Ã‚Â“Ç‚İ‚İA‡ŸÀs‚µ‚Ü‚·B
 
 
 .EXAMPLE
 
 Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt -Continue
-ã€€ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¨åŒä¸€ãƒ•ã‚©ãƒ«ãƒ€ã«å­˜åœ¨ã™ã‚‹FileMaintenance.ps1ã‚’èµ·å‹•ã—ã¾ã™ã€‚
-èµ·å‹•ã™ã‚‹éš›ã«æ¸¡ã™ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¯è¨­å®šãƒ•ã‚¡ã‚¤ãƒ«Comman.txtã‚’1è¡Œã¥ã¤èª­ã¿è¾¼ã¿ã€é †æ¬¡å®Ÿè¡Œã—ã¾ã™ã€‚
-ã‚‚ã—ã€FileMaintenance.ps1ã‚’å®Ÿè¡Œã—ãŸçµæœãŒç•°å¸¸çµ‚äº†ã¨ãªã£ãŸå ´åˆã¯ã€Wrapper.ps1ã‚’ç•°å¸¸çµ‚äº†ã•ã›ãšã€Command.txtã®æ¬¡è¡Œã‚’èª­ã¿è¾¼ã¿ç¶™ç¶šå‡¦ç†ã‚’ã—ã¾ã™ã€‚
+@‚±‚ÌƒvƒƒOƒ‰ƒ€‚Æ“¯ˆêƒtƒHƒ‹ƒ_‚É‘¶İ‚·‚éFileMaintenance.ps1‚ğ‹N“®‚µ‚Ü‚·B
+‹N“®‚·‚éÛ‚É“n‚·ƒpƒ‰ƒ[ƒ^‚Íİ’èƒtƒ@ƒCƒ‹Comman.txt‚ğ1s‚Ã‚Â“Ç‚İ‚İA‡ŸÀs‚µ‚Ü‚·B
+‚à‚µAFileMaintenance.ps1‚ğÀs‚µ‚½Œ‹‰Ê‚ªˆÙíI—¹‚Æ‚È‚Á‚½ê‡‚ÍAWrapper.ps1‚ğˆÙíI—¹‚³‚¹‚¸ACommand.txt‚ÌŸs‚ğ“Ç‚İ‚İŒp‘±ˆ—‚ğ‚µ‚Ü‚·B
 
 
 
 .PARAMETER CommandPath
-ã€€èµ·å‹•ã™ã‚‹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ãƒ‘ã‚¹ã‚’æŒ‡å®šã—ã¾ã™ã€‚
-æŒ‡å®šã¯å¿…é ˆã§ã™ã€‚
-ç›¸å¯¾ã€çµ¶å¯¾ãƒ‘ã‚¹ã§æŒ‡å®šå¯èƒ½ã§ã™ã€‚
-ãƒ¯ã‚¤ãƒ«ãƒ‰ã‚«ãƒ¼ãƒ‰*ã¯ä½¿ç”¨ã§ãã¾ã›ã‚“ã€‚
+@‹N“®‚·‚éƒvƒƒOƒ‰ƒ€ƒpƒX‚ğw’è‚µ‚Ü‚·B
+w’è‚Í•K{‚Å‚·B
+‘Š‘ÎAâ‘ÎƒpƒX‚Åw’è‰Â”\‚Å‚·B
+ƒƒCƒ‹ƒhƒJ[ƒh*‚Íg—p‚Å‚«‚Ü‚¹‚ñB
 
 .PARAMETER CommandFile
-ã€€èµ·å‹•ã™ã‚‹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«æ¸¡ã™ã‚³ãƒãƒ³ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æŒ‡å®šã—ã¾ã™ã€‚
-æŒ‡å®šã¯å¿…é ˆã§ã™ã€‚
-ç›¸å¯¾ã€çµ¶å¯¾ãƒ‘ã‚¹ã§æŒ‡å®šå¯èƒ½ã§ã™ã€‚
-ãƒ¯ã‚¤ãƒ«ãƒ‰ã‚«ãƒ¼ãƒ‰*ã¯ä½¿ç”¨ã§ãã¾ã›ã‚“ã€‚
+@‹N“®‚·‚éƒvƒƒOƒ‰ƒ€‚É“n‚·ƒRƒ}ƒ“ƒhƒtƒ@ƒCƒ‹‚ğw’è‚µ‚Ü‚·B
+w’è‚Í•K{‚Å‚·B
+‘Š‘ÎAâ‘ÎƒpƒX‚Åw’è‰Â”\‚Å‚·B
+ƒƒCƒ‹ƒhƒJ[ƒh*‚Íg—p‚Å‚«‚Ü‚¹‚ñB
 
 .PARAMETER CommandFileEncode
-ã€€ã‚³ãƒãƒ³ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«ã®æ–‡å­—ã‚³ãƒ¼ãƒ‰ã‚’æŒ‡å®šã—ã¾ã™ã€‚
-ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯[Default]ã§Shif-Jisã§ã™ã€‚
+@ƒRƒ}ƒ“ƒhƒtƒ@ƒCƒ‹‚Ì•¶šƒR[ƒh‚ğw’è‚µ‚Ü‚·B
+ƒfƒtƒHƒ‹ƒg‚Í[Default]‚ÅShif-Jis‚Å‚·B
 
 
 .PARAMETER Continue
-ã€€èµ·å‹•ã—ãŸãƒ—ãƒ­ã‚°ãƒ©ãƒ ãŒç•°å¸¸çµ‚äº†ã—ã¦ã‚‚ã€ã‚³ãƒãƒ³ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«ã®æ¬¡è¡Œã‚’ç¶™ç¶šå‡¦ç†ã—ã¾ã™ã€‚
-ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§ã¯ãã®ã¾ã¾ç•°å¸¸çµ‚äº†ã—ã¾ã™ã€‚
+@‹N“®‚µ‚½ƒvƒƒOƒ‰ƒ€‚ªˆÙíI—¹‚µ‚Ä‚àAƒRƒ}ƒ“ƒhƒtƒ@ƒCƒ‹‚ÌŸs‚ğŒp‘±ˆ—‚µ‚Ü‚·B
+ƒfƒtƒHƒ‹ƒg‚Å‚Í‚»‚Ì‚Ü‚ÜˆÙíI—¹‚µ‚Ü‚·B
 
 
 
 .PARAMETER Log2EventLog
-ã€€Windows Event Logã¸ã®å‡ºåŠ›ã‚’åˆ¶å¾¡ã—ã¾ã™ã€‚
-ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯$TRUEã§Event Logå‡ºåŠ›ã—ã¾ã™ã€‚
+@Windows Event Log‚Ö‚Ìo—Í‚ğ§Œä‚µ‚Ü‚·B
+ƒfƒtƒHƒ‹ƒg‚Í$TRUE‚ÅEvent Logo—Í‚µ‚Ü‚·B
 
 .PARAMETER NoLog2EventLog
-ã€€Event Logå‡ºåŠ›ã‚’æŠ‘æ­¢ã—ã¾ã™ã€‚-Log2EventLog $Falseã¨ç­‰ä¾¡ã§ã™ã€‚
+@Event Logo—Í‚ğ—}~‚µ‚Ü‚·B-Log2EventLog $False‚Æ“™‰¿‚Å‚·B
 
 .PARAMETER ProviderName
-ã€€Windows Event Logå‡ºåŠ›ã®ãƒ—ãƒ­ãƒã‚¤ãƒ€åã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯[Infra]ã§ã™ã€‚
+@Windows Event Logo—Í‚ÌƒvƒƒoƒCƒ_–¼‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í[Infra]‚Å‚·B
 
 .PARAMETER EventLogLogName
-ã€€Windows Event Logå‡ºåŠ›ã®ãƒ­ã‚°åã‚’ã—ã¦ã„ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯[Application]ã§ã™ã€‚
+@Windows Event Logo—Í‚ÌƒƒO–¼‚ğ‚µ‚Ä‚¢‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í[Application]‚Å‚·B
 
-.PARAMETER Log2Console
-ã€€ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ã¸ã®ãƒ­ã‚°å‡ºåŠ›ã‚’åˆ¶å¾¡ã—ã¾ã™ã€‚
-ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯$TRUEã§ã‚³ãƒ³ã‚½ãƒ¼ãƒ«å‡ºåŠ›ã—ã¾ã™ã€‚
+.PARAMETER Log2Console 
+@ƒRƒ“ƒ\[ƒ‹‚Ö‚ÌƒƒOo—Í‚ğ§Œä‚µ‚Ü‚·B
+ƒfƒtƒHƒ‹ƒg‚Í$TRUE‚ÅƒRƒ“ƒ\[ƒ‹o—Í‚µ‚Ü‚·B
 
 .PARAMETER NoLog2Console
-ã€€ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ãƒ­ã‚°å‡ºåŠ›ã‚’æŠ‘æ­¢ã—ã¾ã™ã€‚-Log2Console $Falseã¨ç­‰ä¾¡ã§ã™ã€‚
+@ƒRƒ“ƒ\[ƒ‹ƒƒOo—Í‚ğ—}~‚µ‚Ü‚·B-Log2Console $False‚Æ“™‰¿‚Å‚·B
 
 .PARAMETER Log2File
-ã€€ãƒ­ã‚°ãƒ•ã‚£ãƒ«ã¸ã®å‡ºåŠ›ã‚’åˆ¶å¾¡ã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯$Falseã§ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›ã—ã¾ã›ã‚“ã€‚
+@ƒƒOƒtƒBƒ‹‚Ö‚Ìo—Í‚ğ§Œä‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í$False‚ÅƒƒOƒtƒ@ƒCƒ‹o—Í‚µ‚Ü‚¹‚ñB
 
 .PARAMETER NoLog2File
-ã€€ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›ã‚’æŠ‘æ­¢ã—ã¾ã™ã€‚-Log2File $Falseã¨ç­‰ä¾¡ã§ã™ã€‚
+@ƒƒOƒtƒ@ƒCƒ‹o—Í‚ğ—}~‚µ‚Ü‚·B-Log2File $False‚Æ“™‰¿‚Å‚·B
 
 .PARAMETER LogPath
-ã€€ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›ãƒ‘ã‚¹ã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯$NULLã§ã™ã€‚
-ç›¸å¯¾ã€çµ¶å¯¾ãƒ‘ã‚¹ã§æŒ‡å®šå¯èƒ½ã§ã™ã€‚
-ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãªã„å ´åˆã¯æ–°è¦ä½œæˆã—ã¾ã™ã€‚
-ãƒ•ã‚¡ã‚¤ãƒ«ãŒæ—¢å­˜ã®å ´åˆã¯è¿½è¨˜ã—ã¾ã™ã€‚
+@ƒƒOƒtƒ@ƒCƒ‹o—ÍƒpƒX‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í$NULL‚Å‚·B
+‘Š‘ÎAâ‘ÎƒpƒX‚Åw’è‰Â”\‚Å‚·B
+ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢ê‡‚ÍV‹Kì¬‚µ‚Ü‚·B
+ƒtƒ@ƒCƒ‹‚ªŠù‘¶‚Ìê‡‚Í’Ç‹L‚µ‚Ü‚·B
 
 .PARAMETER LogDateFormat
-ã€€ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›ã«å«ã¾ã‚Œã‚‹æ—¥æ™‚è¡¨ç¤ºãƒ•ã‚©ãƒ¼ãƒãƒƒãƒˆã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯[yyyy-MM-dd-HH:mm:ss]å½¢å¼ã§ã™ã€‚
+@ƒƒOƒtƒ@ƒCƒ‹o—Í‚ÉŠÜ‚Ü‚ê‚é“ú•\¦ƒtƒH[ƒ}ƒbƒg‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í[yyyy-MM-dd-HH:mm:ss]Œ`®‚Å‚·B
 
 .PARAMETER NormalReturnCode
-ã€€æ­£å¸¸çµ‚äº†æ™‚ã®ãƒªã‚¿ãƒ¼ãƒ³ã‚³ãƒ¼ãƒ‰ã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯0ã§ã™ã€‚æ­£å¸¸çµ‚äº†=<è­¦å‘Šçµ‚äº†=<ï¼ˆå†…éƒ¨ï¼‰ç•°å¸¸çµ‚äº†ã¨ã—ã¦ä¸‹ã•ã„ã€‚
+@³íI—¹‚ÌƒŠƒ^[ƒ“ƒR[ƒh‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í0‚Å‚·B³íI—¹=<ŒxI—¹=<i“à•”jˆÙíI—¹‚Æ‚µ‚Ä‰º‚³‚¢B
 
 .PARAMETER WarningReturnCode
-ã€€è­¦å‘Šçµ‚äº†æ™‚ã®ãƒªã‚¿ãƒ¼ãƒ³ã‚³ãƒ¼ãƒ‰ã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯1ã§ã™ã€‚æ­£å¸¸çµ‚äº†=<è­¦å‘Šçµ‚äº†=<ï¼ˆå†…éƒ¨ï¼‰ç•°å¸¸çµ‚äº†ã¨ã—ã¦ä¸‹ã•ã„ã€‚
+@ŒxI—¹‚ÌƒŠƒ^[ƒ“ƒR[ƒh‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í1‚Å‚·B³íI—¹=<ŒxI—¹=<i“à•”jˆÙíI—¹‚Æ‚µ‚Ä‰º‚³‚¢B
 
 .PARAMETER ErrorReturnCode
-ã€€ç•°å¸¸çµ‚äº†æ™‚ã®ãƒªã‚¿ãƒ¼ãƒ³ã‚³ãƒ¼ãƒ‰ã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯8ã§ã™ã€‚æ­£å¸¸çµ‚äº†=<è­¦å‘Šçµ‚äº†=<ï¼ˆå†…éƒ¨ï¼‰ç•°å¸¸çµ‚äº†ã¨ã—ã¦ä¸‹ã•ã„ã€‚
+@ˆÙíI—¹‚ÌƒŠƒ^[ƒ“ƒR[ƒh‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í8‚Å‚·B³íI—¹=<ŒxI—¹=<i“à•”jˆÙíI—¹‚Æ‚µ‚Ä‰º‚³‚¢B
 
 .PARAMETER InternalErrorReturnCode
-ã€€ãƒ—ãƒ­ã‚°ãƒ©ãƒ å†…éƒ¨ç•°å¸¸çµ‚äº†æ™‚ã®ãƒªã‚¿ãƒ¼ãƒ³ã‚³ãƒ¼ãƒ‰ã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯16ã§ã™ã€‚æ­£å¸¸çµ‚äº†=<è­¦å‘Šçµ‚äº†=<ï¼ˆå†…éƒ¨ï¼‰ç•°å¸¸çµ‚äº†ã¨ã—ã¦ä¸‹ã•ã„ã€‚
+@ƒvƒƒOƒ‰ƒ€“à•”ˆÙíI—¹‚ÌƒŠƒ^[ƒ“ƒR[ƒh‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í16‚Å‚·B³íI—¹=<ŒxI—¹=<i“à•”jˆÙíI—¹‚Æ‚µ‚Ä‰º‚³‚¢B
 
 .PARAMETER InfoEventID
-ã€€Event Logå‡ºåŠ›ã§Informationã«å¯¾ã™ã‚‹Event IDã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯1ã§ã™ã€‚
+@Event Logo—Í‚ÅInformation‚É‘Î‚·‚éEvent ID‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í1‚Å‚·B
 
 .PARAMETER WarningEventID
-ã€€Event Logå‡ºåŠ›ã§Warningã«å¯¾ã™ã‚‹Event IDã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯10ã§ã™ã€‚
+@Event Logo—Í‚ÅWarning‚É‘Î‚·‚éEvent ID‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í10‚Å‚·B
 
 .PARAMETER SuccessErrorEventID
-ã€€Event Logå‡ºåŠ›ã§Successã«å¯¾ã™ã‚‹Event IDã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯73ã§ã™ã€‚
+@Event Logo—Í‚ÅSuccess‚É‘Î‚·‚éEvent ID‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í73‚Å‚·B
 
 .PARAMETER InternalErrorEventID
-ã€€Event Logå‡ºåŠ›ã§Internal Errorã«å¯¾ã™ã‚‹Event IDã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯99ã§ã™ã€‚
+@Event Logo—Í‚ÅInternal Error‚É‘Î‚·‚éEvent ID‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í99‚Å‚·B
 
 .PARAMETER ErrorEventID
-ã€€Event Logå‡ºåŠ›ã§Errorã«å¯¾ã™ã‚‹Event IDã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯100ã§ã™ã€‚
+@Event Logo—Í‚ÅError‚É‘Î‚·‚éEvent ID‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í100‚Å‚·B
 
 .PARAMETER ErrorAsWarning
-ã€€ç•°å¸¸çµ‚äº†ã—ã¦ã‚‚è­¦å‘Šçµ‚äº†ã®ReturnCodeã‚’è¿”ã—ã¾ã™ã€‚
+@ˆÙíI—¹‚µ‚Ä‚àŒxI—¹‚ÌReturnCode‚ğ•Ô‚µ‚Ü‚·B
 
 .PARAMETER WarningAsNormal
-ã€€è­¦å‘Šçµ‚äº†ã—ã¦ã‚‚æ­£å¸¸çµ‚äº†ã®ReturnCodeã‚’è¿”ã—ã¾ã™ã€‚
+@ŒxI—¹‚µ‚Ä‚à³íI—¹‚ÌReturnCode‚ğ•Ô‚µ‚Ü‚·B
 
 .PARAMETER ExecutableUser
-ã€€ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’å®Ÿè¡Œå¯èƒ½ãªãƒ¦ãƒ¼ã‚¶ã‚’æ­£è¦è¡¨ç¾ã§æŒ‡å®šã—ã¾ã™ã€‚
-ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯[.*]ã§å…¨ã¦ã®ãƒ¦ãƒ¼ã‚¶ãŒå®Ÿè¡Œå¯èƒ½ã§ã™ã€‚ã€€
-è¨˜è¿°ã¯ã‚·ãƒ³ã‚°ãƒ«ã‚¯ã‚ªãƒ¼ãƒ†ãƒ¼ã‚·ãƒ§ãƒ³ã§æ‹¬ã£ã¦ä¸‹ã•ã„ã€‚
-æ­£è¦è¡¨ç¾ã®ãŸã‚ã€ãƒ‰ãƒ¡ã‚¤ãƒ³ã®ãƒãƒƒã‚¯ã‚¹ãƒ©ãƒƒã‚·ãƒ¥ã¯[domain\\.*]ã®æ§˜ã«ãƒãƒƒã‚¯ã‚¹ãƒ©ãƒƒã‚·ãƒ¥ã§ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—ã—ã¦ä¸‹ã•ã„ã€‚ã€€
+@‚±‚ÌƒvƒƒOƒ‰ƒ€‚ğÀs‰Â”\‚Èƒ†[ƒU‚ğ³‹K•\Œ»‚Åw’è‚µ‚Ü‚·B
+ƒfƒtƒHƒ‹ƒg‚Í[.*]‚Å‘S‚Ä‚Ìƒ†[ƒU‚ªÀs‰Â”\‚Å‚·B@
+‹Lq‚ÍƒVƒ“ƒOƒ‹ƒNƒI[ƒe[ƒVƒ‡ƒ“‚ÅŠ‡‚Á‚Ä‰º‚³‚¢B
+³‹K•\Œ»‚Ì‚½‚ßAƒhƒƒCƒ“‚ÌƒoƒbƒNƒXƒ‰ƒbƒVƒ…‚Í[domain\\.*]‚Ì—l‚ÉƒoƒbƒNƒXƒ‰ƒbƒVƒ…‚ÅƒGƒXƒP[ƒv‚µ‚Ä‰º‚³‚¢B@
 
 
 #>
 
 Param(
 
-[parameter(mandatory=$true , HelpMessage = 'èµ·å‹•å¯¾è±¡ã®powershellãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’æŒ‡å®š(ex. .\FileMaintenance.ps1) å…¨ã¦ã®Helpã¯Get-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*\.ps1$')]$CommandPath ,
-[parameter(mandatory=$true , HelpMessage = 'powershellãƒ—ãƒ­ã‚°ãƒ©ãƒ ã«æŒ‡å®šã™ã‚‹ã‚³ãƒãƒ³ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æŒ‡å®š(ex. .\Command.txt) å…¨ã¦ã®Helpã¯Get-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommandFile,
+[parameter(mandatory=$true , HelpMessage = '‹N“®‘ÎÛ‚ÌpowershellƒvƒƒOƒ‰ƒ€‚ğw’è(ex. .\FileMaintenance.ps1) ‘S‚Ä‚ÌHelp‚ÍGet-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*\.ps1$')]$CommandPath ,
+[parameter(mandatory=$true , HelpMessage = 'powershellƒvƒƒOƒ‰ƒ€‚Éw’è‚·‚éƒRƒ}ƒ“ƒhƒtƒ@ƒCƒ‹‚ğw’è(ex. .\Command.txt) ‘S‚Ä‚ÌHelp‚ÍGet-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommandFile,
 
 
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$CommandFileEncode = 'Default', #DefaultæŒ‡å®šã¯Shift-Jis
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$CommandFileEncode = 'Default', #Defaultw’è‚ÍShift-Jis
 
 [Switch]$Continue,
 
@@ -194,52 +194,50 @@ Param(
 
 Try{
 
-    #CommonFunctions.ps1ã®é…ç½®å…ˆã‚’å¤‰æ›´ã—ãŸå ´åˆã¯ã€ã“ã“ã‚’å¤‰æ›´ã€‚åŒä¸€ãƒ•ã‚©ãƒ«ãƒ€ã«é…ç½®å‰æ
+    #CommonFunctions.ps1‚Ì”z’uæ‚ğ•ÏX‚µ‚½ê‡‚ÍA‚±‚±‚ğ•ÏXB“¯ˆêƒtƒHƒ‹ƒ_‚É”z’u‘O’ñ
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
-    Write-Output "CommonFunctions.ps1 ã®Loadã«å¤±æ•—ã—ã¾ã—ãŸã€‚CommonFunctions.ps1ãŒã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã¨åŒä¸€ãƒ•ã‚©ãƒ«ãƒ€ã«å­˜åœ¨ã™ã‚‹ã‹ç¢ºèªã—ã¦ãã ã•ã„"
+    Write-Output "CommonFunctions.ps1 ‚ÌLoad‚É¸”s‚µ‚Ü‚µ‚½BCommonFunctions.ps1‚ª‚±‚Ìƒtƒ@ƒCƒ‹‚Æ“¯ˆêƒtƒHƒ‹ƒ_‚É‘¶İ‚·‚é‚©Šm”F‚µ‚Ä‚­‚¾‚³‚¢"
     Exit 1
     }
 
 
-################ è¨­å®šãŒå¿…è¦ãªã®ã¯ã“ã“ã¾ã§ ##################
+################ İ’è‚ª•K—v‚È‚Ì‚Í‚±‚±‚Ü‚Å ##################
 
 
 
-################# å…±é€šéƒ¨å“ã€é–¢æ•°  #######################
+################# ‹¤’Ê•”•iAŠÖ”  #######################
 
 function Initialize {
 
-#ã‚¤ãƒ™ãƒ³ãƒˆã‚½ãƒ¼ã‚¹æœªè¨­å®šæ™‚ã®å‡¦ç†
-#ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›å…ˆç¢ºèª
-#ReturnCodeç¢ºèª
-#å®Ÿè¡Œãƒ¦ãƒ¼ã‚¶ç¢ºèª
-#ãƒ—ãƒ­ã‚°ãƒ©ãƒ èµ·å‹•ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+#ƒCƒxƒ“ƒgƒ\[ƒX–¢İ’è‚Ìˆ—
+#ƒƒOƒtƒ@ƒCƒ‹o—ÍæŠm”F
+#ReturnCodeŠm”F
+#Àsƒ†[ƒUŠm”F
+#ƒvƒƒOƒ‰ƒ€‹N“®ƒƒbƒZ[ƒW
 
 . PreInitialize
 
-#ã“ã“ã¾ã§å®Œäº†ã™ã‚Œã°æ¥­å‹™çš„ãªãƒ­ã‚¸ãƒƒã‚¯ã®ã¿ã‚’ç¢ºèªã™ã‚Œã°è‰¯ã„
+#‚±‚±‚Ü‚ÅŠ®—¹‚·‚ê‚Î‹Æ–±“I‚ÈƒƒWƒbƒN‚Ì‚İ‚ğŠm”F‚·‚ê‚Î—Ç‚¢
 
 
-#ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®ç¢ºèª
+#ƒpƒ‰ƒ[ƒ^‚ÌŠm”F
 
 
-#ã‚³ãƒãƒ³ãƒ‰ã®æœ‰ç„¡ã‚’ç¢ºèª
+#ƒRƒ}ƒ“ƒh‚Ì—L–³‚ğŠm”F
 
-#    CheckNullOrEmpty -CheckPath $CommandPath -ObjectName 'å®Ÿè¡Œã‚³ãƒãƒ³ãƒ‰ -CommandPath' -IfNullOrEmptyFinalize > $NULL
 
-    $CommandPath = ConvertToAbsolutePath -CheckPath $CommandPath -ObjectName 'å®Ÿè¡Œã‚³ãƒãƒ³ãƒ‰ -CommandPath'
+    $CommandPath = ConvertToAbsolutePath -CheckPath $CommandPath -ObjectName 'ÀsƒRƒ}ƒ“ƒh -CommandPath'
 
-    CheckLeaf -CheckPath $CommandPath -ObjectName 'å®Ÿè¡Œã‚³ãƒãƒ³ãƒ‰ -CommandPath' -IfNoExistFinalize > $NULL
+    CheckLeaf -CheckPath $CommandPath -ObjectName 'ÀsƒRƒ}ƒ“ƒh -CommandPath' -IfNoExistFinalize > $NULL
 
-#ã‚³ãƒãƒ³ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ«ã®æœ‰ç„¡ã‚’ç¢ºèª
-   
-#    CheckNullOrEmpty -CheckPath $CommandFile -ObjectName 'ã‚³ãƒãƒ³ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ« -CommandFile' -IfNullOrEmptyFinalize > $NULL
+#ƒRƒ}ƒ“ƒhƒtƒ@ƒCƒ‹‚Ì—L–³‚ğŠm”F
+    
 
-    $CommandFile = ConvertToAbsolutePath -CheckPath $CommandFile -ObjectName 'ã‚³ãƒãƒ³ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ« -CommandFile'
+    $CommandFile = ConvertToAbsolutePath -CheckPath $CommandFile -ObjectName 'ƒRƒ}ƒ“ƒhƒtƒ@ƒCƒ‹ -CommandFile'
 
-    CheckLeaf -CheckPath $CommandFile -ObjectName 'ã‚³ãƒãƒ³ãƒ‰ãƒ•ã‚¡ã‚¤ãƒ« -CommandFile' -IfNoExistFinalize > $NULL
+    CheckLeaf -CheckPath $CommandFile -ObjectName 'ƒRƒ}ƒ“ƒhƒtƒ@ƒCƒ‹ -CommandFile' -IfNoExistFinalize > $NULL
 
 
 
@@ -247,12 +245,12 @@ function Initialize {
 
 
 
-#å‡¦ç†é–‹å§‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡ºåŠ›
+#ˆ—ŠJnƒƒbƒZ[ƒWo—Í
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¯æ­£å¸¸ã§ã™"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒpƒ‰ƒ[ƒ^‚Í³í‚Å‚·"
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "å®Ÿè¡Œã‚³ãƒãƒ³ãƒ‰ã¯[$($CommandPath)]ã§ã™"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "ÀsƒRƒ}ƒ“ƒh‚Í[$($CommandPath)]‚Å‚·"
 
 }
 
@@ -264,10 +262,10 @@ Param(
 
     IF(-NOT(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))){
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "å®Ÿè¡Œçµæœã¯æ­£å¸¸çµ‚äº†[$($NormalCount)]ã€è­¦å‘Šçµ‚äº†[$($WarningCount)]ã€ç•°å¸¸çµ‚äº†[$($ErrorCount)]ã§ã™"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "ÀsŒ‹‰Ê‚Í³íI—¹[$($NormalCount)]AŒxI—¹[$($WarningCount)]AˆÙíI—¹[$($ErrorCount)]‚Å‚·"
 
         If(($Continue) -and ($ErrorCount -gt 0)){
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]ãŒæŒ‡å®šã•ã‚Œã¦ã„ã‚‹ãŸã‚å‡¦ç†ç•°å¸¸ã§ç•°å¸¸çµ‚äº†ã›ãšæ¬¡ã®å®šç¾©ã‚’å‡¦ç†ã—ã¾ã—ãŸ"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]‚ªw’è‚³‚ê‚Ä‚¢‚é‚½‚ßˆ—ˆÙí‚ÅˆÙíI—¹‚¹‚¸Ÿ‚Ì’è‹`‚ğˆ—‚µ‚Ü‚µ‚½"
             }
 
 
@@ -282,23 +280,23 @@ EndingProcess $ReturnCode
 
 
 
-#####################   ã“ã“ã‹ã‚‰æœ¬ä½“  ######################
+#####################   ‚±‚±‚©‚ç–{‘Ì  ######################
 
 
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
 
-${THIS_FILE}=$MyInvocation.MyCommand.Path       ã€€ã€€                    #ãƒ•ãƒ«ãƒ‘ã‚¹
-${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #ã“ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹
-${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ã‚·ã‚§ãƒ«å
+${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒX
+${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
+${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
 
 
 ${Version} = '0.9.13.3'
 
 
-#åˆæœŸè¨­å®šã€ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç¢ºèªã€èµ·å‹•ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡ºåŠ›
+#‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
 
 . Initialize
 
@@ -309,9 +307,9 @@ ${Version} = '0.9.13.3'
         }
                     catch [Exception]
                     {
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "-CommandFileèª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ã¾ã—ãŸã€‚"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "-CommandFile“Ç‚İ‚İ‚É¸”s‚µ‚Ü‚µ‚½B"
                     $ErrorDetail = $Error[0] | Out-String
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "èµ·å‹•æ™‚ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ : $ErrorDetail"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "‹N“®ƒGƒ‰[ƒƒbƒZ[ƒW : $ErrorDetail"
                     Finalize $ErrorReturnCode
                     }
 
@@ -322,85 +320,85 @@ For ( $i = 0 ; $i -lt $Lines.Count; $i++ )
 
     $Line = $Lines[$i]
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CommandFile)]ã®$($i+1)è¡Œç›®ã‚’å®Ÿè¡Œã—ã¾ã™ã€‚"
+    Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CommandFile)]‚Ì$($i+1)s–Ú‚ğÀs‚µ‚Ü‚·B"
 
 
 
     Switch -Regex ($Line){
 
-        #åˆ†å²1 è¡Œé ­#ã§ã‚³ãƒ¡ãƒ³ãƒˆ
+        #•ªŠò1 s“ª#‚ÅƒRƒƒ“ƒg
         '^#.*$'
-                {Logging -EventID $InfoEventID -EventType Information -EventMessage "ã‚³ãƒ¡ãƒ³ãƒˆ[$($Line)]"}
+                {Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒRƒƒ“ƒg[$($Line)]"}
 
-        #åˆ†å²2 ç©ºç™½
+        #•ªŠò2 ‹ó”’
         '^$'
-                {Logging -EventID $InfoEventID -EventType Information -EventMessage "ç©ºç™½è¡Œ"}
+                {Logging -EventID $InfoEventID -EventType Information -EventMessage "‹ó”’s"}
 
-        #åˆ†å²3 ã‚³ãƒãƒ³ãƒ‰å®Ÿè¡Œ
-        default
+        #•ªŠò3 ƒRƒ}ƒ“ƒhÀs
+        default 
                 {
                    Try{
-       
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "å®Ÿè¡Œã‚³ãƒãƒ³ãƒ‰ã¯[$($CommandPath)]ã€å¼•æ•°ã¯[$($Line)]ã§ã™"
+        
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "ÀsƒRƒ}ƒ“ƒh‚Í[$($CommandPath)]Aˆø”‚Í[$($Line)]‚Å‚·"
                     Invoke-Expression "$CommandPath $Line" -ErrorAction Stop
 
                     }
                     catch [Exception]
                     {
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "[$($CommandPath)]ã®èµ·å‹•ã«å¤±æ•—ã—ã¾ã—ãŸã€‚"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "[$($CommandPath)]‚Ì‹N“®‚É¸”s‚µ‚Ü‚µ‚½B"
                     $ErrorDetail = $Error[0] | Out-String
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "èµ·å‹•æ™‚ã‚¨ãƒ©ãƒ¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ : $ErrorDetail"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "‹N“®ƒGƒ‰[ƒƒbƒZ[ƒW : $ErrorDetail"
                     Finalize $ErrorReturnCode
                     }
 
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CommandFile)]ã®$($i+1)è¡Œç›®ã®å®Ÿè¡Œçµæœã¯[$($LastExitCode)]ã§ã™"
-                   
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CommandFile)]‚Ì$($i+1)s–Ú‚ÌÀsŒ‹‰Ê‚Í[$($LastExitCode)]‚Å‚·"
+                    
 
-                    #çµ‚äº†ã‚³ãƒ¼ãƒ‰ã§åˆ†å²
+                    #I—¹ƒR[ƒh‚Å•ªŠò
                     Switch ($LastExitCode){
 
-                        #æ¡ä»¶1 ç•°å¸¸çµ‚äº†
+                        #ğŒ1 ˆÙíI—¹
                         {$_ -ge $ErrorReturnCode}{
-
+ 
                             $ErrorCount ++
-                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "[$($CommandFile)]ã®$($i+1)è¡Œç›®ã¯ç•°å¸¸çµ‚äº†ã—ã¾ã—ãŸ"
-      
+                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "[$($CommandFile)]‚Ì$($i+1)s–Ú‚ÍˆÙíI—¹‚µ‚Ü‚µ‚½"
+       
 
                             IF($Continue){
-                                Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]ã®ãŸã‚å‡¦ç†ã‚’ç¶™ç¶šã—ã¾ã™ã€‚"  
-                                ;Break    
-    
+                                Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]‚Ì‚½‚ßˆ—‚ğŒp‘±‚µ‚Ü‚·B"   
+                                ;Break     
+     
                                 }else{
                                 Finalize $ErrorReturnCode
                                 }
                         }
-                   
-                        #æ¡ä»¶2 è­¦å‘Šçµ‚äº†
+                    
+                        #ğŒ2 ŒxI—¹
                         {$_ -ge $WarningReturnCode}{
-                           
+                            
                             $WarningCount ++
-                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "[$($CommandFile)]ã®$($i+1)è¡Œç›®ã¯è­¦å‘Šçµ‚äº†ã—ã¾ã—ãŸã€‚ç¶™ç¶šã—ã¾ã™"
-                            ;Break       
+                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "[$($CommandFile)]‚Ì$($i+1)s–Ú‚ÍŒxI—¹‚µ‚Ü‚µ‚½BŒp‘±‚µ‚Ü‚·" 
+                            ;Break        
                         }
-                       
-                        #æ¡ä»¶3 æ­£å¸¸çµ‚äº†
+                        
+                        #ğŒ3 ³íI—¹
                         Default {
                         $NormalCount ++
-                        Logging -EventID $SuccessEventID -EventType Success -EventMessage "[$($CommandFile)]ã®$($i+1)è¡Œç›®ã¯æ­£å¸¸çµ‚äº†ã—ã¾ã—ãŸ"
+                        Logging -EventID $SuccessEventID -EventType Success -EventMessage "[$($CommandFile)]‚Ì$($i+1)s–Ú‚Í³íI—¹‚µ‚Ü‚µ‚½"
                         }
                    }
+    
    
-  
-                # åˆ†å²3 ã‚³ãƒãƒ³ãƒ‰å®Ÿè¡Œ defaultçµ‚ç«¯
+                # •ªŠò3 ƒRƒ}ƒ“ƒhÀs defaultI’[ 
                 }
 
-    #Switch -Regex ($Line)çµ‚ç«¯
+    #Switch -Regex ($Line)I’[
     }
 
-#å¯¾è±¡ç¾¤ã®å‡¦ç†ãƒ«ãƒ¼ãƒ—çµ‚ç«¯
+#‘ÎÛŒQ‚Ìˆ—ƒ‹[ƒvI’[
 }
 
 
-#çµ‚äº†ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡ºåŠ›ã€‚ã“ã“ã§ã¯NormalReturnCodeã§å‘¼ã³å‡ºã™ãŒã€Finalizeã§ã‚¨ãƒ©ãƒ¼ã‚«ã‚¦ãƒ³ãƒˆã‚’è¦‹ã¦å‡¦ç†ã—ã¦ãã‚Œã‚‹
+#I—¹ƒƒbƒZ[ƒWo—ÍB‚±‚±‚Å‚ÍNormalReturnCode‚ÅŒÄ‚Ño‚·‚ªAFinalize‚ÅƒGƒ‰[ƒJƒEƒ“ƒg‚ğŒ©‚Äˆ—‚µ‚Ä‚­‚ê‚é
 
 Finalize $NormalReturnCode

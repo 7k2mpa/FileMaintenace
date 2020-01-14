@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-
+$Script:CommonFunctionsVersion = '20200114_1400'
 
 #ログ等の変数を一括設定したい場合は以下を利用して下さい。
 #
@@ -71,7 +71,7 @@ function Logging{
     IF($Log2File){
     $LogFormattedDate = (Get-Date).ToString($LogDateFormat)
     $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" "+$EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
-    Write-Output $LogWrite | Out-File -FilePath $LogPath -Append
+    Write-Output $LogWrite | Out-File -FilePath $LogPath -Append 
     }   
 
 }
@@ -116,7 +116,7 @@ function CheckLogFilePath{
         }
 
 
-    IF(-NOT(Test-Path -Path $LogPath -IsValid)){
+    IF(-NOT(Test-Path -LiteralPath $LogPath -IsValid)){
 
        Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($LogPath)]は有効なパス表記ではありません。NTFSに使用できない文字列が含まれてないか等を確認して下さい"
        Write-Output  "[$($LogPath)]は有効なパス表記ではありません。NTFSに使用できない文字列が含まれてないか等を確認して下さい"
@@ -144,7 +144,7 @@ function CheckLogFilePath{
 
         "^\.+\\.*"{
        
-            $Script:LogPath =  Join-Path ${THIS_PATH} $LogPath
+            $Script:LogPath =  Join-Path ${THIS_PATH} $LogPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
 
             }
 
@@ -160,14 +160,14 @@ function CheckLogFilePath{
     }
 
 
-        IF(Test-Path -Path $LogPath -PathType Container){
+        IF(Test-Path -LiteralPath $LogPath -PathType Container){
                    Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($SHELLNAME)] ログ出力先ファイル指定先に同一名称のフォルダが存在しています。"      
                    Write-Output "[$($SHELLNAME)] ログ出力先ファイル指定先に同一名称のフォルダが存在しています。"      
                   
                    Exit $ErrorReturnCode
 
                     #この時点で$LogPathには同名フォルダは存在しないので、同名ファイルが存在するかを確認する
-                    }elseif(-NOT(TEST-Path -Path $LogPath -PathType Leaf) ){
+                    }elseif(-NOT(Test-Path -LiteralPath $LogPath -PathType Leaf) ){
                    
                         Try{
                             New-Item $LogPath -ItemType File > $NULL  -ErrorAction Stop
@@ -234,27 +234,27 @@ function TryAction {
 
         '^(Copy|AddTimeStamp)$'
             {
-            Copy-Item $ActionFrom $ActionTo -Force > $Null -ErrorAction Stop
+            Copy-Item -LiteralPath $ActionFrom $ActionTo -Force > $Null -ErrorAction Stop
             }
 
         '^Move$'
             {
-            Move-Item $ActionFrom $ActionTo -Force > $Null -ErrorAction Stop
+            Move-Item -LiteralPath $ActionFrom $ActionTo -Force > $Null -ErrorAction Stop
             }
 
         '^Delete$'
             {
-            Remove-Item $ActionFrom -Force > $Null -ErrorAction Stop
+            Remove-Item -LiteralPath $ActionFrom -Force > $Null -ErrorAction Stop
             }
                        
         '^NullClear$'
             {
-            Clear-Content $ActionFrom -Force > $Null -ErrorAction Stop
+            Clear-Content -LiteralPath $ActionFrom -Force > $Null -ErrorAction Stop
             }
 
         '^(Compress|CompressAndAddTimeStamp)$'
             {
-            Compress-Archive -Path $ActionFrom -DestinationPath $ActionTo -Force > $Null  -ErrorAction Stop
+            Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Force > $Null  -ErrorAction Stop
             }                  
                                        
         '^MakeNewFolder$'
@@ -308,16 +308,28 @@ function TryAction {
 
 
 #相対パスから絶対パスへ変換
+#相対パスは.\ または ..\から始めて下さい。
+#このfunctionは検査対象パスがNull , emptyの場合、異常終了します。確認が必要なパスのみを検査して下さい。
+#* ?等のNTFSに使用できない文字がパスに含まれている場合は異常終了します
+#[]のPowershellでワイルドカードとして扱われる文字は、ワイルドカードとして扱いません。LiteralPathとしてそのまま処理します
+#なおTryActionはワイルドカード[]を扱いません。LiteralPathとしてそのまま処理します
 
 Function ConvertToAbsolutePath {
 
 Param(
-[parameter(mandatory=$true)][String]$CheckPath,
+[String]$CheckPath,
 [parameter(mandatory=$true)][String]$ObjectName
 
 )
 
-    IF(Test-Path -Path $CheckPath -IsValid){
+    IF ([String]::IsNullOrEmpty($CheckPath)){
+           
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) の指定は必須です"
+                    Finalize $ErrorReturnCode
+                    }
+
+
+    IF(Test-Path -LiteralPath $CheckPath -IsValid){
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は有効なパス表記です"
    
     }else{
@@ -333,10 +345,11 @@ Param(
        
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は相対パス表記です"
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "スクリプトが配置されているフォルダ[${THIS_PATH}]、[$($CheckPath)]と結合したパスに変換します"
+        $ConvertedCheckPath = Join-Path ${THIS_PATH} $CheckPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
+         
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "スクリプトが配置されているフォルダ[${THIS_PATH}]、[$($CheckPath)]とを結合した絶対パス表記[$($ConvertedCheckPath)]に変換します"
 
-        Return Join-Path ${THIS_PATH} $CheckPath
-
+        Return $ConvertedCheckPath
         }
 
         "^[c-zC-Z]:\\.*"{
@@ -530,7 +543,7 @@ Param(
 
 )
 
-            If (Test-Path -Path $CheckPath -PathType Container){
+            If (Test-Path -LiteralPath $CheckPath -PathType Container){
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]は存在します"
             Return $true
@@ -558,7 +571,7 @@ Param(
 
 )
 
-            If (Test-Path -Path $CheckPath -PathType Leaf){
+            If (Test-Path -LiteralPath $CheckPath -PathType Leaf){
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]は存在します"
             Return $true
@@ -647,6 +660,8 @@ IF($NoLog2File){[boolean]$Script:Log2File = $False}
 
 Logging -EventID $InfoEventID -EventType Information -EventMessage "${SHELLNAME} Version $($Version)を起動します"
 
+Logging -EventID $InfoEventID -EventType Information -EventMessage "CommonFunctions.ps1 Version $($CommonFunctionsVersion)をLoadしました"
+
 Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータの確認を開始します"
 
 . CheckExecUser
@@ -671,24 +686,32 @@ Param(
 
     $LogFormattedDate = (Get-Date).ToString($LogDateFormat)
 
+    $SQLLog = $Null
+
+
+
+#Powershellではヒアドキュメントの改行はLFとして処理される
+#しかしながら、他のOracleからの出力はLF&CRのため、Windowsメモ帳で開くと改行コードが混在して正しく処理されない
+#よって、明示的にCRを追加してSQLLogで改行コードが混在しないようにする
+#Sakura Editor等では改行コード混在も正しく処理される
+
 $LogWrite = @"
-
-
-----------------------------
-DATE: $LogFormattedDate
-SHELL: $SHELLNAME
-SQL: $SQLName
-
-OS User: $ScriptExecUser
-
-SQL Exec User: $ExecUser
-Password Authrization [$PasswordAuthorization]
-
+`r
+`r
+----------------------------`r
+DATE: $LogFormattedDate`r
+SHELL: $SHELLNAME`r
+SQL: $SQLName`r
+`r
+OS User: $ScriptExecUser`r
+`r
+SQL Exec User: $ExecUser`r
+Password Authrization [$PasswordAuthorization]`r
+`r
 "@
 
-$SQLLog = $Null
 
-Write-Output $LogWrite | Out-File -FilePath $SQLLogPath -Append
+Write-Output $LogWrite | Out-File -FilePath $SQLLogPath -Append  -Encoding $LogFileEncode
 
 Push-Location $OracleHomeBinPath
 
@@ -700,7 +723,7 @@ Push-Location $OracleHomeBinPath
     $SQLLog = $SQLCommand | SQLPlus / as sysdba
     }
 
-Write-Output $SQLLog | Out-File -FilePath $SQLLogPath -Append
+Write-Output $SQLLog | Out-File -FilePath $SQLLogPath -Append  -Encoding $LogFileEncode
 
 
 Pop-Location
@@ -736,8 +759,9 @@ function CheckOracleBackUpMode {
 
    
     #文字列配列に変換する
-    $SQLLog = $SQLLog -replace "`r",""
-    $SQLLog = $SQLLog -split "`n"
+    $SQLLog = $SQLLog -replace "`r","" |  ForEach-Object {$_ -split "`n"}
+#    $SQLLog = $SQLLog -replace "`r",""
+#    $SQLLog = $SQLLog -split "`n"
 
     $NormalModeCount = 0
     $BackUpModeCount = 0
@@ -838,7 +862,7 @@ function Invoke-NativeApplication
                 $isError = $_ -is [System.Management.Automation.ErrorRecord]
                 "$_" | Add-Member -Name IsError -MemberType NoteProperty -Value $isError -PassThru
             }
-        if ((-not $IgnoreExitCode) -and (Test-Path -Path Variable:LASTEXITCODE) -and ($AllowedExitCodes -notcontains $LASTEXITCODE))
+        if ((-not $IgnoreExitCode) -and (Test-Path -LiteralPath -Path Variable:LASTEXITCODE) -and ($AllowedExitCodes -notcontains $LASTEXITCODE))
         {
             throw "Execution failed with exit code $LASTEXITCODE"
         }

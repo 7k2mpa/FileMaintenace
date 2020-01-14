@@ -1,196 +1,28 @@
-#Requires -Version 3.0
-
-<#
-.SYNOPSIS
-Oracle Databaseをバックアップ後に通常モードへ切替するスクリプトです。
-
-はサポートしていません
-
-.DESCRIPTION
-Oracle Databaseをバックアップ後は、状態に応じた起動処理が必要です。
-このスクリプトはWindowsのOracleサービス起動、インスタンス起動、リスナー起動、表領域をバックアップモードから通常モードへの切替等の一連の手順を状態判定しながら自動的に行います。
-
-セットで使用するSQLs.PS1を読み込み、実行します。予め配置してください。
-セットで開発しているStartService.ps1が必要です。予め配置してください。
-対になっている通常モードからバックアップモードへ切替するスクリプトを用意しておりますので、セットで運用してください。
-
-
-配置例
-
-.\OracleDB2NormalMode.ps1
-.\OracleDB2BackUpMode.ps1
-.\StartService.ps1
-.\CommonFunctions.ps1
-..\SQL\SQLs.PS1
-..\Log\SQL.LOG
-..\Lock\BkUp.flg
-
-.EXAMPLE
-
-.\OracleDB2NormalMode -OracleSerivce MCDB
-
-Windowsサービス名OracleServiceMCDB、インスタンス名MCDBのOracle Databaseの全ての表領域を通常モードへ切替します。
-Oracle Databaseの認証はOS認証を用います。このスクリプトが実行されるOSユーザで認証します。
-
-
-.\OracleDB2NormalMode -OracleSerivce MCDB -ExecUser BackUpUser -ExecUserPassword FOOBAR -PasswordAuthorization
-
-Windowsサービス名OracleServiceMCDB、インスタンス名MCDBのOracle Databaseの全ての表領域を通常モードへ切替します。
-OracleDatabaseの認証はパスワード認証を用いています。ユーザID BackUpUpser、パスワード FOOBARでログイン認証します。
-
-
-
-
-.PARAMETER OracleService
-制御するORACLEのサービス名（通常はOracleServiceにSIDを付加したもの）を指定します。
-通常は環境変数ORACLE_SIDで良いですが、未設定の環境では個別に指定が必要です。
-
-.PARAMETER OracleHomeBinPath
-Oracleの各種BINが格納されているフォルダパスを指定します。
-通常は環境変数ORACLE_HOME\BINで良いですが、未設定の環境では個別に指定が必要です。
-.PARAMETER SQLLogPath
-実行するSQL文群のログ出力先を指定します。
-指定は必須です。
-
-
-.PARAMETER SQLCommandsPath
-予め用意した、実行するSQL文群を記述したps1ファイルのパスを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
-
-.PARAMETER BackUpFlagPath
-バックアップ中を示すフラグファイルのパスを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
-
-
-.PARAMETER ExecUser
-Oracleユーザ認証時のユーザ名を指定します。
-OS認証使えない時に使用する事を推奨します。
-
-.PARAMETER ExecUserPassword
-Oracleユーザ認証時のパスワードを指定します。
-OS認証が使えない時に使用する事を推奨します。
-
-.PARAMETER PasswordAuthorization
-Oracleへユーザ/パスワード認証でログオンする事を指定します。
-OS認証が使えない時に使用する事を推奨します。
-
-
-.PARAMETER NoChangeToBackUpMode
-バックアップモードへの切替不要を指定します。
-バックアップソフトウエアによっては、バックアップソフトウエアがOracleをバックアップモードへ切替します。
-その場合は当スイッチをOnにして下さい。
-
-.PARAMETER NoStopListener
-リスナー停止不要を指定します。
-業務断面が必要な場合、バックアップ前にリスナーを停止しますが、業務断面が不要or無停止とする場合は当スイッチをOnにして下さい。
-
-
-
-
-.PARAMETER Log2EventLog
-　Windows Event Logへの出力を制御します。
-デフォルトは$TRUEでEvent Log出力します。
-
-.PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $Falseと等価です。
-Log2EventLogより優先します。
-
-.PARAMETER ProviderName
-　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
-
-.PARAMETER EventLogLogName
-　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
-
-.PARAMETER Log2Console
-　コンソールへのログ出力を制御します。
-デフォルトは$TRUEでコンソール出力します。
-
-.PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $Falseと等価です。
-Log2Consoleより優先します。
-
-.PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$Falseでログファイル出力しません。
-
-.PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $Falseと等価です。
-Log2Fileより優先します。
-
-.PARAMETER LogPath
-　ログファイル出力パスを指定します。デフォルトは$NULLです。
-相対、絶対パスで指定可能です。
-ファイルが存在しない場合は新規作成します。
-ファイルが既存の場合は追記します。
-
-.PARAMETER LogDateFormat
-　ログファイル出力に含まれる日時表示フォーマットを指定します。デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
-
-.PARAMETER NormalReturnCode
-　正常終了時のリターンコードを指定します。デフォルトは0です。正常終了=<警告終了=<（内部）異常終了として下さい。
-
-.PARAMETER WarningReturnCode
-　警告終了時のリターンコードを指定します。デフォルトは1です。正常終了=<警告終了=<（内部）異常終了として下さい。
-
-.PARAMETER ErrorReturnCode
-　異常終了時のリターンコードを指定します。デフォルトは8です。正常終了=<警告終了=<（内部）異常終了として下さい。
-
-.PARAMETER InternalErrorReturnCode
-　プログラム内部異常終了時のリターンコードを指定します。デフォルトは16です。正常終了=<警告終了=<（内部）異常終了として下さい。
-
-.PARAMETER InfoEventID
-　Event Log出力でInformationに対するEvent IDを指定します。デフォルトは1です。
-
-.PARAMETER WarningEventID
-　Event Log出力でWarningに対するEvent IDを指定します。デフォルトは10です。
-
-.PARAMETER SuccessErrorEventID
-　Event Log出力でSuccessに対するEvent IDを指定します。デフォルトは73です。
-
-.PARAMETER InternalErrorEventID
-　Event Log出力でInternal Errorに対するEvent IDを指定します。デフォルトは99です。
-
-.PARAMETER ErrorEventID
-　Event Log出力でErrorに対するEvent IDを指定します。デフォルトは100です。
-
-.PARAMETER ErrorAsWarning
-　異常終了しても警告終了のReturnCodeを返します。
-
-.PARAMETER WarningAsNormal
-　警告終了しても正常終了のReturnCodeを返します。
-
-.PARAMETER ExecutableUser
-　このプログラムを実行可能なユーザを正規表現で指定します。
-デフォルトは[.*]で全てのユーザが実行可能です。　
-記述はシングルクオーテーションで括って下さい。
-正規表現のため、ドメインのバックスラッシュは[domain\\.*]の様にバックスラッシュでエスケープして下さい。　
-
-
-
-#>
-
+﻿#Requires -Version 3.0
 
 Param(
 
-
+[String]$ExecUser = 'hogehoge',
+[String]$ExecUserPassword = 'hogehoge',
 [String]$OracleService = $Env:ORACLE_SID,
+#[String]$OracleService = 'SSDBT',
+
+[String]$SQLLogPath = '.\SC_Logs\SQL.log',
+[String]$BackUpFlagPath = '.\Lock\BkUpDB.flg',
+
+[String][String]$SQLCommandsPath = '.\SQL\SQLs.ps1',
+[Switch]$PasswordAuthorization ,
 
 [String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
 
-[String]$SQLLogPath = '..\Log\SQL.log',
-
-[String][String]$SQLCommandsPath = '..\SQL\SQLs.ps1',
-
 [String]$StartServicePath = '.\StartService.ps1' ,
 
-[String]$ExecUser = 'hogehoge',
-[String]$ExecUserPassword = 'hogehoge',
-[Switch]$PasswordAuthorization ,
+[int][ValidateRange(1,65535)]$RetrySpanSec = 20,
+[int][ValidateRange(1,65535)]$RetryTimes = 15,
 
+[String]$TimeStampFormat = "_yyyyMMdd_HHmmss",
 
-[int][parameter(HelpMessage = 'Oracleサービス起動のリトライ待ち時間(ex. 30(sec))Oracleは起動に時間が掛かるので30秒を推奨 全てのHelpはGet-Help StartService.ps1')][ValidateRange(1,65535)]$RetrySpanSec = 30,
-[int][parameter(HelpMessage = 'Oracleサービス起動のリトライ待ち時間の繰返.回数(ex. 10(times))Oracleは起動に時間が掛かるので10回を推奨 全てのHelpはGet-Help StartService.ps1')][ValidateRange(1,65535)]$RetryTimes = 10,
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Unicode', #Default指定はShift-Jis
 
 
 
@@ -257,7 +89,7 @@ function Initialize {
 
 #OracleBINフォルダの指定、存在確認
 
-    CheckNullOrEmpty -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNullOrEmptyFinalize > $NULL
+    $OracleHomeBinPath = ConvertToAbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
 
     CheckContainer -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
 
@@ -265,25 +97,25 @@ function Initialize {
 #SQLLogファイルの指定、存在、書き込み権限確認
 
 
-#    CheckNullOrEmpty -CheckPath $SQLLogPath -ObjectName '-SQLLogPath' -IfNullOrEmptyFinalize > $NULL
-
         $SQLLogPath = ConvertToAbsolutePath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath'
 
-    If(Test-Path -Path $SQLLogPath -PathType Leaf){
+        Split-Path $SQLLogPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName '-SQLLogPathのParentフォルダ' -IfNoExistFinalize > $NULL}
+
+    If(Test-Path -LiteralPath $SQLLogPath -PathType Leaf){
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLLogPathの書込権限を確認します"
         $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" Write Permission Check"
-       
+        
 
         Try{
-            Write-Output $LogWrite | Out-File -FilePath $SQLLogPath -Append
+            Write-Output $LogWrite | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
             Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLLogPathの書込に成功しました"
             }
         Catch [Exception]{
             Logging -EventType Error -EventID $ErrorEventID -EventMessage  "-SQLLogPathへの書込に失敗しました"
             Finalize $ErrorReturnCode
             }
-    
+     
      }else{
             TryAction -ActionType MakeNewFileWithValue -ActionFrom $SQLLogPath -ActionError $SQLLogPath -FileValue $Null
             }
@@ -298,6 +130,7 @@ function Initialize {
     Try{
 
         . $SQLCommandsPath
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLCommandsPathに指定されたSQL群のLoadに成功しました"
         }
         Catch [Exception]{
         Logging -EventType Error -EventID $ErrorEventID -EventMessage  "-SQLCommandsPathに指定されたSQL群のLoadに失敗しました"
@@ -323,7 +156,7 @@ function Initialize {
         Finalize $ErrorReturnCode
 
         }
-       
+        
 
 
 #処理開始メッセージ出力
@@ -369,7 +202,7 @@ ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェ
 
 $FormattedDate = (Get-Date).ToString($TimeStampFormat)
 
-${Version} = '0.9.14'
+${Version} = '0.9.18'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
@@ -387,9 +220,9 @@ $ReturnMessage = lsnrctl status  2>&1
 
 [String]$ListenerStatus = $ReturnMessage
 
-Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
+Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
 
-    Switch -Regex ($ListenerStatus){
+    Switch -Regex ($ListenerStatus){ 
 
         'インスタンスがあります'{
 
@@ -400,27 +233,27 @@ Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
         'リスナーがありません'{
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Listenerは停止中"
             $NeedToStartListener = $TRUE
-            }  
+            }   
 
         Default{
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "Listenerの状態は不明"
             $NeedToStartListener = $TRUE
             }
-    
+     
      }
 
 
     IF($NeedToStartListener){
-   
+    
         $ReturnMessage = LSNRCTL START
 
-        Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
-   
-
+        Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
+    
+ 
 
         IF($LastExitCode -eq 0){
             Logging -EventID $SuccessEventID -EventType Success -EventMessage "Listenerは起動に成功しました"
-           
+            
             }else{
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "Listenerは起動に失敗しました"
             Finalize $ErrorReturnCode
@@ -429,8 +262,7 @@ Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
     }
 
 
-
-#Windowsサービス起動状態を確認、必要に応じて起動   
+#Windowsサービス起動状態を確認、必要に応じて起動    
 
 
     $ServiceStatus = CheckServiceStatus -ServiceName $TargetOracleService -Health Running -Span 0 -UpTo 1
@@ -438,9 +270,9 @@ Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
 
     IF ($ServiceStatus){
         Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($TargetOracleService)]は既に起動しています"
-       
+        
         }else{
-       
+        
 
        $ServiceCommand = "$StartServicePath -Service $TargetOracleService -RetrySpanSec $RetrySpanSec -RetryTimes $RetryTimes"
 
@@ -449,7 +281,7 @@ Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Windowsサービス [$($TargetOracleService)]起動を開始します"
             Invoke-Expression $ServiceCommand
-       
+        
         }
         catch [Exception]{
 
@@ -459,8 +291,8 @@ Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
             Finalize $ErrorReturnCode
         }
 
-           
-           
+            
+            
             IF($LastExitCode -ne 0){
                 Logging -EventID $ErrorEventID -EventType Error -EventMessage "Windowsサービス [$($TargetOracleService)]起動に失敗しました"
                 Finalize $ErrorReturnCode
@@ -468,32 +300,46 @@ Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
         }
 
 
-#DBインスタンス起動状態確認
+#DBインスタンス状態確認
 
-       . ExecSQL -SQLCommand $DBStatus -SQLName 'DB Status Check' -SQLLogPath $SQLLogPath >$Null
+      $ExecSQLReturnCode =  . ExecSQL -SQLCommand $DBStatus -SQLName 'DB Status Check' -SQLLogPath $SQLLogPath
 
 
+             IF (($ExecSQLReturnCode) -OR ( $SQLLog -match 'ORA-01034')){
 
-             IF ($LastExitCode -ne 0){
-
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "DB Status Checkに失敗しました"
-
-#        Finalize $ErrorReturnCode
-               
-                }else{
                 Logging -EventID $SuccessEventID -EventType Success -EventMessage "DB Status Checkに成功しました"
+                
+                }else{
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "DB Status Checkに失敗しました"
                 }
 
-      
 
         IF($SQLLog -match 'OPEN'){
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle [$($TargetOracleService)]は既に起動しています"
-       
-            }else{
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle [$($TargetOracleService)]は起動していません"       
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle [$($TargetOracleService)]を起動します"
-            ExecSQL -SQLCommand $DBStart -SQLName 'DB Instance Start' -SQLLogPath $SQLLogPath > $Null
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle SID[$($OracleService)]は既にOPENしています"
+         
+  
+        }elseIF($SQLLog -match '(STARTED|MOUNTED)'){
+            
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Oracle SID[$($OracleService)]はMOUNTもしくはNOMOUNT状態です。明示的にSHUTDOWN後STARTUPして下さい"
+            Finalize $ErrorReturnCode
+
+        }else{
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle SID[$($OracleService)]はOPENしていません"        
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle SID[$($OracleService)]をOPENします"
+
+
+            $ExecSQLReturnCode = . ExecSQL -SQLCommand $DBStart -SQLName 'DB Instance OPEN' -SQLLogPath $SQLLogPath
+
+                IF ($ExecSQLReturnCode){
+
+                    Logging -EventID $SuccessEventID -EventType Success -EventMessage "DB Instance OPENに成功しました"
+                
+                    }else{
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "DB Instance OPENに失敗しました"
+                    $ErrorCount ++
+                    }
             }
+
 
 
 
@@ -507,40 +353,42 @@ Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
 
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "Check Back Up Modeに失敗しました"
 
-        Finalize $ErrorReturnCode
-        }else{
+	    Finalize $ErrorReturnCode
+        }else{ 
         Logging -EventID $SuccessEventID -EventType Success -EventMessage "Check Back Up Modeに成功しました"
         }
 
 
 
  IF(-NOT($BackUpModeFlag) -and ($NormalModeFlag)){
-
+ 
     Logging -EventID $InfoEventID -EventType Information -EventMessage "既に通常モードです"
     }
 
  IF(-NOT (($BackUpModeFlag) -xor ($NormalModeFlag))){
 
-    ogging -EventID $ErrorEventID -EventType Error -EventMessage "状態が不明です"
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "状態が不明です"
     $ErrorCount ++
-
-
+ 
+ 
     }elseif(($BackUpModeFlag) -and (-NOT($NormalModeFlag))){
-
+ 
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "バックアップモードです。通常モードへ切替ます"
 
 
-      . ExecSQL -SQLCommand $DBBackUpModeOff -SQLName "Change to Normal Mode" -SQLLogPath $SQLLogPath > $Null
+      $ExecSQLReturnCode = . ExecSQL -SQLCommand $DBBackUpModeOff -SQLName "Change to Normal Mode" -SQLLogPath $SQLLogPath
 
-        IF ($LastExitCode -ne 0){
+        IF ($ExecSQLReturnCode){
 
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Change to Normal Modeに失敗しました"
+            Logging -EventID $SuccessEventID -EventType Success -EventMessage "Change to Normal Modeに成功しました"
 
-            $ErrorCount ++
+	        
 
         }else{
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Change to Normal Modeに成功しました"
+        
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Change to Normal Modeに失敗しました"
+        $ErrorCount ++
         }
 
 
@@ -549,17 +397,19 @@ Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
 
 #コントロールファイル書き出し
 
-. ExecSQL -SQLCommand $DBExportControlFile -SQLName 'DBExportControlFile'  -SQLLogPath $SQLLogPath > $Null
+    $ExecSQLReturnCode = . ExecSQL -SQLCommand $DBExportControlFile -SQLName 'DBExportControlFile'  -SQLLogPath $SQLLogPath
 
 
-      IF ($LastExitCode -ne 0){
+      IF ($ExecSQLReturnCode){
 
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "DBExportControlFileに失敗しました"
-
-        $WarningCount ++
-
-        }else{
         Logging -EventID $SuccessEventID -EventType Success -EventMessage "DBExportControlFileに成功しました"
+
+	    
+
+        }else{ 
+        
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "DBExportControlFileに失敗しました"
+        $WarningCount ++
         }
 
 
@@ -567,17 +417,17 @@ Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append
 
 
 
-. ExecSQL -SQLCommand $ExportRedoLog  -SQLName 'ExportRedoLog'  -SQLLogPath $SQLLogPath > $Null
+    $ExecSQLReturnCode = . ExecSQL -SQLCommand $ExportRedoLog  -SQLName 'ExportRedoLog'  -SQLLogPath $SQLLogPath 
 
 
-      IF ($LastExitCode -ne 0){
+      IF ($ExecSQLReturnCode){
 
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "ExportRedoLogに失敗しました"
-
-        $WarningCount ++
+        Logging -EventID $SuccessEventID -EventType Success -EventMessage "ExportRedoLogに成功しました"
+	    
 
         }else{
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "ExportRedoLogに成功しました"
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "ExportRedoLogに失敗しました"
+        $WarningCount ++
         }
 
 
