@@ -444,7 +444,9 @@ Param(
 
 
 #サービス状態確認
-
+#引数$Healthで状態(Running|Stopped)を指定してください。戻り値は指定状態で$TRUEまたは非指定状態$False
+#サービス起動、停止しても状態推移には時間が掛かります。このfunctionは一定時間$Span、一定回数$UpTo、状態確認を繰り返します
+#起動が遅いサービスは$Spanを大きくしてください
 
 function CheckServiceStatus {
 
