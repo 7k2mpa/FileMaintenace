@@ -159,7 +159,7 @@ Param(
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$CommandFileEncode = 'Default', #Defaultw’è‚ÍShift-Jis
 
 [Switch]$Continue,
-
+[Switch]$Script:NoAction,
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
@@ -295,9 +295,7 @@ ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
 
-
-${Version} = '0.9.13.3'
-
+${Version} = '20200115_2345'
 
 #‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
 

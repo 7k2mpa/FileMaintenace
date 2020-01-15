@@ -375,13 +375,14 @@ filter ComplexFilter{
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
     IF ($_.Name -match ${RegularExpression}){
     IF ($_.Length -ge (1024*$KBsize)){
-    IF ((Split-Path -Parent $_.FullName) -match ${ParentRegularExpression})
+    IF ((Split-Path -Parent $_.FullName).Substring($TargetFolder.Length , (Split-Path -Parent $_.FullName).Length - $TargetFolder.Length) -match ${ParentRegularExpression})
         {Return $_}
     }
     } 
     }                                                                              
 
 }
+
 
 
 function GetFolders{
@@ -429,13 +430,14 @@ Param(
 
     If($Recurse){
 
-            Return ForEach-Object -Process{Get-ChildItem -LiteralPath $TargetFolder -File -Recurse -Include * | ComplexFilter | ForEach-Object {$_.FullName} }           
-                           
+         
+            Return Get-ChildItem -LiteralPath $TargetFolder -File -Recurse -Include * | ComplexFilter | ForEach-Object {$_.FullName}            
+                                                     
             }else{
 
-            Return ForEach-Object -Process{Get-ChildItem -LiteralPath $TargetFolder -File -Include * | ComplexFilter | ForEach-Object {$_.FullName}
+            Return Get-ChildItem -LiteralPath $TargetFolder -File -Include * | ComplexFilter | ForEach-Object {$_.FullName}
             }
-    }
+    
 }
 
 
@@ -622,7 +624,6 @@ function CompressAndAddTimeStamp{
       If(CheckLeafNotExists $ArchiveFileCheckPath){
 
             TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $ArchiveFileCheckPath -ActionError $TargetObject
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ArchiveFileCheckPath)ÇçÏê¨ÇµÇ‹ÇµÇΩ"
             }
 }
 
@@ -685,7 +686,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       Å@Å@                    #ÉtÉãÉpÉ
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #Ç±ÇÃÉtÉ@ÉCÉãÇÃÉpÉX
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ÉVÉFÉãñº
 
-${Version} = '20200115_2136'
+${Version} = '20200115_2345'
 
 
 #èâä˙ê›íËÅAÉpÉâÉÅÅ[É^ämîFÅAãNìÆÉÅÉbÉZÅ[ÉWèoóÕ
