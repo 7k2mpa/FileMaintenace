@@ -103,7 +103,7 @@ Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt -Conti
 ワイルドカード* ? []は使用できません。
 フォルダ、ファイル名に括弧 [ , ] を含む場合はエスケープせずにそのまま入力してください。
 ファイルが存在しない場合は新規作成します。
-ファイルが既存の場合は追記します。。
+ファイルが既存の場合は追記します。
 
 .PARAMETER LogDateFormat
 　ログファイル出力に含まれる日時表示フォーマットを指定します。デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
