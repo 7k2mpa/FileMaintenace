@@ -99,8 +99,11 @@ Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt -Conti
 .PARAMETER LogPath
 　ログファイル出力パスを指定します。デフォルトは$NULLです。
 相対、絶対パスで指定可能です。
+相対パス表記は、.から始める表記にして下さい。（例 .\Log\Log.txt , ..\Script\log\log.txt）
+ワイルドカード* ? []は使用できません。
+フォルダ、ファイル名に括弧 [ , ] を含む場合はエスケープせずにそのまま入力してください。
 ファイルが存在しない場合は新規作成します。
-ファイルが既存の場合は追記します。
+ファイルが既存の場合は追記します。。
 
 .PARAMETER LogDateFormat
 　ログファイル出力に含まれる日時表示フォーマットを指定します。デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
