@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-$Script:CommonFunctionsVersion = '20200114_1400'
+$Script:CommonFunctionsVersion = '20200115_2100'
 
 #ログ等の変数を一括設定したい場合は以下を利用して下さい。
 #
@@ -85,7 +85,7 @@ function CheckEventLogSource{
     Try{
 
            
-        If ([System.Diagnostics.Eventlog]::SourceExists($ProviderName) -eq $false){
+        If (-NOT([System.Diagnostics.Eventlog]::SourceExists($ProviderName) ) ){
         #新規イベントソースを設定
 
            
@@ -224,6 +224,12 @@ function TryAction {
     Finalize $InternalErrorReturnCode
     }
 
+    IF($NoAction){
+    
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "-NoActionが指定されているため、実際の操作はしません"
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "${ActionError}の[${ActionType}]は実行しませんでした"
+        Return
+        }
       
     Try{
   

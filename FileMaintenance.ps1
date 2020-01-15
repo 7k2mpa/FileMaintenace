@@ -249,12 +249,15 @@ Param(
 [int][ValidateRange(0,2147483647)]$Days = 0,
 [int][ValidateRange(0,2147483647)]$KBsize = 0,
 [Regex]$RegularExpression ='.*',
+[Regex]$ParentRegularExpression ='.*',
+
 
 [boolean]$Recurse = $TRUE,
 [Switch]$NoRecurse,
 
 [Switch]$OverRide,
 [Switch]$Continue,
+[Switch]$NoAction,
 
 [Switch]$Compress,
 [String]$CompressedExtString = '.zip',
@@ -369,12 +372,12 @@ filter ComplexFilter{
 
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
     IF ($_.Name -match ${RegularExpression}){
-    IF ($_.Length -ge (1024*$KBsize))
-
+    IF ($_.Length -ge (1024*$KBsize)){
+    IF ((Split-Path -Parent $_.FullName) -match ${ParentRegularExpression})
         {Return $_}
     }
     } 
-                                                                              
+    }                                                                              
 
 }
 
@@ -680,7 +683,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒ
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
-${Version} = '0.9.15.1'
+${Version} = '20200115_2100'
 
 
 #‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
