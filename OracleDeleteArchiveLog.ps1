@@ -192,6 +192,8 @@ Param(
 
 
 
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
+
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
 [String]$ProviderName = "Infra",
@@ -345,10 +347,10 @@ ${Version} = '0.9.15'
     IF ($PasswordAuthorization){
 
         $RmanLog = RMAN target $ExecUser/$ExecUserPassword@$OracleSerivce CMDFILE "$ExecRMANPath" $Days
-        Write-Output $RmanLog | Out-File -FilePath $OracleRmanLogPath -Append
+        Write-Output $RmanLog | Out-File -FilePath $OracleRmanLogPath -Append  -Encoding $LogFileEncode
         }else{
         $RmanLog = RMAN target / CMDFILE "$ExecRMANPath" $Days
-        Write-Output $RmanLog | Out-File -FilePath $OracleRmanLogPath -Append
+        Write-Output $RmanLog | Out-File -FilePath $OracleRmanLogPath -Append  -Encoding $LogFileEncode
         }
 
 

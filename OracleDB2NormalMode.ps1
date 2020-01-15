@@ -22,7 +22,7 @@ Param(
 
 [String]$TimeStampFormat = "_yyyyMMdd_HHmmss",
 
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Unicode', #Default指定はShift-Jis
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
 
 
 
