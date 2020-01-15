@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-$Script:CommonFunctionsVersion = '20200115_2100'
+$Script:CommonFunctionsVersion = '20200115_2115'
 
 #ログ等の変数を一括設定したい場合は以下を利用して下さい。
 #
@@ -226,8 +226,7 @@ function TryAction {
 
     IF($NoAction){
     
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "-NoActionが指定されているため、実際の操作はしません"
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "${ActionError}の[${ActionType}]は実行しませんでした"
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "-NoActionが指定されているため、${ActionError}の[${ActionType}]は実行しませんでした"
         Return
         }
       
@@ -294,9 +293,7 @@ function TryAction {
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]のため処理を継続します。"
             $Script:WarningFlag = $TRUE
             $Script:ContinueFlag = $TRUE
-
-            #Continueの場合、処理継続はするが、処理は失敗しているのでFALSEを返す
-            Return $Flase
+            Return
             }
 
         #Continueしない場合は終了処理へ進む

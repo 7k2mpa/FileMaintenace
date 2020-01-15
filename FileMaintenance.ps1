@@ -258,6 +258,8 @@ Param(
 [Switch]$OverRide,
 [Switch]$Continue,
 [Switch]$NoAction,
+[Switch]$NoneTargetAsWarning,
+
 
 [Switch]$Compress,
 [String]$CompressedExtString = '.zip',
@@ -683,7 +685,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒ
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
-${Version} = '20200115_2100'
+${Version} = '20200115_2136'
 
 
 #‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
@@ -711,9 +713,15 @@ Write-Output 'ˆ—‘ÎÛ‚ÍˆÈ‰º‚Å‚·'
     If ($null -eq $TargetObjects){
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$($TargetFolder)‚Éˆ—‘ÎÛ‚Æ‚È‚éƒtƒ@ƒCƒ‹A‚Ü‚½‚ÍƒtƒHƒ‹ƒ_‚Í‚ ‚è‚Ü‚¹‚ñ"
-        Finalize $NormalReturnCode
-        }
 
+        IF($NoneTargetAsWarning){
+            Logging -EventID $WarningEventID -EventType Warning -EventMessage "-NoneTargetAsWarning‚ªw’è‚³‚ê‚Ä‚¢‚é‚½‚ßAŒxI—¹ˆµ‚¢‚É‚µ‚Ü‚·"
+            Finalize $WarningReturnCode
+            }
+            else{
+            Finalize $NormalReturnCode
+            }
+    }
 
 
 #‘ÎÛƒtƒHƒ‹ƒ_orƒtƒ@ƒCƒ‹ŒQ‚Ìˆ—ƒ‹[ƒv
