@@ -18,7 +18,7 @@
 -Žåˆ—:‘ÎÛƒtƒ@ƒCƒ‹‚ðuˆÚ“®vu•¡»vuíœvu“à—eÁ‹Žiƒkƒ‹ƒNƒŠƒAjvAƒtƒHƒ‹ƒ_‚ðu‹óƒtƒHƒ‹ƒ_íœv‚µ‚Ü‚·B
 -Œãˆ—:‘ÎÛƒtƒ@ƒCƒ‹‚ðu“à—eÁ‹Žiƒkƒ‹ƒNƒŠƒAjv‚µ‚Ü‚·B
 
-ƒtƒBƒ‹ƒ^‚ÍuŒo‰ß“ú”vu—e—Êvu³‹K•\Œ»v‚ÅŽw’è‚Å‚«‚Ü‚·B
+ƒtƒBƒ‹ƒ^‚ÍuŒo‰ß“ú”vu—e—Êvu³‹K•\Œ»vu‘ÎÛƒtƒ@ƒCƒ‹AƒtƒHƒ‹ƒ_‚ÌeƒpƒX‚ÉŠÜ‚Ü‚ê‚é•¶Žš‚Ì³‹K•\Œ»v‚ÅŽw’è‚Å‚«‚Ü‚·B
 
 ‚±‚ÌƒvƒƒOƒ‰ƒ€’P‘Ì‚Å‚ÍA1“x‚Éˆ—‚Å‚«‚é‚Ì‚Í1ƒtƒHƒ‹ƒ_‚Å‚·B•¡”ƒtƒHƒ‹ƒ_‚ðˆ—‚µ‚½‚¢ê‡‚ÍAWrapper.ps1‚ð•¹—p‚µ‚Ä‚­‚¾‚³‚¢B
 
@@ -71,7 +71,21 @@ C:\TESTˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ðÄ‹A“I‚É u.log‚ÅI‚í‚év‚©‚Â10“úˆÈ‘O‚Ì‚à‚Ì‚ðˆ³kŒãC:\TES
 Œ³‚Ìƒtƒ@ƒCƒ‹‚Ííœ‚µ‚Ü‚·
 
 
+.EXAMPLE
 
+FileMaintenace.ps1 -TargetFolder C:\OLD\Log -RegularExpression '^.*\.log$' -Action Delete -ParentRegularExpression '\\OLD\\'
+
+C:\OLD\LogˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ÅÄ‹A“I‚Éu.log‚ÅI‚í‚év‚à‚Ì‚ðíœ‚µ‚Ü‚·B
+’A‚µAƒtƒ@ƒCƒ‹‚Ìƒtƒ‹ƒpƒX‚©‚çC:\OLD\Log‚ðíœ‚µ‚½ƒpƒX‚Éu\OLD\v‚ªŠÜ‚Ü‚ê‚éƒtƒ@ƒCƒ‹‚¾‚¯‚ª‘ÎÛ‚É‚È‚è‚Ü‚·B³‹K•\Œ»‚Ì‚½‚ßAƒpƒX‚ÉŠÜ‚Ü‚ê‚é\iƒoƒbƒNƒXƒ‰ƒbƒVƒ…j‚ª\iƒoƒbƒNƒXƒ‰ƒbƒVƒ…j‚ÅƒGƒXƒP[ƒv‚³‚ê‚Ä‚¢‚Ü‚·B
+—á‚¦‚ÎˆÈ‰º‚Ìƒtƒ@ƒCƒ‹”z’u‚Å‚ÍC:\OLD\Log‚Ü‚Å‚Íƒ}ƒbƒ`‘ÎÛŠO‚Æ‚È‚èC:\OLD\Log\IIS\Current\Infra.log , C:\OLD\Log\Java\Current\Infra.log , C:\OLD\Log\Infra.log‚Ííœ‚³‚ê‚Ü‚¹‚ñB
+
+C:\OLD\Log\IIS\Current\Infra.log
+C:\OLD\Log\IIS\OLD\Infra.log
+C:\OLD\Log\Java\Current\Infra.log
+C:\OLD\Log\Java\OLD\Infra.log
+C:\OLD\Log\Infra.log
+
+ 
 .PARAMETER TargetFolder
 ˆ—‘ÎÛ‚Ìƒtƒ@ƒCƒ‹AƒtƒHƒ‹ƒ_‚ªŠi”[‚³‚ê‚Ä‚¢‚éƒtƒHƒ‹ƒ_‚ðŽw’è‚µ‚Ü‚·B
 Žw’è‚Í•K{‚Å‚·B
@@ -83,7 +97,7 @@ C:\TESTˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ðÄ‹A“I‚É u.log‚ÅI‚í‚év‚©‚Â10“úˆÈ‘O‚Ì‚à‚Ì‚ðˆ³kŒãC:\TES
 .PARAMETER Action
 @ˆ—‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚É‘Î‚·‚é‘€ì‚ðÝ’è‚µ‚Ü‚·BˆÈ‰º‚Ìƒpƒ‰ƒ[ƒ^‚ðŽw’è‚µ‚Ä‰º‚³‚¢B
 
-None:‰½‚à‘€ì‚ð‚µ‚Ü‚¹‚ñB‚±‚ÌÝ’è‚ªƒfƒtƒHƒ‹ƒg‚Å‚·B
+None:‰½‚à‘€ì‚ð‚µ‚Ü‚¹‚ñB‚±‚ÌÝ’è‚ªƒfƒtƒHƒ‹ƒg‚Å‚·B‚±‚ê‚ÍŒë‘€ì–hŽ~‚Ì‚½‚ß‚É‚ ‚è‚Ü‚·B“®ìŒŸØ‚É‚Í-NoActionƒXƒCƒbƒ`‚ð—˜—p‚µ‚Ä‰º‚³‚¢B
 Move:ƒtƒ@ƒCƒ‹‚ð-MoveToFolder‚ÖˆÚ“®‚µ‚Ü‚·B
 Delete:ƒtƒ@ƒCƒ‹‚ðíœ‚µ‚Ü‚·B
 Copy:ƒtƒ@ƒCƒ‹‚ð-MoveToFolder‚ÉƒRƒs[‚µ‚Ü‚·B
@@ -111,6 +125,14 @@ NullClear:ƒtƒ@ƒCƒ‹‚Ì“à—eíœ NullClear‚µ‚Ü‚·B
 ‹Lq‚ÍƒVƒ“ƒOƒ‹ƒNƒI[ƒe[ƒVƒ‡ƒ“‚ÅŠ‡‚Á‚Ä‰º‚³‚¢B
 PowerShell‚ÌŽd—lãA‘å•¶Žš¬•¶Žš‚Ì‹æ•Ê‚Í‚µ‚È‚¢”¤‚Å‚·‚ªAŽÀÛ‚É‚Í‹æ•Ê‚³‚ê‚é‚Ì‚Å’ˆÓ‚µ‚Ä‰º‚³‚¢B
 
+.PARAMETER ParentRegularExpression
+@ˆ—‘ÎÛ‚Ìƒtƒ@ƒCƒ‹AƒtƒHƒ‹ƒ_‚ÌãˆÊƒpƒX‚©‚ç-TargetFolder‚ÌƒpƒX‚Ü‚Å‚ð³‹K•\Œ»‚ÅƒtƒBƒ‹ƒ^‚µ‚Ü‚·B-TargetFolder‚ÉŠÜ‚Ü‚ê‚éƒpƒX‚ÍƒtƒBƒ‹ƒ^‘ÎÛŠO‚Å‚·B
+ƒfƒtƒHƒ‹ƒg‚Í .* ‚Å‘S‚Ä‚ª‘ÎÛ‚Æ‚È‚è‚Ü‚·B
+‹Lq‚ÍƒVƒ“ƒOƒ‹ƒNƒI[ƒe[ƒVƒ‡ƒ“‚ÅŠ‡‚Á‚Ä‰º‚³‚¢B
+PowerShell‚ÌŽd—lãA‘å•¶Žš¬•¶Žš‚Ì‹æ•Ê‚Í‚µ‚È‚¢”¤‚Å‚·‚ªAŽÀÛ‚É‚Í‹æ•Ê‚³‚ê‚é‚Ì‚Å’ˆÓ‚µ‚Ä‰º‚³‚¢B
+
+
+
 .PARAMETER Recurse
 @-TargetFolder‚Ì’¼‰º‚ÌÄ‹A“I‚Ü‚½‚Í”ñÄ‹A‚Éˆ—‚ÌŽw’è‚ª‰Â”\‚Å‚·B
 ƒfƒtƒHƒ‹ƒg‚Í$TRUE‚ÅÄ‹A“Iˆ—‚Å‚·B
@@ -127,6 +149,17 @@ Recurseƒpƒ‰ƒ[ƒ^‚æ‚è—Dæ‚µ‚Ü‚·B
 @ˆÚ“®AƒRƒs[æ‚ÉŠù‚É“¯–¼‚Ìƒtƒ@ƒCƒ‹‚ª‘¶Ý‚µ‚½ê‡“–ŠYƒtƒ@ƒCƒ‹‚Ìˆ—‚ðƒXƒLƒbƒv‚µ‚Ü‚·B
 ƒXƒLƒbƒv‚·‚é‚ÆŒxI—¹‚µ‚Ü‚·B
 ƒfƒtƒHƒ‹ƒg‚Å‚ÍƒXƒLƒbƒv‚¹‚¸‚ÉˆÙíI—¹‚µ‚Ü‚·B
+
+.PARAMETER NoAction
+ƒtƒ@ƒCƒ‹AƒtƒHƒ‹ƒ_‚ðŽÀÛ‚Éíœ“™‚Ì‘€ì‚ð‚¹‚¸‚ÉŽÀs‚µ‚Ü‚·B
+“®ìŠm”F‚Å“–ŠYƒXƒCƒbƒ`‚ðŽw’è‚µ‚Ä‚­‚¾‚³‚¢B
+-Action None‚Í-Compress“™‚ÌPre ActionAPost Action‚ÍŽÀs‚³‚ê‚Ü‚·‚ªA‚±‚ÌƒXƒCƒbƒ`‚Í‘S‚Ä‚Ìƒtƒ@ƒCƒ‹‘€ì‚ðŽÀs‚µ‚È‚­‚È‚è‚Ü‚·B
+ƒƒOã‚ÍŒx‚ªo—Í‚³‚ê‚Ü‚·‚ªAŽÀsŒ‹‰Ê‚Å‚Í‚±‚ÌŒx‚Í–³Ž‹‚³‚ê‚Ü‚·B
+
+.PARAMETER NoneTargetAsWarning
+‘€ì‘ÎÛ‚Ìƒtƒ@ƒCƒ‹AƒtƒHƒ‹ƒ_‚ª‘¶Ý‚µ‚È‚¢ê‡‚ÉŒxI—¹‚µ‚Ü‚·B
+‚±‚ÌƒXƒCƒbƒ`‚ðÝ’è‚µ‚È‚¢‚Æ‘¶Ý‚µ‚È‚¢ê‡‚Í’ÊíI—¹‚µ‚Ü‚·B
+
 
 .PARAMETER Compress
 @‘ÎÛƒtƒ@ƒCƒ‹‚ðˆ³k‚µ‚Ä•Êƒtƒ@ƒCƒ‹‚Æ‚µ‚Ä•Û‘¶‚µ‚Ü‚·B
@@ -686,7 +719,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒ
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
-${Version} = '20200115_2345'
+${Version} = '20200116_2123'
 
 
 #‰ŠúÝ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
