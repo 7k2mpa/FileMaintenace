@@ -1,0 +1,13 @@
+-TargetFolder D:\TEST1 -Action Copy -MoveToFolder D:\TEST2 -OverRide
+#
+#空白行はスキップしてくれます。
+
+#
+#パスにスペースが含まれている場合は引用符で括る
+-TargetFolder D:\TEST1 -Action Copy -MoveToFolder 'D:\TEST 4' -ErrorAsWarning
+
+
+#こんな命名は無いと思いますがパスに引用符が含まれている場合は二重引用符で括る
+-TargetFolder "D:\TEST' 5"
+-TargetFolder "D:\TEST ' 6 TEST"
+#なお、二重引用符はNTFSでは名前に使用出来ません
