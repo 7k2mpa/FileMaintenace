@@ -1,0 +1,32 @@
+
+#Move Oracle Logs To BK_Logs Folder
+
+-TargetFolder D:\oracle\oraclehome\diag\rdbms\ssdbt\ssdbt\trace -RegularExpression '^alert_ssdbt\.log$' -AddTimeStamp -MoveNewFile -MoveToFolder D:\Scripts\Infra\BK_Logs\oracle\oraclehome\diag\rdbms\SSDBT\SSDBT\trace -Action None -NullOriginalFile
+
+
+-TargetFolder D:\oracle\oraclehome\diag\tnslsnr\pnx-tksvdb32\listener\trace -RegularExpression '^listener\.log$' -AddTimeStamp -MoveNewFile -MoveToFolder D:\Scripts\Infra\BK_Logs\oracle\oraclehome\diag\tnslsnr\pnx-tksvdb32\listener\trace -Action None -NullOriginalFile
+
+
+#Move Script Logs To Bk_Logs Folder
+
+-TargetFolder D:\Scripts\Infra\SC_Logs -RegularExpression '^(SQL|RMAN)\.log$' -AddTimeStamp -MoveNewFile -MoveToFolder D:\Scripts\Infra\BK_Logs\Scripts\Infra\SC_Logs -Action Delete
+
+-TargetFolder D:\Scripts\Infra\SC_Logs -RegularExpression '^CONTROLFILE\.BK$' -AddTimeStamp -MoveNewFile -MoveToFolder D:\Scripts\Infra\BK_Logs\Scripts\Infra\SC_Logs -Action Delete
+
+-TargetFolder D:\Scripts\Infra\SC_Logs -RegularExpression '^FILE_BK\.CTL$' -AddTimeStamp  -MoveNewFile -MoveToFolder D:\Scripts\Infra\BK_Logs\Scripts\Infra\SC_Logs -Action Delete
+
+
+#Delete Oracle Old Trace Logs
+
+-TargetFolder D:\oracle\oraclehome\diag\rdbms\SSDBT\SSDBT\trace -RegularExpression '\.(trc|trm)$' -Action Delete -Days 90
+
+
+#Delete Expired Archive Logs and Empty Folders
+
+-TargetFolder E:\oracle\fast_recovery_area\SSDBT\ARCHIVELOG -Action Delete -Days 3
+
+-TargetFolder E:\oracle\fast_recovery_area\SSDBT\ARCHIVELOG -Action DeleteEmptyFolders
+
+#Delete Old Bk_Logs
+
+-TargetFolder D:\Scripts\Infra\BK_Logs -Action Delete -Days 30
