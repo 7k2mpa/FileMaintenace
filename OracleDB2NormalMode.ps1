@@ -131,7 +131,7 @@ function Initialize {
    Try{
 
         . $SQLCommandsPath
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLCommandsPathに指定されたSQL群 Version $($SQLsVersion)のLoadに成功しました"
+        Logging -EventID $SuccessEventID -EventType Success -EventMessage "-SQLCommandsPathに指定されたSQL群 Version $($SQLsVersion)のLoadに成功しました"
  
         }
        Catch [Exception]{
@@ -216,7 +216,7 @@ ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェ
 
 $FormattedDate = (Get-Date).ToString($TimeStampFormat)
 
-${Version} = '20200117_1130'
+${Version} = '20200117_1133'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
