@@ -289,7 +289,7 @@ function Initialize {
 
     Split-Path $SQLLogPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName '-SQLLogPathのParentフォルダ' -IfNoExistFinalize > $NULL}
 
-    If(Test-Path -Path $SQLLogPath -PathType Leaf){
+    If(Test-Path -LiteralPath $SQLLogPath -PathType Leaf){
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLLogPathの書込権限を確認します"
         $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" Write Permission Check"
@@ -382,7 +382,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       　　                    #フ�
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
 
-${Version} = '20200117_1050'
+${Version} = '20200117_1130'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
