@@ -1,6 +1,6 @@
 ﻿#Requires -Version 3.0
 
-$Script:SQLsVersion = '20200117_1120'
+$Script:SQLsVersion = '20200117_2012'
 
 [String]$DBStart = @'
 
@@ -40,6 +40,7 @@ exit
 '@
 
 
+#&controlfiledotctlPATH,&controlfiledotbkPATHはLoad元で置換変数の様に置換する
 
 [String]$DBExportControlFile = @"
 

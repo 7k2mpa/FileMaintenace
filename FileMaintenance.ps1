@@ -1,4 +1,4 @@
-#Requires -Version 1.0
+#Requires -Version 3.0
 
 <#
 .SYNOPSIS
@@ -25,6 +25,10 @@
 
 ƒƒOo—Íæ‚Í[Windows EventLog][ƒRƒ“ƒ\[ƒ‹][ƒƒOƒtƒ@ƒCƒ‹]‚ª‘I‘ð‰Â”\‚Å‚·B‚»‚ê‚¼‚êo—ÍA—}Ž~‚ªŽw’è‚Å‚«‚Ü‚·B
 
+‚±‚ÌƒvƒƒOƒ‰ƒ€‚ÍPowerShell 3.0ˆÈ~‚ª•K—v‚Å‚·B
+Windows Server 2008,2008R2‚ÍWMF(Windows Management Framework)3.0ˆÈ~‚ð’Ç‰ÁƒCƒ“ƒXƒg[ƒ‹‚µ‚Ä‚­‚¾‚³‚¢B‚»‚êˆÈ‘O‚ÌOS‚Å‚Í‰Ò“­‚µ‚Ü‚¹‚ñB
+
+https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows-powershell?view=powershell-7#upgrading-existing-windows-powershell
 
 
 .EXAMPLE
@@ -408,7 +412,7 @@ filter ComplexFilter{
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
     IF ($_.Name -match ${RegularExpression}){
     IF ($_.Length -ge (1024*$KBsize)){
-    IF ((Split-Path -Parent $_.FullName).Substring($TargetFolder.Length , (Split-Path -Parent $_.FullName).Length - $TargetFolder.Length) -match ${ParentRegularExpression})
+    IF (($_.FullName).Substring($TargetFolder.Length , (Split-Path -Parent $_.FullName).Length - $TargetFolder.Length +1) -match ${ParentRegularExpression})
         {Return $_}
     }
     } 
@@ -460,6 +464,7 @@ function GetFiles{
 Param(
 [parameter(mandatory=$true)][String]$TargetFolder
 )
+
 
     If($Recurse){
 
@@ -719,7 +724,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒ
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
-${Version} = '20200116_2123'
+${Version} = '20200117_2225'
 
 
 #‰ŠúÝ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
