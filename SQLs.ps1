@@ -1,9 +1,6 @@
 ﻿#Requires -Version 3.0
 
-
-
-
-
+$Script:SQLsVersion = '20200117_1120'
 
 [String]$DBStart = @'
 
@@ -12,12 +9,15 @@ startup
 exit
 '@
 
-[String]$DBOpen = @'
 
-WHENEVER SQLERROR EXIT 1
+[String]$DBMount = @'
+alter database mount;
+exit
+'@
+
+[String]$DBOpen = @'
 alter database open;
 exit
-
 '@
 
 
@@ -39,11 +39,13 @@ shutdown immediate;
 exit
 '@
 
+
+
 [String]$DBExportControlFile = @"
 
 WHENEVER SQLERROR EXIT 1
-alter database backup controlfile to 'D:\Scripts\Infra\SC_Logs\file_bk.ctl';
-alter database backup controlfile to trace as 'D:\Scripts\Infra\SC_Logs\controlfile.bk';
+alter database backup controlfile to '&controlfiledotctlPATH';
+alter database backup controlfile to trace as '&controlfiledotbkPATH';
 exit
 
 "@

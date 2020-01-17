@@ -24,7 +24,8 @@ Param(
 
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
 
-
+[String]$controlfiledotctlPATH = '.\SC_Logs\file_bk.ctl' ,
+[String]$controlfiledotbkPATH = '.\SC_Logs\controlfile.bk',
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
@@ -101,7 +102,7 @@ function Initialize {
 
         Split-Path $SQLLogPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName '-SQLLogPathのParentフォルダ' -IfNoExistFinalize > $NULL}
 
-    If(Test-Path -LiteralPath $SQLLogPath -PathType Leaf){
+    If(Test-Path -Path $SQLLogPath -PathType Leaf){
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLLogPathの書込権限を確認します"
         $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" Write Permission Check"
@@ -127,12 +128,13 @@ function Initialize {
     CheckLeaf -CheckPath $SQLCommandsPath -ObjectName '-SQLCommandsPath' -IfNoExistFinalize > $NULL
 
 
-    Try{
+   Try{
 
         . $SQLCommandsPath
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLCommandsPathに指定されたSQL群のLoadに成功しました"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLCommandsPathに指定されたSQL群 Version $($SQLsVersion)のLoadに成功しました"
+ 
         }
-        Catch [Exception]{
+       Catch [Exception]{
         Logging -EventType Error -EventID $ErrorEventID -EventMessage  "-SQLCommandsPathに指定されたSQL群のLoadに失敗しました"
         Finalize $ErrorReturnCode
     }
@@ -156,7 +158,19 @@ function Initialize {
         Finalize $ErrorReturnCode
 
         }
-        
+
+
+#ControlFile出力先pathの存在確認
+
+
+    $controlfiledotctlPATH = ConvertToAbsolutePath -CheckPath $controlfiledotctlPATH -ObjectName '-controlfiledotctlPATH '
+
+    CheckContainer -CheckPath (Split-Path $ControlfiledotctlPATH -Parent) -ObjectName '-controlfiledotctlPATHのParent Folder ' -IfNoExistFinalize > $NULL
+
+    $controlfiledotbkPATH = ConvertToAbsolutePath -CheckPath $controlfiledotbkPATH -ObjectName '-controlfiledotbkPATH '
+
+    CheckContainer -CheckPath (Split-Path $ControlfiledotbkPATH -Parent) -ObjectName '-controlfiledotbkPATHのParent Folder ' -IfNoExistFinalize > $NULL
+
 
 
 #処理開始メッセージ出力
@@ -202,7 +216,7 @@ ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェ
 
 $FormattedDate = (Get-Date).ToString($TimeStampFormat)
 
-${Version} = '0.9.18'
+${Version} = '20200117_1050'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
@@ -396,6 +410,13 @@ Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
 
 #コントロールファイル書き出し
+
+
+#SQL.ps1の置換変数表示になっている対象部分を置換
+
+    $DBExportControlFile = $DBExportControlFile.Replace('&controlfiledotctlPATH' , $controlfiledotctlPATH)
+    $DBExportControlFile = $DBExportControlFile.Replace('&controlfiledotbkPATH' , $controlfiledotbkPATH)
+
 
     $ExecSQLReturnCode = . ExecSQL -SQLCommand $DBExportControlFile -SQLName 'DBExportControlFile'  -SQLLogPath $SQLLogPath
 
