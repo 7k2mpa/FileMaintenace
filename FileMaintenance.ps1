@@ -360,10 +360,13 @@ Try{
 
 
 #CheckLeafNotExists–ß‚è’l
-#ƒ`ƒFƒbƒN‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢...$TRUE
+
 #ƒ`ƒFƒbƒN‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é‚ªA-OverRide‚ğw’è...$TRUE@i‚±‚Ìw’è‚Í-Continue‚É—Dæ‚·‚éj
 #ƒ`ƒFƒbƒN‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é‚ªA-Continue‚ğw’è...$False
 #ƒ`ƒFƒbƒN‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é...$ErrorReturnCode ‚ÅFinalize‚Öi‚Ş
+#ƒ`ƒFƒbƒN‘ÎÛ‚Æ“¯ˆê–¼Ì‚ÌƒtƒHƒ‹ƒ_‚ª‘¶İ‚·‚é‚ªA-Continue‚ğw’è...$False
+#ƒ`ƒFƒbƒN‘ÎÛ‚Æ“¯ˆê–¼Ì‚ÌƒtƒHƒ‹ƒ_‚ª‘¶İ‚·‚é...$ErrorReturnCode ‚ÅFinalize‚Öi‚Ş
+#ƒ`ƒFƒbƒN‘ÎÛ‚Ìƒtƒ@ƒCƒ‹AƒtƒHƒ‹ƒ_‚ª‘¶İ‚µ‚È‚¢...$TRUE
 
 function CheckLeafNotExists {
 
@@ -373,6 +376,7 @@ Param(
 
 Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf)‚Ì‘¶İ‚ğŠm”F‚µ‚Ü‚·"
 
+    #Šù‚Éƒtƒ@ƒCƒ‹‚ª‚ ‚é‚ªAOverRidew’è‚Í–³‚¢B‚æ‚Á‚ÄAˆÙíI—¹ or Continuew’è‚ ‚è‚ÅŒp‘±
 
     If( (Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -AND (-NOT($OverRide)) ){
 
@@ -392,14 +396,42 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
             Return $False
             }
 
-
+      #Šù‚Éƒtƒ@ƒCƒ‹‚ª‚ ‚é‚ªAOverRidew’è‚ª‚ ‚éB‚æ‚Á‚ÄŒp‘±  
 
      }elseif( (Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -AND ($OverRide) ){
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Šù‚É$($CheckLeaf)‚ª‘¶İ‚µ‚Ü‚·‚ª-OverRide[$OverRide]‚Ì‚½‚ßã‘‚«‚µ‚Ü‚·"
             $Script:OverRideCount ++
 
+
+
+            #‚±‚±‚Ü‚Å—ˆ‚ê‚Îƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢‚ÍŠm’èB“¯ˆê–¼Ì‚ÌƒtƒHƒ‹ƒ_‚ª‘¶İ‚·‚é‰Â”\«‚Íc‚Á‚Ä‚¢‚é
+            #“¯ˆê–¼Ì‚ÌƒtƒHƒ‹ƒ_‚ª‘¶İ‚·‚é‚ÆOverRideo—ˆ‚È‚¢‚Ì‚ÅAContinuew’è‚ ‚è‚Ìê‡‚ÍŒp‘±Bw’è‚È‚µ‚ÅˆÙíI—¹
+
+            }elseif(Test-Path -LiteralPath $CheckLeaf -PathType Container){
+
+                Logging -EventID $WarningEventID -EventType Warning -EventMessage "Šù‚É“¯ˆê–¼ÌƒtƒHƒ‹ƒ_$($CheckLeaf)‚ª‘¶İ‚µ‚Ü‚·"
+                $Script:WarningFlag = $TRUE
+
+                IF(-NOT($Continue)){
+
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Šù‚É“¯ˆê–¼ÌƒtƒHƒ‹ƒ_$($CheckLeaf)‚ª‘¶İ‚·‚é‚½‚ßA${SHELLNAME}‚ğI—¹‚µ‚Ü‚·"
+                    $ErrorCount ++
+                    Finalize $ErrorReturnCode
+            
+                    }else{
+                    Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]‚Ì‚½‚ßˆ—‚ğŒp‘±‚µ‚Ü‚·B"
+                    $Script:ContinueFlag = $true
+
+                    #Šù‘¶ƒtƒHƒ‹ƒ_‚ª‚ ‚é‚Ì‚Å$False‚ğ•Ô‚µ‚Äƒtƒ@ƒCƒ‹ˆ—‚³‚¹‚È‚¢
+                    Return $False
+                    }
+
+            
+            #“¯ˆê–¼Ì‚Ìƒtƒ@ƒCƒ‹AƒtƒHƒ‹ƒ_‹¤‚É‘¶İ‚µ‚È‚¢
+
             }else{
+
             Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf)‚Í‘¶İ‚µ‚Ü‚¹‚ñ"            
             }
 
@@ -724,7 +756,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒ
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
-${Version} = '20200117_2225'
+${Version} = '20200118_2357'
 
 
 #‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
@@ -790,16 +822,50 @@ $TargetObjectName = GetTargetObjectName $TargetObject
 
     If( (($Action -match "^(Move|Copy)$")) -OR ($MoveNewFile)) {
 
+        #ƒtƒ@ƒCƒ‹‚ªˆÚ“®‚·‚éAction—p‚Éƒtƒ@ƒCƒ‹ˆÚ“®æ‚ÌeƒtƒHƒ‹ƒ_ƒpƒX‚ğ¶¬‚·‚é
+        
+        #C:\TargetFolder                    :TargetFolder
+        #C:\TargetFolder\A\B\C              :TargetFileParentFolder
+        #C:\TargetFolder\A\B\C\target.txt   :TargetFile
+        # \A\B\C\@‚Ì•”•ª‚ğæ‚èo‚µ‚ÄAˆÚ“®æƒtƒHƒ‹ƒ_MoveToFolder‚ÆJoin-Path‚·‚é
+        # String.Substringƒƒ\ƒbƒh‚Í•¶š—ñ‚©‚çAˆø”ˆÊ’u‚©‚çÅŒã‚Ü‚Å‚ğæ‚èo‚·
+
         $MoveToNewFolder = Join-Path $MoveToFolder ($TargetFileParentFolder).Substring($TargetFolder.Length)
         If($Recurse){
+
+            #”O‚Ì‚½‚ßAƒtƒ@ƒCƒ‹ˆÚ“®æeƒtƒHƒ‹ƒ_ƒpƒX‚É“¯ˆê–¼Ì‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é‚©Šm”F
+
+            IF(Test-Path -LiteralPath $MoveToNewFolder -PathType Leaf){
+
+                Logging -EventID $WarningEventID -EventType Warning -EventMessage "Šù‚É“¯ˆê–¼Ìƒtƒ@ƒCƒ‹$($MoveToNewFolder)‚ª‘¶İ‚µ‚Ü‚·"
+                $Script:WarningFlag = $TRUE
+
+                IF(-NOT($Continue)){
+
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Šù‚É“¯ˆê–¼Ìƒtƒ@ƒCƒ‹$($MoveToNewFolder)‚ª‘¶İ‚·‚é‚½‚ßA${SHELLNAME}‚ğI—¹‚µ‚Ü‚·"
+                    $ErrorCount ++
+                    Finalize $ErrorReturnCode
+            
+                    }else{
+                    Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]‚Ì‚½‚ßˆ—‚ğŒp‘±‚µ‚Ü‚·B"
+                    $Script:ContinueFlag = $true
+
+                    #Continue‚ÅForEachƒ‹[ƒv‚ğ“r’†‚Å”²‚¯‚ÄŸ‚Ì—v‘f‚ğÀs
+                    #ForEachI’[•t‹ß‚ÌƒJƒEƒ“ƒ^ˆ—‚ª‚³‚ê‚È‚¢‚Ì‚ÅA‚±‚±‚ÅƒJƒEƒ“ƒgƒAƒbƒv‚·‚é
+
+                    $ContinueCount ++
+                    $WarningCount ++
+                    Continue
+                    }
+            }
 
 
             If (-NOT(CheckContainer -CheckPath $MoveToNewFolder -ObjectName ˆÚ“®æƒtƒHƒ‹ƒ_)){
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "V‹K‚É$($MoveToNewFolder)‚ğì¬‚µ‚Ü‚·"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "V‹K‚É$($MoveToNewFolder)‚ğì¬‚µ‚Ü‚·"
 
-            TryAction -ActionType MakeNewFolder -ActionFrom $MoveToNewFolder -ActionError $MoveToNewFolder
-            }
+                TryAction -ActionType MakeNewFolder -ActionFrom $MoveToNewFolder -ActionError $MoveToNewFolder
+                }
         }
     }
 
