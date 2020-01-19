@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-$Script:CommonFunctionsVersion = '20200119_1025'
+$Script:CommonFunctionsVersion = '20200119_2120'
 
 #ログ等の変数を一括設定したい場合は以下を利用して下さい。
 #
@@ -599,6 +599,49 @@ Param(
                     Return $false
                     }
         }
+}
+
+
+function CheckLogPath {
+
+
+Param(
+
+[String]$CheckPath,
+[String]$ObjectName
+
+)
+    #ログ出力先ファイルの親フォルダが存在しなければ異常終了
+
+    Split-Path $CheckPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName $ObjectName -IfNoExistFinalize > $NULL}
+
+    #ログ出力先（予定）ファイルと同一名称のフォルダが存在していれば異常終了
+
+    If(Test-Path -LiteralPath $CheckPath -PathType Container){
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称フォルダ$($CheckLeaf)が存在します"        
+        Finalize $ErrorReturnCode
+        }
+
+
+    If(Test-Path -LiteralPath $CheckPath -PathType Leaf){
+
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($ObjectName)]への書込権限を確認します"
+        $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" Write Permission Check"
+        
+
+        Try{
+            Write-Output $LogWrite | Out-File -FilePath $CheckPath -Append -Encoding $LogFileEncode
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($ObjectName)]への書込に成功しました"
+            }
+        Catch [Exception]{
+            Logging -EventType Error -EventID $ErrorEventID -EventMessage  "[$($ObjectName)]への書込に失敗しました"
+            Finalize $ErrorReturnCode
+            }
+     
+     }else{
+            TryAction -ActionType MakeNewFileWithValue -ActionFrom $CheckPath -ActionError $CheckPath -FileValue $Null
+            }
+
 }
 
 

@@ -287,26 +287,8 @@ function Initialize {
 
     $SQLLogPath = ConvertToAbsolutePath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath'
 
-    Split-Path $SQLLogPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName '-SQLLogPathのParentフォルダ' -IfNoExistFinalize > $NULL}
+    CheckLogPath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath' > $NULL
 
-    If(Test-Path -LiteralPath $SQLLogPath -PathType Leaf){
-
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLLogPathの書込権限を確認します"
-        $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" Write Permission Check"
-        
-
-        Try{
-            Write-Output $LogWrite | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLLogPathの書込に成功しました"
-            }
-        Catch [Exception]{
-            Logging -EventType Error -EventID $ErrorEventID -EventMessage  "-SQLLogPathへの書込に失敗しました"
-            Finalize $ErrorReturnCode
-            }
-     
-     }else{
-            TryAction -ActionType MakeNewFileWithValue -ActionFrom $SQLLogPath -ActionError $SQLLogPath -FileValue $Null
-            }
 
 #SQLコマンド群の指定、存在確認、Load
 
@@ -382,7 +364,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       　　                    #フ�
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
 
-${Version} = '20200117_1133'
+${Version} = '20200119_2120'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
