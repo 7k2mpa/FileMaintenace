@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-$Script:CommonFunctionsVersion = '20200115_2345'
+$Script:CommonFunctionsVersion = '20200119_1025'
 
 #ƒƒO“™‚Ì•Ï”‚ğˆêŠ‡İ’è‚µ‚½‚¢ê‡‚ÍˆÈ‰º‚ğ—˜—p‚µ‚Ä‰º‚³‚¢B
 #
@@ -303,12 +303,15 @@ function TryAction {
 
    IF($ActionType -match '^(Compress|CompressAndAddTimeStamp|AddTimeStamp|Copy|Move)$' ){
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ActionTo)‚ğì¬‚µ‚Ü‚µ‚½"
-   
-   }
+        }
 
-   
+
+    IF($OverRideFlag){
+        $Script:OverRideCount ++
+        $Script:OverRideFlag = $False
+        }
+           
     Logging -EventID $SuccessEventID -EventType Success -EventMessage "${ActionError}‚Ì[${ActionType}]‚É¬Œ÷‚µ‚Ü‚µ‚½"
- 
 
 }
 

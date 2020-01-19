@@ -401,9 +401,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
      }elseif( (Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -AND ($OverRide) ){
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Šù‚É$($CheckLeaf)‚ª‘¶İ‚µ‚Ü‚·‚ª-OverRide[$OverRide]‚Ì‚½‚ßã‘‚«‚µ‚Ü‚·"
-            $Script:OverRideCount ++
-
-
+            $Script:OverRideFlag = $TRUE
 
             #‚±‚±‚Ü‚Å—ˆ‚ê‚Îƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢‚ÍŠm’èB“¯ˆê–¼Ì‚ÌƒtƒHƒ‹ƒ_‚ª‘¶İ‚·‚é‰Â”\«‚Íc‚Á‚Ä‚¢‚é
             #“¯ˆê–¼Ì‚ÌƒtƒHƒ‹ƒ_‚ª‘¶İ‚·‚é‚ÆOverRideo—ˆ‚È‚¢‚Ì‚ÅAContinuew’è‚ ‚è‚Ìê‡‚ÍŒp‘±Bw’è‚È‚µ‚ÅˆÙíI—¹
@@ -745,6 +743,7 @@ EndingProcess $ReturnCode
 
 [boolean]$ErrorFlag = $False
 [boolean]$WarningFlag = $False
+[boolean]$OverRideFlag = $False
 [boolean]$ContinueFlag = $False
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
@@ -756,7 +755,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒ
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
-${Version} = '20200118_2357'
+${Version} = '20200119_1026'
 
 
 #‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
@@ -822,12 +821,17 @@ $TargetObjectName = GetTargetObjectName $TargetObject
 
     If( (($Action -match "^(Move|Copy)$")) -OR ($MoveNewFile)) {
 
-        #ƒtƒ@ƒCƒ‹‚ªˆÚ“®‚·‚éAction—p‚Éƒtƒ@ƒCƒ‹ˆÚ“®æ‚ÌeƒtƒHƒ‹ƒ_ƒpƒX‚ğ¶¬‚·‚é
+        #ƒtƒ@ƒCƒ‹‚ªˆÚ“®‚·‚éAction—p‚Éƒtƒ@ƒCƒ‹ˆÚ“®æ‚ÌeƒtƒHƒ‹ƒ_ƒpƒX$MoveToNewFolder‚ğ¶¬‚·‚é
         
         #C:\TargetFolder                    :TargetFolder
         #C:\TargetFolder\A\B\C              :TargetFileParentFolder
         #C:\TargetFolder\A\B\C\target.txt   :TargetFile
-        # \A\B\C\@‚Ì•”•ª‚ğæ‚èo‚µ‚ÄAˆÚ“®æƒtƒHƒ‹ƒ_MoveToFolder‚ÆJoin-Path‚·‚é
+        #D:\MoveToFolder                    :MoveToFolder
+        #D:\MoveToFolder\A\B\C              :MoveToNewFolder
+
+        #D:\MoveToFolder\A\B\C\target.txt   :ƒtƒ@ƒCƒ‹‚ÌˆÚ“®æƒpƒX
+
+        #MoveToNewFolder‚ğì‚é‚É‚Í \A\B\C\@‚Ì•”•ª‚ğæ‚èo‚µ‚ÄAˆÚ“®æƒtƒHƒ‹ƒ_MoveToFolder‚ÆJoin-Path‚·‚é
         # String.Substringƒƒ\ƒbƒh‚Í•¶š—ñ‚©‚çAˆø”ˆÊ’u‚©‚çÅŒã‚Ü‚Å‚ğæ‚èo‚·
 
         $MoveToNewFolder = Join-Path $MoveToFolder ($TargetFileParentFolder).Substring($TargetFolder.Length)
