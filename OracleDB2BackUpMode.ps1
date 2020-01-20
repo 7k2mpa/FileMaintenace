@@ -300,12 +300,14 @@ function Initialize {
     Try{
 
         . $SQLCommandsPath
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "-SQLCommandsPathに指定されたSQL群 Version $($SQLsVersion)のLoadに成功しました"
+
         }
         Catch [Exception]{
         Logging -EventType Error -EventID $ErrorEventID -EventMessage  "-SQLCommandsPathに指定されたSQL群のLoadに失敗しました"
         Finalize $ErrorReturnCode
     }
+
+    Logging -EventID $SuccessEventID -EventType Success -EventMessage "-SQLCommandsPathに指定されたSQL群 Version $($SQLsVersion)のLoadに成功しました"
 
 
 #Oracle起動確認
@@ -364,7 +366,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       　　                    #フ�
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
 
-${Version} = '20200119_2120'
+${Version} = '20200120_1025'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力

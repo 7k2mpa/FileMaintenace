@@ -98,28 +98,10 @@ function Initialize {
 #SQLLogファイルの指定、存在、書き込み権限確認
 
 
-        $SQLLogPath = ConvertToAbsolutePath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath'
+    $SQLLogPath = ConvertToAbsolutePath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath'
 
-        Split-Path $SQLLogPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName '-SQLLogPathのParentフォルダ' -IfNoExistFinalize > $NULL}
+    CheckLogPath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath' > $NULL
 
-    If(Test-Path -LiteralPath $SQLLogPath -PathType Leaf){
-
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLLogPathの書込権限を確認します"
-        $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" Write Permission Check"
-        
-
-        Try{
-            Write-Output $LogWrite | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "-SQLLogPathの書込に成功しました"
-            }
-        Catch [Exception]{
-            Logging -EventType Error -EventID $ErrorEventID -EventMessage  "-SQLLogPathへの書込に失敗しました"
-            Finalize $ErrorReturnCode
-            }
-     
-     }else{
-            TryAction -ActionType MakeNewFileWithValue -ActionFrom $SQLLogPath -ActionError $SQLLogPath -FileValue $Null
-            }
 
 #SQLコマンド群の指定、存在確認、Load
 
@@ -128,16 +110,17 @@ function Initialize {
     CheckLeaf -CheckPath $SQLCommandsPath -ObjectName '-SQLCommandsPath' -IfNoExistFinalize > $NULL
 
 
-   Try{
+    Try{
 
         . $SQLCommandsPath
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "-SQLCommandsPathに指定されたSQL群 Version $($SQLsVersion)のLoadに成功しました"
- 
+
         }
-       Catch [Exception]{
+        Catch [Exception]{
         Logging -EventType Error -EventID $ErrorEventID -EventMessage  "-SQLCommandsPathに指定されたSQL群のLoadに失敗しました"
         Finalize $ErrorReturnCode
     }
+
+    Logging -EventID $SuccessEventID -EventType Success -EventMessage "-SQLCommandsPathに指定されたSQL群 Version $($SQLsVersion)のLoadに成功しました"
 
 
 #Oracleサービス起動用のStartService.ps1の存在確認
@@ -216,7 +199,7 @@ ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェ
 
 $FormattedDate = (Get-Date).ToString($TimeStampFormat)
 
-${Version} = '20200117_1133'
+${Version} = '20200120_1025'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力

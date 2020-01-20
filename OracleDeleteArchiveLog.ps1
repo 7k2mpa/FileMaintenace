@@ -179,9 +179,9 @@ Param(
 
 [String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
 
-[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$ExecRMANPath = '..\SQL\DeleteArchiveLog.rman' ,
+[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$ExecRMANPath = '.\SQL\DeleteArchiveLog.rman' ,
 
-[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$OracleRmanLogPath = '..\Log\RMAN.log',
+[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$OracleRmanLogPath = '.\SC_Logs\RMAN.log',
 
 [parameter(mandatory=$true)][int][ValidateRange(1,65535)]$Days = 1,
 
@@ -268,14 +268,14 @@ function Initialize {
 
 #OracleRmanLogファイルの指定、存在、書き込み権限確認
 
-
-
     $OracleRmanLogPath = ConvertToAbsolutePath -CheckPath $OracleRmanLogPath -ObjectName '-OracleRmanLogPath'
 
-    If(-NOT(CheckLeaf -CheckPath $OracleRmanLogPath -ObjectName 'ログファイル -OracleRmanLogPath')){
+    CheckLogPath -CheckPath $OracleRmanLogPath -ObjectName '-OracleRMANLLogPath' > $NULL
 
-        TryAction -ActionType MakeNewFileWithValue -ActionFrom $OracleRmanLogPath -ActionError $OracleRmanLogPath -FileValue $Null
-        }
+#    If(-NOT(CheckLeaf -CheckPath $OracleRmanLogPath -ObjectName 'ログファイル -OracleRmanLogPath')){
+
+#        TryAction -ActionType MakeNewFileWithValue -ActionFrom $OracleRmanLogPath -ActionError $OracleRmanLogPath -FileValue $Null
+#        }
 
 
 #実行するRMANファイルの存在確認
@@ -334,7 +334,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       　　                    #フ�
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
 
-${Version} = '0.9.15'
+${Version} = '20200120_1025'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力

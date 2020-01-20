@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-$Script:CommonFunctionsVersion = '20200119_2120'
+$Script:CommonFunctionsVersion = '20200120_1025'
 
 #ログ等の変数を一括設定したい場合は以下を利用して下さい。
 #
@@ -625,16 +625,16 @@ Param(
 
     If(Test-Path -LiteralPath $CheckPath -PathType Leaf){
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($ObjectName)]への書込権限を確認します"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckPath)]への書込権限を確認します"
         $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" Write Permission Check"
         
 
         Try{
             Write-Output $LogWrite | Out-File -FilePath $CheckPath -Append -Encoding $LogFileEncode
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($ObjectName)]への書込に成功しました"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckPath)]への書込に成功しました"
             }
         Catch [Exception]{
-            Logging -EventType Error -EventID $ErrorEventID -EventMessage  "[$($ObjectName)]への書込に失敗しました"
+            Logging -EventType Error -EventID $ErrorEventID -EventMessage  "$($ObjectName) [$($CheckPath)]への書込に失敗しました"
             Finalize $ErrorReturnCode
             }
      
