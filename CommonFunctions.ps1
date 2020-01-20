@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-$Script:CommonFunctionsVersion = '20200120_1025'
+$Script:CommonFunctionsVersion = '20200120_2235'
 
 #ログ等の変数を一括設定したい場合は以下を利用して下さい。
 #
@@ -339,6 +339,9 @@ Param(
                     Finalize $ErrorReturnCode
                     }
 
+    #Windowsではパス区切に/も使用できる。しかしながら、処理を簡単にするため\に統一する
+
+    $CheckPath = $CheckPath.Replace('/','\')
 
     IF(Test-Path -LiteralPath $CheckPath -IsValid){
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は有効なパス表記です"
@@ -348,6 +351,7 @@ Param(
        Finalize $ErrorReturnCode  
 
     }
+
 
 
     Switch -Regex ($CheckPath){
@@ -360,22 +364,40 @@ Param(
          
         Logging -EventID $InfoEventID -EventType Information -EventMessage "スクリプトが配置されているフォルダ[${THIS_PATH}]、[$($CheckPath)]とを結合した絶対パス表記[$($ConvertedCheckPath)]に変換します"
 
-        Return $ConvertedCheckPath
+        $CheckPath = $ConvertedCheckPath
+
         }
 
         "^[c-zC-Z]:\\.*"{
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は絶対パス表記です"
 
-        Return $CheckPath
 
         }
-       Default{
+        Default{
       
-       Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]は相対パス、絶対パス表記ではありません"
-       Finalize $ErrorReturnCode
-       }
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]は相対パス、絶対パス表記ではありません"
+        Finalize $ErrorReturnCode
+        }
     }
+
+    #パス末尾に\\が連続すると処理が複雑になるので、使わせない
+
+    IF($CheckPath -match '\\\\'){
+ 
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Windowsパス指定で区切記号\の重複は許容されていますが、本プログラムでは都合上使用しないで下さい。"
+        Finalize $ErrorReturnCode
+        }
+
+
+    #パスがフォルダで末尾に\が存在した場合は削除する。末尾の\有無で結果は一緒なのだが、統一しないとパス文字列切り出しが複雑になりすぎる。
+
+    IF($CheckPath.Substring($CheckPath.Length -1 , 1) -eq '\'){
+    
+            $CheckPath = $CheckPath.Substring(0 , $CheckPath.Length -1)
+            }
+
+    Return $CheckPath
 
 }
 
