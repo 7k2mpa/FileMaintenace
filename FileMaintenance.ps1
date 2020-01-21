@@ -318,11 +318,13 @@ Param(
 [boolean]$Log2Console = $TRUE,
 [Switch]$NoLog2Console,
 
-[boolean]$Log2File = $False,
+[boolean]$Log2File = $false,
 [Switch]$NoLog2File,
-[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath = '.\SC_Logs\Infra.log',
+#[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath = '.\SC_Logs\Infra.log',
 #[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath = ..\Log\FileMaintenance.log ,
+[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath  ,
 [String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss',
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Defaultw’è‚ÍShift-Jis
 
 [int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
 [int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
@@ -757,7 +759,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒ
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
-${Version} = '20200119_1026'
+${Version} = '20200119_1426'
 
 
 #‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í

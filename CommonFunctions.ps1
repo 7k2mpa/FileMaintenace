@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-$Script:CommonFunctionsVersion = '20200121_0950'
+$Script:CommonFunctionsVersion = '20200121_1426'
 
 #ログ等の変数を一括設定したい場合は以下を利用して下さい。
 #
@@ -51,143 +51,30 @@ function Logging{
     Param(
     [parameter(mandatory=$true)][ValidateRange(1,65535)][int]$EventID,
     [parameter(mandatory=$true)][String][ValidateSet("Information", "Warning", "Error" ,"Success")]$EventType,
-    [parameter(mandatory=$true)][String]$EventMessage,
-    [Switch]$OnlyConsole
+    [parameter(mandatory=$true)][String]$EventMessage
     )
 
 
-    IF($Log2EventLog -and -NOT($OnlyConsole) ){
+    IF(($Log2EventLog -OR $ForceConsoleEventLog) -and -NOT($ForceConsole) ){
 
     Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType $EventType -EventId $EventID -Message "[$($SHELLNAME)] $($EventMessage)"
     }
 
 
-    IF($Log2Console -or $OnlyConsole ){
+    IF($Log2Console -or $ForceConsole -or $ForceConsoleEventLog){
 
     $ConsoleWrite = $EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
     Write-Host $ConsoleWrite
     }   
 
 
-    IF($Log2File -and -NOT($OnlyConsole) ){
+    IF($Log2File -and -NOT($ForceConsole -or $ForceConsoleEventLog )){
     $LogFormattedDate = (Get-Date).ToString($LogDateFormat)
     $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" "+$EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
-    Write-Output $LogWrite | Out-File -FilePath $LogPath -Append 
+    Write-Output $LogWrite | Out-File -FilePath $LogPath -Append -Encoding $LogFileEncode
     }   
 
 }
-
-
-#イベントソース未設定時の処理
-#この確認が終わるまではFunction Loggingのログ出力可能か確定しないので、異常時はExitで抜ける
-
-function CheckEventLogSource{
-
-    Try{
-
-           
-        If (-NOT([System.Diagnostics.Eventlog]::SourceExists($ProviderName) ) ){
-        #新規イベントソースを設定
-
-           
-            New-EventLog -LogName $EventLogLogName -Source $ProviderName  -ErrorAction Stop
-            Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Information -EventId $InfoEventID -Message "[$($SHELLNAME)] 新規イベントソース[$(ProviderName)]を[$($EventLogLogName)]へ登録しました"
-            }
-       
-    }
-    Catch [Exception]{
-    Write-Output "EventLogにSouce $($ProviderName)が存在しないため、新規作成を試みましたが失敗しました。新規Sourceの作成は実行ユーザが管理者権限を保有している必要があります。一度Powershellを管理者権限で開いて手動でこのプログラムを実行してください。"
-    Write-Output "起動時エラーメッセージ : $Error[0]"
-    Exit $ErrorReturnCode
-    }
-       
-}
-
-
-#ログファイル出力先確認
-#この確認が終わるまではFunction Loggingのログ出力可能か確定しないので、異常時はExitで抜ける
-
-function CheckLogFilePath{
-
-
-
-
-    IF (-NOT($Log2File)){
-        Return
-        }
-
-
-    IF(-NOT(Test-Path -LiteralPath $LogPath -IsValid)){
-
-       Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($LogPath)]は有効なパス表記ではありません。NTFSに使用できない文字列が含まれてないか等を確認して下さい"
-       Write-Output  "[$($LogPath)]は有効なパス表記ではありません。NTFSに使用できない文字列が含まれてないか等を確認して下さい"
-       Exit $ErrorReturnCode  
-
-    }
-
-
-
-        IF ([String]::IsNullOrEmpty($LogPath)){
-           
-            Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($SHELLNAME)] -Log2File[$($Log2File)]を指定した時、ログ出力先 -LogPathの指定が必要です"
-           
-            Write-Output "-Log2File[$($Log2File)]を指定した時、ログ出力先 -LogPathの指定が必要です"
-           
-            Exit $ErrorReturnCode
-            }
-
-
-
-
-                #ログ出力先指定が相対パス&カレントパスがスクリプト配置先ではない可能性を考慮して、相対パス指定はスクリプト配置先を基準にしたパスに変換する
-
-    Switch -Regex ($LogPath){
-
-        "^\.+\\.*"{
-       
-            $Script:LogPath =  Join-Path ${THIS_PATH} $LogPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
-
-            }
-
-        "^[c-zC-Z]:\\.*"{
-       
-            }
-      
-        Default{
-       
-            Write-Output "-LogPath [-LogPath $($LogPath)]は相対パス、絶対パス表記ではありません"
-            Exit $ErrorReturnCode
-            }
-    }
-
-
-        IF(Test-Path -LiteralPath $LogPath -PathType Container){
-                   Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($SHELLNAME)] ログ出力先ファイル指定先に同一名称のフォルダが存在しています。"      
-                   Write-Output "[$($SHELLNAME)] ログ出力先ファイル指定先に同一名称のフォルダが存在しています。"      
-                  
-                   Exit $ErrorReturnCode
-
-                    #この時点で$LogPathには同名フォルダは存在しないので、同名ファイルが存在するかを確認する
-                    }elseif(-NOT(Test-Path -LiteralPath $LogPath -PathType Leaf) ){
-                   
-                        Try{
-                            New-Item $LogPath -ItemType File > $NULL  -ErrorAction Stop
-
-                            #新規作成に成功すれば、Loggingが使える
-                            Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($SHELLNAME)] ログ出力先ファイルが存在しません。$($LogPath)を新規作成します"
-                        }
-       
-                        catch [Exception]{
-                        Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID -Message "[$($SHELLNAME)] ログ出力先ファイル$($LogPath)の作成に失敗しました。作成先フォルダが存在しないか、権限が不足しています"
-                        Write-Output "ログ出力先ファイル$($LogPath)の作成に失敗しました。作成先フォルダが存在しないか、権限が不足しています"
-                        Write-Output "起動時エラーメッセージ : $Error[0]"
-                        Exit $ErrorReturnCode
-                        }
-                    }
-   
-}
-
-
 
 
 #ReturnCode大小関係確認
@@ -202,6 +89,64 @@ function CheckReturnCode {
     Exit 1
     }
 }
+
+
+
+#イベントソース未設定時の処理
+#この確認が終わるまではログ出力可能か確定しないのでコンソール出力を強制
+
+function CheckEventLogSource{
+
+    IF (-NOT($Log2EventLog)){
+        Return
+        }
+
+
+$ForceConsole = $TRUE
+
+    TRY{
+
+        If (-NOT([System.Diagnostics.Eventlog]::SourceExists($ProviderName) ) ){
+        #新規イベントソースを設定
+           
+            New-EventLog -LogName $EventLogLogName -Source $ProviderName  -ErrorAction Stop
+            $ForceConsleEventLog = $TRUE    
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "新規イベントソース[$($ProviderName)]を[$($EventLogLogName)]へ登録しました"
+            }
+       
+    }
+    Catch [Exception]{
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "EventLogにSouce $($ProviderName)が存在しないため、新規作成を試みましたが失敗しました。新規Sourceの作成は実行ユーザが管理者権限を保有している必要があります。一度Powershellを管理者権限で開いて手動でこのプログラムを実行してください。"
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $Error[0]"
+    Exit $ErrorReturnCode
+    }
+
+$ForceConsole = $false
+$ForceConsoleEventLog = $false
+
+}
+
+
+#ログファイル出力先確認
+#この確認が終わるまではログ出力可能か確定しないのでEventLogとコンソール出力を強制
+
+function CheckLogFilePath{
+
+    IF (-NOT($Log2File)){
+        Return
+        }
+
+$ForceConsleEventLog = $TRUE    
+
+    $LogPath = ConvertToAbsolutePath -CheckPath $LogPath -ObjectName '-LogPath'
+
+    CheckLogPath -CheckPath $LogPath -ObjectName '-LogPath' > $NULL
+    
+$ForceConsoleEventLog = $false
+
+}
+
+
 
 
 
@@ -414,7 +359,7 @@ Param(
                 }
 
 
-    #Windows予約語がパス名に含まれているか判定
+    #Windows予約語がパスに含まれているか判定
 
     IF($CheckPath -match '\\(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])(\\|$|\..*$)'){
 
@@ -686,6 +631,7 @@ Param(
             }
         Catch [Exception]{
             Logging -EventType Error -EventID $ErrorEventID -EventMessage  "$($ObjectName) [$($CheckPath)]への書込に失敗しました"
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $Error[0]"
             Finalize $ErrorReturnCode
             }
      
@@ -740,6 +686,12 @@ function CheckExecUser {
 function PreInitialize {
 
 $error.clear()
+$ForceConsole = $false
+$ForceConsoleEventLog = $false
+
+#ReturnCode確認
+
+. CheckReturnCode
 
 
 #イベントソース未設定時の処理
@@ -752,9 +704,6 @@ $error.clear()
 . CheckLogFilePath
 
 
-#ReturnCode確認
-
-. CheckReturnCode
 
 #ここはfunctionなので変数はfunction内でのものとなる。スクリプト全体に反映するにはスコープを明示的に$Script:変数名とする
 
