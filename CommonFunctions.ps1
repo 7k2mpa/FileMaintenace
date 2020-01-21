@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-$Script:CommonFunctionsVersion = '20200121_1426'
+$Script:CommonFunctionsVersion = '20200121_2230'
 
 #ƒƒO“™‚Ì•Ï”‚ğˆêŠ‡İ’è‚µ‚½‚¢ê‡‚ÍˆÈ‰º‚ğ—˜—p‚µ‚Ä‰º‚³‚¢B
 #

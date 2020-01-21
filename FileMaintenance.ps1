@@ -759,7 +759,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒ
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
-${Version} = '20200119_1426'
+${Version} = '20200119_2230'
 
 
 #‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
@@ -804,16 +804,19 @@ Write-Output 'ˆ—‘ÎÛ‚ÍˆÈ‰º‚Å‚·'
 ForEach ($TargetObject in $TargetObjects)
 {
 
-[boolean]$ErrorFlag = $False
-[boolean]$WarningFlag = $False
-[boolean]$ContinueFlag = $False
+DO
+{
 
-$FormattedDate = (Get-Date).ToString($TimeStampFormat)
-$ExtensionString = [System.IO.Path]::GetExtension($TargetObject)
-$FileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension($TargetObject)
-$TargetFileParentFolder = Split-Path $TargetObject -Parent
+    [boolean]$ErrorFlag = $False
+    [boolean]$WarningFlag = $False
+    [boolean]$ContinueFlag = $False
 
-$TargetObjectName = GetTargetObjectName $TargetObject
+    $FormattedDate = (Get-Date).ToString($TimeStampFormat)
+    $ExtensionString = [System.IO.Path]::GetExtension($TargetObject)
+    $FileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension($TargetObject)
+    $TargetFileParentFolder = Split-Path $TargetObject -Parent
+
+    $TargetObjectName = GetTargetObjectName $TargetObject
 
     Logging -EventID $InfoEventID -EventType Information -EventMessage "--- ‘ÎÛObject $($TargetObjectName) ˆ—ŠJn---"
 
@@ -848,18 +851,9 @@ $TargetObjectName = GetTargetObjectName $TargetObject
                 TryAction -ActionType MakeNewFolder -ActionFrom $MoveToNewFolder -ActionError $MoveToNewFolder
 
                 IF($ContinueFlag){
-
-                    #Continue‚ÅForEachƒ‹[ƒv‚ğ“r’†‚Å”²‚¯‚ÄŸ‚Ì—v‘f‚ğÀs
-                    #ForEachI’[•t‹ß‚ÌƒJƒEƒ“ƒ^ˆ—‚ª‚³‚ê‚È‚¢‚Ì‚ÅA‚±‚±‚ÅƒJƒEƒ“ƒgƒAƒbƒv‚·‚é
-
-                    $ContinueCount ++
-                    $WarningCount ++
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "--- ‘ÎÛObject $($TargetObjectName) ˆ—I—¹---"
-                    Continue
-                
+                    Break                
                     }
-
-                }
+            }
         }
     }
 
@@ -868,9 +862,8 @@ $TargetObjectName = GetTargetObjectName $TargetObject
 #ˆ³kƒtƒ‰ƒO‚Ü‚½‚Íƒ^ƒCƒ€ƒXƒ^ƒ“ƒv•t‰Áƒtƒ‰ƒO‚ªTrue‚Ìˆ—
 
    IF( ($Compress) -OR ($AddTimeStamp)){
-
-    CompressAndAddTimeStamp
-    }
+        CompressAndAddTimeStamp
+        }
 
 
 #Main Action
@@ -940,8 +933,12 @@ $TargetObjectName = GetTargetObjectName $TargetObject
 
     IF ($NullOriginalFile){
 
-       TryAction -ActionType NullClear -ActionFrom $TargetObject -ActionError $TargetObject
-    }
+        TryAction -ActionType NullClear -ActionFrom $TargetObject -ActionError $TargetObject
+        }
+
+
+}
+while($False)
 
 
 #ˆÙíAŒx‚ğŠm”FBˆÙí>Œx>³í‚Ì‡ˆÊ‚ÅÀsŒ‹‰Ê”ƒJƒEƒ“ƒgƒAƒbƒv
@@ -957,8 +954,7 @@ $TargetObjectName = GetTargetObjectName $TargetObject
     IF($ContinueFlag){
         $ContinueCount ++
         }
-        
- 
+         
     Logging -EventID $InfoEventID -EventType Information -EventMessage "--- ‘ÎÛObject $($TargetObjectName) ˆ—I—¹---"
   
 
