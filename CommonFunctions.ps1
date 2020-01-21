@@ -110,7 +110,7 @@ $ForceConsole = $TRUE
         #新規イベントソースを設定
            
             New-EventLog -LogName $EventLogLogName -Source $ProviderName  -ErrorAction Stop
-            $ForceConsleEventLog = $TRUE    
+            $ForceConsoleEventLog = $TRUE    
             Logging -EventID $InfoEventID -EventType Information -EventMessage "新規イベントソース[$($ProviderName)]を[$($EventLogLogName)]へ登録しました"
             }
        
