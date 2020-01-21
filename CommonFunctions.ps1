@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-$Script:CommonFunctionsVersion = '20200120_2235'
+$Script:CommonFunctionsVersion = '20200121_0950'
 
 #ログ等の変数を一括設定したい場合は以下を利用して下さい。
 #
@@ -51,24 +51,25 @@ function Logging{
     Param(
     [parameter(mandatory=$true)][ValidateRange(1,65535)][int]$EventID,
     [parameter(mandatory=$true)][String][ValidateSet("Information", "Warning", "Error" ,"Success")]$EventType,
-    [parameter(mandatory=$true)][String]$EventMessage
+    [parameter(mandatory=$true)][String]$EventMessage,
+    [Switch]$OnlyConsole
     )
 
 
-    IF($Log2EventLog){
+    IF($Log2EventLog -and -NOT($OnlyConsole) ){
 
     Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType $EventType -EventId $EventID -Message "[$($SHELLNAME)] $($EventMessage)"
     }
 
 
-    IF($Log2Console){
+    IF($Log2Console -or $OnlyConsole ){
 
     $ConsoleWrite = $EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
     Write-Host $ConsoleWrite
     }   
 
 
-    IF($Log2File){
+    IF($Log2File -and -NOT($OnlyConsole) ){
     $LogFormattedDate = (Get-Date).ToString($LogDateFormat)
     $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" "+$EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
     Write-Output $LogWrite | Out-File -FilePath $LogPath -Append 
@@ -385,17 +386,45 @@ Param(
 
     IF($CheckPath -match '\\\\'){
  
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Windowsパス指定で区切記号\の重複は許容されていますが、本プログラムでは都合上使用しないで下さい。"
-        Finalize $ErrorReturnCode
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "Windowsパス指定で区切記号\の重複は許容されていますが、本プログラムでは都合上使用しません。重複した\を削除します"
+
+            For ( $i = 0 ; $i -lt $CheckPath.Length-1 ; $i++ )        
+            {
+            $CheckPath = $CheckPath.Replace('\\','\')
+            }
+
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "重複した\を削除した$ObjectName[$($CheckPath)]に変換しました"
         }
 
 
-    #パスがフォルダで末尾に\が存在した場合は削除する。末尾の\有無で結果は一緒なのだが、統一しないとパス文字列切り出しが複雑になりすぎる。
+    #パスがフォルダで末尾に\が存在した場合は削除する。末尾の\有無で結果は一緒なのだが、統一しないと文字列数が異なるためパス文字列切り出しが誤動作する。
 
     IF($CheckPath.Substring($CheckPath.Length -1 , 1) -eq '\'){
     
             $CheckPath = $CheckPath.Substring(0 , $CheckPath.Length -1)
             }
+
+
+    #TEST-Path -isvalidはコロン:の含まれているPathを正しく判定しないので個別に判定
+
+    IF ((Split-Path $CheckPath -noQualifier) -match '(\/|:|\?|`"|<|>|\||\*)') {
+    
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName にNTFSで使用できない文字を指定しています"
+				Finalize $ErrorReturnCode
+                }
+
+
+    #Windows予約語がパス名に含まれているか判定
+
+    IF($CheckPath -match '\\(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])(\\|$|\..*$)'){
+
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName のパスにWindows予約語を含んでいます。以下は予約語のためWindowsでファイル、フォルダ名称に使用できません(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
+				Finalize $ErrorReturnCode
+                }        
+
+
+
+
 
     Return $CheckPath
 
