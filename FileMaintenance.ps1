@@ -841,38 +841,24 @@ $TargetObjectName = GetTargetObjectName $TargetObject
         $MoveToNewFolder = Join-Path $MoveToFolder ($TargetFileParentFolder).Substring($TargetFolder.Length)
         If($Recurse){
 
-            #念のため、ファイル移動先親フォルダパスに同一名称のファイルが存在するか確認
+            If (-NOT(CheckContainer -CheckPath $MoveToNewFolder -ObjectName 移動先フォルダ)){
 
-            IF(Test-Path -LiteralPath $MoveToNewFolder -PathType Leaf){
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "新規に$($MoveToNewFolder)を作成します"
 
-                Logging -EventID $WarningEventID -EventType Warning -EventMessage "既に同一名称ファイル$($MoveToNewFolder)が存在します"
-                $Script:WarningFlag = $TRUE
+                TryAction -ActionType MakeNewFolder -ActionFrom $MoveToNewFolder -ActionError $MoveToNewFolder
 
-                IF(-NOT($Continue)){
-
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称ファイル$($MoveToNewFolder)が存在するため、${SHELLNAME}を終了します"
-                    $ErrorCount ++
-                    Finalize $ErrorReturnCode
-            
-                    }else{
-                    Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]のため処理を継続します。"
-                    $Script:ContinueFlag = $true
+                IF($ContinueFlag){
 
                     #ContinueでForEachループを途中で抜けて次の要素を実行
                     #ForEach終端付近のカウンタ処理がされないので、ここでカウントアップする
 
                     $ContinueCount ++
                     $WarningCount ++
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理終了---"
                     Continue
+                
                     }
-            }
 
-
-            If (-NOT(CheckContainer -CheckPath $MoveToNewFolder -ObjectName 移動先フォルダ)){
-
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "新規に$($MoveToNewFolder)を作成します"
-
-                TryAction -ActionType MakeNewFolder -ActionFrom $MoveToNewFolder -ActionError $MoveToNewFolder
                 }
         }
     }
