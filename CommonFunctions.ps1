@@ -254,6 +254,7 @@ function TryAction {
 
     IF($OverRideFlag){
         $Script:OverRideCount ++
+        $Script:InLoopOverRideCount ++
         $Script:OverRideFlag = $False
         }
            

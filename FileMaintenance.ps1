@@ -332,6 +332,8 @@ Param(
 [int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16,
 
 [int][ValidateRange(1,65535)]$InfoEventID = 1,
+[int][ValidateRange(1,65535)]$InfoLoopStartEventID = 2,
+[int][ValidateRange(1,65535)]$InfoLoopEndEventID = 3,
 [int][ValidateRange(1,65535)]$WarningEventID = 10,
 [int][ValidateRange(1,65535)]$SuccessEventID = 73,
 [int][ValidateRange(1,65535)]$InternalErrorEventID = 99,
@@ -747,6 +749,7 @@ EndingProcess $ReturnCode
 
 [boolean]$ErrorFlag = $False
 [boolean]$WarningFlag = $False
+[boolean]$NormalFlag = $False
 [boolean]$OverRideFlag = $False
 [boolean]$ContinueFlag = $False
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
@@ -809,7 +812,10 @@ DO
 
     [boolean]$ErrorFlag = $False
     [boolean]$WarningFlag = $False
+    [boolean]$NormalFlag = $False
+    [boolean]$OverRideFlag = $False
     [boolean]$ContinueFlag = $False
+    [int]$InLoopOverRideCount = 0
 
     $FormattedDate = (Get-Date).ToString($TimeStampFormat)
     $ExtensionString = [System.IO.Path]::GetExtension($TargetObject)
@@ -818,7 +824,7 @@ DO
 
     $TargetObjectName = GetTargetObjectName $TargetObject
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理開始---"
+    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理開始---"
 
 
 
@@ -949,13 +955,14 @@ while($False)
             $WarningCount ++
             }else{
                 $NormalCount ++
+                $NormalFlag = $TRUE
                 }
 
     IF($ContinueFlag){
         $ContinueCount ++
         }
          
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理終了---"
+    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理終了 E[$($ErrorFlag)] W[$($WarningFlag)] N[$($NormalFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
   
 
 #対象群の処理ループ終端
