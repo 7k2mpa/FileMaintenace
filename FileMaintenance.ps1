@@ -953,9 +953,8 @@ while($False)
         $ErrorCount ++
         }elseif($WarningFlag) {
             $WarningCount ++
-            }else{
+            }elseif($NormalFlag){
                 $NormalCount ++
-                $NormalFlag = $TRUE
                 }
 
     IF($ContinueFlag){

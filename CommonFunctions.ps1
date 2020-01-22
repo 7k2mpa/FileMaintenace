@@ -170,11 +170,21 @@ function TryAction {
     Finalize $InternalErrorReturnCode
     }
 
+
     IF($NoAction){
     
         Logging -EventID $WarningEventID -EventType Warning -EventMessage "-NoActionÇ™éwíËÇ≥ÇÍÇƒÇ¢ÇÈÇΩÇﬂÅA${ActionError}ÇÃ[${ActionType}]ÇÕé¿çsÇµÇ‹ÇπÇÒÇ≈ÇµÇΩ"
+        $Script:NormalFlag = $TRUE
+
+        IF($OverRideFlag){
+            $Script:OverRideCount ++
+            $Script:InLoopOverRideCount ++
+            $Script:OverRideFlag = $False
+            }
+
         Return
         }
+
       
     Try{
   
@@ -259,6 +269,7 @@ function TryAction {
         }
            
     Logging -EventID $SuccessEventID -EventType Success -EventMessage "${ActionError}ÇÃ[${ActionType}]Ç…ê¨å˜ÇµÇ‹ÇµÇΩ"
+    $Script:NormalFlag = $TRUE
 
 }
 
