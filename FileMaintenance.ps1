@@ -392,8 +392,14 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
         If(-NOT($Continue)){
  
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "Šù‚É$($CheckLeaf)‚ª‘¶İ‚·‚é‚½‚ßA${SHELLNAME}‚ğI—¹‚µ‚Ü‚·"
-            Finalize $ErrorReturnCode
             
+            IF($ForceEndLoop){
+                $Script:ErrorFlag = $TRUE
+                $Script:ForceFinalize = $TRUE
+                Break
+                }else{
+                Finalize $ErrorReturnCode
+                }
             }else{
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]‚Ì‚½‚ßˆ—‚ğŒp‘±‚µ‚Ü‚·B"
             $Script:ContinueFlag = $true
@@ -706,6 +712,7 @@ function Finalize{
 Param(
 [parameter(mandatory=$true)][int]$ReturnCode
 )
+    $ForceFinalize = $False
 
     IF(-NOT(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))){
     
@@ -752,6 +759,8 @@ EndingProcess $ReturnCode
 [boolean]$NormalFlag = $False
 [boolean]$OverRideFlag = $False
 [boolean]$ContinueFlag = $False
+[Boolean]$ForceFinalize = $False
+[Boolean]$ForceEndloop = $False
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
@@ -762,7 +771,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒ
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
-${Version} = '20200119_2230'
+${Version} = '20200122_2330'
 
 
 #‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
@@ -815,6 +824,7 @@ DO
     [boolean]$NormalFlag = $False
     [boolean]$OverRideFlag = $False
     [boolean]$ContinueFlag = $False
+    [Boolean]$ForceEndloop = $TRUE
     [int]$InLoopOverRideCount = 0
 
     $FormattedDate = (Get-Date).ToString($TimeStampFormat)
@@ -943,6 +953,8 @@ DO
         }
 
 
+
+#ˆÙíI—¹‚È‚Ç‚ÍBreak‚µ‚Äƒtƒ@ƒCƒ‹ˆ—I’[‚Ö”²‚¯‚éB
 }
 while($False)
 
@@ -961,8 +973,13 @@ while($False)
         $ContinueCount ++
         }
          
-    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- ‘ÎÛObject $($TargetObjectName) ˆ—I—¹ E[$($ErrorFlag)] W[$($WarningFlag)] N[$($NormalFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
+    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- ‘ÎÛObject $($TargetObjectName) ˆ—I—¹ Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
   
+
+    IF($ForceFinalize){
+    
+        Finalize $ErrorReturnCode
+        }
 
 #‘ÎÛŒQ‚Ìˆ—ƒ‹[ƒvI’[
    

@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-$Script:CommonFunctionsVersion = '20200121_2230'
+$Script:CommonFunctionsVersion = '20200122_2330'
 
 #ログ等の変数を一括設定したい場合は以下を利用して下さい。
 #
@@ -253,7 +253,14 @@ function TryAction {
             }
 
         #Continueしない場合は終了処理へ進む
-        Finalize $ErrorReturnCode   
+        IF($ForceEndLoop){
+            $Script:ErrorFlag = $TRUE
+            $Script:ForceFinalize = $TRUE
+            Break
+            }else{
+            Finalize $ErrorReturnCode
+            }
+   
     }
 
 
@@ -305,7 +312,7 @@ Param(
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は有効なパス表記です"
    
     }else{
-       Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]は有効なパス表記ではありません。NTFSに使用できない文字列が含まれてないか等を確認して下さい"
+       Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]は有効なパス表記ではありません。存在しないドライブを指定している、NTFSに使用できない文字列が含まれてないか等を確認して下さい"
        Finalize $ErrorReturnCode  
 
     }
