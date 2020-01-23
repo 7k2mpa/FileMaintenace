@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-$Script:CommonFunctionsVersion = '20200123_1145'
+$Script:CommonFunctionsVersion = '20200123_1445'
 
 #ログ等の変数を一括設定したい場合は以下を利用して下さい。
 #
@@ -642,6 +642,7 @@ Param(
     If(Test-Path -LiteralPath $CheckPath -PathType Leaf){
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckPath)]への書込権限を確認します"
+        $LogFormattedDate = (Get-Date).ToString($LogDateFormat)
         $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" Write Permission Check"
         
 
