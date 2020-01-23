@@ -277,13 +277,13 @@ Log2File‚æ‚è—Dæ‚µ‚Ü‚·B
 
 Param(
 
-#[parameter(mandatory=$true , HelpMessage = 'ˆ—‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚ğw’è(ex. D:\Logs) ‘S‚Ä‚ÌHelp‚ÍGet-Help FileMaintenance.ps1')][String]$TargetFolder,
-[parameter(mandatory=$true , HelpMessage = 'ˆ—‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚ğw’è(ex. D:\Logs) ‘S‚Ä‚ÌHelp‚ÍGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$TargetFolder,
-#[parameter(mandatory=$true , HelpMessage = 'ˆ—‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚ğw’è(ex. D:\Logs) ‘S‚Ä‚ÌHelp‚ÍGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
+[parameter(position=0, mandatory=$true , HelpMessage = 'ˆ—‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚ğw’è(ex. D:\Logs) ‘S‚Ä‚ÌHelp‚ÍGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$TargetFolder,
+#[parameter(position=0, mandatory=$true , HelpMessage = 'ˆ—‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚ğw’è(ex. D:\Logs) ‘S‚Ä‚ÌHelp‚ÍGet-Help FileMaintenance.ps1')][String]$TargetFolder,  #debug—p‚É—pˆÓ‚µ‚Ä‚ ‚è‚Ü‚·B’Êí‚Íg‚í‚È‚¢
+#[parameter(position=0, mandatory=$true , HelpMessage = 'ˆ—‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚ğw’è(ex. D:\Logs) ‘S‚Ä‚ÌHelp‚ÍGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
 
-[String][ValidateSet("Move", "Copy", "Delete" , "none" , "DeleteEmptyFolders" , "NullClear")]$Action='none',
-[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$MoveToFolder,
-#[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$MoveToFolder,
+[String][parameter(position=1)][ValidateSet("Move", "Copy", "Delete" , "none" , "DeleteEmptyFolders" , "NullClear")]$Action='none',
+
+[String][parameter(position=2)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$MoveToFolder,
 
 [int][ValidateRange(0,2147483647)]$Days = 0,
 [int][ValidateRange(0,2147483647)]$KBsize = 0,
@@ -369,9 +369,9 @@ Try{
 
 #ƒ`ƒFƒbƒN‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é‚ªA-OverRide‚ğw’è...$TRUE@i‚±‚Ìw’è‚Í-Continue‚É—Dæ‚·‚éj
 #ƒ`ƒFƒbƒN‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é‚ªA-Continue‚ğw’è...$False
-#ƒ`ƒFƒbƒN‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é...$ErrorReturnCode ‚ÅFinalize‚Öi‚Ş
+#ƒ`ƒFƒbƒN‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚·‚é...$ErrorReturnCode ‚ÅFinalize‚Öi‚ŞA‚Ü‚½‚ÍBreak
 #ƒ`ƒFƒbƒN‘ÎÛ‚Æ“¯ˆê–¼Ì‚ÌƒtƒHƒ‹ƒ_‚ª‘¶İ‚·‚é‚ªA-Continue‚ğw’è...$False
-#ƒ`ƒFƒbƒN‘ÎÛ‚Æ“¯ˆê–¼Ì‚ÌƒtƒHƒ‹ƒ_‚ª‘¶İ‚·‚é...$ErrorReturnCode ‚ÅFinalize‚Öi‚Ş
+#ƒ`ƒFƒbƒN‘ÎÛ‚Æ“¯ˆê–¼Ì‚ÌƒtƒHƒ‹ƒ_‚ª‘¶İ‚·‚é...$ErrorReturnCode ‚ÅFinalize‚Öi‚ŞA‚Ü‚½‚ÍBreak
 #ƒ`ƒFƒbƒN‘ÎÛ‚Ìƒtƒ@ƒCƒ‹AƒtƒHƒ‹ƒ_‚ª‘¶İ‚µ‚È‚¢...$TRUE
 
 function CheckLeafNotExists {
@@ -771,7 +771,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒ
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
-${Version} = '20200122_2330'
+${Version} = '20200123_1145'
 
 
 #‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
@@ -816,7 +816,24 @@ Write-Output 'ˆ—‘ÎÛ‚ÍˆÈ‰º‚Å‚·'
 ForEach ($TargetObject in $TargetObjects)
 {
 
-DO
+#Powershell‚ÍGOTO•¶‚ª‘¶İ‚¹‚¸ˆ—•ªŠò‚ª‚Å‚«‚È‚¢B
+#‚»‚Ì‚½‚ßDo/While‚ğ—p‚¢‚Äˆ—“r’†‚ÅƒGƒ‰[‚ª”­¶‚µ‚½ê‡‚Ì•ªŠò‚ğÀ‘•‚µ‚Ä‚¢‚é
+
+#Do/While()‚ÍÅŒã‚É•]‰¿‚ªs‚í‚ê‚éƒ‹[ƒvBÅŒã‚Ì•]‰¿‚ªFalse‚Æ‚È‚é‚Æƒ‹[ƒv‚ğI—¹‚·‚éB‚±‚±‚ÅWhile($false)‚Æ‚µ‚Ä‚ ‚é‚Ì‚ÅA
+#Do/While‚ÌŠÔ‚Í1‰ñ‚¾‚¯Às‚³‚ê‚éB
+#Do/While‚Íƒ‹[ƒv‚Ì‚½‚ßAˆ—“r’†‚ÅBreak‚·‚é‚ÆAWhile‚Öjump‚·‚éB
+
+#ƒtƒ@ƒCƒ‹ŒQˆ—ƒ‹[ƒv’†‚ÌƒGƒ‰[i—á‚¦‚ÎAƒtƒ@ƒCƒ‹‚ğDeletes‚µ‚½‚ªAŒ ŒÀ‚ª–³‚­‚Äíœ‚Å‚«‚È‚¢“™j‚Å‘z’è‚³‚ê‚éˆ—Aw’è•û–@‚ÍˆÈ‰º‚Å‚ ‚éB
+
+#1.WhileˆÈ~‚Ìˆ—I—¹ƒƒbƒZ[ƒWo—Í‚ÖJump‚µ‚ÄAŸ‚Ìƒtƒ@ƒCƒ‹‚ğˆ—Œp‘±
+# Break , $ForceEndloog = $TRUE , $ForceFinalize = $False 
+#2.WhileˆÈ~‚Ìˆ—I—¹ƒƒbƒZ[ƒWo—Í‚ÖJump‚µ‚ÄAŸ‚Ìƒtƒ@ƒCƒ‹‚Íˆ—‚¹‚¸‚ÉFinalize‚Öi‚Şiˆ—‘Å‚¿Ø‚èj
+# Break , $ForceEndloog = $TRUE , $ForceFinalize = $TRUE
+#3.ˆ—I—¹ƒƒbƒZ[ƒWo—Í‚µ‚È‚¢BFinalize‚Öi‚Şiˆ—‘Å‚¿Ø‚èj
+#Finalize $ErrorReturnCode
+ 
+
+Do
 {
 
     [boolean]$ErrorFlag = $False
@@ -956,7 +973,7 @@ DO
 
 #ˆÙíI—¹‚È‚Ç‚ÍBreak‚µ‚Äƒtƒ@ƒCƒ‹ˆ—I’[‚Ö”²‚¯‚éB
 }
-while($False)
+While($False)
 
 
 #ˆÙíAŒx‚ğŠm”FBˆÙí>Œx>³í‚Ì‡ˆÊ‚ÅÀsŒ‹‰Ê”ƒJƒEƒ“ƒgƒAƒbƒv

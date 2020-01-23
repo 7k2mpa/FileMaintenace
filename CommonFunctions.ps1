@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-$Script:CommonFunctionsVersion = '20200122_2330'
+$Script:CommonFunctionsVersion = '20200123_1145'
 
 #ログ等の変数を一括設定したい場合は以下を利用して下さい。
 #
@@ -24,6 +24,7 @@ $Script:CommonFunctionsVersion = '20200122_2330'
 #[Switch]$NoLog2File,
 #[String][ValidatePattern('^(\.+\\|[C-Z]:\\).*')]$LogPath ,
 #[String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
+#[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
 
 #[int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
 #[int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
