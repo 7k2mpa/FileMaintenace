@@ -155,9 +155,9 @@ Recurseパラメータより優先します。
 デフォルトではスキップせずに異常終了します。
 
 .PARAMETER NoAction
-ファイル、フォルダを実際に削除等の操作をせずに実行します。
-動作確認で当該スイッチを指定してください。
--Action Noneは-Compress等のPre Action、Post Actionは実行されますが、このスイッチは全てのファイル操作を実行しなくなります。
+ファイル、フォルダを実際に削除等の操作をせずに実行します。全ての処理は成功扱いになります。
+動作確認するときに当該スイッチを指定してください。
+-Action Noneは-Compress等の前処理、後処理は実行されますが、このスイッチは全てのファイル操作を実行しなくなります。
 ログ上は警告が出力されますが、実行結果ではこの警告は無視されます。
 
 .PARAMETER NoneTargetAsWarning
@@ -188,7 +188,7 @@ Recurseパラメータより優先します。
 .PARAMETER NullOriginalFile
 　対象ファイルの内容消去（ヌルクリア）します。
 -Action NullClearと等価です。
-
+後処理のため、主処理と併用可能です。例えば、ファイル複製後、元ファイルを削除する、といった用途に使用して下さい。
 
 .PARAMETER Log2EventLog
 　Windows Event Logへの出力を制御します。
@@ -231,6 +231,10 @@ Log2Fileより優先します。
 .PARAMETER LogDateFormat
 　ログファイル出力に含まれる日時表示フォーマットを指定します。デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
 
+.PARAMETER LogFileEncode
+ログファイルの文字コードを指定します。
+デフォルトはShift-JISです。
+
 .PARAMETER NormalReturnCode
 　正常終了時のリターンコードを指定します。デフォルトは0です。正常終了=<警告終了=<（内部）異常終了として下さい。
 
@@ -246,10 +250,16 @@ Log2Fileより優先します。
 .PARAMETER InfoEventID
 　Event Log出力でInformationに対するEvent IDを指定します。デフォルトは1です。
 
+.PARAMETER InfoLoopStartEventID
+　Event Log出力でファイル/フォルダ処理開始のInformationに対するEvent IDを指定します。デフォルトは2です。
+
+.PARAMETER InfoLoopEndEventID
+　Event Log出力でファイル/フォルダ処理終了のInformationに対するEvent IDを指定します。デフォルトは3です。
+
 .PARAMETER WarningEventID
 　Event Log出力でWarningに対するEvent IDを指定します。デフォルトは10です。
 
-.PARAMETER SuccessErrorEventID
+.PARAMETER SuccessEventID
 　Event Log出力でSuccessに対するEvent IDを指定します。デフォルトは73です。
 
 .PARAMETER InternalErrorEventID
@@ -638,6 +648,9 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
         Logging -EventID $InfoEventID -EventType Information -EventMessage "マッチしたファイルはファイル名に日付付加[${AddTimeStamp}]、圧縮[${Compress}]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動[$($MoveNewFile)]します"
         }
 
+    IF($NoAction){
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "-NoAction[${NoAction}]が指定されているため実際にはファイル/フォルダの処理をしません"
+        }
 
     IF($OverRide){
         Logging -EventID $InfoEventID -EventType Information -EventMessage "-OverRide[${OverRide}]が指定されているため生成したファイルと同名のものがあった場合は上書きします"
