@@ -370,6 +370,7 @@ Try{
 #チェック対象のファイルが存在するが、-OverRideを指定...$TRUE　（この指定は-Continueに優先する）
 #チェック対象のファイルが存在するが、-Continueを指定...$False
 #チェック対象のファイルが存在する...$ErrorReturnCode でFinalizeへ進む、またはBreak
+#チェック対象の同一名称のフォルダが存在するが、-OverRideを指定...上書きが出来ないので$ErrorReturnCode でFinalizeへ進む、またはBreak
 #チェック対象と同一名称のフォルダが存在するが、-Continueを指定...$False
 #チェック対象と同一名称のフォルダが存在する...$ErrorReturnCode でFinalizeへ進む、またはBreak
 #チェック対象のファイル、フォルダが存在しない...$TRUE
@@ -426,8 +427,14 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
                 IF(-NOT($Continue)){
 
                     Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称フォルダ$($CheckLeaf)が存在するため、${SHELLNAME}を終了します"
-                    $ErrorCount ++
-                    Finalize $ErrorReturnCode
+
+                    IF($ForceEndLoop){
+                        $Script:ErrorFlag = $TRUE
+                        $Script:ForceFinalize = $TRUE
+                        Break
+                        }else{
+                        Finalize $ErrorReturnCode
+                        }
             
                     }else{
                     Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]のため処理を継続します。"
