@@ -232,7 +232,7 @@ arcserveUDPコンソールサーバのホスト名、IPアドレスを指定します。
 Param(
 
 [String][parameter(mandatory=$true)]$Plan ,
-[String]$Server,
+[String]$Server = 'hoge-hoge',
 [Switch]$AllServers,
 [String][ValidateSet("Full", "Incr")]$BackUpJobType = 'Incr',
 
@@ -323,6 +323,11 @@ function Initialize {
 
 #パラメータの確認
 
+    CheckHostname -CheckHostName $Server > $NULL
+
+    CheckHostname -CheckHostName $UDPConsoleServerName > $NULL     
+
+
 #UDPConsoleの存在を確認
 
     IF(Test-Connection -ComputerName $UDPConsoleServerName -Quiet){
@@ -394,7 +399,9 @@ Param(
 [parameter(mandatory=$true)][int]$ReturnCode
 )
 
-    TryAction -ActionType Delete -ActionFrom  $BackupFlagFilePath -ActionError "BackUp Flag [$($BackupFlagFilePath)]"
+    IF(CheckLeaf -CheckPath $BackupFlagFilePath -ObjectName 'BackUp Flag'){
+        TryAction -ActionType Delete -ActionFrom  $BackupFlagFilePath -ActionError "BackUp Flag [$($BackupFlagFilePath)]"
+        }
 
     IF(-NOT(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))){
 

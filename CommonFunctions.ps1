@@ -910,6 +910,39 @@ function AddTimeStampToFileName{
 }
 
 
+
+function CheckHostname {
+
+Param(
+[parameter(mandatory=$true)][String]$CheckHostName
+)
+
+    Switch -Regex ($CheckHostName){
+
+    '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
+        {
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CheckHostName)] is valid IP Address"
+        Return $TRUE     
+        }
+    '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$'
+        {
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CheckHostName)] is valid Hostname"
+        Return $TRUE                
+        }
+    Default
+        {
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "[$($CheckHostName)] is invalid Hostname"
+        Finalize $ErroReturnCode
+        }
+
+    }
+
+#ValidIpAddressRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
+
+#ValidHostnameRegex = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$";
+
+}
+
 #https://github.com/mnaoumov/Invoke-NativeApplication
 
 function Invoke-NativeApplication
