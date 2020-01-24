@@ -624,7 +624,8 @@ function CheckLogPath {
 Param(
 
 [String]$CheckPath,
-[String]$ObjectName
+[String]$ObjectName ,
+[String]$FileValue = $NULL
 
 )
     #ログ出力先ファイルの親フォルダが存在しなければ異常終了
