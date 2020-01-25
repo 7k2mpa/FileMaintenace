@@ -2,71 +2,150 @@
 
 <#
 .SYNOPSIS
-指定したプログラムを設定ファイルに書かれたパラメータを読み込んで、順次呼び出すプログラムです。
+arcserveUDP ver.6以降で実装されたCLI経由でバックアップジョブを起動するプログラムです。
 実行にはCommonFunctions.ps1が必要です。
-セットで開発しているFileMaintenance.ps1と併用すると複数のログ処理を一括実行できます。
+セットで開発しているFileMaintenance.ps1と併用すると複数の処理を一括実行できます。
 
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
-設定ファイルから1行づつパラメータを読み込み、指定したプログラムに順次実行させます。
+arcserveUDP CLI経由でバックアップジョブを起動するプログラムです。
+バックアップはフルバックアップ、差分バックアップを選択できます。
+認証はパスワード平文、パスワードファイル、両方をサポートしています。
+パスワードファイルを用いる場合、実行ユーザはパスワードを作成したユーザと同一にする必要があります。これはWindowsOSの仕様です。
+例えば設定ファイルで$ExecUserを'arcserve'とし、プログラムを実行しているユーザが異なる場合はパスワードファイルを'arcserve'ユーザで作成しても認証する事は出来ません。
+ジョブスケジューラ等で実行する時のユーザを'arcserve'として実行して下さい。
 
-設定ファイルは任意に設定可能です。
-設定ファイルの行頭を#とすると当該行はコメントとして処理されます。
-設定ファイルの空白行はスキップします。
+このプログラムとバックアップコンソールサーバとは同一または異なるホスト、両方をサポートしています。
+バックアップコンソールをCPUコア数の多いバックアップサーバに搭載した場合、大量のジョブスケジューラライセンスが必要ですが、異なるホストに当プログラムを配置する事でライセンスを節約可能です。
 
 ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
 
+ファイル配置例
+
+D:\script\infra\arcserveUDPBackUp.ps1
+D:\script\infra\Log\backup.flg
+D:\script\infra\UDP.psw
 
 
-設定ファイル例です。例えば以下をDailyMaintenance.txtに保存して-CommandFile .\DailyMaintenance.txtと指定して下さい。
 
----
-#14日経過した.logで終わるファイルを削除
--TargetFolder D:\IIS\LOG -RegularExpression '^.*\.log$' -Action Delete -Days 14
 
-#7日経過したアクセスログをOld_Logへ退避
--TargetFolder D:\AccessLog -MoveToFolder .\Old_Log -Days 7
 ---
 
 
 
 .EXAMPLE
 
-Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt
-　このプログラムと同一フォルダに存在するFileMaintenance.ps1を起動します。
-起動する際に渡すパラメータは設定ファイルComman.txtを1行づつ読み込み、順次実行します。
+arcserveUDPBackUp.ps1 -Plan SSDB -Server SVDB01 -BackUpJobType Incr
+arcserveUDPのバックアッププラン[SSDB]に含まれる、サーバ[SVDB01]を差分バックアップ起動します。
+
+.EXAMPLE
+
+arcserveUDPBackUp.ps1 -Plan SSDB -AllServers -BackUpJobType Full -UDPConsoleServerName BKUPSV01.corp.local
+arcserveUDPのバックアッププラン[SSDB]に含まれる、全てのサーバをフルバックアップ起動します。
+arcserveUDPのコンソールサーバはBKUPSV01.corp.localを指定します。
+
+.EXAMPLE
+
+arcserveUDPBackUp.ps1 -Plan SSDB -Server SVDB02 -BackUpJobType Incr -AuthorizationType PlainText -ExecUser = 'arcserve' -ExecUserDomain = 'INTRA' -ExecUserPassword = 'hogehoge'
+arcserveUDPのバックアッププラン[SSDB]に含まれる、サーバ[SVDB02]を差分バックアップ起動します。
+認証方式は平文パスワードとします。
+バックアップコンソールサーバの管理ユーザはドメインユーザINTRA\arcserve、パスワードはhogehogeを指定します。
+認証方式を平文パスワードとした場合、このプログラムを実行しているユーザと異なるユーザを指定する事が出来ます。
 
 
 .EXAMPLE
 
-Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt -Continue
-　このプログラムと同一フォルダに存在するFileMaintenance.ps1を起動します。
-起動する際に渡すパラメータは設定ファイルComman.txtを1行づつ読み込み、順次実行します。
-もし、FileMaintenance.ps1を実行した結果が異常終了となった場合は、Wrapper.ps1を異常終了させず、Command.txtの次行を読み込み継続処理をします。
+arcserveUDPBackUp.ps1 -Plan SSDB -AllServers -BackUpJobType Full -AuthorizationType JobExecUserAndPasswordFile -ExecUserPasswordFilePath '.\UDP.psw'
+arcserveUDPのバックアッププラン[SSDB]に含まれる、全てのサーバをフルバックアップ起動します。
+認証方式はジョブ実行ユーザとパスワードファイルとします。ジョブ実行ユーザでバックアップコンソールサーバにログオンします。
+この時のパスワードは予めジョブ実行ユーザのパスワードファイルを作成しておく必要があります。
+パスワードファイルは指定したファイル名UDP.pswを自動変換します。
+このプログラムを実行するユーザがDomain\arcserveの時には、ファイル名本体にアンダースコア'_'に続いてユーザ名[arcserve]を自動的に付加したファイル名UDP_arcserve.pswを読み込み、パスワードファイルとして使用します。
 
 
-
-.PARAMETER CommandPath
-　起動するプログラムパスを指定します。
+.PARAMETER Plan
+arcserveUDPに登録してあるプラン名を指定します。
 指定は必須です。
-相対、絶対パスで指定可能です。
+
 ワイルドカード*は使用できません。
 
-.PARAMETER CommandFile
-　起動するプログラムに渡すコマンドファイルを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
+.PARAMETER Server
+arcserveUDPに登録してあるプランに含まれるサーバ名を1台分指定します。
+プランに含まれないサーバは指定できません。
 ワイルドカード*は使用できません。
 
-.PARAMETER CommandFileEncode
-　コマンドファイルの文字コードを指定します。
-デフォルトは[Default]でShif-Jisです。
+.PARAMETER AllServers
+arcserveUDPに登録してあるプランに含まれるサーバ全てをバックアップ対象にします。
+
+.PARAMETER BackUpJobType
+対象のバックアップ方式をしています。
+
+Full:フルバックアップ
+Incr:増分バックアップ
 
 
-.PARAMETER Continue
-　起動したプログラムが異常終了しても、コマンドファイルの次行を継続処理します。
-デフォルトではそのまま異常終了します。
+
+
+.PARAMETER BackupFlagFilePath = '.\SC_Logs\BackUp.flg' ,
+バックアップ中を示すバックアップファイルの保存先パスを指定します。
+ファイル名.拡張子で指定しますが、ファイル名に自動的に_Plan名_バックアップ対象サーバ名を付加したファイル名で保存します。
+AllServersを指定した場合、バックアップサーバ名はAllとなります。
+
+
+.PARAMETER PROTOCOL
+arcserveUDPコンソールサーバにログオンする時のプロトコルを指定します。
+http / httpsを指定してください。
+デフォルトはhttpです。
+
+.PARAMETER UDPConsolePort
+arcserveUDPコンソールサーバにログオンする時の通信ポート番号を指定します。
+デフォルトは8015です。
+
+
+.PARAMETER UDPCLIPath
+arcserveUDP CLIが配置されたパスを指定します。
+相対、絶対パスで指定可能です。
+
+
+.PARAMETER AuthorizationType
+arcserveUDPコンソールサーバにログオンする認証方式を指定します。
+
+JobExecUserAndPasswordFile:本プログラムを実行しているユーザ / 本プログラムを実行しているユーザ名を含むパスワードファイル
+FixedPasswordFile:指定したユーザ / 指定したパスワードファイル
+PlanText:指定したユーザ / 平文パスワード
+
+.PARAMETER ExecUser
+認証方式をPlainText , FixedPasswordFileとした時のarcserveUDPコンソールサーバログオンのOSユーザ名を指定します。
+ドメインユーザの場合、ドメイン部分を除去したものを指定してください。
+
+例:FooDOMAIN\BarUSERであれば、BarUSER
+
+
+.PARAMETER ExecUserDomain
+認証方式をPlainText , FixedPasswordFileとした時のarcserveUDPコンソールサーバログオンOSユーザのドメイン名を指定します。
+
+例:FooDOMAIN\BarUSERであれば、FooDOMAIN
+
+.PARAMETER ExecUserPassword
+認証方式をPlainTextとした時のarcserveUDPコンソールサーバログオンOSユーザのパスワードを平文で指定します。
+
+
+.PARAMETER FixedPasswordFilePath
+認証方式をFixedPasswordFileとした時のarcserveUDPコンソールサーバログオンOSユーザのパスワードファイルを指定します。
+
+
+
+.PARAMETER ExecUserPasswordFilePath
+認証方式をJobExecUserAndPasswordFileとした時のarcserveUDPコンソールサーバログオンOSユーザのパスワードファイルパスを指定します。
+
+例:'.\UDP.psw' , 本プログラムを実行しているユーザがFooDOMAIN\BarUSER
+'.UDP_BarUSER.psw'がパスワードファイルとして指定されます。
+アンダースコア_以降の部分は実行しているユーザ名が自動的に挿入されます。
+
+
+.PARAMETER UDPConsoleServerName
+arcserveUDPコンソールサーバのホスト名、IPアドレスを指定します。
 
 
 
@@ -153,7 +232,7 @@ Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt -Conti
 Param(
 
 [String][parameter(mandatory=$true)]$Plan ,
-[String]$Server,
+[String]$Server = 'hoge-hoge',
 [Switch]$AllServers,
 [String][ValidateSet("Full", "Incr")]$BackUpJobType = 'Incr',
 
@@ -176,7 +255,6 @@ Param(
 [String]$UDPConsoleServerName = 'localhost' ,
 
 
-[Switch]$NoAction,
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
@@ -245,6 +323,11 @@ function Initialize {
 
 #パラメータの確認
 
+    CheckHostname -CheckHostName $Server > $NULL
+
+    CheckHostname -CheckHostName $UDPConsoleServerName > $NULL     
+
+
 #UDPConsoleの存在を確認
 
     IF(Test-Connection -ComputerName $UDPConsoleServerName -Quiet){
@@ -273,7 +356,7 @@ IF($AuthorizationType -match '^JobExecUserAndPasswordFile$' ){
 
     }
 
-    $BackupFlagFilePath  = ConvertToAbsolutePath -CheckPath $BackupFlagFilePath -ObjectName '-ackupFlagFilePath'
+    $BackupFlagFilePath  = ConvertToAbsolutePath -CheckPath $BackupFlagFilePath -ObjectName '-BackupFlagFilePath'
     
     CheckContainer -CheckPath (Split-Path -Parent -Path $BackupFlagFilePath) -ObjectName '-BackupFlagFilePathの親フォルダ' > $NULL
 
@@ -316,7 +399,9 @@ Param(
 [parameter(mandatory=$true)][int]$ReturnCode
 )
 
-    TryAction -ActionType Delete -ActionFrom  $BackupFlagFilePath -ActionError "BackUp Flag [$($BackupFlagFilePath)]"
+    IF(CheckLeaf -CheckPath $BackupFlagFilePath -ObjectName 'BackUp Flag'){
+        TryAction -ActionType Delete -ActionFrom  $BackupFlagFilePath -ActionError "BackUp Flag [$($BackupFlagFilePath)]"
+        }
 
     IF(-NOT(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))){
 
