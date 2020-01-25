@@ -250,7 +250,7 @@ Param(
 [String]$ExecUserPasswordFilePath = '.\UDP.psw' ,
 [String]$FixedPasswordFilePath = '.\UDP_arcserve.psw' ,
 
-[String][ValidateSet("JobExecUserAndPasswordFile","FixedPasswordFile" , "PlanText")]$AuthorizationType = 'JobExecUserAndPasswordFile' ,
+[String][ValidateSet("JobExecUserAndPasswordFile","FixedPasswordFile" , "PlainText")]$AuthorizationType = 'PlainText' ,
 
 [String]$UDPConsoleServerName = 'localhost' ,
 
@@ -323,10 +323,23 @@ function Initialize {
 
 #パラメータの確認
 
-    CheckHostname -CheckHostName $Server > $NULL
+IF(-NOT($AllServers)){
 
-    CheckHostname -CheckHostName $UDPConsoleServerName > $NULL     
+    CheckHostname -CheckHostName $Server -ObjectName 'バックアップ対象 -Server' > $NULL
+    }
 
+    CheckHostname -CheckHostName $UDPConsoleServerName -ObjectName 'arcserveUDP Console Server -UDPConsoleServerName' > $NULL
+
+#[String][ValidateSet("JobExecUserAndPasswordFile","FixedPasswordFile" , "PlanText")]$AuthorizationType = 'JobExecUserAndPasswordFile' ,
+
+
+IF($AuthorizationType -match '^(FixedPasswordFile|PlainText)$' ){
+
+    CheckDomainName -CheckDomainName $ExecUserDomain > $NULL
+    
+    CheckUserName -CheckUserName $ExecUser > $NULL
+
+    }
 
 #UDPConsoleの存在を確認
 
@@ -352,13 +365,13 @@ IF($AuthorizationType -match '^JobExecUserAndPasswordFile$' ){
 
     $ExecUserPasswordFilePath  = ConvertToAbsolutePath -CheckPath $ExecUserPasswordFilePath -ObjectName '-ExecUserPasswordFilePath'
     
-    CheckContainer -CheckPath (Split-Path -Parent -Path $ExecUserPasswordFilePath) -ObjectName '-ExecUserPasswordFilePathの親フォルダ' > $NULL
+    CheckContainer -CheckPath (Split-Path -Parent -Path $ExecUserPasswordFilePath) -ObjectName '-ExecUserPasswordFilePathの親フォルダ'  -IfNoExistFinalize > $NULL
 
     }
 
     $BackupFlagFilePath  = ConvertToAbsolutePath -CheckPath $BackupFlagFilePath -ObjectName '-BackupFlagFilePath'
     
-    CheckContainer -CheckPath (Split-Path -Parent -Path $BackupFlagFilePath) -ObjectName '-BackupFlagFilePathの親フォルダ' > $NULL
+    CheckContainer -CheckPath (Split-Path -Parent -Path $BackupFlagFilePath) -ObjectName '-BackupFlagFilePathの親フォルダ'  -IfNoExistFinalize > $NULL
 
 
 #arcserveUDP CLIの有無を確認

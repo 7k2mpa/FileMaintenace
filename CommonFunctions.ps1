@@ -910,28 +910,79 @@ function AddTimeStampToFileName{
 }
 
 
+function CheckUserName {
+
+Param(
+[parameter(mandatory=$true)][String]$CheckUserName,
+[String]$ObjectName 
+)
+
+    Switch -Regex ($CheckUserName){
+
+    '^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z]$'
+        {
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckUserName)] is valid"
+        Return $TRUE     
+        }
+
+    Default
+        {
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) [$($CheckUserName)] is invalid"
+        Finalize $ErroReturnCode
+        }
+
+    }
+
+}
+
+function CheckDomainName {
+
+Param(
+[parameter(mandatory=$true)][String]$CheckDomainName,
+[String]$ObjectName 
+)
+
+    Switch -Regex ($CheckDomainName){
+
+    '^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z]$'
+        {
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckDomainName)] is valid"
+        Return $TRUE     
+        }
+
+    Default
+        {
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) [$($CheckDomainName)] is invalid"
+        Finalize $ErroReturnCode
+        }
+
+    }
+
+}
+
 
 function CheckHostname {
 
 Param(
-[parameter(mandatory=$true)][String]$CheckHostName
+[parameter(mandatory=$true)][String]$CheckHostName,
+[String]$ObjectName 
 )
 
     Switch -Regex ($CheckHostName){
 
     '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
         {
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CheckHostName)] is valid IP Address"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckHostName)] is valid IP Address"
         Return $TRUE     
         }
     '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$'
         {
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CheckHostName)] is valid Hostname"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckHostName)] is valid Hostname"
         Return $TRUE                
         }
     Default
         {
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "[$($CheckHostName)] is invalid Hostname"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) [$($CheckHostName)] is invalid Hostname"
         Finalize $ErroReturnCode
         }
 
