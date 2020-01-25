@@ -335,9 +335,9 @@ IF(-NOT($AllServers)){
 
 IF($AuthorizationType -match '^(FixedPasswordFile|PlainText)$' ){
 
-    CheckDomainName -CheckDomainName $ExecUserDomain > $NULL
+    CheckDomainName -CheckDomainName $ExecUserDomain -ObjectName '実行ユーザが所属するドメイン -ExecUserDomain'  > $NULL
     
-    CheckUserName -CheckUserName $ExecUser > $NULL
+    CheckUserName -CheckUserName $ExecUser -ObjectName '実行ユーザ -ExecUser ' > $NULL
 
     }
 
@@ -395,6 +395,9 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "arcserve UDP
 function GetUserAndDomain{
 
 $UserInfo = @()
+
+#ユーザ名はdomain\userの形式で出力されるので、バックスラッシュ\を区切り記号として、配列に代入
+#-Splitは正規表現なのでエスケープ記号はバックスラッシュ\　Powershellのエスケープであるバッククオート`ではない
 
 $UserInfo = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name -split '\\'
 
