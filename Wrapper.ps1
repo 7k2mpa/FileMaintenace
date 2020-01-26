@@ -152,8 +152,8 @@ Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt -Conti
 
 Param(
 
-[parameter(mandatory=$true , HelpMessage = '起動対象のpowershellプログラムを指定(ex. .\FileMaintenance.ps1) 全てのHelpはGet-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*\.ps1$')]$CommandPath ,
-[parameter(mandatory=$true , HelpMessage = 'powershellプログラムに指定するコマンドファイルを指定(ex. .\Command.txt) 全てのHelpはGet-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommandFile,
+[parameter(position=0, mandatory=$true , HelpMessage = '起動対象のpowershellプログラムを指定(ex. .\FileMaintenance.ps1) 全てのHelpはGet-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*\.ps1$')]$CommandPath ,
+[parameter(position=1, mandatory=$true , HelpMessage = 'powershellプログラムに指定するコマンドファイルを指定(ex. .\Command.txt) 全てのHelpはGet-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommandFile,
 
 
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$CommandFileEncode = 'Default', #Default指定はShift-Jis

@@ -111,7 +111,7 @@ StopService.ps1 -MountedDrive F:
 
 Param(
 
-[parameter(mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help UnMountDrive.ps1')][String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
+[parameter(position=0, mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help UnMountDrive.ps1')][String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
 #[String][ValidatePattern('^[d-z]:$')]$MountedDrive="F:",
 
 

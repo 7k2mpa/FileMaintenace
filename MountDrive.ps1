@@ -111,8 +111,8 @@ StopService.ps1 -MountedDrive F:
 
 Param(
 
-[parameter(mandatory=$true , HelpMessage = 'UNC Pathを指定(ex. \\FileServer\Share) 全てのHelpはGet-Help MountDrive.ps1')][String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,                                                                          
-[parameter(mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help MountDrive.ps1')][String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive,
+[parameter(position=0, mandatory=$true , HelpMessage = 'UNC Pathを指定(ex. \\FileServer\Share) 全てのHelpはGet-Help MountDrive.ps1')][String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,                                                                          
+[parameter(position=1, mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help MountDrive.ps1')][String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive,
 
 #[String][validatePattern("^\\\\\w+\\\w+")]$TargetPath="\\KBCSG01\kog-al-prd-bkt-fgw",                                                                          
 #[String][ValidatePattern("^[d-z]:$")]$MountDrive= 'F:',
