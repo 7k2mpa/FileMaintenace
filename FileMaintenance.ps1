@@ -851,7 +851,6 @@ ForEach ($TargetObject in $TargetObjects)
 # Break , $ForceEndloog = $TRUE , $ForceFinalize = $TRUE
 #3.処理終了メッセージ出力しない。Finalizeへ進む（処理打ち切り）
 #Finalize $ErrorReturnCode
- 
 
 Do
 {
@@ -861,7 +860,7 @@ Do
     [boolean]$NormalFlag = $False
     [boolean]$OverRideFlag = $False
     [boolean]$ContinueFlag = $False
-    [Boolean]$ForceEndloop = $TRUE
+    [Boolean]$ForceEndloop = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
     [int]$InLoopOverRideCount = 0    ;#$OverRideCountは処理全体のOverRide回数。$InLoopOverRideCountは1処理ループ内でのOverRide回数。1オブジェクトで複数回OverRideがあり得るため
 
     $FormattedDate = (Get-Date).ToString($TimeStampFormat)
@@ -903,6 +902,7 @@ Do
 
                 TryAction -ActionType MakeNewFolder -ActionFrom $MoveToNewFolder -ActionError $MoveToNewFolder
 
+                #$TryActionが異常終了&-Continue $TRUEだと$Continue $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
                 IF($ContinueFlag){
                     Break                
                     }
