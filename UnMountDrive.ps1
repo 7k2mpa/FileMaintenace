@@ -269,6 +269,4 @@ Try{
 
 
 Logging -EventID $SuccessEventID -EventType Success -EventMessage "ドライブ${MountedDrive}のアンマウントに成功しました"
-Finalize $NormalReturnCode
-
-         
+Finalize $NormalReturnCode     

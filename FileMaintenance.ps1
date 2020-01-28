@@ -774,13 +774,13 @@ EndingProcess $ReturnCode
 
 #####################   ここから本体  ######################
 
-[boolean]$ErrorFlag = $False
+[boolean]$ErrorFlag = $false
 [boolean]$WarningFlag = $False
 [boolean]$NormalFlag = $False
 [boolean]$OverRideFlag = $False
 [boolean]$ContinueFlag = $False
-[Boolean]$ForceFinalize = $False
-[Boolean]$ForceEndloop = $False
+[Boolean]$ForceFinalize = $False          ;#$TRUEでオブジェクト処理ループを強制終了。
+[Boolean]$ForceEndloop = $False           ;#$FalseではFinalize , $TRUEではループ内でBreak
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
@@ -862,7 +862,7 @@ Do
     [boolean]$OverRideFlag = $False
     [boolean]$ContinueFlag = $False
     [Boolean]$ForceEndloop = $TRUE
-    [int]$InLoopOverRideCount = 0
+    [int]$InLoopOverRideCount = 0    ;#$OverRideCountは処理全体のOverRide回数。$InLoopOverRideCountは1処理ループ内でのOverRide回数。1オブジェクトで複数回OverRideがあり得るため
 
     $FormattedDate = (Get-Date).ToString($TimeStampFormat)
     $ExtensionString = [System.IO.Path]::GetExtension($TargetObject)
