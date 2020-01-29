@@ -202,7 +202,7 @@ Log2EventLogより優先します。
 　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
 
 .PARAMETER EventLogLogName
-　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
+　Windows Event Log出力のログ名を指定します。デフォルトは[Application]です。
 
 .PARAMETER Log2Console 
 　コンソールへのログ出力を制御します。
@@ -377,7 +377,7 @@ Try{
 
 #CheckLeafNotExists戻り値
 
-#チェック対象のファイルが存在するが、-OverRideを指定...$TRUE　（この指定は-Continueに優先する）
+#チェック対象のファイルが存在するが、-OverRideを指定...$TRUE　（この指定は-Continueに優先する）なおTryActionは既にファイルが存在する場合は強制上書き
 #チェック対象のファイルが存在するが、-Continueを指定...$False
 #チェック対象のファイルが存在する...$ErrorReturnCode でFinalizeへ進む、またはBreak
 #チェック対象の同一名称のフォルダが存在するが、-OverRideを指定...上書きが出来ないので$ErrorReturnCode でFinalizeへ進む、またはBreak
@@ -465,6 +465,15 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
 Return $true
 }
 
+
+#オブジェクトを複数条件でフィルタ
+
+#最終変更日時が$Dayより古い
+#(ファイル|フォルダ)名が正規表現$RegularExpressionにマッチ
+#ファイル容量が $KBsizeより大きい
+#C:\TargetFolder                    :TargetFolder
+#C:\TargetFolder\A\B\C\target.txt   :TargetObject
+#上記の時\A\B\C\部分が正規表現$ParentRegularExpressionにマッチ
 
 filter ComplexFilter{
 
