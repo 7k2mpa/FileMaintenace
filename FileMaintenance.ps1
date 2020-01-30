@@ -296,13 +296,17 @@ Param(
 
 [String][parameter(position=2)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$MoveToFolder,
 
-[String][parameter(position=3)][ValidateSet("none"  , "NullClear")]$PostAction='none',
+[String][parameter(position=3)][ValidateSet("none"  , "NullClear" , "Rename")]$PostAction='none',
 
 [int][ValidateRange(0,2147483647)]$Days = 0,
 [int][ValidateRange(0,2147483647)]$KBsize = 0,
-[Regex]$RegularExpression ='.*',
+#[Regex]$RegularExpression ='applog([0-9][0-9])([0-9][0-9])([0-9][0-9])',
+[Regex]$RegularExpression ='\.txt$',
+#[Regex]$RegularExpression ='.*',
 [Regex]$ParentRegularExpression ='.*',
 
+[Regex]$RenameToRegularExpression ='.loglog',
+#[Regex]$RenameToRegularExpression ='applicationlog-20$1-$2-$3',
 
 [boolean]$Recurse = $TRUE,
 [Switch]$NoRecurse,
@@ -653,7 +657,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
         Logging -EventID $InfoEventID -EventType Information -EventMessage "指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする空フォルダを再帰的[$($Recurse)]に削除します"
         
         }else{
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする$($KBSize)KB以上のファイルを移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]にAction[$($Action)]します。"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする$($KBSize)KB以上のファイルを移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]にAction[$($Action)]、PostAction[$($PostAction)]します。"
         }
 
     IF( ($Compress) -OR ($AddTimeStamp)){
@@ -757,7 +761,7 @@ Param(
             Logging -EventID $InfoEventID -EventType Information -EventMessage "指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする空フォルダを再帰的[$($Recurse)]に削除しました"
             }else{
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "指定フォルダ${TargetFolder}の${Days}日以前の正規表現 ${RegularExpression} にマッチする${KBSize}KB以上の全てのファイルを移動先フォルダ${MoveToFolder}へ再帰的[${Recurse}]にAction[${Action}]しました"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "指定フォルダ${TargetFolder}の${Days}日以前の正規表現 ${RegularExpression} にマッチする${KBSize}KB以上の全てのファイルを移動先フォルダ${MoveToFolder}へ再帰的[${Recurse}]にAction[${Action}]、PostAction[$($PostAction)]しました"
             }
 
         IF( ($Compress) -OR ($AddTimeStamp)){
@@ -940,7 +944,9 @@ Do
     #分岐1 何もしない
     '^none$'
             {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Action[${Action}]のため対象ファイル${TargetObject}は操作しません"
+            IF ($PostAction -eq 'none'){
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "Action[${Action}]のため対象ファイル${TargetObject}は操作しません"
+                }
             }
 
     #分岐2 削除
@@ -1005,6 +1011,27 @@ Do
             
             }
 
+    #分岐2 Rename
+    '^Rename$'
+            {
+
+
+                Logging -EventID $InfoEventID -EventType Information -EventMessage  "Rename後のファイル名と同一ファイルが存在するか確認します。"
+
+
+                $NewFilePath = Join-Path (Split-Path $TargetObject -Parent) -ChildPath  ((Split-Path -Leaf $TargetObject) -replace "$RegularExpression" , "$RenameToRegularExpression")
+
+                $NewFilePath = ConvertToAbsolutePath -CheckPath $NewFilePath -ObjectName 'Rename後のファイル名'
+
+                    If(CheckLeafNotExists $NewFilePath){
+
+                        TryAction -ActionType Rename -ActionFrom $TargetObject -ActionError $TargetObject
+                        }else{
+                        Logging -EventID $InfoEventID -EventType Information -EventMessage  "Rename後のファイル名[$($NewFilePath)]が存在するため[$($TargetObject)]のRenameはしません。"
+                        }
+
+            
+            }
 
     #分岐5 NullClear
     '^NullClear$'

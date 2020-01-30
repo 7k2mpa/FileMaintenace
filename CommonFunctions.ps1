@@ -156,7 +156,7 @@ function TryAction {
     
     Param(
 
-    [parameter(mandatory=$true)][String][ValidateSet("Move", "Copy", "Delete" , "AddTimeStamp" , "NullClear" ,"Compress" , "CompressAndAddTimeStamp" , "MakeNewFolder" ,"MakeNewFileWithValue" )]$ActionType,
+    [parameter(mandatory=$true)][String][ValidateSet("Move", "Copy", "Delete" , "AddTimeStamp" , "NullClear" ,"Compress" , "CompressAndAddTimeStamp" , "MakeNewFolder" ,"MakeNewFileWithValue" , "Rename" )]$ActionType,
     [parameter(mandatory=$true)][String]$ActionFrom,
     [String]$ActionTo,
     [parameter(mandatory=$true)][String]$ActionError,
@@ -165,7 +165,7 @@ function TryAction {
 
     )
 
-    IF (-NOT($ActionType -match "^(Delete|NullClear|MakeNewFolder)$" ) -and ($Null -eq $ActionTo)){
+    IF (-NOT($ActionType -match "^(Delete|NullClear|MakeNewFolder|Rename)$" ) -and ($Null -eq $ActionTo)){
 
     Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Function TryAction内部エラー。${ActionType}では$'$ActionTo'の指定が必要です"
     Finalize $InternalErrorReturnCode
@@ -227,6 +227,11 @@ function TryAction {
         '^MakeNewFileWithValue$'
             {
             New-Item -ItemType File -Path $ActionFrom -Value $FileValue > $Null -ErrorAction Stop
+            }
+
+        '^Rename$'
+            {
+            Get-ChildItem $ActionFrom | Rename-Item -NewName {$_.Name -replace "$RegularExpression" , "$RenameToRegularExpression" }  -Force > $NULL  -ErrorAction Stop
             }
                                            
         Default                                 
@@ -299,6 +304,8 @@ Param(
 
 )
 
+
+
     IF ([String]::IsNullOrEmpty($CheckPath)){
            
                     Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) の指定は必須です"
@@ -314,7 +321,7 @@ Param(
    
     }else{
        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]は有効なパス表記ではありません。存在しないドライブを指定している、NTFSに使用できない文字列が含まれてないか等を確認して下さい"
-       Finalize $ErrorReturnCode  
+       Finalize $ErrorReturnCode
 
     }
 
@@ -375,7 +382,7 @@ Param(
     IF ((Split-Path $CheckPath -noQualifier) -match '(\/|:|\?|`"|<|>|\||\*)') {
     
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName にNTFSで使用できない文字を指定しています"
-				Finalize $ErrorReturnCode
+                Finalize $ErrorReturnCode
                 }
 
 
@@ -384,7 +391,7 @@ Param(
     IF($CheckPath -match '\\(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])(\\|$|\..*$)'){
 
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName のパスにWindows予約語を含んでいます。以下は予約語のためWindowsでファイル、フォルダ名称に使用できません(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
-				Finalize $ErrorReturnCode
+                Finalize $ErrorReturnCode
                 }        
 
 
