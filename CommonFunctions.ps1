@@ -1,6 +1,6 @@
 #Requires -Version 3.0
 
-$Script:CommonFunctionsVersion = '20200123_1445'
+$Script:CommonFunctionsVersion = '20200130_1050'
 
 #ƒƒO“™‚Ì•Ï”‚ğˆêŠ‡İ’è‚µ‚½‚¢ê‡‚ÍˆÈ‰º‚ğ—˜—p‚µ‚Ä‰º‚³‚¢B
 #
@@ -156,7 +156,7 @@ function TryAction {
     
     Param(
 
-    [parameter(mandatory=$true)][String][ValidateSet("Move", "Copy", "Delete" , "AddTimeStamp" , "NullClear" ,"Compress" , "CompressAndAddTimeStamp" , "MakeNewFolder" ,"MakeNewFileWithValue")]$ActionType,
+    [parameter(mandatory=$true)][String][ValidateSet("Move", "Copy", "Delete" , "AddTimeStamp" , "NullClear" ,"Compress" , "CompressAndAddTimeStamp" , "MakeNewFolder" ,"MakeNewFileWithValue" )]$ActionType,
     [parameter(mandatory=$true)][String]$ActionFrom,
     [String]$ActionTo,
     [parameter(mandatory=$true)][String]$ActionError,

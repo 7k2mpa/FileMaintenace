@@ -293,7 +293,10 @@ Param(
 
 [String][parameter(position=1)][ValidateSet("Move", "Copy", "Delete" , "none" , "DeleteEmptyFolders" , "NullClear")]$Action='none',
 
+
 [String][parameter(position=2)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$MoveToFolder,
+
+[String][parameter(position=3)][ValidateSet("none"  , "NullClear")]$PostAction='none',
 
 [int][ValidateRange(0,2147483647)]$Days = 0,
 [int][ValidateRange(0,2147483647)]$KBsize = 0,
@@ -565,6 +568,7 @@ function Initialize {
 #Switchˆ—
 
 IF($NoRecurse){[boolean]$Script:Recurse = $false}
+IF($NullOriginalFile){[String]$Script:PostAction = 'NullClear'}
 
 
 #ƒpƒ‰ƒ[ƒ^‚ÌŠm”F
@@ -800,7 +804,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒ
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
-${Version} = '20200123_1145'
+${Version} = '20200130_1050'
 
 
 #‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
@@ -993,10 +997,36 @@ Do
 #Post Action
 #null clearƒtƒ‰ƒO‚ª³‚Ìê‡‚Ínull clearˆ—
 
-    IF ($NullOriginalFile){
+    Switch -Regex ($PostAction){
 
-        TryAction -ActionType NullClear -ActionFrom $TargetObject -ActionError $TargetObject
-        }
+    #•ªŠò1 ‰½‚à‚µ‚È‚¢
+    '^none$'
+            {
+            
+            }
+
+
+    #•ªŠò5 NullClear
+    '^NullClear$'
+            {
+            TryAction -ActionType NullClear -ActionFrom $TargetObject -ActionError $TargetObject          
+            }
+
+
+    #•ªŠò6 $Action‚ªğŒ®‚Ì‚Ç‚ê‚©‚É“K‡‚µ‚È‚¢ê‡‚ÍAƒvƒƒOƒ‰ƒ€ƒ~ƒX
+    Default 
+            {
+            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "PostAction”»’è‚Ì“à•”ƒGƒ‰[B”»’è®‚Ébug‚ª‚ ‚è‚Ü‚·"
+            Finalize $InternalErrorReturnCode
+            }
+    }
+
+
+
+#    IF ($NullOriginalFile){
+
+#        TryAction -ActionType NullClear -ActionFrom $TargetObject -ActionError $TargetObject
+#        }
 
 
 
