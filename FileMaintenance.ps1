@@ -16,7 +16,7 @@
 
 -前処理:対象ファイルから別ファイルを生成します。可能な処理は「ファイル名にタイムスタンプ付加」「圧縮」「生成した別ファイルの移動」です。併用指定可能です。「生成した別ファイルの移動」を指定しないと対象ファイルと同一フォルダに配置します。
 -主処理:対象ファイルを「移動」「複製」「削除」「内容消去（ヌルクリア）」、フォルダを「空フォルダ削除」します。
--後処理:対象ファイルを「内容消去（ヌルクリア）」します。
+-後処理:対象ファイルを「内容消去（ヌルクリア）」「名称変更」します。
 
 フィルタは「経過日数」「容量」「正規表現」「対象ファイル、フォルダの親パスに含まれる文字の正規表現」で指定できます。
 
@@ -301,8 +301,8 @@ Param(
 [int][ValidateRange(0,2147483647)]$Days = 0,
 [int][ValidateRange(0,2147483647)]$KBsize = 0,
 #[Regex]$RegularExpression ='applog([0-9][0-9])([0-9][0-9])([0-9][0-9])',
-[Regex]$RegularExpression ='\.txt$',
-#[Regex]$RegularExpression ='.*',
+#[Regex]$RegularExpression ='\.txt$',
+[Regex]$RegularExpression ='.*',
 [Regex]$ParentRegularExpression ='.*',
 
 [Regex]$RenameToRegularExpression ='.loglog',
@@ -612,9 +612,9 @@ IF($NullOriginalFile){[String]$Script:PostAction = 'NullClear'}
                 }
 
 
-    If (($Action -match "^(Move|Delete)$") -AND  ($NullOriginalFile)){
+    If (($Action -match "^(Move|Delete)$") -AND  ($PostAction -ne 'none')){
 
-				Logging -EventType Error -EventID $ErrorEventID -EventMessage "対象ファイルを削除または移動後、NullClearすることは出来ません"
+				Logging -EventType Error -EventID $ErrorEventID -EventMessage "対象ファイルを削除または移動後、-PostAction[$($PostAction)]することは出来ません"
 				Finalize $ErrorReturnCode
                 }
 
@@ -627,7 +627,7 @@ IF($NullOriginalFile){[String]$Script:PostAction = 'NullClear'}
 
 
     IF ($Action -eq "DeleteEmptyFolders"){
-        IF( ($Compress) -OR ($AddTimeStamp) -OR ($MoveNewFile) -OR($NullOriginalFile)){
+        IF( ($Compress) -OR ($AddTimeStamp) -OR ($MoveNewFile) -OR ($PostAction -ne 'none' )){
     
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時はファイル操作は行えません"
 				Finalize $ErrorReturnCode
@@ -938,7 +938,6 @@ Do
 
 #Main Action
 
-
     Switch -Regex ($Action){
 
     #分岐1 何もしない
@@ -1001,7 +1000,6 @@ Do
 
 
 #Post Action
-#null clearフラグが正の場合はnull clear処理
 
     Switch -Regex ($PostAction){
 
@@ -1014,46 +1012,32 @@ Do
     #分岐2 Rename
     '^Rename$'
             {
+            $NewFilePath = Join-Path (Split-Path $TargetObject -Parent) -ChildPath  ((Split-Path -Leaf $TargetObject) -replace "$RegularExpression" , "$RenameToRegularExpression")
 
-
-                Logging -EventID $InfoEventID -EventType Information -EventMessage  "Rename後のファイル名と同一ファイルが存在するか確認します。"
-
-
-                $NewFilePath = Join-Path (Split-Path $TargetObject -Parent) -ChildPath  ((Split-Path -Leaf $TargetObject) -replace "$RegularExpression" , "$RenameToRegularExpression")
-
-                $NewFilePath = ConvertToAbsolutePath -CheckPath $NewFilePath -ObjectName 'Rename後のファイル名'
+            $NewFilePath = ConvertToAbsolutePath -CheckPath $NewFilePath -ObjectName 'Rename後のファイル名'
 
                     If(CheckLeafNotExists $NewFilePath){
 
-                        TryAction -ActionType Rename -ActionFrom $TargetObject -ActionError $TargetObject
+                        TryAction -ActionType Rename -ActionFrom $TargetObject -ActionTo $NewFilePath -ActionError $TargetObject
                         }else{
                         Logging -EventID $InfoEventID -EventType Information -EventMessage  "Rename後のファイル名[$($NewFilePath)]が存在するため[$($TargetObject)]のRenameはしません。"
                         }
-
-            
             }
 
-    #分岐5 NullClear
+    #分岐3 NullClear
     '^NullClear$'
             {
             TryAction -ActionType NullClear -ActionFrom $TargetObject -ActionError $TargetObject          
             }
 
 
-    #分岐6 $Actionが条件式のどれかに適合しない場合は、プログラムミス
+    #分岐4 $Actionが条件式のどれかに適合しない場合は、プログラムミス
     Default 
             {
             Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "PostAction判定の内部エラー。判定式にbugがあります"
             Finalize $InternalErrorReturnCode
             }
     }
-
-
-
-#    IF ($NullOriginalFile){
-
-#        TryAction -ActionType NullClear -ActionFrom $TargetObject -ActionError $TargetObject
-#        }
 
 
 

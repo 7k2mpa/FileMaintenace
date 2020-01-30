@@ -199,7 +199,7 @@ function TryAction {
             Copy-Item -LiteralPath $ActionFrom $ActionTo -Force > $Null -ErrorAction Stop
             }
 
-        '^Move$'
+        '^(Move|Rename)$'
             {
             Move-Item -LiteralPath $ActionFrom $ActionTo -Force > $Null -ErrorAction Stop
             }
@@ -227,11 +227,6 @@ function TryAction {
         '^MakeNewFileWithValue$'
             {
             New-Item -ItemType File -Path $ActionFrom -Value $FileValue > $Null -ErrorAction Stop
-            }
-
-        '^Rename$'
-            {
-            Get-ChildItem $ActionFrom | Rename-Item -NewName {$_.Name -replace "$RegularExpression" , "$RenameToRegularExpression" }  -Force > $NULL  -ErrorAction Stop
             }
                                            
         Default                                 
@@ -270,7 +265,7 @@ function TryAction {
     }
 
 
-   IF($ActionType -match '^(Compress|CompressAndAddTimeStamp|AddTimeStamp|Copy|Move)$' ){
+   IF($ActionType -match '^(Compress|CompressAndAddTimeStamp|AddTimeStamp|Copy|Move|Rename)$' ){
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ActionTo)ÇçÏê¨ÇµÇ‹ÇµÇΩ"
         }
 
