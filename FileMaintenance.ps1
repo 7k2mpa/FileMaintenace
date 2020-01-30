@@ -293,6 +293,7 @@ Param(
 
 [String][parameter(position=1)][ValidateSet("Move", "Copy", "Delete" , "none" , "DeleteEmptyFolders" , "NullClear")]$Action='none',
 
+[Array][ValidateSet("AddTimeStamp", "Compress", "MoveNewFile" , "none" )]$PreAction = 'none',
 
 [String][parameter(position=2)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$MoveToFolder,
 
@@ -574,6 +575,9 @@ function Initialize {
 IF($NoRecurse){[boolean]$Script:Recurse = $false}
 IF($NullOriginalFile){[String]$Script:PostAction = 'NullClear'}
 
+IF($AddTimeStamp){$Script:PreAction +='AddTimeStamp'}
+IF($MoveNewFile){$Script:PreAction +='MoveNewFile'}
+IF($Compress){$Script:PreAction +='Compress'}
 
 #パラメータの確認
 
@@ -589,8 +593,8 @@ IF($NullOriginalFile){[String]$Script:PostAction = 'NullClear'}
 
 #移動先フォルダの要不要と有無を確認
 
-    If (  ($Action -match "^(Move|Copy)$") -OR ($MoveNewFile)  ){
-    
+#    If (  ($Action -match "^(Move|Copy)$") -OR ($MoveNewFile)  ){
+    If (  ($Action -match "^(Move|Copy)$") -OR ($PreAction -eq 'MoveNewFile')  ){    
 
         $MoveToFolder = ConvertToAbsolutePath -CheckPath $MoveToFolder -ObjectName '移動先フォルダ-MoveToFolder'
 
@@ -605,8 +609,9 @@ IF($NullOriginalFile){[String]$Script:PostAction = 'NullClear'}
 
 #組み合わせが不正な指定を確認
 
-    If(($TargetFolder -eq $MoveToFolder) -AND (($Action -match "move|copy") -OR  ($MoveNewFile))){
+#    If(($TargetFolder -eq $MoveToFolder) -AND (($Action -match "move|copy") -OR  ($MoveNewFile))){
 
+    If(($TargetFolder -eq $MoveToFolder) -AND (($Action -match "move|copy") -OR  ($PreAction -eq 'MoveNewFile'))){
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "移動先フォルダと移動先フォルダとが同一の時に、ファイルの移動、複製は出来ません"
 				Finalize $ErrorReturnCode
                 }
@@ -618,8 +623,9 @@ IF($NullOriginalFile){[String]$Script:PostAction = 'NullClear'}
 				Finalize $ErrorReturnCode
                 }
 
+   If (($PreAction -eq 'MoveNewFile' ) -AND  (-NOT($PreAction -match "^(Compress|AddTimeStamp)$") )){
 
-    If (($MoveNewFile) -AND  (-NOT(($Compress) -OR ($AddTimeStamp)))){
+#    If (($MoveNewFile) -AND  (-NOT(($Compress) -OR ($AddTimeStamp)))){
 
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "-MoveNewFileは、-Compresまたは-AddTimeStampと併用する必要があります。元ファイルの移動には-Action Moveを指定してください"
 				Finalize $ErrorReturnCode
@@ -703,9 +709,11 @@ function CompressAndAddTimeStamp{
 
 #圧縮フラグTrueの時
 
-        IF($Compress){
+#        IF($Compress){
+        IF($PreAction -eq 'Compress'){
 
-            IF($AddTimeStamp){
+#            IF($AddTimeStamp){
+            IF($PreAction -eq 'AddTimeStamp'){
                 $ArchiveFile = Join-Path $TargetFileParentFolder ($FileNameWithOutExtentionString+$FormattedDate+$ExtensionString+$CompressedExtString)
                 $ActionType = "CompressAndAddTimeStamp"
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮&タイムスタンプ付加した[$(Split-Path -Leaf $ArchiveFile)]を作成します"
@@ -728,7 +736,9 @@ function CompressAndAddTimeStamp{
 
 #移動フラグがTrueならば、作成した圧縮orタイムスタンプ付加したファイルを移動する
 
-    IF($MoveNewFile){
+
+#    IF($MoveNewFile){
+    IF($PreAction -eq 'MoveNewFile'){
 
         $ArchiveFileCheckPath = Join-Path $MoveToNewFolder (Split-Path -Leaf $ArchiveFile)
         Logging -EventID $InfoEventID -EventType Information -EventMessage "-MoveNewFile[$($MoveNewFile)]のため、作成したファイルは$($MoveToNewFolder)に配置します"
@@ -894,8 +904,9 @@ Do
 #移動元のファイルパスから移動先のファイルパスを生成。
 #再帰的でなければ、移動先パスは確実に存在するのでスキップ
 #ファイル削除または何もしないときは移動先パスを確認する必要がないのでスキップ
+#    If( (($Action -match "^(Move|Copy)$")) -OR ($MoveNewFile)) {
 
-    If( (($Action -match "^(Move|Copy)$")) -OR ($MoveNewFile)) {
+    If( (($Action -match "^(Move|Copy)$")) -OR ($PreAction -eq 'MoveNewFile')) {
 
         #ファイルが移動するAction用にファイル移動先の親フォルダパス$MoveToNewFolderを生成する
         
@@ -931,7 +942,9 @@ Do
 #Pre Action
 #圧縮フラグまたはタイムスタンプ付加フラグがTrueの処理
 
-   IF( ($Compress) -OR ($AddTimeStamp)){
+   IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
+
+#   IF( ($Compress) -OR ($AddTimeStamp)){
         CompressAndAddTimeStamp
         }
 
@@ -943,7 +956,7 @@ Do
     #分岐1 何もしない
     '^none$'
             {
-            IF ($PostAction -eq 'none'){
+            IF ( ($PostAction -eq 'none') -OR ($PreAction -eq 'none') ){
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Action[${Action}]のため対象ファイル${TargetObject}は操作しません"
                 }
             }
