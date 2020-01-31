@@ -156,7 +156,7 @@ function TryAction {
     
     Param(
 
-    [parameter(mandatory=$true)][String][ValidateSet("Move", "Copy", "Delete" , "AddTimeStamp" , "NullClear" ,"Compress" , "CompressAndAddTimeStamp" , "MakeNewFolder" ,"MakeNewFileWithValue" , "Rename" )]$ActionType,
+    [parameter(mandatory=$true)][String][ValidateSet("Move", "Copy", "Delete" , "AddTimeStamp" , "NullClear" ,"Compress" , "CompressAndAddTimeStamp" , "MakeNewFolder" ,"MakeNewFileWithValue" , "Rename" , "Archive" , "ArchiveAndAddTimeStamp")]$ActionType,
     [parameter(mandatory=$true)][String]$ActionFrom,
     [String]$ActionTo,
     [parameter(mandatory=$true)][String]$ActionError,
@@ -229,6 +229,13 @@ function TryAction {
             {
             New-Item -ItemType File -Path $ActionFrom -Value $FileValue > $Null -ErrorAction Stop
             }
+
+        '^(Archive|ArchiveAndAddTimeStamp)$'
+            {
+            $ActionTo = $ActionTo -replace "\[" , "``["
+            Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Update > $Null  -ErrorAction Stop
+            }                  
+
                                            
         Default                                 
             {
@@ -266,7 +273,7 @@ function TryAction {
     }
 
 
-   IF($ActionType -match '^(Compress|CompressAndAddTimeStamp|AddTimeStamp|Copy|Move|Rename)$' ){
+   IF($ActionType -match '^(Compress|CompressAndAddTimeStamp|AddTimeStamp|Copy|Move|Rename|Archive|ArchiveAndAddTimeStamp)$' ){
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ActionTo)ÇçÏê¨ÇµÇ‹ÇµÇΩ"
         }
 

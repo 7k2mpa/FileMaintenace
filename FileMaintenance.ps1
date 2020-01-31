@@ -1,4 +1,4 @@
-#Requires -Version 3.0
+#Requires -Version 5.0
 
 <#
 .SYNOPSIS
@@ -25,8 +25,8 @@
 
 ƒƒOo—Íæ‚Í[Windows EventLog][ƒRƒ“ƒ\[ƒ‹][ƒƒOƒtƒ@ƒCƒ‹]‚ª‘I‘ğ‰Â”\‚Å‚·B‚»‚ê‚¼‚êo—ÍA—}~‚ªw’è‚Å‚«‚Ü‚·B
 
-‚±‚ÌƒvƒƒOƒ‰ƒ€‚ÍPowerShell 3.0ˆÈ~‚ª•K—v‚Å‚·B
-Windows Server 2008,2008R2‚ÍWMF(Windows Management Framework)3.0ˆÈ~‚ğ’Ç‰ÁƒCƒ“ƒXƒg[ƒ‹‚µ‚Ä‚­‚¾‚³‚¢B‚»‚êˆÈ‘O‚ÌOS‚Å‚Í‰Ò“­‚µ‚Ü‚¹‚ñB
+‚±‚ÌƒvƒƒOƒ‰ƒ€‚ÍPowerShell 5.0ˆÈ~‚ª•K—v‚Å‚·B
+Windows Server 2008,2008R2‚ÍWMF(Windows Management Framework)5.0ˆÈ~‚ğ’Ç‰ÁƒCƒ“ƒXƒg[ƒ‹‚µ‚Ä‚­‚¾‚³‚¢B‚»‚êˆÈ‘O‚ÌOS‚Å‚Í‰Ò“­‚µ‚Ü‚¹‚ñB
 
 https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows-powershell?view=powershell-7#upgrading-existing-windows-powershell
 
@@ -288,16 +288,21 @@ Log2File‚æ‚è—Dæ‚µ‚Ü‚·B
 Param(
 
 [parameter(position=0, mandatory=$true , HelpMessage = 'ˆ—‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚ğw’è(ex. D:\Logs) ‘S‚Ä‚ÌHelp‚ÍGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$TargetFolder,
-#[parameter(position=0, mandatory=$true , HelpMessage = 'ˆ—‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚ğw’è(ex. D:\Logs) ‘S‚Ä‚ÌHelp‚ÍGet-Help FileMaintenance.ps1')][String]$TargetFolder,  #debug—p‚É—pˆÓ‚µ‚Ä‚ ‚è‚Ü‚·B’Êí‚Íg‚í‚È‚¢
+
+#[parameter(position=0, mandatory=$true , HelpMessage = 'ˆ—‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚ğw’è(ex. D:\Logs) ‘S‚Ä‚ÌHelp‚ÍGet-Help FileMaintenance.ps1')][String]$TargetFolder,  #Validation debug—p‚É—pˆÓ‚µ‚Ä‚ ‚è‚Ü‚·B’Êí‚Íg‚í‚È‚¢
 #[parameter(position=0, mandatory=$true , HelpMessage = 'ˆ—‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚ğw’è(ex. D:\Logs) ‘S‚Ä‚ÌHelp‚ÍGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
 
 [String][parameter(position=1)][ValidateSet("Move", "Copy", "Delete" , "none" , "DeleteEmptyFolders" , "NullClear")]$Action='none',
 
-[Array][ValidateSet("AddTimeStamp", "Compress", "MoveNewFile" , "none" )]$PreAction = 'none',
-
-[String][parameter(position=2)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$MoveToFolder,
+[Array][parameter(position=2)][ValidateSet("AddTimeStamp", "Compress", "MoveNewFile" , "none" , "Archive")]$PreAction = 'none',
 
 [String][parameter(position=3)][ValidateSet("none"  , "NullClear" , "Rename")]$PostAction='none',
+
+[String][parameter(position=4)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$MoveToFolder,
+
+[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$ArchivePath  ,
+[String]$ArchiveFileName  ,
+
 
 [int][ValidateRange(0,2147483647)]$Days = 0,
 [int][ValidateRange(0,2147483647)]$KBsize = 0,
@@ -607,6 +612,12 @@ IF($Compress){$Script:PreAction +='Compress'}
                 Finalize $ErrorReturnCode
                 }
 
+
+    IF($PreAction -eq 'Archive'){
+        CheckNullOrEmpty -CheckPath $ArchiveFileName -ObjectName '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL    
+        }
+
+
 #‘g‚İ‡‚í‚¹‚ª•s³‚Èw’è‚ğŠm”F
 
 #    If(($TargetFolder -eq $MoveToFolder) -AND (($Action -match "move|copy") -OR  ($MoveNewFile))){
@@ -623,14 +634,17 @@ IF($Compress){$Script:PreAction +='Compress'}
 				Finalize $ErrorReturnCode
                 }
 
-   If (($PreAction -eq 'MoveNewFile' ) -AND  (-NOT($PreAction -match "^(Compress|AddTimeStamp)$") )){
+   If (($PreAction -eq 'MoveNewFile' ) -AND  (-NOT($PreAction -match "^(Compress|AddTimeStamp|Archive)$") )){
 
-#    If (($MoveNewFile) -AND  (-NOT(($Compress) -OR ($AddTimeStamp)))){
-
-				Logging -EventType Error -EventID $ErrorEventID -EventMessage "-MoveNewFile‚ÍA-Compres‚Ü‚½‚Í-AddTimeStamp‚Æ•¹—p‚·‚é•K—v‚ª‚ ‚è‚Ü‚·BŒ³ƒtƒ@ƒCƒ‹‚ÌˆÚ“®‚É‚Í-Action Move‚ğw’è‚µ‚Ä‚­‚¾‚³‚¢"
+				Logging -EventType Error -EventID $ErrorEventID -EventMessage "-PreAction‚ÅMoveNewFile‚ÍACompres , AddTimeStamp , Archive‚Æ•¹—p‚·‚é•K—v‚ª‚ ‚è‚Ü‚·BŒ³ƒtƒ@ƒCƒ‹‚ÌˆÚ“®‚É‚Í-Action Move‚ğw’è‚µ‚Ä‚­‚¾‚³‚¢"
 				Finalize $ErrorReturnCode
                 }
 
+   If (($PreAction -eq 'Compress') -AND  ($PreAction -eq 'Archive') ){
+
+				Logging -EventType Error -EventID $ErrorEventID "-PreAction‚ÅCompress‚ÆArchive‚Æ‚ğ“¯‚Éw’è‚·‚é–‚Í‚Å‚«‚Ü‚¹‚ñ"
+				Finalize $ErrorReturnCode
+                }
 
     IF ($Action -eq "DeleteEmptyFolders"){
         IF( ($Compress) -OR ($AddTimeStamp) -OR ($MoveNewFile) -OR ($PostAction -ne 'none' )){
@@ -663,12 +677,16 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒpƒ‰ƒ[ƒ^‚Í
         Logging -EventID $InfoEventID -EventType Information -EventMessage "w’èƒtƒHƒ‹ƒ_$($TargetFolder)‚Ì$($Days)“úˆÈ‘O‚Ì³‹K•\Œ» $($RegularExpression) ‚Éƒ}ƒbƒ`‚·‚é‹óƒtƒHƒ‹ƒ_‚ğÄ‹A“I[$($Recurse)]‚Éíœ‚µ‚Ü‚·"
         
         }else{
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "w’èƒtƒHƒ‹ƒ_$($TargetFolder)‚Ì$($Days)“úˆÈ‘O‚Ì³‹K•\Œ» $($RegularExpression) ‚Éƒ}ƒbƒ`‚·‚é$($KBSize)KBˆÈã‚Ìƒtƒ@ƒCƒ‹‚ğˆÚ“®æƒtƒHƒ‹ƒ_$($MoveToFolder)‚ÖÄ‹A“I[$($Recurse)]‚ÉAction[$($Action)]APostAction[$($PostAction)]‚µ‚Ü‚·B"
+        Logging -EventID $InfoEventID -EventType Information `
+        -EventMessage "w’èƒtƒHƒ‹ƒ_$($TargetFolder)‚Ì$($Days)“úˆÈ‘O‚Ì³‹K•\Œ» $($RegularExpression) ‚Éƒ}ƒbƒ`‚·‚é$($KBSize)KBˆÈã‚Ìƒtƒ@ƒCƒ‹‚ğˆÚ“®æƒtƒHƒ‹ƒ_$($MoveToFolder)‚ÖÄ‹A“I[$($Recurse)]‚ÉAction[$($Action)]APostAction[$($PostAction)]‚µ‚Ü‚·B"
         }
+#    IF( ($Compress) -OR ($AddTimeStamp)){
+    IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
 
-    IF( ($Compress) -OR ($AddTimeStamp)){
+#        Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒ}ƒbƒ`‚µ‚½ƒtƒ@ƒCƒ‹‚Íƒtƒ@ƒCƒ‹–¼‚É“ú•t•t‰Á[${AddTimeStamp}]Aˆ³k[${Compress}]‚µ‚ÄAˆÚ“®æƒtƒHƒ‹ƒ_$($MoveToFolder)‚ÖÄ‹A“I[$($Recurse)]‚ÉˆÚ“®[$($MoveNewFile)]‚µ‚Ü‚·"
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒ}ƒbƒ`‚µ‚½ƒtƒ@ƒCƒ‹‚Íƒtƒ@ƒCƒ‹–¼‚É“ú•t•t‰Á[${AddTimeStamp}]Aˆ³k[${Compress}]‚µ‚ÄAˆÚ“®æƒtƒHƒ‹ƒ_$($MoveToFolder)‚ÖÄ‹A“I[$($Recurse)]‚ÉˆÚ“®[$($MoveNewFile)]‚µ‚Ü‚·"
+        Logging -EventID $InfoEventID -EventType Information `
+        -EventMessage ("ƒ}ƒbƒ`‚µ‚½ƒtƒ@ƒCƒ‹‚Íƒtƒ@ƒCƒ‹–¼‚É“ú•t•t‰Á["+[Boolean]($PreAction -eq 'AddTimeStamp')+"]Aˆ³k["+[Boolean]($PreAction -eq 'Compress')+"]‚µ‚ÄAˆÚ“®æƒtƒHƒ‹ƒ_$($MoveToFolder)‚ÖÄ‹A“I[$($Recurse)]‚ÉˆÚ“®["+[Boolean]($PreAction -eq 'MoveNewFile')+"]‚µ‚Ü‚·")
         }
 
     IF($NoAction){
@@ -714,7 +732,10 @@ function CompressAndAddTimeStamp{
 
 #            IF($AddTimeStamp){
             IF($PreAction -eq 'AddTimeStamp'){
-                $ArchiveFile = Join-Path $TargetFileParentFolder ($FileNameWithOutExtentionString+$FormattedDate+$ExtensionString+$CompressedExtString)
+
+#                $ArchiveFile = Join-Path $TargetFileParentFolder ($FileNameWithOutExtentionString+$FormattedDate+$ExtensionString+$CompressedExtString)
+
+                $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )+$CompressedExtString )
                 $ActionType = "CompressAndAddTimeStamp"
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "ˆ³k&ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv•t‰Á‚µ‚½[$(Split-Path -Leaf $ArchiveFile)]‚ğì¬‚µ‚Ü‚·"
             }else{
@@ -728,7 +749,9 @@ function CompressAndAddTimeStamp{
 
 #ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv•t‰Á‚Ì‚İTrue‚Ì
 
-                $ArchiveFile = Join-Path $TargetFileParentFolder ($FileNameWithOutExtentionString+$FormattedDate+$ExtensionString)
+#                $ArchiveFile = Join-Path $TargetFileParentFolder ($FileNameWithOutExtentionString+$FormattedDate+$ExtensionString)
+
+                $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath (AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )
                 $ActionType = "AddTimeStamp"
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒ^ƒCƒ€ƒXƒ^ƒ“ƒv•t‰Á‚µ‚½[$(Split-Path -Leaf $ArchiveFile)]‚ğì¬‚µ‚Ü‚·"
                 }
@@ -741,7 +764,7 @@ function CompressAndAddTimeStamp{
     IF($PreAction -eq 'MoveNewFile'){
 
         $ArchiveFileCheckPath = Join-Path $MoveToNewFolder (Split-Path -Leaf $ArchiveFile)
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "-MoveNewFile[$($MoveNewFile)]‚Ì‚½‚ßAì¬‚µ‚½ƒtƒ@ƒCƒ‹‚Í$($MoveToNewFolder)‚É”z’u‚µ‚Ü‚·"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage ("-PreAction MoveNewFile["+[Boolean]($PreAction -eq 'MoveNewFile')+"]‚Ì‚½‚ßAì¬‚µ‚½ƒtƒ@ƒCƒ‹‚Í$($MoveToNewFolder)‚É”z’u‚µ‚Ü‚·")
 
         }else{
         $ArchiveFileCheckPath = $ArchiveFile        
@@ -771,14 +794,15 @@ Param(
             Logging -EventID $InfoEventID -EventType Information -EventMessage "w’èƒtƒHƒ‹ƒ_$($TargetFolder)‚Ì$($Days)“úˆÈ‘O‚Ì³‹K•\Œ» $($RegularExpression) ‚Éƒ}ƒbƒ`‚·‚é‹óƒtƒHƒ‹ƒ_‚ğÄ‹A“I[$($Recurse)]‚Éíœ‚µ‚Ü‚µ‚½"
             }else{
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "w’èƒtƒHƒ‹ƒ_${TargetFolder}‚Ì${Days}“úˆÈ‘O‚Ì³‹K•\Œ» ${RegularExpression} ‚Éƒ}ƒbƒ`‚·‚é${KBSize}KBˆÈã‚Ì‘S‚Ä‚Ìƒtƒ@ƒCƒ‹‚ğˆÚ“®æƒtƒHƒ‹ƒ_${MoveToFolder}‚ÖÄ‹A“I[${Recurse}]‚ÉAction[${Action}]APostAction[$($PostAction)]‚µ‚Ü‚µ‚½"
+            Logging -EventID $InfoEventID -EventType Information `
+            -EventMessage "w’èƒtƒHƒ‹ƒ_${TargetFolder}‚Ì${Days}“úˆÈ‘O‚Ì³‹K•\Œ» ${RegularExpression} ‚Éƒ}ƒbƒ`‚·‚é${KBSize}KBˆÈã‚Ì‘S‚Ä‚Ìƒtƒ@ƒCƒ‹‚ğˆÚ“®æƒtƒHƒ‹ƒ_${MoveToFolder}‚ÖÄ‹A“I[${Recurse}]‚ÉAction[${Action}]APostAction[$($PostAction)]‚µ‚Ü‚µ‚½"
             }
 
-        IF( ($Compress) -OR ($AddTimeStamp)){
+    IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒ}ƒbƒ`‚µ‚½ƒtƒ@ƒCƒ‹‚Íƒtƒ@ƒCƒ‹–¼‚É“ú•t•t‰Á[${AddTimeStamp}]Aˆ³k[${Compress}]‚µ‚ÄAˆÚ“®æƒtƒHƒ‹ƒ_$($MoveToFolder)‚ÖÄ‹A“I[$($Recurse)]‚ÉˆÚ“®[$($MoveNewFile)]‚µ‚Ü‚µ‚½"
-
-            }
+        Logging -EventID $InfoEventID -EventType Information `
+        -EventMessage ("ƒ}ƒbƒ`‚µ‚½ƒtƒ@ƒCƒ‹‚Íƒtƒ@ƒCƒ‹–¼‚É“ú•t•t‰Á["+[Boolean]($PreAction -eq 'AddTimeStamp')+"]Aˆ³k["+[Boolean]($PreAction -eq 'Compress')+"]‚µ‚ÄAˆÚ“®æƒtƒHƒ‹ƒ_$($MoveToFolder)‚ÖÄ‹A“I[$($Recurse)]‚ÉˆÚ“®["+[Boolean]($PreAction -eq 'MoveNewFile')+"]‚µ‚Ü‚µ‚½")
+        }
 
         IF($OverRide -and ($OverRideCount -gt 0)){
             Logging -EventID $InfoEventID -EventType Information -EventMessage "-OverRide[${OverRide}]‚ªw’è‚³‚ê‚Ä‚¢‚é‚½‚ß¶¬‚µ‚½ƒtƒ@ƒCƒ‹‚Æ“¯–¼‚Ì‚à‚Ì‚ğ[$($OverRideCount)]‰ñAã‘‚«‚µ‚Ü‚µ‚½"
@@ -818,7 +842,7 @@ ${THIS_FILE}=$MyInvocation.MyCommand.Path       @@                    #ƒtƒ‹ƒpƒ
 ${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #‚±‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX
 ${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # ƒVƒFƒ‹–¼
 
-${Version} = '20200130_1050'
+${Version} = '20200131_1605'
 
 
 #‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
@@ -857,6 +881,33 @@ Write-Output 'ˆ—‘ÎÛ‚ÍˆÈ‰º‚Å‚·'
     }
 
 
+IF( ($PreAction -eq 'Archive') ){
+
+    IF($PreAction -eq 'MoveNewFile'){
+        $ArchiveToFolder = $MoveToFolder
+        }else{
+        $ArchiveToFolder = $TargetFolder
+        }
+
+
+    IF($PreAction -eq 'AddTimeStamp'){  
+
+    $ArchivePath = Join-Path -Path $ArchiveToFolder -ChildPath ( AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $ArchiveFileName )
+    }else{
+    $ArchivePath = Join-Path -Path $ArchiveToFolder -ChildPath $ArchiveFileName
+    }
+
+    $ArchivePath = ConvertToAbsolutePath -CheckPath $ArchivePath -ObjectName  'Archiveo—Íæ'
+
+#    $ArchivePath = Join-Path -Path (Split-Path -Path $ArchivePath -Parent) -ChildPath ( AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName (Split-Path -Path $ArchivePath -Leaf) )
+
+    IF(Test-Path -LiteralPath $ArchivePath -PathType Container){
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Šù‚É“¯ˆê–¼ÌƒtƒHƒ‹ƒ_$($CheckLeaf)‚ª‘¶İ‚·‚é‚½‚ßA${SHELLNAME}‚ğI—¹‚µ‚Ü‚·"
+        Finalize $ErrorReturnCode
+        }    
+    }
+
+
 #‘ÎÛƒtƒHƒ‹ƒ_orƒtƒ@ƒCƒ‹ŒQ‚Ìˆ—ƒ‹[ƒv
 #‘ÎÛƒtƒHƒ‹ƒ_‚ÍƒIƒuƒWƒFƒNƒgA‘ÎÛƒtƒ@ƒCƒ‹‚Íƒtƒ@ƒCƒ‹–¼•ÏXorˆÚ“®‚ª‚ ‚é‚½‚ßƒpƒX•¶š—ñ‚Æ‚µ‚Äˆ—
 
@@ -890,12 +941,9 @@ Do
     [Boolean]$ForceEndloop = $TRUE   ;#‚±‚Ìƒ‹[ƒv“à‚ÅˆÙíI—¹‚·‚é‚Íƒ‹[ƒvI’[‚ÖBreak‚µ‚ÄAˆ—Œ‹‰Ê‚ğ•\¦‚·‚éB’¼‚®‚ÉFinalize‚µ‚È‚¢
     [int]$InLoopOverRideCount = 0    ;#$OverRideCount‚Íˆ—‘S‘Ì‚ÌOverRide‰ñ”B$InLoopOverRideCount‚Í1ˆ—ƒ‹[ƒv“à‚Å‚ÌOverRide‰ñ”B1ƒIƒuƒWƒFƒNƒg‚Å•¡”‰ñOverRide‚ª‚ ‚è“¾‚é‚½‚ß
 
-    $FormattedDate = (Get-Date).ToString($TimeStampFormat)
-    $ExtensionString = [System.IO.Path]::GetExtension($TargetObject)
-    $FileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension($TargetObject)
-    $TargetFileParentFolder = Split-Path $TargetObject -Parent
+    [String]$TargetFileParentFolder = Split-Path $TargetObject -Parent
 
-    $TargetObjectName = GetTargetObjectName $TargetObject
+    [String]$TargetObjectName = GetTargetObjectName $TargetObject
 
     Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- ‘ÎÛObject $($TargetObjectName) ˆ—ŠJn---"
 
@@ -903,10 +951,11 @@ Do
 
 #ˆÚ“®Œ³‚Ìƒtƒ@ƒCƒ‹ƒpƒX‚©‚çˆÚ“®æ‚Ìƒtƒ@ƒCƒ‹ƒpƒX‚ğ¶¬B
 #Ä‹A“I‚Å‚È‚¯‚ê‚ÎAˆÚ“®æƒpƒX‚ÍŠmÀ‚É‘¶İ‚·‚é‚Ì‚ÅƒXƒLƒbƒv
-#ƒtƒ@ƒCƒ‹íœ‚Ü‚½‚Í‰½‚à‚µ‚È‚¢‚Æ‚«‚ÍˆÚ“®æƒpƒX‚ğŠm”F‚·‚é•K—v‚ª‚È‚¢‚Ì‚ÅƒXƒLƒbƒv
-#    If( (($Action -match "^(Move|Copy)$")) -OR ($MoveNewFile)) {
 
-    If( (($Action -match "^(Move|Copy)$")) -OR ($PreAction -eq 'MoveNewFile')) {
+#Action[(Move|Copy)]ˆÈŠO‚Íƒtƒ@ƒCƒ‹ˆÚ“®‚ª–³‚¢BˆÚ“®æƒpƒX‚ğŠm”F‚·‚é•K—v‚ª‚È‚¢‚Ì‚ÅƒXƒLƒbƒv
+#PreAction[Archive]‚ÍMoveNewFile[TRUE]‚Å‚ào—Íƒtƒ@ƒCƒ‹‚Í1ŒÂ‚ÅŠK‘w\‘¢‚ğæ‚ç‚È‚¢B‚æ‚Á‚ÄƒXƒLƒbƒv
+
+    If( (($Action -match "^(Move|Copy)$")) -OR (($PreAction -eq 'MoveNewFile') -AND (-NOT($PreAction -ne 'Archive')) )) {
 
         #ƒtƒ@ƒCƒ‹‚ªˆÚ“®‚·‚éAction—p‚Éƒtƒ@ƒCƒ‹ˆÚ“®æ‚ÌeƒtƒHƒ‹ƒ_ƒpƒX$MoveToNewFolder‚ğ¶¬‚·‚é
         
@@ -920,6 +969,7 @@ Do
 
         #MoveToNewFolder‚ğì‚é‚É‚Í \A\B\C\@‚Ì•”•ª‚ğæ‚èo‚µ‚ÄAˆÚ“®æƒtƒHƒ‹ƒ_MoveToFolder‚ÆJoin-Path‚·‚é
         # String.Substringƒƒ\ƒbƒh‚Í•¶š—ñ‚©‚çAˆø”ˆÊ’u‚©‚çÅŒã‚Ü‚Å‚ğæ‚èo‚·
+        #MoveToNewFolder‚ÍNoRecurse‚Å‚àMove|Copy‚Åˆê—¥g—p‚·‚é‚Ì‚Åì¬
 
         $MoveToNewFolder = Join-Path $MoveToFolder ($TargetFileParentFolder).Substring($TargetFolder.Length)
         If($Recurse){
@@ -940,13 +990,16 @@ Do
 
 
 #Pre Action
-#ˆ³kƒtƒ‰ƒO‚Ü‚½‚Íƒ^ƒCƒ€ƒXƒ^ƒ“ƒv•t‰Áƒtƒ‰ƒO‚ªTrue‚Ìˆ—
 
-   IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
+   IF(( $PreAction -match '^(Compress|AddTimeStamp)$') -AND (-NOT($PreAction -eq 'Archive'))){
 
-#   IF( ($Compress) -OR ($AddTimeStamp)){
         CompressAndAddTimeStamp
-        }
+        
+        }elseIF($PreAction -eq 'Archive'){
+       
+            TryAction -ActionType Archive -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
+
+            }
 
 
 #Main Action
@@ -956,7 +1009,7 @@ Do
     #•ªŠò1 ‰½‚à‚µ‚È‚¢
     '^none$'
             {
-            IF ( ($PostAction -eq 'none') -OR ($PreAction -eq 'none') ){
+            IF ( ($PostAction -eq 'none') -AND ($PreAction -eq 'none') ){
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Action[${Action}]‚Ì‚½‚ß‘ÎÛƒtƒ@ƒCƒ‹${TargetObject}‚Í‘€ì‚µ‚Ü‚¹‚ñ"
                 }
             }
@@ -1022,10 +1075,11 @@ Do
             
             }
 
-    #•ªŠò2 Rename
+    #•ªŠò2 Rename RenameŒã‚Ì“¯ˆê–¼Ìƒtƒ@ƒCƒ‹‚ª‚É‘¶İ‚µ‚È‚¢‚±‚Æ‚ğŠm”F‚µ‚Ä‚©‚çˆ—
     '^Rename$'
             {
-            $NewFilePath = Join-Path (Split-Path $TargetObject -Parent) -ChildPath  ((Split-Path -Leaf $TargetObject) -replace "$RegularExpression" , "$RenameToRegularExpression")
+   #                     $NewFilePath = Join-Path (Split-Path $TargetObject -Parent) -ChildPath  ((Split-Path -Leaf $TargetObject) -replace "$RegularExpression" , "$RenameToRegularExpression")
+            $NewFilePath = Join-Path $TargetFileParentFolder -ChildPath  ((Split-Path -Leaf $TargetObject) -replace "$RegularExpression" , "$RenameToRegularExpression")
 
             $NewFilePath = ConvertToAbsolutePath -CheckPath $NewFilePath -ObjectName 'RenameŒã‚Ìƒtƒ@ƒCƒ‹–¼'
 
