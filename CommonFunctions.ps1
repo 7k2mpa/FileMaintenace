@@ -217,7 +217,11 @@ function TryAction {
         '^(Compress|CompressAndAddTimeStamp)$'
             {
             $ActionTo = $ActionTo -replace "\[" , "``["
-            Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Force > $Null  -ErrorAction Stop
+
+#            $ActionTo = "``"+$ActionTo
+
+#            echo $ActionTo
+            Compress-Archive -LiteralPath $ActionFrom -DestinationPath $($ActionTo) -Force > $Null  -ErrorAction Stop
             }                  
                                        
         '^MakeNewFolder$'
@@ -232,7 +236,7 @@ function TryAction {
 
         '^(Archive|ArchiveAndAddTimeStamp)$'
             {
-            $ActionTo = $ActionTo -replace "\[" , "``["
+            $ActionTo = $ActionTo -replace "\[" , "```["
             Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Update > $Null  -ErrorAction Stop
             }                  
 

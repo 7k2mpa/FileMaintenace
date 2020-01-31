@@ -955,7 +955,7 @@ Do
 #Action[(Move|Copy)]以外はファイル移動が無い。移動先パスを確認する必要がないのでスキップ
 #PreAction[Archive]はMoveNewFile[TRUE]でも出力ファイルは1個で階層構造を取らない。よってスキップ
 
-    If( (($Action -match "^(Move|Copy)$")) -OR (($PreAction -eq 'MoveNewFile') -AND (-NOT($PreAction -ne 'Archive')) )) {
+    If( (($Action -match "^(Move|Copy)$")) -OR (($PreAction -eq 'MoveNewFile') -AND ($PreAction -ne 'Archive') )) {
 
         #ファイルが移動するAction用にファイル移動先の親フォルダパス$MoveToNewFolderを生成する
         
