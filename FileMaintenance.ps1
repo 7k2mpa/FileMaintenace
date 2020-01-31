@@ -683,8 +683,6 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
 #    IF( ($Compress) -OR ($AddTimeStamp)){
     IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
 
-#        Logging -EventID $InfoEventID -EventType Information -EventMessage "マッチしたファイルはファイル名に日付付加[${AddTimeStamp}]、圧縮[${Compress}]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動[$($MoveNewFile)]します"
-
         Logging -EventID $InfoEventID -EventType Information `
         -EventMessage ("マッチしたファイルはファイル名に日付付加["+[Boolean]($PreAction -eq 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -eq 'Compress')+"]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -eq 'MoveNewFile')+"]します")
         }
@@ -968,7 +966,7 @@ Do
         #D:\MoveToFolder\A\B\C\target.txt   :ファイルの移動先パス
 
         #MoveToNewFolderを作るには \A\B\C\　の部分を取り出して、移動先フォルダMoveToFolderとJoin-Pathする
-        # String.Substringメソッドは文字列から、引数位置から最後までを取り出す
+        #String.Substringメソッドは文字列から、引数位置から最後までを取り出す
         #MoveToNewFolderはNoRecurseでもMove|Copyで一律使用するので作成
 
         $MoveToNewFolder = Join-Path $MoveToFolder ($TargetFileParentFolder).Substring($TargetFolder.Length)

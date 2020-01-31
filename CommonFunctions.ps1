@@ -1,4 +1,4 @@
-#Requires -Version 3.0
+#Requires -Version 5.0
 
 $Script:CommonFunctionsVersion = '20200130_1050'
 
@@ -216,12 +216,13 @@ function TryAction {
 
         '^(Compress|CompressAndAddTimeStamp)$'
             {
-            $ActionTo = $ActionTo -replace "\[" , "``["
+            $ActionTo = $ActionTo -replace "\[" , "````["
 
 #            $ActionTo = "``"+$ActionTo
 
-#            echo $ActionTo
-            Compress-Archive -LiteralPath $ActionFrom -DestinationPath $($ActionTo) -Force > $Null  -ErrorAction Stop
+#          echo $ActionTo
+#           exit
+            Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Force > $Null  -ErrorAction Stop
             }                  
                                        
         '^MakeNewFolder$'
@@ -236,7 +237,9 @@ function TryAction {
 
         '^(Archive|ArchiveAndAddTimeStamp)$'
             {
-            $ActionTo = $ActionTo -replace "\[" , "```["
+            $ActionTo = $ActionTo -replace "\[" , "````["
+
+#                        echo $ActionTo
             Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Update > $Null  -ErrorAction Stop
             }                  
 
