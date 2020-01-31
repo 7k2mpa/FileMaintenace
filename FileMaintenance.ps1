@@ -300,7 +300,7 @@ Param(
 
 [String][parameter(position=4)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$MoveToFolder,
 
-[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$ArchivePath  ,
+
 [String]$ArchiveFileName  ,
 
 
