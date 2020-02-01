@@ -14,7 +14,7 @@
 
 フィルタ結果に対して可能な処理は以下です。
 
--前処理:対象ファイルから別ファイルを生成します。可能な処理は「ファイル名にタイムスタンプ付加」「圧縮」「生成した別ファイルの移動」です。併用指定可能です。「生成した別ファイルの移動」を指定しないと対象ファイルと同一フォルダに配置します。
+-前処理:対象ファイルから別ファイルを生成します。可能な処理は「ファイル名にタイムスタンプ付加」「圧縮」「生成した別ファイルの移動」「複数のファイルを1ファイルにアーカイブ」です。併用指定可能です。「生成した別ファイルの移動」を指定しないと対象ファイルと同一フォルダに配置します。
 -主処理:対象ファイルを「移動」「複製」「削除」「内容消去（ヌルクリア）」、フォルダを「空フォルダ削除」します。
 -後処理:対象ファイルを「内容消去（ヌルクリア）」「名称変更」します。
 
@@ -98,8 +98,20 @@ C:\OLD\Log\Infra.log
 ワイルドカード* ? []は使用できません。
 フォルダ名に括弧 [ , ] を含む場合はエスケープせずにそのまま入力してください。
 
+.PARAMETER PreAction
+処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
+PreActionはAction|PostActionと異なり複数のパラメータを指定できます。
+パラメータはカンマ,で区切って下さい。
+
+None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-NoActionスイッチを利用して下さい。
+Compress:対象ファイルから圧縮したファイルを新規生成します。
+AddTimeStamp:対象ファイルからファイル名に-TimeStampFormatで定められた書式でタイムスタンプ付加したファイルを新規生成します。
+Archive:対象ファイル群をまとめてアーカイブファイルを新規生成します。既にアーカイブファイルがある場合は、アーカイブファイルに対象ファイル群を追加します。アーカイブファイルは-ArchiveFileNameで指定したファイル名です。
+MoveNewFile:新規生成するファイルを-TargetFolderと同一ではなく、-MoveToFolderへ配置します。
+
+
 .PARAMETER Action
-　処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
+処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
 
 None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-NoActionスイッチを利用して下さい。
 Move:ファイルを-MoveToFolderへ移動します。
@@ -108,12 +120,23 @@ Copy:ファイルを-MoveToFolderにコピーします。
 DeleteEmptyFolders:空フォルダを削除します。
 NullClear:ファイルの内容削除 NullClearします。
 
+.PARAMETER PostAction
+処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
+
+None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-NoActionスイッチを利用して下さい。
+Rename:ファイル名を正規表現-RenameToRegularExpressionで置換します。
+NullClear:ファイルの内容削除 NullClearします。PostActionのため、Actionと併用可能です。例えばファイル複製後、元ファイルを削除する、といった用途に使用して下さい。
+
+
 .PARAMETER MoveToFolder
 　処理対象のファイルの移動、コピー先フォルダを指定します。
 相対、絶対パスで指定可能です。
 相対パス表記は、.から始める表記にして下さい。（例 .\Log , ..\Script\log）
 ワイルドカード* ? []は使用できません。
 フォルダ名に括弧 [ , ] を含む場合はエスケープせずにそのまま入力してください。
+
+.PARAMETER ArchiveFileName
+-PreAction Archive指定時のアーカイブファイル名を指定します。
 
 .PARAMETER Days
 　処理対象のファイル、フォルダを更新経過日数でフィルタします。
@@ -135,6 +158,10 @@ PowerShellの仕様上、大文字小文字の区別はしない筈ですが、実際には区別されるので注
 記述はシングルクオーテーションで括って下さい。
 PowerShellの仕様上、大文字小文字の区別はしない筈ですが、実際には区別されるので注意して下さい。
 
+.PARAMETER RenameToRegularExpression
+-PostAction Renameを指定した場合のファイル名正規表現置換規則を指定します。
+-RegularExpressionに対する置換パターンを指定します。
+https://docs.microsoft.com/ja-jp/dotnet/standard/base-types/substitutions-in-regular-expressions
 
 
 .PARAMETER Recurse
@@ -165,30 +192,35 @@ Recurseパラメータより優先します。
 このスイッチを設定しないと存在しない場合は通常終了します。
 
 
-.PARAMETER Compress
-　対象ファイルを圧縮して別ファイルとして保存します。
--Action -AddTimeStamp -ClearNullOriginalと同時に指定可能です。
-
 .PARAMETER CompressedExtString
-　-Compress指定時のファイル拡張子を指定できます。
+　-PreAction Compress指定時のファイル拡張子を指定できます。
 デフォルトは[.zip]です。
 
-.PARAMETER AddTimeStamp
-　対象ファイル名に日時を付加して別ファイルとして保存します。
--Action -Compres -ClearNullOriginalと併用可能です。
-
 .PARAMETER TimeStampFormat
-　-AddTimeStamp指定時の書式を指定できます。
+　-PreAction AddTimeStamp指定時の書式を指定できます。
 デフォルトは[_yyyyMMdd_HHmmss]です。
 
+
+
+.PARAMETER Compress
+このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction Compressを使用してください。
+対象ファイルを圧縮して別ファイルとして保存します。
+
+.PARAMETER AddTimeStamp
+このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction AddTimeStampを使用してください。
+対象ファイル名に日時を付加して別ファイルとして保存します。
+
 .PARAMETER MoveNewFile
-　-Compress -AddTimeStampを指定した際に生成される別ファイルを-MoveToFolderの指定先に保存します。
+このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction MoveNewFileを使用してください。
+-PreAction Compress , AddTimeStampを指定した際に生成される別ファイルを-MoveToFolderの指定先に保存します。
 デフォルトは対象ファイルと同一ディレクトリへ保存します。
 
 .PARAMETER NullOriginalFile
-　対象ファイルの内容消去（ヌルクリア）します。
--Action NullClearと等価です。
-後処理のため、主処理と併用可能です。例えば、ファイル複製後、元ファイルを削除する、といった用途に使用して下さい。
+このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction NullClearまたは-Action NullClearを使用してください。
+対象ファイルの内容消去（ヌルクリア）します。
+-PostAction NullClearと等価です。
+
+
 
 .PARAMETER Log2EventLog
 　Windows Event Logへの出力を制御します。
@@ -599,7 +631,7 @@ IF($Compress){$Script:PreAction +='Compress'}
 #移動先フォルダの要不要と有無を確認
 
 #    If (  ($Action -match "^(Move|Copy)$") -OR ($MoveNewFile)  ){
-    If (  ($Action -match "^(Move|Copy)$") -OR ($PreAction -eq 'MoveNewFile')  ){    
+    If (  ($Action -match "^(Move|Copy)$") -OR ($PreAction -contains 'MoveNewFile')  ){    
 
         $MoveToFolder = ConvertToAbsolutePath -CheckPath $MoveToFolder -ObjectName '移動先フォルダ-MoveToFolder'
 
@@ -613,7 +645,7 @@ IF($Compress){$Script:PreAction +='Compress'}
                 }
 
 
-    IF($PreAction -eq 'Archive'){
+    IF($PreAction -contains 'Archive'){
         CheckNullOrEmpty -CheckPath $ArchiveFileName -ObjectName '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL    
         }
 
@@ -622,7 +654,7 @@ IF($Compress){$Script:PreAction +='Compress'}
 
 #    If(($TargetFolder -eq $MoveToFolder) -AND (($Action -match "move|copy") -OR  ($MoveNewFile))){
 
-    If(($TargetFolder -eq $MoveToFolder) -AND (($Action -match "move|copy") -OR  ($PreAction -eq 'MoveNewFile'))){
+    If(($TargetFolder -eq $MoveToFolder) -AND (($Action -match "move|copy") -OR  ($PreAction -contains 'MoveNewFile'))){
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "移動先フォルダと移動先フォルダとが同一の時に、ファイルの移動、複製は出来ません"
 				Finalize $ErrorReturnCode
                 }
@@ -634,13 +666,13 @@ IF($Compress){$Script:PreAction +='Compress'}
 				Finalize $ErrorReturnCode
                 }
 
-   If (($PreAction -eq 'MoveNewFile' ) -AND  (-NOT($PreAction -match "^(Compress|AddTimeStamp|Archive)$") )){
+   If (($PreAction -contains 'MoveNewFile' ) -AND  (-NOT($PreAction -match "^(Compress|AddTimeStamp|Archive)$") )){
 
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "-PreActionでMoveNewFileは、Compres , AddTimeStamp , Archiveと併用する必要があります。元ファイルの移動には-Action Moveを指定してください"
 				Finalize $ErrorReturnCode
                 }
 
-   If (($PreAction -eq 'Compress') -AND  ($PreAction -eq 'Archive') ){
+   If (($PreAction -contains 'Compress') -AND  ($PreAction -contains 'Archive') ){
 
 				Logging -EventType Error -EventID $ErrorEventID "-PreActionでCompressとArchiveとを同時に指定する事はできません"
 				Finalize $ErrorReturnCode
@@ -684,7 +716,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
     IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
 
         Logging -EventID $InfoEventID -EventType Information `
-        -EventMessage ("マッチしたファイルはファイル名に日付付加["+[Boolean]($PreAction -eq 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -eq 'Compress')+"]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -eq 'MoveNewFile')+"]します")
+        -EventMessage ("マッチしたファイルはファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -contains 'Compress')+"]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -contains 'MoveNewFile')+"]します")
         }
 
     IF($NoAction){
@@ -726,10 +758,10 @@ function CompressAndAddTimeStamp{
 #圧縮フラグTrueの時
 
 #        IF($Compress){
-        IF($PreAction -eq 'Compress'){
+        IF($PreAction -contains 'Compress'){
 
 #            IF($AddTimeStamp){
-            IF($PreAction -eq 'AddTimeStamp'){
+            IF($PreAction -contains 'AddTimeStamp'){
 
 #                $ArchiveFile = Join-Path $TargetFileParentFolder ($FileNameWithOutExtentionString+$FormattedDate+$ExtensionString+$CompressedExtString)
 
@@ -759,10 +791,10 @@ function CompressAndAddTimeStamp{
 
 
 #    IF($MoveNewFile){
-    IF($PreAction -eq 'MoveNewFile'){
+    IF($PreAction -contains 'MoveNewFile'){
 
         $ArchiveFileCheckPath = Join-Path $MoveToNewFolder (Split-Path -Leaf $ArchiveFile)
-        Logging -EventID $InfoEventID -EventType Information -EventMessage ("-PreAction MoveNewFile["+[Boolean]($PreAction -eq 'MoveNewFile')+"]のため、作成したファイルは$($MoveToNewFolder)に配置します")
+        Logging -EventID $InfoEventID -EventType Information -EventMessage ("-PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"]のため、作成したファイルは$($MoveToNewFolder)に配置します")
 
         }else{
         $ArchiveFileCheckPath = $ArchiveFile        
@@ -799,7 +831,7 @@ Param(
     IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
 
         Logging -EventID $InfoEventID -EventType Information `
-        -EventMessage ("マッチしたファイルはファイル名に日付付加["+[Boolean]($PreAction -eq 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -eq 'Compress')+"]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -eq 'MoveNewFile')+"]しました")
+        -EventMessage ("マッチしたファイルはファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -contains 'Compress')+"]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -contains 'MoveNewFile')+"]しました")
         }
 
         IF($OverRide -and ($OverRideCount -gt 0)){
@@ -879,16 +911,16 @@ Write-Output '処理対象は以下です'
     }
 
 
-IF( ($PreAction -eq 'Archive') ){
+IF( ($PreAction -contains 'Archive') ){
 
-    IF($PreAction -eq 'MoveNewFile'){
+    IF($PreAction -contains 'MoveNewFile'){
         $ArchiveToFolder = $MoveToFolder
         }else{
         $ArchiveToFolder = $TargetFolder
         }
 
 
-    IF($PreAction -eq 'AddTimeStamp'){  
+    IF($PreAction -contains 'AddTimeStamp'){  
 
     $ArchivePath = Join-Path -Path $ArchiveToFolder -ChildPath ( AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $ArchiveFileName )
     }else{
@@ -953,7 +985,7 @@ Do
 #Action[(Move|Copy)]以外はファイル移動が無い。移動先パスを確認する必要がないのでスキップ
 #PreAction[Archive]はMoveNewFile[TRUE]でも出力ファイルは1個で階層構造を取らない。よってスキップ
 
-    If( (($Action -match "^(Move|Copy)$")) -OR (($PreAction -eq 'MoveNewFile') -AND ($PreAction -ne 'Archive') )) {
+    If( (($Action -match "^(Move|Copy)$")) -OR (($PreAction -contains 'MoveNewFile') -AND ($PreAction -ne 'Archive') )) {
 
         #ファイルが移動するAction用にファイル移動先の親フォルダパス$MoveToNewFolderを生成する
         
@@ -989,11 +1021,11 @@ Do
 
 #Pre Action
 
-   IF(( $PreAction -match '^(Compress|AddTimeStamp)$') -AND (-NOT($PreAction -eq 'Archive'))){
+   IF(( $PreAction -match '^(Compress|AddTimeStamp)$') -AND (-NOT($PreAction -contains 'Archive'))){
 
         CompressAndAddTimeStamp
         
-        }elseIF($PreAction -eq 'Archive'){
+        }elseIF($PreAction -contains 'Archive'){
        
             TryAction -ActionType Archive -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
 
@@ -1007,7 +1039,7 @@ Do
     #分岐1 何もしない
     '^none$'
             {
-            IF ( ($PostAction -eq 'none') -AND ($PreAction -eq 'none') ){
+            IF ( ($PostAction -eq 'none') -AND ($PreAction -contains 'none') ){
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Action[${Action}]のため対象ファイル${TargetObject}は操作しません"
                 }
             }
