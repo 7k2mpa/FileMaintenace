@@ -332,12 +332,12 @@ Param(
 
 [String][parameter(position=4)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$MoveToFolder,
 
-
 [String]$ArchiveFileName  ,
 
 
 [int][ValidateRange(0,2147483647)]$Days = 0,
 [int][ValidateRange(0,2147483647)]$KBsize = 0,
+
 #[Regex]$RegularExpression ='applog([0-9][0-9])([0-9][0-9])([0-9][0-9])',
 #[Regex]$RegularExpression ='\.txt$',
 [Regex]$RegularExpression ='.*',
@@ -354,13 +354,14 @@ Param(
 [Switch]$NoAction,
 [Switch]$NoneTargetAsWarning,
 
+[String]$CompressedExtString = '.zip',
+
+[String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss',
+
 
 [Switch]$Compress,
-[String]$CompressedExtString = '.zip',
 [Switch]$AddTimeStamp,
-[String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss',
 [Switch]$MoveNewFile,
-
 [Switch]$NullOriginalFile,
 
 
