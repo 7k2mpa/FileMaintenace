@@ -196,12 +196,12 @@ function TryAction {
 
         '^(Copy|AddTimeStamp)$'
             {
-            Copy-Item -LiteralPath $ActionFrom $ActionTo -Force > $Null -ErrorAction Stop
+            Copy-Item -LiteralPath $ActionFrom -Destination $ActionTo -Force > $Null -ErrorAction Stop
             }
 
         '^(Move|Rename)$'
             {
-            Move-Item -LiteralPath $ActionFrom $ActionTo -Force > $Null -ErrorAction Stop
+            Move-Item -LiteralPath $ActionFrom -Destination $ActionTo -Force > $Null -ErrorAction Stop
             }
 
         '^Delete$'
@@ -220,7 +220,7 @@ function TryAction {
 
 #            $ActionTo = "``"+$ActionTo
 
-          echo $ActionTo
+#          echo $ActionTo
 #           exit
             Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Force > $Null  -ErrorAction Stop
             }                  
@@ -540,7 +540,7 @@ $Counter = 0
       # 期待値でなく、チェック回数の上限に達していない場合は、指定間隔(秒)待機
 
       Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($ServiceName)]は存在します。Status[$($Health)]ではありません。$($SPAN)秒待機します。"
-      sleep $Span
+      Start-sleep $Span
 
       # 無限ループに戻る
 
