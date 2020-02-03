@@ -869,9 +869,12 @@ EndingProcess $ReturnCode
 [int][ValidateRange(0,2147483647)]$OverRideCount = 0
 [int][ValidateRange(0,2147483647)]$ContinueCount = 0
 
-${THIS_FILE}=$MyInvocation.MyCommand.Path       　　                    #フルパス
-${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
-${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
+#${THIS_FILE}=$MyInvocation.MyCommand.Path       　
+${THIS_FILE}=$PSScriptRoot
+#${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
+${THIS_PATH}=Split-Path -Parent ($PSScriptRoot)          #このファイルのパス
+${SHELLNAME}=Split-Path -Leaf ($PSScriptRoot)  # シェル名
+#${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
 
 ${Version} = '20200131_1605'
 

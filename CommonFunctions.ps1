@@ -216,11 +216,11 @@ function TryAction {
 
         '^(Compress|CompressAndAddTimeStamp)$'
             {
-            $ActionTo = $ActionTo -replace "\[" , "````["
+           $ActionTo = $ActionTo -replace "\[" , "````["
 
 #            $ActionTo = "``"+$ActionTo
 
-#          echo $ActionTo
+          echo $ActionTo
 #           exit
             Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Force > $Null  -ErrorAction Stop
             }                  
