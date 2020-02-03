@@ -566,7 +566,7 @@ ForEach ($Folder in ($TargetFolders | ComplexFilter))
 
 #配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
 
-$Folders = $Folders | Sort Depth -Descending
+$Folders = $Folders | Sort-Object Depth -Descending
 
 Return $Folders
 
@@ -631,7 +631,6 @@ IF($Compress){$Script:PreAction +='Compress'}
 
 #移動先フォルダの要不要と有無を確認
 
-#    If (  ($Action -match "^(Move|Copy)$") -OR ($MoveNewFile)  ){
     If (  ($Action -match "^(Move|Copy)$") -OR ($PreAction -contains 'MoveNewFile')  ){    
 
         $MoveToFolder = ConvertToAbsolutePath -CheckPath $MoveToFolder -ObjectName '移動先フォルダ-MoveToFolder'
@@ -713,7 +712,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
         Logging -EventID $InfoEventID -EventType Information `
         -EventMessage "指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする$($KBSize)KB以上のファイルを移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]にAction[$($Action)]、PostAction[$($PostAction)]します。"
         }
-#    IF( ($Compress) -OR ($AddTimeStamp)){
+
     IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
 
         Logging -EventID $InfoEventID -EventType Information `
@@ -758,13 +757,10 @@ function CompressAndAddTimeStamp{
 
 #圧縮フラグTrueの時
 
-#        IF($Compress){
+
         IF($PreAction -contains 'Compress'){
 
-#            IF($AddTimeStamp){
             IF($PreAction -contains 'AddTimeStamp'){
-
-#                $ArchiveFile = Join-Path $TargetFileParentFolder ($FileNameWithOutExtentionString+$FormattedDate+$ExtensionString+$CompressedExtString)
 
                 $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )+$CompressedExtString )
                 $ActionType = "CompressAndAddTimeStamp"
@@ -780,8 +776,6 @@ function CompressAndAddTimeStamp{
 
 #タイムスタンプ付加のみTrueの時
 
-#                $ArchiveFile = Join-Path $TargetFileParentFolder ($FileNameWithOutExtentionString+$FormattedDate+$ExtensionString)
-
                 $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath (AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )
                 $ActionType = "AddTimeStamp"
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "タイムスタンプ付加した[$(Split-Path -Leaf $ArchiveFile)]を作成します"
@@ -790,8 +784,6 @@ function CompressAndAddTimeStamp{
 
 #移動フラグがTrueならば、作成した圧縮orタイムスタンプ付加したファイルを移動する
 
-
-#    IF($MoveNewFile){
     IF($PreAction -contains 'MoveNewFile'){
 
         $ArchiveFileCheckPath = Join-Path $MoveToNewFolder (Split-Path -Leaf $ArchiveFile)
@@ -815,7 +807,7 @@ Param(
 )
     $ForceFinalize = $False
 
-    IF(-NOT(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))){
+    IF(($NormalCount -ne 0) -or ($WarningCount -ne 0) -or ($ErrorCount -ne 0)){
     
 
        Logging -EventID $InfoEventID -EventType Information -EventMessage "実行結果は正常終了[$($NormalCount)]、警告終了[$($WarningCount)]、異常終了[$($ErrorCount)]です"
@@ -926,14 +918,12 @@ IF( ($PreAction -contains 'Archive') ){
 
     IF($PreAction -contains 'AddTimeStamp'){  
 
-    $ArchivePath = Join-Path -Path $ArchiveToFolder -ChildPath ( AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $ArchiveFileName )
-    }else{
-    $ArchivePath = Join-Path -Path $ArchiveToFolder -ChildPath $ArchiveFileName
-    }
+        $ArchivePath = Join-Path -Path $ArchiveToFolder -ChildPath ( AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $ArchiveFileName )
+        }else{
+        $ArchivePath = Join-Path -Path $ArchiveToFolder -ChildPath $ArchiveFileName
+        }
 
     $ArchivePath = ConvertToAbsolutePath -CheckPath $ArchivePath -ObjectName  'Archive出力先'
-
-#    $ArchivePath = Join-Path -Path (Split-Path -Path $ArchivePath -Parent) -ChildPath ( AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName (Split-Path -Path $ArchivePath -Leaf) )
 
     IF(Test-Path -LiteralPath $ArchivePath -PathType Container){
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称フォルダ$($CheckLeaf)が存在するため、${SHELLNAME}を終了します"
@@ -989,7 +979,7 @@ Do
 #Action[(Move|Copy)]以外はファイル移動が無い。移動先パスを確認する必要がないのでスキップ
 #PreAction[Archive]はMoveNewFile[TRUE]でも出力ファイルは1個で階層構造を取らない。よってスキップ
 
-    If( (($Action -match "^(Move|Copy)$")) -OR (($PreAction -contains 'MoveNewFile') -AND ($PreAction -ne 'Archive') )) {
+    If( (($Action -match "^(Move|Copy)$")) -OR (($PreAction -contains 'MoveNewFile') -AND ($PreAction -notcontains 'Archive') )) {
 
         #ファイルが移動するAction用にファイル移動先の親フォルダパス$MoveToNewFolderを生成する
         
@@ -1025,7 +1015,7 @@ Do
 
 #Pre Action
 
-   IF(( $PreAction -match '^(Compress|AddTimeStamp)$') -AND (-NOT($PreAction -contains 'Archive'))){
+   IF(( $PreAction -match '^(Compress|AddTimeStamp)$') -AND ($PreAction -notcontains 'Archive')){
 
         CompressAndAddTimeStamp
         
@@ -1112,7 +1102,6 @@ Do
     #分岐2 Rename Rename後の同一名称ファイルがに存在しないことを確認してから処理
     '^Rename$'
             {
-   #                     $NewFilePath = Join-Path (Split-Path $TargetObject -Parent) -ChildPath  ((Split-Path -Leaf $TargetObject) -replace "$RegularExpression" , "$RenameToRegularExpression")
             $NewFilePath = Join-Path $TargetFileParentFolder -ChildPath  ((Split-Path -Leaf $TargetObject) -replace "$RegularExpression" , "$RenameToRegularExpression")
 
             $NewFilePath = ConvertToAbsolutePath -CheckPath $NewFilePath -ObjectName 'Rename後のファイル名'
