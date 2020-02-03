@@ -184,7 +184,6 @@ Recurseパラメータより優先します。
 .PARAMETER NoAction
 ファイル、フォルダを実際に削除等の操作をせずに実行します。全ての処理は成功扱いになります。
 動作確認するときに当該スイッチを指定してください。
--Action Noneは-Compress等の前処理、後処理は実行されますが、このスイッチは全てのファイル操作を実行しなくなります。
 ログ上は警告が出力されますが、実行結果ではこの警告は無視されます。
 
 .PARAMETER NoneTargetAsWarning
@@ -807,8 +806,7 @@ Param(
 )
     $ForceFinalize = $False
 
-    IF(($NormalCount -ne 0) -or ($WarningCount -ne 0) -or ($ErrorCount -ne 0)){
-    
+    IF(-NOT(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))){    
 
        Logging -EventID $InfoEventID -EventType Information -EventMessage "実行結果は正常終了[$($NormalCount)]、警告終了[$($WarningCount)]、異常終了[$($ErrorCount)]です"
 
