@@ -323,7 +323,7 @@ Param(
 #[parameter(position=0, mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String]$TargetFolder,  #Validation debug用に用意してあります。通常は使わない
 #[parameter(position=0, mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
 
-[String][parameter(position=1)][ValidateSet("Move", "Copy", "Delete" , "none" , "DeleteEmptyFolders" , "NullClear")]$Action='none',
+[String][parameter(position=1)][ValidateSet("Move", "Copy", "Delete" , "none" , "DeleteEmptyFolders" , "NullClear" , "KeepFilesCount")]$Action='none',
 
 [Array][parameter(position=2)][ValidateSet("AddTimeStamp", "Compress", "MoveNewFile" , "none" , "Archive")]$PreAction = 'none',
 
@@ -333,7 +333,7 @@ Param(
 
 [String]$ArchiveFileName  ,
 
-
+[int][ValidateRange(0,2147483647)]$KeepFiles = 1,
 [int][ValidateRange(0,2147483647)]$Days = 0,
 [int][ValidateRange(0,2147483647)]$KBsize = 0,
 
@@ -565,14 +565,55 @@ ForEach ($Folder in ($TargetFolders | ComplexFilter))
 
 #配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
 
-$Folders = $Folders | Sort-Object Depth -Descending
+Return ($Folders | Sort-Object -Property Depth -Descending)
 
-Return $Folders
+#$Folders = $Folders | Sort-Object Depth -Descending
+
+#Return $Folders
 
 }
 
-
 function GetFiles{
+
+Param(
+[parameter(mandatory=$true)][String]$TargetFolder
+)
+
+
+$Files = @()
+
+    If($Recurse){
+
+            $TargetFiles = Get-ChildItem -LiteralPath $TargetFolder -File -Recurse -Include *      
+                            
+            }else{
+
+            $TargetFiles = Get-ChildItem -LiteralPath $TargetFolder -File -Include *
+            }
+    
+
+ForEach ($File in ($TargetFiles | ComplexFilter))
+          
+    {
+    $Files += New-Object PSObject -Property @{
+      Object = $File
+      Time = $File.LastWriteTime
+    }
+}
+
+
+#配列に入れたパス一式を古い順にソート
+
+IF($Action -eq 'KeepFilesCount'){
+
+    Return ($Files | Sort-Object -Property Time | ForEach-Object {$_.Object.FullName})
+    }else{
+    Return ($Files | ForEach-Object {$_.Object.FullName})
+    }
+
+}
+
+function OLD_GetFiles{
 
 Param(
 [parameter(mandatory=$true)][String]$TargetFolder
@@ -651,7 +692,6 @@ IF($Compress){$Script:PreAction +='Compress'}
 
 #組み合わせが不正な指定を確認
 
-#    If(($TargetFolder -eq $MoveToFolder) -AND (($Action -match "move|copy") -OR  ($MoveNewFile))){
 
     If(($TargetFolder -eq $MoveToFolder) -AND (($Action -match "move|copy") -OR  ($PreAction -contains 'MoveNewFile'))){
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "移動先フォルダと移動先フォルダとが同一の時に、ファイルの移動、複製は出来ません"
@@ -659,7 +699,7 @@ IF($Compress){$Script:PreAction +='Compress'}
                 }
 
 
-    If (($Action -match "^(Move|Delete)$") -AND  ($PostAction -ne 'none')){
+    If (($Action -match "^(Move|Delete|KeepFilesCount)$") -AND  ($PostAction -ne 'none')){
 
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "対象ファイルを削除または移動後、-PostAction[$($PostAction)]することは出来ません"
 				Finalize $ErrorReturnCode
@@ -858,6 +898,7 @@ EndingProcess $ReturnCode
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
 [int][ValidateRange(0,2147483647)]$OverRideCount = 0
 [int][ValidateRange(0,2147483647)]$ContinueCount = 0
+[int]$InLoopDeletedFilesCount = 0
 
 #${THIS_FILE}=$MyInvocation.MyCommand.Path       　
 ${THIS_FILE}=$PSScriptRoot
@@ -890,6 +931,8 @@ Write-Output '処理対象は以下です'
         $TargetObjects = GetFiles $TargetFolder
         Write-Output $TargetObjects
         }
+
+#Write-Output $TargetObjects.Object.Fullname
 
     If ($null -eq $TargetObjects){
 
@@ -963,7 +1006,10 @@ Do
     [Boolean]$ForceEndloop = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
     [int]$InLoopOverRideCount = 0    ;#$OverRideCountは処理全体のOverRide回数。$InLoopOverRideCountは1処理ループ内でのOverRide回数。1オブジェクトで複数回OverRideがあり得るため
 
+
     [String]$TargetFileParentFolder = Split-Path $TargetObject -Parent
+
+#    [String]$TargetObjectName = $TargetObject.Object.Fullname
 
     [String]$TargetObjectName = GetTargetObjectName $TargetObject
 
@@ -1077,8 +1123,25 @@ Do
             TryAction -ActionType NullClear -ActionFrom $TargetObject -ActionError $TargetObject          
             }
 
+    #分岐6 KeepFilesCount
+    '^KeepFilesCount$'
+            {
+            IF (($TargetObjects.Length -$InLoopDeletedFilesCount) -gt $KeepFiles  ){
+                Logging -EventID $InfoEventID -EventType Information -EventMessage  "指定世代数[$($KeepFiles)]以上のマッチしたファイルがあるため、最も古い[$($TargetObject)]を削除します"
+                TryAction -ActionType Delete -ActionFrom $TargetObject -ActionError $TargetObject
 
-    #分岐6 $Actionが条件式のどれかに適合しない場合は、プログラムミス
+                #$TryActionが異常終了&-Continue $TRUEだと$Continue $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
+                IF($ContinueFlag){
+                    Break                
+                    }
+                $InLoopDeletedFilesCount ++
+            
+                }else{
+                Logging -EventID $InfoEventID -EventType Information -EventMessage  "指定世代数[$($KeepFiles)]以上のマッチしたファイルは無いため[$($TargetObject)]は操作しません"
+                }
+            }
+
+    #分岐7 $Actionが条件式のどれかに適合しない場合は、プログラムミス
     Default 
             {
             Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Action判定の内部エラー。判定式にbugがあります"
