@@ -918,6 +918,7 @@ Write-Output $TargetObjects
 IF( ($PreAction -contains 'Archive') ){
 
     IF($PreAction -contains 'MoveNewFile'){
+        
         $ArchiveToFolder = $MoveToFolder
         }else{
         $ArchiveToFolder = $TargetFolder
@@ -933,11 +934,18 @@ IF( ($PreAction -contains 'Archive') ){
 
     $ArchivePath = ConvertToAbsolutePath -CheckPath $ArchivePath -ObjectName  'Archive出力先'
 
-    IF(Test-Path -LiteralPath $ArchivePath -PathType Container){
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称フォルダ$($CheckLeaf)が存在するため、${SHELLNAME}を終了します"
-        Finalize $ErrorReturnCode
-        }    
-    }
+    IF(-NOT(CheckLeafNotExists -CheckLeaf $ArchivePath)){
+        
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称ファイルまたはフォルダ$($CheckLeaf)が存在するため、${SHELLNAME}を終了します"
+        Finalize $ErrorReturnCode        
+        }
+
+#    IF(Test-Path -LiteralPath $ArchivePath -PathType Container){
+#        Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称フォルダ$($CheckLeaf)が存在するため、${SHELLNAME}を終了します"
+#        Finalize $ErrorReturnCode
+#        }    
+
+}
 
 
 #対象フォルダorファイル群の処理ループ
