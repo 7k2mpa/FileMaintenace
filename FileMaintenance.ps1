@@ -886,16 +886,12 @@ Write-Output '処理対象は以下です'
     IF($Action -eq "DeleteEmptyFolders"){
 
         $TargetObjects = GetFolders $TargetFolder
-#        Write-Output $TargetObjects.Object.Fullname
 
         }else{
         $TargetObjects = GetFiles $TargetFolder
-#        Write-Output $TargetObjects
         }
 
 Write-Output $TargetObjects
-
-exit
 
     If ($null -eq $TargetObjects){
 
@@ -971,11 +967,6 @@ Do
 
     [String]$TargetFileParentFolder = Split-Path $TargetObject -Parent
 
-#    [String]$TargetObjectName = $TargetObject.Object.Fullname
-
-#     [String]$TargetObjectName = GetTargetObjectName $TargetObject
-
-#    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理開始---"
     Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObject) 処理開始---"
 
 
