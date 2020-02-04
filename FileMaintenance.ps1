@@ -748,12 +748,15 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
 
 }
 
+#圧縮フラグまたはタイムスタンプ付加フラグがTrueの処理
 
 function CompressAndAddTimeStamp{
 
-#圧縮フラグまたはタイムスタンプ付加フラグがTrueの処理
+Param(
+[parameter(mandatory=$true)][String]$TargetObject
+) 
 
- 
+        [String]$TargetFileParentFolder = Split-Path $TargetObject -Parent
 
 #圧縮フラグTrueの時
 
@@ -763,11 +766,11 @@ function CompressAndAddTimeStamp{
             IF($PreAction -contains 'AddTimeStamp'){
 
                 $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )+$CompressedExtString )
-                $ActionType = "CompressAndAddTimeStamp"
+                $Script:ActionType = "CompressAndAddTimeStamp"
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮&タイムスタンプ付加した[$(Split-Path -Leaf $ArchiveFile)]を作成します"
             }else{
                 $ArchiveFile = $TargetObject+$CompressedExtString
-                $ActionType = "Compress"
+                $Script:ActionType = "Compress"
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮した[$(Split-Path -Leaf $ArchiveFile)]を作成します" 
             }          
  
@@ -777,7 +780,7 @@ function CompressAndAddTimeStamp{
 #タイムスタンプ付加のみTrueの時
 
                 $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath (AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )
-                $ActionType = "AddTimeStamp"
+                $Script:ActionType = "AddTimeStamp"
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "タイムスタンプ付加した[$(Split-Path -Leaf $ArchiveFile)]を作成します"
                 }
 
@@ -786,18 +789,23 @@ function CompressAndAddTimeStamp{
 
     IF($PreAction -contains 'MoveNewFile'){
 
-        $ArchiveFileCheckPath = Join-Path $MoveToNewFolder (Split-Path -Leaf $ArchiveFile)
         Logging -EventID $InfoEventID -EventType Information -EventMessage ("-PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"]のため、作成したファイルは$($MoveToNewFolder)に配置します")
+#        $ArchiveFileCheckPath = Join-Path $MoveToNewFolder (Split-Path -Leaf $ArchiveFile)
+        Return ( Join-Path $MoveToNewFolder (Split-Path -Leaf $ArchiveFile) )
+
+#        Logging -EventID $InfoEventID -EventType Information -EventMessage ("-PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"]のため、作成したファイルは$($MoveToNewFolder)に配置します")
 
         }else{
-        $ArchiveFileCheckPath = $ArchiveFile        
+        Return $ArchiveFile        
+#        $ArchiveFileCheckPath = $ArchiveFile        
+
         }
 
 
-      If(CheckLeafNotExists $ArchiveFileCheckPath){
+#      If(CheckLeafNotExists $ArchiveFileCheckPath){
 
-            TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $ArchiveFileCheckPath -ActionError $TargetObject
-            }
+#            TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $ArchiveFileCheckPath -ActionError $TargetObject
+#            }
 }
 
 function Finalize{
@@ -1014,13 +1022,20 @@ Do
 
    IF(( $PreAction -match '^(Compress|AddTimeStamp)$') -AND ($PreAction -notcontains 'Archive')){
 
-        CompressAndAddTimeStamp
-        
-        }elseIF($PreAction -contains 'Archive'){
-       
-            TryAction -ActionType Archive -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
+      $ArchivePath = CompressAndAddTimeStamp -TargetObject $TargetObject
+#        CompressAndAddTimeStamp
 
+
+      If(CheckLeafNotExists $ArchivePath){
+
+            TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
             }
+
+        
+    }elseIF($PreAction -contains 'Archive'){
+       
+        TryAction -ActionType Archive -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
+        }
 
 
 #Main Action
