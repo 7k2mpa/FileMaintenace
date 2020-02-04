@@ -565,11 +565,7 @@ ForEach ($Folder in ($TargetFolders | ComplexFilter))
 
 #配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
 
-Return ($Folders | Sort-Object -Property Depth -Descending)
-
-#$Folders = $Folders | Sort-Object Depth -Descending
-
-#Return $Folders
+Return ($Folders | Sort-Object -Property Depth -Descending | ForEach-Object {$_.Object.FullName})
 
 }
 
@@ -612,26 +608,6 @@ IF($Action -eq 'KeepFilesCount'){
     }
 
 }
-
-function OLD_GetFiles{
-
-Param(
-[parameter(mandatory=$true)][String]$TargetFolder
-)
-
-
-    If($Recurse){
-
-         
-            Return Get-ChildItem -LiteralPath $TargetFolder -File -Recurse -Include * | ComplexFilter | ForEach-Object {$_.FullName}            
-                                                     
-            }else{
-
-            Return Get-ChildItem -LiteralPath $TargetFolder -File -Include * | ComplexFilter | ForEach-Object {$_.FullName}
-            }
-    
-}
-
 
 function Initialize {
 
@@ -772,21 +748,6 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
 
 }
 
-function GetTargetObjectName{
-
-Param(
-[parameter(mandatory=$true)]$TargetObject
-)
-
-    IF ($Action -eq "DeleteEmptyFolders"){
-
-        Return $TargetObject.Object.Fullname
-        
-     }else{
-        Return $TargetObject
-        }
-
-}
 
 function CompressAndAddTimeStamp{
 
@@ -898,7 +859,7 @@ EndingProcess $ReturnCode
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
 [int][ValidateRange(0,2147483647)]$OverRideCount = 0
 [int][ValidateRange(0,2147483647)]$ContinueCount = 0
-[int]$InLoopDeletedFilesCount = 0
+[int][ValidateRange(0,2147483647)]$InLoopDeletedFilesCount = 0
 
 #${THIS_FILE}=$MyInvocation.MyCommand.Path       　
 ${THIS_FILE}=$PSScriptRoot
@@ -925,14 +886,16 @@ Write-Output '処理対象は以下です'
     IF($Action -eq "DeleteEmptyFolders"){
 
         $TargetObjects = GetFolders $TargetFolder
-        Write-Output $TargetObjects.Object.Fullname
+#        Write-Output $TargetObjects.Object.Fullname
 
         }else{
         $TargetObjects = GetFiles $TargetFolder
-        Write-Output $TargetObjects
+#        Write-Output $TargetObjects
         }
 
-#Write-Output $TargetObjects.Object.Fullname
+Write-Output $TargetObjects
+
+exit
 
     If ($null -eq $TargetObjects){
 
@@ -974,7 +937,6 @@ IF( ($PreAction -contains 'Archive') ){
 
 
 #対象フォルダorファイル群の処理ループ
-#対象フォルダはオブジェクト、対象ファイルはファイル名変更or移動があるためパス文字列として処理
 
 ForEach ($TargetObject in $TargetObjects)
 {
@@ -1011,10 +973,10 @@ Do
 
 #    [String]$TargetObjectName = $TargetObject.Object.Fullname
 
-    [String]$TargetObjectName = GetTargetObjectName $TargetObject
+#     [String]$TargetObjectName = GetTargetObjectName $TargetObject
 
-    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理開始---"
-
+#    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理開始---"
+    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObject) 処理開始---"
 
 
 #移動元のファイルパスから移動先のファイルパスを生成。
@@ -1102,17 +1064,17 @@ Do
     #分岐4 空フォルダを判定して削除
     '^DeleteEmptyFolders$'
             {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObjectName)が空かを確認します"
+
+            Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObject)が空かを確認します"
 
 
-            If ($TargetObject.Object.GetFileSystemInfos().Count -eq 0){
-     
-                Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObjectName)は空です"
-                TryAction -ActionType Delete -ActionFrom $TargetObjectName -ActionError $TargetObjectName
-
+            If ($TargetObject.GetFileSystemInfos().Count -eq 0){     
+                Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObject)は空です"
+                TryAction -ActionType Delete -ActionFrom $TargetObject -ActionError $TargetObject
 
                 }else{
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "フォルダ$($TargetObjectName)は空ではありません" 
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "フォルダ$($TargetObject)は空ではありません" 
+
                 }
             }
 
@@ -1211,7 +1173,7 @@ While($False)
         $ContinueCount ++
         }
          
-    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
+    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象Object $($TargetObject) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
   
 
     IF($ForceFinalize){
