@@ -543,7 +543,6 @@ Param(
 [parameter(mandatory=$true)][String]$TargetFolder
 )
 
-
 $Folders = @()
 
     If($Recurse){
@@ -569,10 +568,6 @@ ForEach ($Folder in ($TargetFolders | ComplexFilter))
 
 Return ($Folders | Sort-Object -Property Depth -Descending)
 
-#$Folders = $Folders | Sort-Object Depth -Descending
-
-#Return $Folders
-
 }
 
 
@@ -583,19 +578,15 @@ Param(
 [parameter(mandatory=$true)][String]$TargetFolder
 )
 
-#$GetType = 'File'
-
 $Files = @()
 
     If($Recurse){
 
-#            $TargetFiles = Get-ChildItem -LiteralPath $TargetFolder -Recurse -Include *   
             $TargetFiles = Get-ChildItem -LiteralPath $TargetFolder -File -Recurse -Include *      
                             
             }else{
 
             $TargetFiles = Get-ChildItem -LiteralPath $TargetFolder -File -Include *
-#            $TargetFiles = Get-ChildItem -LiteralPath $TargetFolder  -Include *
             }
     
 
@@ -609,7 +600,7 @@ ForEach ($File in ($TargetFiles | ComplexFilter))
 }
 
 
-#配列に入れたパス一式を古い順にソート
+#KeepFilesCountのみ配列に入れたパス一式を古い順にソート
 
 IF($Action -eq 'KeepFilesCount'){
 
@@ -897,7 +888,7 @@ ${THIS_PATH}=Split-Path -Parent ($PSScriptRoot)          #このファイルのパス
 ${SHELLNAME}=Split-Path -Leaf ($PSScriptRoot)  # シェル名
 #${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
 
-${Version} = '20200131_1605'
+${Version} = '20200205_1420'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
@@ -935,6 +926,8 @@ Write-Output '処理対象は以下です'
             }
     }
 
+    　
+#-PreAction Archiveは複数ファイルを1ファイルに圧縮する。よって、ループ前に圧縮先の1ファイルのフルパスを確定しておく
 
 IF( ($PreAction -contains 'Archive') ){
 
@@ -999,7 +992,9 @@ Do
 
     [String]$TargetFileParentFolder = Split-Path $TargetObject -Parent
 
-    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObject) 処理開始---"
+    $TargetObjectName = GetTargetObjectName -TargetObject $TargetObject
+
+    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理開始---"
 
 
 #移動元のファイルパスから移動先のファイルパスを生成。
@@ -1027,7 +1022,7 @@ Do
         $MoveToNewFolder = Join-Path $MoveToFolder ($TargetFileParentFolder).Substring($TargetFolder.Length)
         If($Recurse){
 
-            If (-NOT(CheckContainer -CheckPath $MoveToNewFolder -ObjectName 移動先フォルダ)){
+            If (-NOT(CheckContainer -CheckPath $MoveToNewFolder -ObjectName '移動先フォルダ')){
 
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "新規に$($MoveToNewFolder)を作成します"
 
@@ -1201,7 +1196,7 @@ While($False)
         $ContinueCount ++
         }
          
-    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象Object $($TargetObject) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
+    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
   
 
     IF($ForceFinalize){
