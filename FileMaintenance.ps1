@@ -350,6 +350,7 @@ Param(
 
 [Switch]$OverRide,
 [Switch]$Continue,
+[Switch]$ContinueAsNormal,
 [Switch]$NoAction,
 [Switch]$NoneTargetAsWarning,
 
@@ -443,8 +444,10 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
     If( (Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -AND (-NOT($OverRide)) ){
 
         Logging -EventID $WarningEventID -EventType Warning -EventMessage "既に$($CheckLeaf)が存在します"
-        $Script:WarningFlag = $TRUE
-        
+
+        IF(-NOT($ContinueAsNormal)){
+            $Script:WarningFlag = $TRUE
+            }    
         If(-NOT($Continue)){
  
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に$($CheckLeaf)が存在するため、${SHELLNAME}を終了します"
@@ -534,7 +537,6 @@ filter ComplexFilter{
 }
 
 
-
 function GetFolders{
 
 Param(
@@ -565,9 +567,15 @@ ForEach ($Folder in ($TargetFolders | ComplexFilter))
 
 #配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
 
-Return ($Folders | Sort-Object -Property Depth -Descending | ForEach-Object {$_.Object.FullName})
+Return ($Folders | Sort-Object -Property Depth -Descending)
+
+#$Folders = $Folders | Sort-Object Depth -Descending
+
+#Return $Folders
 
 }
+
+
 
 function GetFiles{
 
@@ -575,16 +583,19 @@ Param(
 [parameter(mandatory=$true)][String]$TargetFolder
 )
 
+#$GetType = 'File'
 
 $Files = @()
 
     If($Recurse){
 
+#            $TargetFiles = Get-ChildItem -LiteralPath $TargetFolder -Recurse -Include *   
             $TargetFiles = Get-ChildItem -LiteralPath $TargetFolder -File -Recurse -Include *      
                             
             }else{
 
             $TargetFiles = Get-ChildItem -LiteralPath $TargetFolder -File -Include *
+#            $TargetFiles = Get-ChildItem -LiteralPath $TargetFolder  -Include *
             }
     
 
@@ -628,6 +639,7 @@ function Initialize {
 
 IF($NoRecurse){[boolean]$Script:Recurse = $false}
 IF($NullOriginalFile){[String]$Script:PostAction = 'NullClear'}
+IF($ContinueAsNormal){[Switch]$Script:Continue = $TRUE}
 
 IF($AddTimeStamp){$Script:PreAction +='AddTimeStamp'}
 IF($MoveNewFile){$Script:PreAction +='MoveNewFile'}
@@ -742,8 +754,26 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
         Logging -EventID $InfoEventID -EventType Information -EventMessage "-OverRide[${OverRide}]が指定されているため生成したファイルと同名のものがあった場合は上書きします"
         }
 
-    If($Continue){
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]が指定されているため生成したファイルと同名のものがあった場合等の処理異常で異常終了せず次のファイル、フォルダを処理します"
+    If($ContinueAsNormal){
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "-ContinueAsNormal[$($ContinueAsNormal)]が指定されているため生成したファイルと同名のものがあった場合は正常扱いで次のファイルを処理します。ファイル名同一以外の処理異常は警告しますが、次のファイル、フォルダを処理します"
+        }elseIF($Continue){
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]が指定されているため生成したファイル、フォルダと同名のものがあった場合等の処理異常で異常終了せず警告後、次のファイル、フォルダを処理します"
+        }
+
+}
+
+function GetTargetObjectName{
+
+Param(
+[parameter(mandatory=$true)]$TargetObject
+)
+
+    IF ($Action -eq "DeleteEmptyFolders"){
+
+        Return $TargetObject.Object.Fullname
+        
+     }else{
+        Return $TargetObject
         }
 
 }
@@ -790,22 +820,13 @@ Param(
     IF($PreAction -contains 'MoveNewFile'){
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage ("-PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"]のため、作成したファイルは$($MoveToNewFolder)に配置します")
-#        $ArchiveFileCheckPath = Join-Path $MoveToNewFolder (Split-Path -Leaf $ArchiveFile)
         Return ( Join-Path $MoveToNewFolder (Split-Path -Leaf $ArchiveFile) )
-
-#        Logging -EventID $InfoEventID -EventType Information -EventMessage ("-PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"]のため、作成したファイルは$($MoveToNewFolder)に配置します")
 
         }else{
         Return $ArchiveFile        
-#        $ArchiveFileCheckPath = $ArchiveFile        
 
         }
 
-
-#      If(CheckLeafNotExists $ArchiveFileCheckPath){
-
-#            TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $ArchiveFileCheckPath -ActionError $TargetObject
-#            }
 }
 
 function Finalize{
@@ -894,12 +915,12 @@ Write-Output '処理対象は以下です'
     IF($Action -eq "DeleteEmptyFolders"){
 
         $TargetObjects = GetFolders $TargetFolder
+        Write-Output $TargetObjects.Object.Fullname
 
         }else{
         $TargetObjects = GetFiles $TargetFolder
+        Write-Output $TargetObjects
         }
-
-Write-Output $TargetObjects
 
     If ($null -eq $TargetObjects){
 
@@ -936,14 +957,9 @@ IF( ($PreAction -contains 'Archive') ){
 
     IF(-NOT(CheckLeafNotExists -CheckLeaf $ArchivePath)){
         
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称ファイルまたはフォルダ$($CheckLeaf)が存在するため、${SHELLNAME}を終了します"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称ファイルまたはフォルダ$($ArchivePath)が存在するため、${SHELLNAME}を終了します"
         Finalize $ErrorReturnCode        
         }
-
-#    IF(Test-Path -LiteralPath $ArchivePath -PathType Container){
-#        Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称フォルダ$($CheckLeaf)が存在するため、${SHELLNAME}を終了します"
-#        Finalize $ErrorReturnCode
-#        }    
 
 }
 
@@ -1031,8 +1047,6 @@ Do
    IF(( $PreAction -match '^(Compress|AddTimeStamp)$') -AND ($PreAction -notcontains 'Archive')){
 
       $ArchivePath = CompressAndAddTimeStamp -TargetObject $TargetObject
-#        CompressAndAddTimeStamp
-
 
       If(CheckLeafNotExists $ArchivePath){
 
@@ -1078,17 +1092,17 @@ Do
     #分岐4 空フォルダを判定して削除
     '^DeleteEmptyFolders$'
             {
+            Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObjectName)が空かを確認します"
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObject)が空かを確認します"
 
+            If ($TargetObject.Object.GetFileSystemInfos().Count -eq 0){
+     
+                Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObjectName)は空です"
+                TryAction -ActionType Delete -ActionFrom $TargetObjectName -ActionError $TargetObjectName
 
-            If ($TargetObject.GetFileSystemInfos().Count -eq 0){     
-                Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObject)は空です"
-                TryAction -ActionType Delete -ActionFrom $TargetObject -ActionError $TargetObject
 
                 }else{
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "フォルダ$($TargetObject)は空ではありません" 
-
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "フォルダ$($TargetObjectName)は空ではありません" 
                 }
             }
 
