@@ -100,14 +100,14 @@ C:\OLD\Log\Infra.log
 
 .PARAMETER PreAction
 処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
-PreActionはAction|PostActionと異なり複数のパラメータを指定できます。
+PreActionは(Action|PostAction)と異なり複数パラメータを指定できます。
 パラメータはカンマ,で区切って下さい。
 
 None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-NoActionスイッチを利用して下さい。
 Compress:対象ファイルから圧縮したファイルを新規生成します。
 AddTimeStamp:対象ファイルからファイル名に-TimeStampFormatで定められた書式でタイムスタンプ付加したファイルを新規生成します。
-Archive:対象ファイル群をまとめてアーカイブファイルを新規生成します。既にアーカイブファイルがある場合は、アーカイブファイルに対象ファイル群を追加します。アーカイブファイルは-ArchiveFileNameで指定したファイル名です。
-MoveNewFile:新規生成するファイルを-TargetFolderと同一ではなく、-MoveToFolderへ配置します。
+Archive:対象ファイル群をまとめた1アーカイブファイルを新規生成します。-OverRideを指定すると、既存アーカイブファイルへ対象ファイル群を追加します。アーカイブファイルは-ArchiveFileNameで指定したファイル名です。
+MoveNewFile:-PreActionの新規生成ファイルを-TargetFolderと同一ではなく、-MoveToFolderへ配置します。
 
 
 .PARAMETER Action
@@ -118,6 +118,7 @@ Move:ファイルを-MoveToFolderへ移動します。
 Delete:ファイルを削除します。
 Copy:ファイルを-MoveToFolderにコピーします。
 DeleteEmptyFolders:空フォルダを削除します。
+KeepFilesCount:指定世代数になるまで、マッチしたファイル群を古い順に削除します。
 NullClear:ファイルの内容削除 NullClearします。
 
 .PARAMETER PostAction
@@ -181,6 +182,12 @@ Recurseパラメータより優先します。
 スキップすると警告終了します。
 デフォルトではスキップせずに異常終了します。
 
+.PARAMETER ContinueAsNormal
+　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
+-Continueと異なりスキップしても正常終了します。ファイルの差分コピー等で利用してください。
+-Continueに優先します。
+デフォルトではスキップせずに異常終了します。
+
 .PARAMETER NoAction
 ファイル、フォルダを実際に削除等の操作をせずに実行します。全ての処理は成功扱いになります。
 動作確認するときに当該スイッチを指定してください。
@@ -199,7 +206,9 @@ Recurseパラメータより優先します。
 　-PreAction AddTimeStamp指定時の書式を指定できます。
 デフォルトは[_yyyyMMdd_HHmmss]です。
 
-
+.PARAMETER KeepFiles
+-Action KeepFilesCount指定時の世代数を指定します。
+デフォルトは1です。
 
 .PARAMETER Compress
 このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction Compressを使用してください。
@@ -215,7 +224,7 @@ Recurseパラメータより優先します。
 デフォルトは対象ファイルと同一ディレクトリへ保存します。
 
 .PARAMETER NullOriginalFile
-このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction NullClearまたは-Action NullClearを使用してください。
+このパラメータは廃止予定です。後方互換性のために残していますが、-PostAction NullClearまたは-Action NullClearを使用してください。
 対象ファイルの内容消去（ヌルクリア）します。
 -PostAction NullClearと等価です。
 
@@ -230,10 +239,12 @@ Recurseパラメータより優先します。
 Log2EventLogより優先します。
 
 .PARAMETER ProviderName
-　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
+　Windows Event Log出力のプロバイダ名を指定します。
+デフォルトは[Infra]です。
 
 .PARAMETER EventLogLogName
-　Windows Event Log出力のログ名を指定します。デフォルトは[Application]です。
+　Windows Event Log出力のログ名を指定します。
+デフォルトは[Application]です。
 
 .PARAMETER Log2Console 
 　コンソールへのログ出力を制御します。
@@ -244,7 +255,8 @@ Log2EventLogより優先します。
 Log2Consoleより優先します。
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$Falseでログファイル出力しません。
+　ログフィルへの出力を制御します。
+デフォルトは$Falseでログファイル出力しません。
 
 .PARAMETER NoLog2File
 　ログファイル出力を抑止します。-Log2File $Falseと等価です。
@@ -260,7 +272,8 @@ Log2Fileより優先します。
 ファイルが既存の場合は追記します。
 
 .PARAMETER LogDateFormat
-　ログファイル出力に含まれる日時表示フォーマットを指定します。デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
+　ログファイル出力に含まれる日時表示フォーマットを指定します。
+デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
 
 .PARAMETER LogFileEncode
 ログファイルの文字コードを指定します。
