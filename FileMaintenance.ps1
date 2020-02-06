@@ -543,7 +543,7 @@ Return $true
 #C:\TargetFolder\A\B\C\target.txt   :TargetObject
 #上記の時\A\B\C\部分が正規表現$ParentRegularExpressionにマッチ
 
-filter ComplexFilter{
+filter Old_ComplexFilter{
 
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
     IF ($_.Name -match ${RegularExpression}){
@@ -553,6 +553,93 @@ filter ComplexFilter{
     }
     } 
     }                                                                              
+
+}
+
+filter ComplexFilter{
+    IF (($_.PSIsContainer -eq ($FilterType -eq 'Folder')) -OR ( -NOT($_.PSIsContainer) -eq ($FilterType -eq 'File'))) {
+    IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
+    IF ($_.Name -match ${RegularExpression}){
+    IF ($_.Length -ge ($Size)){
+    IF (($_.FullName).Substring($TargetFolder.Length , (Split-Path -Parent $_.FullName).Length - $TargetFolder.Length +1) -match ${ParentRegularExpression})
+        {Return $_}
+    }
+    } 
+    }                                                                              
+    }
+}
+
+function GetObjects{
+
+Param(
+[parameter(mandatory=$true)][String]$TargetFolder
+)
+
+$Objects = @()
+
+#IF($FilterType -eq 'File'){
+
+ #   If($Recurse){
+
+ #           $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse -Include * -File     
+ #                           
+ #           }else{
+
+ #           $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Include * -File
+ #           }
+
+#}else{
+#    If($Recurse){
+
+ #           $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse -Directory 
+                            
+ #           }else{
+
+ #           $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Directory
+ #           }
+
+
+#}
+
+  If($Recurse){
+
+          $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse -Include *      
+           }else{
+
+           $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Include * 
+            }
+
+#echo $TargetObjects   
+ForEach ($Object in ($TargetObjects | ComplexFilter))
+#ForEach ($Object in ($TargetObjects | ComplexFilter))
+          
+    {
+    $Objects += New-Object PSObject -Property @{
+      Object = $Object
+      Time = $Object.LastWriteTime
+      Depth = ($Object.FullName.Split("\\")).Count
+    }
+}
+
+
+ Switch -Regex ($Action){
+ 
+ '^KeepFilesCount$'{
+        Return ($Objects | Sort-Object -Property Time | ForEach-Object {$_.Object.FullName})
+ }
+ '^DeleteEmptyFolders'{
+    Return ($Objects | Sort-Object -Property Depth -Descending | ForEach-Object {$_.Object.FullName})
+        
+ }
+ Default{
+    Return ($Objects | ForEach-Object {$_.Object.FullName})
+ }
+
+
+ }
+
+
+
 
 }
 
@@ -933,13 +1020,19 @@ Write-Output '処理対象は以下です'
 
     IF($Action -eq "DeleteEmptyFolders"){
 
-        $TargetObjects = GetFolders $TargetFolder
+        $FilterType = "Folder"
+
+#        $TargetObjects = GetFolders $TargetFolder
 #        Write-Output $TargetObjects.Object.Fullname
 
         }else{
-        $TargetObjects = GetFiles $TargetFolder
+
+        $FilterType = "File"
+ #       $TargetObjects = GetFiles $TargetFolder
  #       Write-Output $TargetObjects
         }
+
+$TargetObjects = GetObjects -TargetFolder $TargetFolder
 
 Write-Output $TargetObjects
 
