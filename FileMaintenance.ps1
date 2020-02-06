@@ -2,31 +2,31 @@
 
 <#
 .SYNOPSIS
-���O�t�@�C�����k�A�폜���n�߂Ƃ����F�X�ȏ��������閜�\�c�[���ł��B
-���s�ɂ�CommonFunctions.ps1���K�v�ł��B
-�Z�b�g�ŊJ�����Ă���Wrapper.ps1�ƕ��p����ƕ����������ꊇ���s�ł��܂��B
+ログファイル圧縮、削除を始めとした色々な処理をする万能ツールです。
+実行にはCommonFunctions.ps1が必要です。
+セットで開発しているWrapper.ps1と併用すると複数処理を一括実行できます。
 
-<Common Parameters>�̓T�|�[�g���Ă��܂���
+<Common Parameters>はサポートしていません
 
 .DESCRIPTION
-�Ώۂ̃t�H���_�Ɋ܂܂��A�t�@�C���A�t�H���_���e������Ńt�B���^���đI�����܂��B
-�t�B���^���ʂ��p�����[�^�Ɋ�Â��A�O�����A�又���A�㏈�����܂��B
+対象のフォルダに含まれる、ファイル、フォルダを各種条件でフィルタして選択します。
+フィルタ結果をパラメータに基づき、前処理、主処理、後処理します。
 
-�t�B���^���ʂɑ΂��ĉ\�ȏ����͈ȉ��ł��B
+フィルタ結果に対して可能な処理は以下です。
 
--�O����:�Ώۃt�@�C������ʃt�@�C���𐶐����܂��B�\�ȏ����́u�t�@�C�����Ƀ^�C���X�^���v�t���v�u���k�v�u���������ʃt�@�C���̈ړ��v�u�����̃t�@�C����1�t�@�C���ɃA�[�J�C�u�v�ł��B���p�w��\�ł��B�u���������ʃt�@�C���̈ړ��v���w�肵�Ȃ��ƑΏۃt�@�C���Ɠ���t�H���_�ɔz�u���܂��B
--�又��:�Ώۃt�@�C�����u�ړ��v�u�����v�u�폜�v�u���e�����i�k���N���A�j�v�A�t�H���_���u��t�H���_�폜�v���܂��B
--�㏈��:�Ώۃt�@�C�����u���e�����i�k���N���A�j�v�u���̕ύX�v���܂��B
+-前処理:対象ファイルから別ファイルを生成します。可能な処理は「ファイル名にタイムスタンプ付加」「圧縮」「生成した別ファイルの移動」「複数のファイルを1ファイルにアーカイブ」です。併用指定可能です。「生成した別ファイルの移動」を指定しないと対象ファイルと同一フォルダに配置します。
+-主処理:対象ファイルを「移動」「複製」「削除」「内容消去（ヌルクリア）」、フォルダを「空フォルダ削除」します。
+-後処理:対象ファイルを「内容消去（ヌルクリア）」「名称変更」します。
 
-�t�B���^�́u�o�ߓ����v�u�e�ʁv�u���K�\���v�u�Ώۃt�@�C���A�t�H���_�̐e�p�X�Ɋ܂܂�镶���̐��K�\���v�Ŏw��ł��܂��B
+フィルタは「経過日数」「容量」「正規表現」「対象ファイル、フォルダの親パスに含まれる文字の正規表現」で指定できます。
 
-���̃v���O�����P�̂ł́A1�x�ɏ����ł���̂�1�t�H���_�ł��B�����t�H���_�������������ꍇ�́AWrapper.ps1�𕹗p���Ă��������B
+このプログラム単体では、1度に処理できるのは1フォルダです。複数フォルダを処理したい場合は、Wrapper.ps1を併用してください。
 
 
-���O�o�͐��[Windows EventLog][�R���\�[��][���O�t�@�C��]���I���\�ł��B���ꂼ��o�́A�}�~���w��ł��܂��B
+ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
 
-���̃v���O������PowerShell 5.0�ȍ~���K�v�ł��B
-Windows Server 2008,2008R2��WMF(Windows Management Framework)5.0�ȍ~��ǉ��C���X�g�[�����Ă��������B����ȑO��OS�ł͉ғ����܂���B
+このプログラムはPowerShell 5.0以降が必要です。
+Windows Server 2008,2008R2はWMF(Windows Management Framework)5.0以降を追加インストールしてください。それ以前のOSでは稼働しません。
 
 https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows-powershell?view=powershell-7#upgrading-existing-windows-powershell
 
@@ -34,54 +34,54 @@ https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -noLog2Console
-C:\TEST�ȉ��̃t�@�C�����ċA�I�Ɍ����������܂��i�q�t�H���_���Ώہj
-��Ƃׂ̍������e���R���\�[���ɕ\�����܂���B
-�悸�̓����e�i���X�Ώۂ̂��̂��\������邩�m�F���Ă݂ĉ������B
+C:\TEST以下のファイルを再帰的に検索だけします（子フォルダも対象）
+作業の細かい内容をコンソールに表示しません。
+先ずはメンテナンス対象のものが表示されるか確認してみて下さい。
 
 
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -Action Delete
-C:\TEST�ȉ��̃t�@�C�����ċA�I�ɍ폜���܂��i�q�t�H���_���Ώہj
+C:\TEST以下のファイルを再帰的に削除します（子フォルダも対象）
 
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -Action DeleteEmptyFolders
-C:\TEST�ȉ��̋�t�H���_���ċA�I�ɍ폜���܂��i�q�t�H���_���Ώہj
+C:\TEST以下の空フォルダを再帰的に削除します（子フォルダも対象）
 
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -Action Delete -noRecurse
-C:\TEST�ȉ��̃t�@�C�����ċA�I�ɍ폜���܂��i�q�t�H���_�͑ΏۊO�j
+C:\TEST以下のファイルを非再帰的に削除します（子フォルダは対象外）
 
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -Action Copy -MoveToFolder C:\TEST1 -KBsize 10 -continue
-C:\TEST�ȉ��̃t�@�C����10KB�ȏ�̂��̂��ċA�I��C:\TEST1�֕������܂��B�ړ���Ɏq�t�H���_��������΍쐬���܂�
-�ړ���ɓ��ꖼ�̂̃t�@�C�����������ꍇ�̓X�L�b�v���ď������p�����܂�
+C:\TEST以下のファイルで10KB以上のものを再帰的にC:\TEST1へ複製します。移動先に子フォルダが無ければ作成します
+移動先に同一名称のファイルがあった場合はスキップして処理を継続します
 
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -Compress -Action none -AddTimeStamp -NullOriginalFile
-C:\TEST�ȉ��̃t�@�C�����ċA�I�� �u.log�ŏI���v���̂փt�@�C�����ɓ��t��t�����Ĉ��k���܂��B
-���t�@�C���͎c��܂����A���e�����i�k���N���A�j���܂��B
+C:\TEST以下のファイルを再帰的に 「.logで終わる」ものへファイル名に日付を付加して圧縮します。
+元ファイルは残りますが、内容消去（ヌルクリア）します。
 
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -Compress $True -Action Delete -MoveNewFile $True -MoveToFolder C:\TEST1 -OverRide -Days 10
 
-C:\TEST�ȉ��̃t�@�C�����ċA�I�� �u.log�ŏI���v����10���ȑO�̂��̂����k��C:\TEST1�ֈړ����܂��B
-�ړ���ɓ��ꖼ�̂̂��̂��������ꍇ�͏㏑�����܂��B
-���̃t�@�C���͍폜���܂�
+C:\TEST以下のファイルを再帰的に 「.logで終わる」かつ10日以前のものを圧縮後C:\TEST1へ移動します。
+移動先に同一名称のものがあった場合は上書きします。
+元のファイルは削除します
 
 
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\OLD\Log -RegularExpression '^.*\.log$' -Action Delete -ParentRegularExpression '\\OLD\\'
 
-C:\OLD\Log�ȉ��̃t�@�C���ōċA�I�Ɂu.log�ŏI���v���̂��폜���܂��B
-�A���A�t�@�C���̃t���p�X����C:\OLD\Log���폜�����p�X�Ɂu\OLD\�v���܂܂��t�@�C���������ΏۂɂȂ�܂��B���K�\���̂��߁A�p�X�Ɋ܂܂��\�i�o�b�N�X���b�V���j��\�i�o�b�N�X���b�V���j�ŃG�X�P�[�v����Ă��܂��B
-�Ⴆ�Έȉ��̃t�@�C���z�u�ł�C:\OLD\Log�܂ł̓}�b�`�ΏۊO�ƂȂ�C:\OLD\Log\IIS\Current\Infra.log , C:\OLD\Log\Java\Current\Infra.log , C:\OLD\Log\Infra.log�͍폜����܂���B
+C:\OLD\Log以下のファイルで再帰的に「.logで終わる」ものを削除します。
+但し、ファイルのフルパスからC:\OLD\Logを削除したパスに「\OLD\」が含まれるファイルだけが対象になります。正規表現のため、パスに含まれる\（バックスラッシュ）が\（バックスラッシュ）でエスケープされています。
+例えば以下のファイル配置ではC:\OLD\Logまではマッチ対象外となりC:\OLD\Log\IIS\Current\Infra.log , C:\OLD\Log\Java\Current\Infra.log , C:\OLD\Log\Infra.logは削除されません。
 
 C:\OLD\Log\IIS\Current\Infra.log
 C:\OLD\Log\IIS\OLD\Infra.log
@@ -91,240 +91,240 @@ C:\OLD\Log\Infra.log
 
  
 .PARAMETER TargetFolder
-�����Ώۂ̃t�@�C���A�t�H���_���i�[����Ă���t�H���_���w�肵�܂��B
-�w��͕K�{�ł��B
-���΁A��΃p�X�Ŏw��\�ł��B
-���΃p�X�\�L�́A.����n�߂�\�L�ɂ��ĉ������B�i�� .\Log , ..\Script\log�j
-���C���h�J�[�h* ? []�͎g�p�ł��܂���B
-�t�H���_���Ɋ��� [ , ] ���܂ޏꍇ�̓G�X�P�[�v�����ɂ��̂܂ܓ��͂��Ă��������B
+処理対象のファイル、フォルダが格納されているフォルダを指定します。
+指定は必須です。
+相対、絶対パスで指定可能です。
+相対パス表記は、.から始める表記にして下さい。（例 .\Log , ..\Script\log）
+ワイルドカード* ? []は使用できません。
+フォルダ名に括弧 [ , ] を含む場合はエスケープせずにそのまま入力してください。
 
 .PARAMETER PreAction
-�����Ώۂ̃t�@�C���ɑ΂��鑀���ݒ肵�܂��B�ȉ��̃p�����[�^���w�肵�ĉ������B
-PreAction��(Action|PostAction)�ƈقȂ蕡���p�����[�^���w��ł��܂��B
-�p�����[�^�̓J���},�ŋ�؂��ĉ������B
+処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
+PreActionは(Action|PostAction)と異なり複数パラメータを指定できます。
+パラメータはカンマ,で区切って下さい。
 
-None:������������܂���B���̐ݒ肪�f�t�H���g�ł��B����͌둀��h�~�̂��߂ɂ���܂��B���쌟�؂ɂ�-NoAction�X�C�b�`�𗘗p���ĉ������B
-Compress:�Ώۃt�@�C�����爳�k�����t�@�C����V�K�������܂��B
-AddTimeStamp:�Ώۃt�@�C������t�@�C������-TimeStampFormat�Œ�߂�ꂽ�����Ń^�C���X�^���v�t�������t�@�C����V�K�������܂��B
-Archive:�Ώۃt�@�C���Q���܂Ƃ߂�1�A�[�J�C�u�t�@�C����V�K�������܂��B-OverRide���w�肷��ƁA�����A�[�J�C�u�t�@�C���֑Ώۃt�@�C���Q��ǉ����܂��B�A�[�J�C�u�t�@�C����-ArchiveFileName�Ŏw�肵���t�@�C�����ł��B
-MoveNewFile:-PreAction�̐V�K�����t�@�C����-TargetFolder�Ɠ���ł͂Ȃ��A-MoveToFolder�֔z�u���܂��B
+None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-NoActionスイッチを利用して下さい。
+Compress:対象ファイルから圧縮したファイルを新規生成します。
+AddTimeStamp:対象ファイルからファイル名に-TimeStampFormatで定められた書式でタイムスタンプ付加したファイルを新規生成します。
+Archive:対象ファイル群をまとめた1アーカイブファイルを新規生成します。-OverRideを指定すると、既存アーカイブファイルへ対象ファイル群を追加します。アーカイブファイルは-ArchiveFileNameで指定したファイル名です。
+MoveNewFile:-PreActionの新規生成ファイルを-TargetFolderと同一ではなく、-MoveToFolderへ配置します。
 
 
 .PARAMETER Action
-�����Ώۂ̃t�@�C���ɑ΂��鑀���ݒ肵�܂��B�ȉ��̃p�����[�^���w�肵�ĉ������B
+処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
 
-None:������������܂���B���̐ݒ肪�f�t�H���g�ł��B����͌둀��h�~�̂��߂ɂ���܂��B���쌟�؂ɂ�-NoAction�X�C�b�`�𗘗p���ĉ������B
-Move:�t�@�C����-MoveToFolder�ֈړ����܂��B
-Delete:�t�@�C�����폜���܂��B
-Copy:�t�@�C����-MoveToFolder�ɃR�s�[���܂��B
-DeleteEmptyFolders:��t�H���_���폜���܂��B
-KeepFilesCount:�w�萢�㐔�ɂȂ�܂ŁA�}�b�`�����t�@�C���Q���Â����ɍ폜���܂��B
-NullClear:�t�@�C���̓��e�폜 NullClear���܂��B
+None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-NoActionスイッチを利用して下さい。
+Move:ファイルを-MoveToFolderへ移動します。
+Delete:ファイルを削除します。
+Copy:ファイルを-MoveToFolderにコピーします。
+DeleteEmptyFolders:空フォルダを削除します。
+KeepFilesCount:指定世代数になるまで、マッチしたファイル群を古い順に削除します。
+NullClear:ファイルの内容削除 NullClearします。
 
 .PARAMETER PostAction
-�����Ώۂ̃t�@�C���ɑ΂��鑀���ݒ肵�܂��B�ȉ��̃p�����[�^���w�肵�ĉ������B
+処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
 
-None:������������܂���B���̐ݒ肪�f�t�H���g�ł��B����͌둀��h�~�̂��߂ɂ���܂��B���쌟�؂ɂ�-NoAction�X�C�b�`�𗘗p���ĉ������B
-Rename:�t�@�C�����𐳋K�\��-RenameToRegularExpression�Œu�����܂��B
-NullClear:�t�@�C���̓��e�폜 NullClear���܂��BPostAction�̂��߁AAction�ƕ��p�\�ł��B�Ⴆ�΃t�@�C��������A���t�@�C�����폜����A�Ƃ������p�r�Ɏg�p���ĉ������B
+None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-NoActionスイッチを利用して下さい。
+Rename:ファイル名を正規表現-RenameToRegularExpressionで置換します。
+NullClear:ファイルの内容削除 NullClearします。PostActionのため、Actionと併用可能です。例えばファイル複製後、元ファイルを削除する、といった用途に使用して下さい。
 
 
 .PARAMETER MoveToFolder
-�@�����Ώۂ̃t�@�C���̈ړ��A�R�s�[��t�H���_���w�肵�܂��B
-���΁A��΃p�X�Ŏw��\�ł��B
-���΃p�X�\�L�́A.����n�߂�\�L�ɂ��ĉ������B�i�� .\Log , ..\Script\log�j
-���C���h�J�[�h* ? []�͎g�p�ł��܂���B
-�t�H���_���Ɋ��� [ , ] ���܂ޏꍇ�̓G�X�P�[�v�����ɂ��̂܂ܓ��͂��Ă��������B
+　処理対象のファイルの移動、コピー先フォルダを指定します。
+相対、絶対パスで指定可能です。
+相対パス表記は、.から始める表記にして下さい。（例 .\Log , ..\Script\log）
+ワイルドカード* ? []は使用できません。
+フォルダ名に括弧 [ , ] を含む場合はエスケープせずにそのまま入力してください。
 
 .PARAMETER ArchiveFileName
--PreAction Archive�w�莞�̃A�[�J�C�u�t�@�C�������w�肵�܂��B
+-PreAction Archive指定時のアーカイブファイル名を指定します。
 
 .PARAMETER Days
-�@�����Ώۂ̃t�@�C���A�t�H���_���X�V�o�ߓ����Ńt�B���^���܂��B
-�f�t�H���g��0���őS�Ẵt�@�C�����ΏۂƂȂ�܂��B
+　処理対象のファイル、フォルダを更新経過日数でフィルタします。
+デフォルトは0日で全てのファイルが対象となります。
 
 .PARAMETER Size
-�@�����Ώۂ̃t�@�C����e�ʂŃt�B���^���܂��B
-�f�t�H���g��0KB�őS�Ẵt�@�C�����ΏۂƂȂ�܂��B
-�����\�L�ɉ����āAKB,MB,GB�̐ڔ��������p�\�ł��B
-�Ⴆ��-Size 10MB�́A�����I��10*1024^6�Ɋ��Z���Ă���܂��B
+　処理対象のファイルを容量でフィルタします。
+デフォルトは0KBで全てのファイルが対象となります。
+整数表記に加えて、KB,MB,GBの接尾辞が利用可能です。
+例えば-Size 10MBは、自動的に10*1024^6に換算してくれます。
 
 .PARAMETER RegularExpression
-�@�����Ώۂ̃t�@�C���A�t�H���_�𐳋K�\���Ńt�B���^���܂��B
-�f�t�H���g�� .* �őS�Ă��ΏۂƂȂ�܂��B
-�L�q�̓V���O���N�I�[�e�[�V�����Ŋ����ĉ������B
-PowerShell�̎d�l��A�啶���������̋�ʂ͂��Ȃ����ł����A���ۂɂ͋�ʂ����̂Œ��ӂ��ĉ������B
+　処理対象のファイル、フォルダを正規表現でフィルタします。
+デフォルトは .* で全てが対象となります。
+記述はシングルクオーテーションで括って下さい。
+PowerShellの仕様上、大文字小文字の区別はしない筈ですが、実際には区別されるので注意して下さい。
 
 .PARAMETER ParentRegularExpression
-�@�����Ώۂ̃t�@�C���A�t�H���_�̏�ʃp�X����-TargetFolder�̃p�X�܂ł𐳋K�\���Ńt�B���^���܂��B-TargetFolder�Ɋ܂܂��p�X�̓t�B���^�ΏۊO�ł��B
-�f�t�H���g�� .* �őS�Ă��ΏۂƂȂ�܂��B
-�L�q�̓V���O���N�I�[�e�[�V�����Ŋ����ĉ������B
-PowerShell�̎d�l��A�啶���������̋�ʂ͂��Ȃ����ł����A���ۂɂ͋�ʂ����̂Œ��ӂ��ĉ������B
+　処理対象のファイル、フォルダの上位パスから-TargetFolderのパスまでを正規表現でフィルタします。-TargetFolderに含まれるパスはフィルタ対象外です。
+デフォルトは .* で全てが対象となります。
+記述はシングルクオーテーションで括って下さい。
+PowerShellの仕様上、大文字小文字の区別はしない筈ですが、実際には区別されるので注意して下さい。
 
 .PARAMETER RenameToRegularExpression
--PostAction Rename���w�肵���ꍇ�̃t�@�C�������K�\���u���K�����w�肵�܂��B
--RegularExpression�ɑ΂���u���p�^�[�����w�肵�܂��B
+-PostAction Renameを指定した場合のファイル名正規表現置換規則を指定します。
+-RegularExpressionに対する置換パターンを指定します。
 https://docs.microsoft.com/ja-jp/dotnet/standard/base-types/substitutions-in-regular-expressions
 
 
 .PARAMETER Recurse
-�@-TargetFolder�̒����̍ċA�I�܂��͔�ċA�ɏ����̎w�肪�\�ł��B
-�f�t�H���g��$TRUE�ōċA�I�����ł��B
+　-TargetFolderの直下の再帰的または非再帰に処理の指定が可能です。
+デフォルトは$TRUEで再帰的処理です。
 
 .PARAMETER NoRecurse
-�@-TargetFolder�̒����݂̂������ΏۂƂ��܂��B-Recurse $False�Ɠ����ł��B
-Recurse�p�����[�^���D�悵�܂��B
+　-TargetFolderの直下のみを処理対象とします。-Recurse $Falseと等価です。
+Recurseパラメータより優先します。
 
 .PARAMETER OverRide
-�@�ړ��A�R�s�[��Ɋ��ɓ����̃t�@�C�������݂��Ă������I�ɏ㏑�����܂��B
-�f�t�H���g�ł͏㏑�������Ɉُ�I�����܂��B
+　移動、コピー先に既に同名のファイルが存在しても強制的に上書きします。
+デフォルトでは上書きせずに異常終了します。
 
 .PARAMETER Continue
-�@�ړ��A�R�s�[��Ɋ��ɓ����̃t�@�C�������݂����ꍇ���Y�t�@�C���̏������X�L�b�v���܂��B
-�X�L�b�v����ƌx���I�����܂��B
-�f�t�H���g�ł̓X�L�b�v�����Ɉُ�I�����܂��B
+　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
+スキップすると警告終了します。
+デフォルトではスキップせずに異常終了します。
 
 .PARAMETER ContinueAsNormal
-�@�ړ��A�R�s�[��Ɋ��ɓ����̃t�@�C�������݂����ꍇ���Y�t�@�C���̏������X�L�b�v���܂��B
--Continue�ƈقȂ�X�L�b�v���Ă�����I�����܂��B�t�@�C���̍����R�s�[���ŗ��p���Ă��������B
--Continue�ɗD�悵�܂��B
-�f�t�H���g�ł̓X�L�b�v�����Ɉُ�I�����܂��B
+　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
+-Continueと異なりスキップしても正常終了します。ファイルの差分コピー等で利用してください。
+-Continueに優先します。
+デフォルトではスキップせずに異常終了します。
 
 .PARAMETER NoAction
-�t�@�C���A�t�H���_�����ۂɍ폜���̑���������Ɏ��s���܂��B�S�Ă̏����͐��������ɂȂ�܂��B
-����m�F����Ƃ��ɓ��Y�X�C�b�`���w�肵�Ă��������B
-���O��͌x�����o�͂���܂����A���s���ʂł͂��̌x���͖�������܂��B
+ファイル、フォルダを実際に削除等の操作をせずに実行します。全ての処理は成功扱いになります。
+動作確認するときに当該スイッチを指定してください。
+ログ上は警告が出力されますが、実行結果ではこの警告は無視されます。
 
 .PARAMETER NoneTargetAsWarning
-����Ώۂ̃t�@�C���A�t�H���_�����݂��Ȃ��ꍇ�Ɍx���I�����܂��B
-���̃X�C�b�`��ݒ肵�Ȃ��Ƒ��݂��Ȃ��ꍇ�͒ʏ�I�����܂��B
+操作対象のファイル、フォルダが存在しない場合に警告終了します。
+このスイッチを設定しないと存在しない場合は通常終了します。
 
 
 .PARAMETER CompressedExtString
-�@-PreAction Compress�w�莞�̃t�@�C���g���q���w��ł��܂��B
-�f�t�H���g��[.zip]�ł��B
+　-PreAction Compress指定時のファイル拡張子を指定できます。
+デフォルトは[.zip]です。
 
 .PARAMETER TimeStampFormat
-�@-PreAction AddTimeStamp�w�莞�̏������w��ł��܂��B
-�f�t�H���g��[_yyyyMMdd_HHmmss]�ł��B
+　-PreAction AddTimeStamp指定時の書式を指定できます。
+デフォルトは[_yyyyMMdd_HHmmss]です。
 
 .PARAMETER KeepFiles
--Action KeepFilesCount�w�莞�̐��㐔���w�肵�܂��B
-�f�t�H���g��1�ł��B
+-Action KeepFilesCount指定時の世代数を指定します。
+デフォルトは1です。
 
 .PARAMETER Compress
-���̃p�����[�^�͔p�~�\��ł��B����݊����̂��߂Ɏc���Ă��܂����A-PreAction Compress���g�p���Ă��������B
-�Ώۃt�@�C�������k���ĕʃt�@�C���Ƃ��ĕۑ����܂��B
+このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction Compressを使用してください。
+対象ファイルを圧縮して別ファイルとして保存します。
 
 .PARAMETER AddTimeStamp
-���̃p�����[�^�͔p�~�\��ł��B����݊����̂��߂Ɏc���Ă��܂����A-PreAction AddTimeStamp���g�p���Ă��������B
-�Ώۃt�@�C�����ɓ�����t�����ĕʃt�@�C���Ƃ��ĕۑ����܂��B
+このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction AddTimeStampを使用してください。
+対象ファイル名に日時を付加して別ファイルとして保存します。
 
 .PARAMETER MoveNewFile
-���̃p�����[�^�͔p�~�\��ł��B����݊����̂��߂Ɏc���Ă��܂����A-PreAction MoveNewFile���g�p���Ă��������B
--PreAction Compress , AddTimeStamp���w�肵���ۂɐ��������ʃt�@�C����-MoveToFolder�̎w���ɕۑ����܂��B
-�f�t�H���g�͑Ώۃt�@�C���Ɠ���f�B���N�g���֕ۑ����܂��B
+このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction MoveNewFileを使用してください。
+-PreAction Compress , AddTimeStampを指定した際に生成される別ファイルを-MoveToFolderの指定先に保存します。
+デフォルトは対象ファイルと同一ディレクトリへ保存します。
 
-.PARAMETER NullOriginalFilei
-���̃p�����[�^�͔p�~�\��ł��B����݊����̂��߂Ɏc���Ă��܂����A-PostAction NullClear�܂���-Action NullClear���g�p���Ă��������B
-�Ώۃt�@�C���̓��e�����i�k���N���A�j���܂��B
--PostAction NullClear�Ɠ����ł��B
+.PARAMETER NullOriginalFile
+このパラメータは廃止予定です。後方互換性のために残していますが、-PostAction NullClearまたは-Action NullClearを使用してください。
+対象ファイルの内容消去（ヌルクリア）します。
+-PostAction NullClearと等価です。
 
 
 
 .PARAMETER Log2EventLog
-�@Windows Event Log�ւ̏o�͂𐧌䂵�܂��B
-�f�t�H���g��$TRUE��Event Log�o�͂��܂��B
+　Windows Event Logへの出力を制御します。
+デフォルトは$TRUEでEvent Log出力します。
 
 .PARAMETER NoLog2EventLog
-�@Event Log�o�͂�}�~���܂��B-Log2EventLog $False�Ɠ����ł��B
-Log2EventLog���D�悵�܂��B
+　Event Log出力を抑止します。-Log2EventLog $Falseと等価です。
+Log2EventLogより優先します。
 
 .PARAMETER ProviderName
-�@Windows Event Log�o�͂̃v���o�C�_�����w�肵�܂��B
-�f�t�H���g��[Infra]�ł��B
+　Windows Event Log出力のプロバイダ名を指定します。
+デフォルトは[Infra]です。
 
 .PARAMETER EventLogLogName
-�@Windows Event Log�o�͂̃��O�����w�肵�܂��B
-�f�t�H���g��[Application]�ł��B
+　Windows Event Log出力のログ名を指定します。
+デフォルトは[Application]です。
 
 .PARAMETER Log2Console 
-�@�R���\�[���ւ̃��O�o�͂𐧌䂵�܂��B
-�f�t�H���g��$TRUE�ŃR���\�[���o�͂��܂��B
+　コンソールへのログ出力を制御します。
+デフォルトは$TRUEでコンソール出力します。
 
 .PARAMETER NoLog2Console
-�@�R���\�[�����O�o�͂�}�~���܂��B-Log2Console $False�Ɠ����ł��B
-Log2Console���D�悵�܂��B
+　コンソールログ出力を抑止します。-Log2Console $Falseと等価です。
+Log2Consoleより優先します。
 
 .PARAMETER Log2File
-�@���O�t�B���ւ̏o�͂𐧌䂵�܂��B
-�f�t�H���g��$False�Ń��O�t�@�C���o�͂��܂���B
+　ログフィルへの出力を制御します。
+デフォルトは$Falseでログファイル出力しません。
 
 .PARAMETER NoLog2File
-�@���O�t�@�C���o�͂�}�~���܂��B-Log2File $False�Ɠ����ł��B
-Log2File���D�悵�܂��B
+　ログファイル出力を抑止します。-Log2File $Falseと等価です。
+Log2Fileより優先します。
 
 .PARAMETER LogPath
-�@���O�t�@�C���o�̓p�X���w�肵�܂��B�f�t�H���g��$NULL�ł��B
-���΁A��΃p�X�Ŏw��\�ł��B
-���΃p�X�\�L�́A.����n�߂�\�L�ɂ��ĉ������B�i�� .\Log\Log.txt , ..\Script\log\log.txt�j
-���C���h�J�[�h* ? []�͎g�p�ł��܂���B
-�t�H���_�A�t�@�C�����Ɋ��� [ , ] ���܂ޏꍇ�̓G�X�P�[�v�����ɂ��̂܂ܓ��͂��Ă��������B
-�t�@�C�������݂��Ȃ��ꍇ�͐V�K�쐬���܂��B
-�t�@�C���������̏ꍇ�͒ǋL���܂��B
+　ログファイル出力パスを指定します。デフォルトは$NULLです。
+相対、絶対パスで指定可能です。
+相対パス表記は、.から始める表記にして下さい。（例 .\Log\Log.txt , ..\Script\log\log.txt）
+ワイルドカード* ? []は使用できません。
+フォルダ、ファイル名に括弧 [ , ] を含む場合はエスケープせずにそのまま入力してください。
+ファイルが存在しない場合は新規作成します。
+ファイルが既存の場合は追記します。
 
 .PARAMETER LogDateFormat
-�@���O�t�@�C���o�͂Ɋ܂܂������\���t�H�[�}�b�g���w�肵�܂��B
-�f�t�H���g��[yyyy-MM-dd-HH:mm:ss]�`���ł��B
+　ログファイル出力に含まれる日時表示フォーマットを指定します。
+デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
 
 .PARAMETER LogFileEncode
-���O�t�@�C���̕����R�[�h���w�肵�܂��B
-�f�t�H���g��Shift-JIS�ł��B
+ログファイルの文字コードを指定します。
+デフォルトはShift-JISです。
 
 .PARAMETER NormalReturnCode
-�@����I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��0�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
+　正常終了時のリターンコードを指定します。デフォルトは0です。正常終了=<警告終了=<（内部）異常終了として下さい。
 
 .PARAMETER WarningReturnCode
-�@�x���I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��1�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
+　警告終了時のリターンコードを指定します。デフォルトは1です。正常終了=<警告終了=<（内部）異常終了として下さい。
 
 .PARAMETER ErrorReturnCode
-�@�ُ�I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��8�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
+　異常終了時のリターンコードを指定します。デフォルトは8です。正常終了=<警告終了=<（内部）異常終了として下さい。
 
 .PARAMETER InternalErrorReturnCode
-�@�v���O���������ُ�I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��16�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
+　プログラム内部異常終了時のリターンコードを指定します。デフォルトは16です。正常終了=<警告終了=<（内部）異常終了として下さい。
 
 .PARAMETER InfoEventID
-�@Event Log�o�͂�Information�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��1�ł��B
+　Event Log出力でInformationに対するEvent IDを指定します。デフォルトは1です。
 
 .PARAMETER InfoLoopStartEventID
-�@Event Log�o�͂Ńt�@�C��/�t�H���_�����J�n��Information�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��2�ł��B
+　Event Log出力でファイル/フォルダ処理開始のInformationに対するEvent IDを指定します。デフォルトは2です。
 
 .PARAMETER InfoLoopEndEventID
-�@Event Log�o�͂Ńt�@�C��/�t�H���_�����I����Information�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��3�ł��B
+　Event Log出力でファイル/フォルダ処理終了のInformationに対するEvent IDを指定します。デフォルトは3です。
 
 .PARAMETER WarningEventID
-�@Event Log�o�͂�Warning�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��10�ł��B
+　Event Log出力でWarningに対するEvent IDを指定します。デフォルトは10です。
 
 .PARAMETER SuccessEventID
-�@Event Log�o�͂�Success�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��73�ł��B
+　Event Log出力でSuccessに対するEvent IDを指定します。デフォルトは73です。
 
 .PARAMETER InternalErrorEventID
-�@Event Log�o�͂�Internal Error�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��99�ł��B
+　Event Log出力でInternal Errorに対するEvent IDを指定します。デフォルトは99です。
 
 .PARAMETER ErrorEventID
-�@Event Log�o�͂�Error�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��100�ł��B
+　Event Log出力でErrorに対するEvent IDを指定します。デフォルトは100です。
 
 .PARAMETER ErrorAsWarning
-�@�ُ�I�����Ă��x���I����ReturnCode��Ԃ��܂��B
+　異常終了しても警告終了のReturnCodeを返します。
 
 .PARAMETER WarningAsNormal
-�@�x���I�����Ă�����I����ReturnCode��Ԃ��܂��B
+　警告終了しても正常終了のReturnCodeを返します。
 
 .PARAMETER ExecutableUser
-�@���̃v���O���������s�\�ȃ��[�U�𐳋K�\���Ŏw�肵�܂��B
-�f�t�H���g��[.*]�őS�Ẵ��[�U�����s�\�ł��B�@
-�L�q�̓V���O���N�I�[�e�[�V�����Ŋ����ĉ������B
-���K�\���̂��߁A�h���C���̃o�b�N�X���b�V����[domain\\.*]�̗l�Ƀo�b�N�X���b�V���ŃG�X�P�[�v���ĉ������B�@
+　このプログラムを実行可能なユーザを正規表現で指定します。
+デフォルトは[.*]で全てのユーザが実行可能です。　
+記述はシングルクオーテーションで括って下さい。
+正規表現のため、ドメインのバックスラッシュは[domain\\.*]の様にバックスラッシュでエスケープして下さい。　
 
 
 
@@ -333,10 +333,10 @@ Log2File���D�悵�܂��B
 
 Param(
 
-[parameter(position=0, mandatory=$true , HelpMessage = '�����Ώۂ̃t�H���_���w��(ex. D:\Logs) �S�Ă�Help��Get-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$TargetFolder,
+[parameter(position=0, mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$TargetFolder,
 
-#[parameter(position=0, mandatory=$true , HelpMessage = '�����Ώۂ̃t�H���_���w��(ex. D:\Logs) �S�Ă�Help��Get-Help FileMaintenance.ps1')][String]$TargetFolder,  #Validation debug�p�ɗp�ӂ��Ă���܂��B�ʏ�͎g��Ȃ�
-#[parameter(position=0, mandatory=$true , HelpMessage = '�����Ώۂ̃t�H���_���w��(ex. D:\Logs) �S�Ă�Help��Get-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
+#[parameter(position=0, mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String]$TargetFolder,  #Validation debug用に用意してあります。通常は使わない
+#[parameter(position=0, mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
  
 
 [Array][parameter(position=1)][ValidateSet("AddTimeStamp", "Compress", "MoveNewFile" , "none" , "Archive")]$PreAction = 'none',
@@ -378,12 +378,12 @@ Param(
 
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss',
 
-#�ȉ��X�C�b�`�Q�͔p�~�\��
+#以下スイッチ群は廃止予定
 [Switch]$Compress,
 [Switch]$AddTimeStamp,
 [Switch]$MoveNewFile,
 [Switch]$NullOriginalFile,
-#�ȏ�X�C�b�`�Q�͔p�~�\��
+#以上スイッチ群は廃止予定
 
 
 [boolean]$Log2EventLog = $TRUE,
@@ -400,7 +400,7 @@ Param(
 #[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath = ..\Log\FileMaintenance.log ,
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath  ,
 [String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss',
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default�w���Shift-Jis
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
 
 [int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
 [int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
@@ -426,30 +426,30 @@ Param(
 
 Try{
 
-    #CommonFunctions.ps1�̔z�u���ύX�����ꍇ�́A������ύX�B����t�H���_�ɔz�u�O��
+    #CommonFunctions.ps1の配置先を変更した場合は、ここを変更。同一フォルダに配置前提
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
-    Write-Output "CommonFunctions.ps1 ��Load�Ɏ��s���܂����BCommonFunctions.ps1�����̃t�@�C���Ɠ���t�H���_�ɑ��݂��邩�m�F���Ă�������"
+    Write-Output "CommonFunctions.ps1 のLoadに失敗しました。CommonFunctions.ps1がこのファイルと同一フォルダに存在するか確認してください"
     Exit 1
     }
 
 
-################ �ݒ肪�K�v�Ȃ̂͂����܂� ##################
+################ 設定が必要なのはここまで ##################
 
 
-################# ���ʕ��i�A�֐�  #######################
+################# 共通部品、関数  #######################
 
 
-#CheckLeafNotExists�߂�l
+#CheckLeafNotExists戻り値
 
-#�`�F�b�N�Ώۂ̃t�@�C�������݂��邪�A-OverRide���w��...$TRUE�@�i���̎w���-Continue�ɗD�悷��j�Ȃ�TryAction�͊��Ƀt�@�C�������݂���ꍇ�͋����㏑��
-#�`�F�b�N�Ώۂ̃t�@�C�������݂��邪�A-Continue���w��...$False
-#�`�F�b�N�Ώۂ̃t�@�C�������݂���...$ErrorReturnCode ��Finalize�֐i�ށA�܂���Break
-#�`�F�b�N�Ώۂ̓��ꖼ�̂̃t�H���_�����݂��邪�A-OverRide���w��...�㏑�����o���Ȃ��̂�$ErrorReturnCode ��Finalize�֐i�ށA�܂���Break
-#�`�F�b�N�ΏۂƓ��ꖼ�̂̃t�H���_�����݂��邪�A-Continue���w��...$False
-#�`�F�b�N�ΏۂƓ��ꖼ�̂̃t�H���_�����݂���...$ErrorReturnCode ��Finalize�֐i�ށA�܂���Break
-#�`�F�b�N�Ώۂ̃t�@�C���A�t�H���_�����݂��Ȃ�...$TRUE
+#チェック対象のファイルが存在するが、-OverRideを指定...$TRUE　（この指定は-Continueに優先する）なおTryActionは既にファイルが存在する場合は強制上書き
+#チェック対象のファイルが存在するが、-Continueを指定...$False
+#チェック対象のファイルが存在する...$ErrorReturnCode でFinalizeへ進む、またはBreak
+#チェック対象の同一名称のフォルダが存在するが、-OverRideを指定...上書きが出来ないので$ErrorReturnCode でFinalizeへ進む、またはBreak
+#チェック対象と同一名称のフォルダが存在するが、-Continueを指定...$False
+#チェック対象と同一名称のフォルダが存在する...$ErrorReturnCode でFinalizeへ進む、またはBreak
+#チェック対象のファイル、フォルダが存在しない...$TRUE
 
 function CheckLeafNotExists {
 
@@ -457,20 +457,20 @@ Param(
 [parameter(mandatory=$true)][String]$CheckLeaf
 )
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf)�̑��݂��m�F���܂�"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf)の存在を確認します"
 
-    #���Ƀt�@�C�������邪�AOverRide�w��͖����B����āA�ُ�I�� or Continue�w�肠��Ōp��
+    #既にファイルがあるが、OverRide指定は無い。よって、異常終了 or Continue指定ありで継続
 
     If( (Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -AND (-NOT($OverRide)) ){
 
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "����$($CheckLeaf)�����݂��܂�"
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "既に$($CheckLeaf)が存在します"
 
         IF(-NOT($ContinueAsNormal)){
             $Script:WarningFlag = $TRUE
             }    
         If(-NOT($Continue)){
  
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "����$($CheckLeaf)�����݂��邽�߁A${SHELLNAME}���I�����܂�"
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に$($CheckLeaf)が存在するため、${SHELLNAME}を終了します"
             
             IF($ForceEndLoop){
                 $Script:ErrorFlag = $TRUE
@@ -480,31 +480,31 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
                 Finalize $ErrorReturnCode
                 }
             }else{
-            Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]�̂��ߏ������p�����܂��B"
+            Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]のため処理を継続します。"
             $Script:ContinueFlag = $true
 
-            #�����t�@�C��������̂�$False��Ԃ��ăt�@�C�����������Ȃ�
+            #既存ファイルがあるので$Falseを返してファイル処理させない
             Return $False
             }
 
-      #���Ƀt�@�C�������邪�AOverRide�w�肪����B����Čp��  
+      #既にファイルがあるが、OverRide指定がある。よって継続  
 
      }elseif( (Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -AND ($OverRide) ){
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "����$($CheckLeaf)�����݂��܂���-OverRide[$OverRide]�̂��ߏ㏑�����܂�"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "既に$($CheckLeaf)が存在しますが-OverRide[$OverRide]のため上書きします"
             $Script:OverRideFlag = $TRUE
 
-            #�����܂ŗ���΃t�@�C�������݂��Ȃ��͊m��B���ꖼ�̂̃t�H���_�����݂���\���͎c���Ă���
-            #���ꖼ�̂̃t�H���_�����݂����OverRide�o���Ȃ��̂ŁAContinue�w�肠��̏ꍇ�͌p���B�w��Ȃ��ňُ�I��
+            #ここまで来ればファイルが存在しないは確定。同一名称のフォルダが存在する可能性は残っている
+            #同一名称のフォルダが存在するとOverRide出来ないので、Continue指定ありの場合は継続。指定なしで異常終了
 
             }elseif(Test-Path -LiteralPath $CheckLeaf -PathType Container){
 
-                Logging -EventID $WarningEventID -EventType Warning -EventMessage "���ɓ��ꖼ�̃t�H���_$($CheckLeaf)�����݂��܂�"
+                Logging -EventID $WarningEventID -EventType Warning -EventMessage "既に同一名称フォルダ$($CheckLeaf)が存在します"
                 $Script:WarningFlag = $TRUE
 
                 IF(-NOT($Continue)){
 
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "���ɓ��ꖼ�̃t�H���_$($CheckLeaf)�����݂��邽�߁A${SHELLNAME}���I�����܂�"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称フォルダ$($CheckLeaf)が存在するため、${SHELLNAME}を終了します"
 
                     IF($ForceEndLoop){
                         $Script:ErrorFlag = $TRUE
@@ -515,33 +515,33 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
                         }
             
                     }else{
-                    Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]�̂��ߏ������p�����܂��B"
+                    Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]のため処理を継続します。"
                     $Script:ContinueFlag = $true
 
-                    #�����t�H���_������̂�$False��Ԃ��ăt�@�C�����������Ȃ�
+                    #既存フォルダがあるので$Falseを返してファイル処理させない
                     Return $False
                     }
 
             
-            #���ꖼ�̂̃t�@�C���A�t�H���_���ɑ��݂��Ȃ�
+            #同一名称のファイル、フォルダ共に存在しない
 
             }else{
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf)�͑��݂��܂���"            
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf)は存在しません"            
             }
 
 Return $true
 }
 
 
-#�I�u�W�F�N�g�𕡐������Ńt�B���^
+#オブジェクトを複数条件でフィルタ
 
-#�ŏI�ύX������$Day���Â�
-#(�t�@�C��|�t�H���_)�������K�\��$RegularExpression�Ƀ}�b�`
-#�t�@�C���e�ʂ� $Size���傫��
+#最終変更日時が$Dayより古い
+#(ファイル|フォルダ)名が正規表現$RegularExpressionにマッチ
+#ファイル容量が $Sizeより大きい
 #C:\TargetFolder                    :TargetFolder
 #C:\TargetFolder\A\B\C\target.txt   :TargetObject
-#��L�̎�\A\B\C\���������K�\��$ParentRegularExpression�Ƀ}�b�`
+#上記の時\A\B\C\部分が正規表現$ParentRegularExpressionにマッチ
 
 filter ComplexFilter{
 
@@ -584,7 +584,7 @@ ForEach ($Folder in ($TargetFolders | ComplexFilter))
     }
 }
 
-#�z��ɓ��ꂽ�p�X�ꎮ���p�X���[�����ɐ���B��t�H���_����t�H���_�ɓ���q�ɂȂ��Ă���ꍇ�A�[���K�w����폜����K�v������B
+#配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
 
 Return ($Folders | Sort-Object -Property Depth -Descending)
 
@@ -620,7 +620,7 @@ ForEach ($File in ($TargetFiles | ComplexFilter))
 }
 
 
-#KeepFilesCount�̂ݔz��ɓ��ꂽ�p�X�ꎮ���Â����Ƀ\�[�g
+#KeepFilesCountのみ配列に入れたパス一式を古い順にソート
 
 IF($Action -eq 'KeepFilesCount'){
 
@@ -635,18 +635,18 @@ function Initialize {
 
 
 
-#�C�x���g�\�[�X���ݒ莞�̏���
-#���O�t�@�C���o�͐�m�F
-#ReturnCode�m�F
-#���s���[�U�m�F
-#�v���O�����N�����b�Z�[�W
+#イベントソース未設定時の処理
+#ログファイル出力先確認
+#ReturnCode確認
+#実行ユーザ確認
+#プログラム起動メッセージ
 
 . PreInitialize
 
-#�����܂Ŋ�������΋Ɩ��I�ȃ��W�b�N�݂̂��m�F����Ηǂ�
+#ここまで完了すれば業務的なロジックのみを確認すれば良い
 
 
-#Switch����
+#Switch処理
 
 IF($NoRecurse){[boolean]$Script:Recurse = $false}
 IF($NullOriginalFile){[String]$Script:PostAction = 'NullClear'}
@@ -656,82 +656,82 @@ IF($AddTimeStamp){$Script:PreAction +='AddTimeStamp'}
 IF($MoveNewFile){$Script:PreAction +='MoveNewFile'}
 IF($Compress){$Script:PreAction +='Compress'}
 
-#�p�����[�^�̊m�F
+#パラメータの確認
 
 
-#�w��t�H���_�̗L�����m�F
-#CheckContainer function��$True,$False���ߒl�Ȃ̂�$Null�֎̂Ă�B�̂ĂȂ��ƃR���\�[���o�͂����
+#指定フォルダの有無を確認
+#CheckContainer functionは$True,$Falseが戻値なので$Nullへ捨てる。捨てないとコンソール出力される
 
-    $TargetFolder = ConvertToAbsolutePath -CheckPath $TargetFolder -ObjectName  '�w��t�H���_-TargetFolder'
+    $TargetFolder = ConvertToAbsolutePath -CheckPath $TargetFolder -ObjectName  '指定フォルダ-TargetFolder'
 
-   CheckContainer -CheckPath $TargetFolder -ObjectName '�w��t�H���_-TargetFolder' -IfNoExistFinalize > $NULL
+   CheckContainer -CheckPath $TargetFolder -ObjectName '指定フォルダ-TargetFolder' -IfNoExistFinalize > $NULL
 
 
 
-#�ړ���t�H���_�̗v�s�v�ƗL�����m�F
+#移動先フォルダの要不要と有無を確認
 
     If (  ($Action -match "^(Move|Copy)$") -OR ($PreAction -contains 'MoveNewFile')  ){    
 
-        $MoveToFolder = ConvertToAbsolutePath -CheckPath $MoveToFolder -ObjectName '�ړ���t�H���_-MoveToFolder'
+        $MoveToFolder = ConvertToAbsolutePath -CheckPath $MoveToFolder -ObjectName '移動先フォルダ-MoveToFolder'
 
-        CheckContainer -CheckPath $MoveToFolder -ObjectName '�ړ���t�H���_-MoveToFolder' -IfNoExistFinalize > $NULL
+        CheckContainer -CheckPath $MoveToFolder -ObjectName '移動先フォルダ-MoveToFolder' -IfNoExistFinalize > $NULL
  
 
                   
      }elseif(-NOT (CheckNullOrEmpty -CheckPath $MoveToFolder)){
-                Logging -EventID $ErrorEventID -EventType Error -EventMessage "Action[$($Action)]�̎��A-MoveToFolder�w��͕s�v�ł�"
+                Logging -EventID $ErrorEventID -EventType Error -EventMessage "Action[$($Action)]の時、-MoveToFolder指定は不要です"
                 Finalize $ErrorReturnCode
                 }
 
 
-#ArchiveFileName�̗v�s�v�ƗL���AValidation���m�F
+#ArchiveFileNameの要不要と有無、Validationを確認
 
     IF($PreAction -contains 'Archive'){
         CheckNullOrEmpty -CheckPath $ArchiveFileName -ObjectName '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL
         
         IF( $ArchiveFileName -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "-ArchiveFileName��NTFS�Ŏg�p�ł��Ȃ��������w�肵�Ă��܂�"
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "-ArchiveFileNameにNTFSで使用できない文字を指定しています"
 				Finalize $ErrorReturnCode
                 } 
         }
 
 
-#�g�ݍ��킹���s���Ȏw����m�F
+#組み合わせが不正な指定を確認
 
 
     If(($TargetFolder -eq $MoveToFolder) -AND (($Action -match "move|copy") -OR  ($PreAction -contains 'MoveNewFile'))){
-				Logging -EventType Error -EventID $ErrorEventID -EventMessage "�ړ���t�H���_�ƈړ���t�H���_�Ƃ�����̎��ɁA�t�@�C���̈ړ��A�����͏o���܂���"
+				Logging -EventType Error -EventID $ErrorEventID -EventMessage "移動先フォルダと移動先フォルダとが同一の時に、ファイルの移動、複製は出来ません"
 				Finalize $ErrorReturnCode
                 }
 
 
     If (($Action -match "^(Move|Delete|KeepFilesCount)$") -AND  ($PostAction -ne 'none')){
 
-				Logging -EventType Error -EventID $ErrorEventID -EventMessage "�Ώۃt�@�C�����폜�܂��͈ړ���A-PostAction[$($PostAction)]���邱�Ƃ͏o���܂���"
+				Logging -EventType Error -EventID $ErrorEventID -EventMessage "対象ファイルを削除または移動後、-PostAction[$($PostAction)]することは出来ません"
 				Finalize $ErrorReturnCode
                 }
 
    If (($PreAction -contains 'MoveNewFile' ) -AND  (-NOT($PreAction -match "^(Compress|AddTimeStamp|Archive)$") )){
 
-				Logging -EventType Error -EventID $ErrorEventID -EventMessage "-PreAction��MoveNewFile�́ACompres , AddTimeStamp , Archive�ƕ��p����K�v������܂��B���t�@�C���̈ړ��ɂ�-Action Move���w�肵�Ă�������"
+				Logging -EventType Error -EventID $ErrorEventID -EventMessage "-PreActionでMoveNewFileは、Compres , AddTimeStamp , Archiveと併用する必要があります。元ファイルの移動には-Action Moveを指定してください"
 				Finalize $ErrorReturnCode
                 }
 
    If (($PreAction -contains 'Compress') -AND  ($PreAction -contains 'Archive') ){
 
-				Logging -EventType Error -EventID $ErrorEventID "-PreAction��Compress��Archive�Ƃ𓯎��Ɏw�肷�鎖�͂ł��܂���"
+				Logging -EventType Error -EventID $ErrorEventID "-PreActionでCompressとArchiveとを同時に指定する事はできません"
 				Finalize $ErrorReturnCode
                 }
 
     IF ($Action -eq "DeleteEmptyFolders"){
         IF( ($Compress) -OR ($AddTimeStamp) -OR ($MoveNewFile) -OR ($PostAction -ne 'none' )){
     
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "��t�H���_�폜-Action[$Action]���w�肵�����̓t�@�C������͍s���܂���"
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時はファイル操作は行えません"
 				Finalize $ErrorReturnCode
 
         }elseif($KBSize -ne 0){
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "��t�H���_�폜-Action[$Action]���w�肵�����̓t�@�C���e�ʎw��-KBsize�͍s���܂���"
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時はファイル容量指定-KBsizeは行えません"
 				Finalize $ErrorReturnCode
                 }
     }
@@ -739,44 +739,44 @@ IF($Compress){$Script:PreAction +='Compress'}
 
     IF ($TimeStampFormat -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "-TimeStampFormat��NTFS�Ŏg�p�ł��Ȃ��������w�肵�Ă��܂�"
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "-TimeStampFormatにNTFSで使用できない文字を指定しています"
 				Finalize $ErrorReturnCode
                 }
 
 
 
-#�����J�n���b�Z�[�W�o��
+#処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "�p�����[�^�͐���ł�"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは正常です"
 
     IF ($Action -eq "DeleteEmptyFolders"){
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "�w��t�H���_$($TargetFolder)��$($Days)���ȑO�̐��K�\�� $($RegularExpression) �Ƀ}�b�`�����t�H���_���ċA�I[$($Recurse)]�ɍ폜���܂�"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする空フォルダを再帰的[$($Recurse)]に削除します"
         
         }else{
         Logging -EventID $InfoEventID -EventType Information `
-        -EventMessage ("�w��t�H���_$($TargetFolder)��$($Days)���ȑO�̐��K�\�� $($RegularExpression) �Ƀ}�b�`����"+($Size / 1KB)+"KB�ȏ�̃t�@�C�����ړ���t�H���_$($MoveToFolder)�֍ċA�I[$($Recurse)]��Action[$($Action)]�APostAction[$($PostAction)]���܂��B")
+        -EventMessage ("指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする"+($Size / 1KB)+"KB以上のファイルを移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]にAction[$($Action)]、PostAction[$($PostAction)]します。")
         }
 
     IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
 
         Logging -EventID $InfoEventID -EventType Information `
-        -EventMessage ("�}�b�`�����t�@�C���̓t�@�C�����ɓ��t�t��["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]�A���k["+[Boolean]($PreAction -contains 'Compress')+"]���āA�ړ���t�H���_$($MoveToFolder)�֍ċA�I[$($Recurse)]�Ɉړ�["+[Boolean]($PreAction -contains 'MoveNewFile')+"]���܂�")
+        -EventMessage ("マッチしたファイルはファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -contains 'Compress')+"]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -contains 'MoveNewFile')+"]します")
         }
 
     IF($NoAction){
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "-NoAction[${NoAction}]���w�肳��Ă��邽�ߎ��ۂɂ̓t�@�C��/�t�H���_�̏��������܂���"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "-NoAction[${NoAction}]が指定されているため実際にはファイル/フォルダの処理をしません"
         }
 
     IF($OverRide){
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "-OverRide[${OverRide}]���w�肳��Ă��邽�ߐ��������t�@�C���Ɠ����̂��̂��������ꍇ�͏㏑�����܂�"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "-OverRide[${OverRide}]が指定されているため生成したファイルと同名のものがあった場合は上書きします"
         }
 
     If($ContinueAsNormal){
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "-ContinueAsNormal[$($ContinueAsNormal)]���w�肳��Ă��邽�ߐ��������t�@�C���Ɠ����̂��̂��������ꍇ�͐��툵���Ŏ��̃t�@�C�����������܂��B�t�@�C��������ȊO�̏����ُ�͌x�����܂����A���̃t�@�C���A�t�H���_���������܂�"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "-ContinueAsNormal[$($ContinueAsNormal)]が指定されているため生成したファイルと同名のものがあった場合は正常扱いで次のファイルを処理します。ファイル名同一以外の処理異常は警告しますが、次のファイル、フォルダを処理します"
         }elseIF($Continue){
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]���w�肳��Ă��邽�ߐ��������t�@�C���A�t�H���_�Ɠ����̂��̂��������ꍇ���̏����ُ�ňُ�I�������x����A���̃t�@�C���A�t�H���_���������܂�"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]が指定されているため生成したファイル、フォルダと同名のものがあった場合等の処理異常で異常終了せず警告後、次のファイル、フォルダを処理します"
         }
 
 }
@@ -797,7 +797,7 @@ Param(
 
 }
 
-#���k�t���O�܂��̓^�C���X�^���v�t���t���O��True�̏���
+#圧縮フラグまたはタイムスタンプ付加フラグがTrueの処理
 
 function CompressAndAddTimeStamp{
 
@@ -807,7 +807,7 @@ Param(
 
         [String]$TargetFileParentFolder = Split-Path $TargetObject -Parent
 
-#���k�t���OTrue�̎�
+#圧縮フラグTrueの時
 
 
         IF($PreAction -contains 'Compress'){
@@ -816,29 +816,29 @@ Param(
 
                 $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )+$CompressedExtString )
                 $Script:ActionType = "CompressAndAddTimeStamp"
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "���k&�^�C���X�^���v�t������[$(Split-Path -Leaf $ArchiveFile)]���쐬���܂�"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮&タイムスタンプ付加した[$(Split-Path -Leaf $ArchiveFile)]を作成します"
             }else{
                 $ArchiveFile = $TargetObject+$CompressedExtString
                 $Script:ActionType = "Compress"
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "���k����[$(Split-Path -Leaf $ArchiveFile)]���쐬���܂�" 
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮した[$(Split-Path -Leaf $ArchiveFile)]を作成します" 
             }          
  
         }else{
 
 
-#�^�C���X�^���v�t���̂�True�̎�
+#タイムスタンプ付加のみTrueの時
 
                 $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath (AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )
                 $Script:ActionType = "AddTimeStamp"
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "�^�C���X�^���v�t������[$(Split-Path -Leaf $ArchiveFile)]���쐬���܂�"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "タイムスタンプ付加した[$(Split-Path -Leaf $ArchiveFile)]を作成します"
                 }
 
 
-#�ړ��t���O��True�Ȃ�΁A�쐬�������kor�^�C���X�^���v�t�������t�@�C�����ړ�����
+#移動フラグがTrueならば、作成した圧縮orタイムスタンプ付加したファイルを移動する
 
     IF($PreAction -contains 'MoveNewFile'){
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage ("-PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"]�̂��߁A�쐬�����t�@�C����$($MoveToNewFolder)�ɔz�u���܂�")
+        Logging -EventID $InfoEventID -EventType Information -EventMessage ("-PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"]のため、作成したファイルは$($MoveToNewFolder)に配置します")
         Return ( Join-Path $MoveToNewFolder (Split-Path -Leaf $ArchiveFile) )
 
         }else{
@@ -857,29 +857,29 @@ Param(
 
     IF(-NOT(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))){    
 
-       Logging -EventID $InfoEventID -EventType Information -EventMessage "���s���ʂ͐���I��[$($NormalCount)]�A�x���I��[$($WarningCount)]�A�ُ�I��[$($ErrorCount)]�ł�"
+       Logging -EventID $InfoEventID -EventType Information -EventMessage "実行結果は正常終了[$($NormalCount)]、警告終了[$($WarningCount)]、異常終了[$($ErrorCount)]です"
 
        IF ($Action -eq "DeleteEmptyFolders"){
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "�w��t�H���_$($TargetFolder)��$($Days)���ȑO�̐��K�\�� $($RegularExpression) �Ƀ}�b�`�����t�H���_���ċA�I[$($Recurse)]�ɍ폜���܂���"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする空フォルダを再帰的[$($Recurse)]に削除しました"
             }else{
 
             Logging -EventID $InfoEventID -EventType Information `
-            -EventMessage ("�w��t�H���_${TargetFolder}��${Days}���ȑO�̐��K�\�� ${RegularExpression} �Ƀ}�b�`����"+($Size / 1KB)+"KB�ȏ�̑S�Ẵt�@�C�����ړ���t�H���_${MoveToFolder}�֍ċA�I[${Recurse}]��Action[${Action}]�APostAction[$($PostAction)]���܂���")
+            -EventMessage ("指定フォルダ${TargetFolder}の${Days}日以前の正規表現 ${RegularExpression} にマッチする"+($Size / 1KB)+"KB以上の全てのファイルを移動先フォルダ${MoveToFolder}へ再帰的[${Recurse}]にAction[${Action}]、PostAction[$($PostAction)]しました")
             }
 
     IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
 
         Logging -EventID $InfoEventID -EventType Information `
-        -EventMessage ("�}�b�`�����t�@�C���̓t�@�C�����ɓ��t�t��["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]�A���k["+[Boolean]($PreAction -contains 'Compress')+"]���āA�ړ���t�H���_$($MoveToFolder)�֍ċA�I[$($Recurse)]�Ɉړ�["+[Boolean]($PreAction -contains 'MoveNewFile')+"]���܂���")
+        -EventMessage ("マッチしたファイルはファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -contains 'Compress')+"]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -contains 'MoveNewFile')+"]しました")
         }
 
         IF($OverRide -and ($OverRideCount -gt 0)){
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "-OverRide[${OverRide}]���w�肳��Ă��邽�ߐ��������t�@�C���Ɠ����̂��̂�[$($OverRideCount)]��A�㏑�����܂���"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "-OverRide[${OverRide}]が指定されているため生成したファイルと同名のものを[$($OverRideCount)]回、上書きしました"
             }
 
         IF(($Continue) -and ($ContinueCount -gt 0)){
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]���w�肳��Ă��邽�ߐ��������t�@�C���Ɠ����̂��̂��������ꍇ���̏����ُ�ňُ�I���������̃t�@�C���A�t�H���_��[$($ContinueCount)]�񏈗����܂���"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]が指定されているため生成したファイルと同名のものがあった場合等の処理異常で異常終了せず次のファイル、フォルダを[$($ContinueCount)]回処理しました"
             }
     }
 
@@ -893,15 +893,15 @@ EndingProcess $ReturnCode
 
 
 
-#####################   ��������{��  ######################
+#####################   ここから本体  ######################
 
 [boolean]$ErrorFlag = $false
 [boolean]$WarningFlag = $False
 [boolean]$NormalFlag = $False
 [boolean]$OverRideFlag = $False
 [boolean]$ContinueFlag = $False
-[Boolean]$ForceFinalize = $False          ;#$TRUE�ŃI�u�W�F�N�g�������[�v�������I���B
-[Boolean]$ForceEndloop = $False           ;#$False�ł�Finalize , $TRUE�ł̓��[�v����Break
+[Boolean]$ForceFinalize = $False          ;#$TRUEでオブジェクト処理ループを強制終了。
+[Boolean]$ForceEndloop = $False           ;#$FalseではFinalize , $TRUEではループ内でBreak
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
@@ -909,27 +909,27 @@ EndingProcess $ReturnCode
 [int][ValidateRange(0,2147483647)]$ContinueCount = 0
 [int][ValidateRange(0,2147483647)]$InLoopDeletedFilesCount = 0
 
-#${THIS_FILE}=$MyInvocation.MyCommand.Path       �@
+#${THIS_FILE}=$MyInvocation.MyCommand.Path       　
 ${THIS_FILE}=$PSScriptRoot
-#${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #���̃t�@�C���̃p�X
-${THIS_PATH}=Split-Path -Parent ($PSScriptRoot)          #���̃t�@�C���̃p�X
-${SHELLNAME}=Split-Path -Leaf ($PSScriptRoot)  # �V�F����
-#${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # �V�F����
+#${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
+${THIS_PATH}=Split-Path -Parent ($PSScriptRoot)          #このファイルのパス
+${SHELLNAME}=Split-Path -Leaf ($PSScriptRoot)  # シェル名
+#${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
 
 ${Version} = '20200205_1420'
 
 
-#�����ݒ�A�p�����[�^�m�F�A�N�����b�Z�[�W�o��
+#初期設定、パラメータ確認、起動メッセージ出力
 
 . Initialize
 
 
 
-#�Ώۂ̃t�H���_�܂��̓t�@�C����T���Ĕz��ɓ����
+#対象のフォルダまたはファイルを探して配列に入れる
 
 $TargetObjects = @()
 
-Write-Output '�����Ώۂ͈ȉ��ł�'
+Write-Output '処理対象は以下です'
 
     IF($Action -eq "DeleteEmptyFolders"){
 
@@ -943,10 +943,10 @@ Write-Output '�����Ώۂ͈ȉ��ł�'
 
     If ($null -eq $TargetObjects){
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($TargetFolder)�ɏ����ΏۂƂȂ�t�@�C���A�܂��̓t�H���_�͂���܂���"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($TargetFolder)に処理対象となるファイル、またはフォルダはありません"
 
         IF($NoneTargetAsWarning){
-            Logging -EventID $WarningEventID -EventType Warning -EventMessage "-NoneTargetAsWarning���w�肳��Ă��邽�߁A�x���I�������ɂ��܂�"
+            Logging -EventID $WarningEventID -EventType Warning -EventMessage "-NoneTargetAsWarningが指定されているため、警告終了扱いにします"
             Finalize $WarningReturnCode
             }
             else{
@@ -954,8 +954,8 @@ Write-Output '�����Ώۂ͈ȉ��ł�'
             }
     }
 
-    �@
-#-PreAction Archive�͕����t�@�C����1�t�@�C���Ɉ��k����B����āA���[�v�O�Ɉ��k���1�t�@�C���̃t���p�X���m�肵�Ă���
+    　
+#-PreAction Archiveは複数ファイルを1ファイルに圧縮する。よって、ループ前に圧縮先の1ファイルのフルパスを確定しておく
 
 IF( ($PreAction -contains 'Archive') ){
 
@@ -974,36 +974,36 @@ IF( ($PreAction -contains 'Archive') ){
         $ArchivePath = Join-Path -Path $ArchiveToFolder -ChildPath $ArchiveFileName
         }
 
-    $ArchivePath = ConvertToAbsolutePath -CheckPath $ArchivePath -ObjectName  'Archive�o�͐�'
+    $ArchivePath = ConvertToAbsolutePath -CheckPath $ArchivePath -ObjectName  'Archive出力先'
 
     IF(-NOT(CheckLeafNotExists -CheckLeaf $ArchivePath)){
         
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "���ɓ��ꖼ�̃t�@�C���܂��̓t�H���_$($ArchivePath)�����݂��邽�߁A${SHELLNAME}���I�����܂�"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称ファイルまたはフォルダ$($ArchivePath)が存在するため、${SHELLNAME}を終了します"
         Finalize $ErrorReturnCode        
         }
 
 }
 
 
-#�Ώۃt�H���_or�t�@�C���Q�̏������[�v
+#対象フォルダorファイル群の処理ループ
 
 ForEach ($TargetObject in $TargetObjects)
 {
 
-#Powershell��GOTO�������݂����������򂪂ł��Ȃ��B
-#���̂���Do/While��p���ď����r���ŃG���[�����������ꍇ�̕�����������Ă���
+#PowershellはGOTO文が存在せず処理分岐ができない。
+#そのためDo/Whileを用いて処理途中でエラーが発生した場合の分岐を実装している
 
-#Do/While()�͍Ō�ɕ]�����s���郋�[�v�B�Ō�̕]����False�ƂȂ�ƃ��[�v���I������B������While($false)�Ƃ��Ă���̂ŁA
-#Do/While�̊Ԃ�1�񂾂����s�����B
-#Do/While�̓��[�v�̂��߁A�����r����Break����ƁAWhile��jump����B
+#Do/While()は最後に評価が行われるループ。最後の評価がFalseとなるとループを終了する。ここでWhile($false)としてあるので、
+#Do/Whileの間は1回だけ実行される。
+#Do/Whileはループのため、処理途中でBreakすると、Whileへjumpする。
 
-#�t�@�C���Q�������[�v���̃G���[�i�Ⴆ�΁A�t�@�C����Delete���s�������A�����������č폜�ł��Ȃ����j�őz�肳��鏈���A�w����@�͈ȉ��ł���B
+#ファイル群処理ループ中のエラー（例えば、ファイルをDelete試行したが、権限が無くて削除できない等）で想定される処理、指定方法は以下である。
 
-#1.While�ȍ~�̏����I�����b�Z�[�W�o�͂�Jump���āA���̃t�@�C���������p��
+#1.While以降の処理終了メッセージ出力へJumpして、次のファイルを処理継続
 # Break , $ForceEndloog = $TRUE , $ForceFinalize = $False 
-#2.While�ȍ~�̏����I�����b�Z�[�W�o�͂�Jump���āA���̃t�@�C���͏���������Finalize�֐i�ށi�����ł��؂�j
+#2.While以降の処理終了メッセージ出力へJumpして、次のファイルは処理せずにFinalizeへ進む（処理打ち切り）
 # Break , $ForceEndloog = $TRUE , $ForceFinalize = $TRUE
-#3.�����I�����b�Z�[�W�o�͂��Ȃ��BFinalize�֐i�ށi�����ł��؂�j
+#3.処理終了メッセージ出力しない。Finalizeへ進む（処理打ち切り）
 #Finalize $ErrorReturnCode
 
 Do
@@ -1014,26 +1014,26 @@ Do
     [boolean]$NormalFlag = $False
     [boolean]$OverRideFlag = $False
     [boolean]$ContinueFlag = $False
-    [Boolean]$ForceEndloop = $TRUE   ;#���̃��[�v���ňُ�I�����鎞�̓��[�v�I�[��Break���āA�������ʂ�\������B������Finalize���Ȃ�
-    [int]$InLoopOverRideCount = 0    ;#$OverRideCount�͏����S�̂�OverRide�񐔁B$InLoopOverRideCount��1�������[�v���ł�OverRide�񐔁B1�I�u�W�F�N�g�ŕ�����OverRide�����蓾�邽��
+    [Boolean]$ForceEndloop = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
+    [int]$InLoopOverRideCount = 0    ;#$OverRideCountは処理全体のOverRide回数。$InLoopOverRideCountは1処理ループ内でのOverRide回数。1オブジェクトで複数回OverRideがあり得るため
 
 
     [String]$TargetFileParentFolder = Split-Path $TargetObject -Parent
 
     $TargetObjectName = GetTargetObjectName -TargetObject $TargetObject
 
-    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- �Ώ�Object $($TargetObjectName) �����J�n---"
+    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理開始---"
 
 
-#�ړ����̃t�@�C���p�X����ړ���̃t�@�C���p�X�𐶐��B
-#�ċA�I�łȂ���΁A�ړ���p�X�͊m���ɑ��݂���̂ŃX�L�b�v
+#移動元のファイルパスから移動先のファイルパスを生成。
+#再帰的でなければ、移動先パスは確実に存在するのでスキップ
 
-#Action[(Move|Copy)]�ȊO�̓t�@�C���ړ��������B�ړ���p�X���m�F����K�v���Ȃ��̂ŃX�L�b�v
-#PreAction[Archive]��MoveNewFile[TRUE]�ł��o�̓t�@�C����1�ŊK�w�\�������Ȃ��B����ăX�L�b�v
+#Action[(Move|Copy)]以外はファイル移動が無い。移動先パスを確認する必要がないのでスキップ
+#PreAction[Archive]はMoveNewFile[TRUE]でも出力ファイルは1個で階層構造を取らない。よってスキップ
 
     If( (($Action -match "^(Move|Copy)$")) -OR (($PreAction -contains 'MoveNewFile') -AND ($PreAction -notcontains 'Archive') )) {
 
-        #�t�@�C�����ړ�����Action�p�Ƀt�@�C���ړ���̐e�t�H���_�p�X$MoveToNewFolder�𐶐�����
+        #ファイルが移動するAction用にファイル移動先の親フォルダパス$MoveToNewFolderを生成する
         
         #C:\TargetFolder                    :TargetFolder
         #C:\TargetFolder\A\B\C              :TargetFileParentFolder
@@ -1041,22 +1041,22 @@ Do
         #D:\MoveToFolder                    :MoveToFolder
         #D:\MoveToFolder\A\B\C              :MoveToNewFolder
 
-        #D:\MoveToFolder\A\B\C\target.txt   :�t�@�C���̈ړ���p�X
+        #D:\MoveToFolder\A\B\C\target.txt   :ファイルの移動先パス
 
-        #MoveToNewFolder�����ɂ� \A\B\C\�@�̕��������o���āA�ړ���t�H���_MoveToFolder��Join-Path����
-        #String.Substring���\�b�h�͕����񂩂�A�����ʒu����Ō�܂ł����o��
-        #MoveToNewFolder��NoRecurse�ł�Move|Copy�ňꗥ�g�p����̂ō쐬
+        #MoveToNewFolderを作るには \A\B\C\　の部分を取り出して、移動先フォルダMoveToFolderとJoin-Pathする
+        #String.Substringメソッドは文字列から、引数位置から最後までを取り出す
+        #MoveToNewFolderはNoRecurseでもMove|Copyで一律使用するので作成
 
         $MoveToNewFolder = Join-Path $MoveToFolder ($TargetFileParentFolder).Substring($TargetFolder.Length)
         If($Recurse){
 
-            If (-NOT(CheckContainer -CheckPath $MoveToNewFolder -ObjectName '�ړ���t�H���_')){
+            If (-NOT(CheckContainer -CheckPath $MoveToNewFolder -ObjectName '移動先フォルダ')){
 
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "�V�K��$($MoveToNewFolder)���쐬���܂�"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "新規に$($MoveToNewFolder)を作成します"
 
                 TryAction -ActionType MakeNewFolder -ActionFrom $MoveToNewFolder -ActionError $MoveToNewFolder
 
-                #$TryAction���ُ�I��&-Continue $TRUE����$Continue $TRUE�ɂȂ�̂ŁA���̏ꍇ�͌㑱�����͂��Ȃ��Ŏ���Object�����ɐi��
+                #$TryActionが異常終了&-Continue $TRUEだと$Continue $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
                 IF($ContinueFlag){
                     Break                
                     }
@@ -1087,21 +1087,21 @@ Do
 
     Switch -Regex ($Action){
 
-    #����1 �������Ȃ�
+    #分岐1 何もしない
     '^none$'
             {
             IF ( ($PostAction -eq 'none') -AND ($PreAction -contains 'none') ){
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "Action[${Action}]�̂��ߑΏۃt�@�C��${TargetObject}�͑��삵�܂���"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "Action[${Action}]のため対象ファイル${TargetObject}は操作しません"
                 }
             }
 
-    #����2 �폜
+    #分岐2 削除
     '^Delete$'
             {
             TryAction -ActionType Delete -ActionFrom $TargetObject -ActionError $TargetObject
             } 
 
-    #����3 �ړ� or ���� �@����̃t�@�C�����i�ړ�|������j�ɑ��݂��Ȃ����Ƃ��m�F���Ă��珈��
+    #分岐3 移動 or 複製 　同一のファイルが（移動|複製先）に存在しないことを確認してから処理
     '^(Move|Copy)$'
             {
             $TargetFileMoveToPath = Join-Path $MoveToNewFolder (Split-Path -Leaf $TargetObject)
@@ -1112,52 +1112,52 @@ Do
                 }           
             }
 
-    #����4 ��t�H���_�𔻒肵�č폜
+    #分岐4 空フォルダを判定して削除
     '^DeleteEmptyFolders$'
             {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage  "�t�H���_$($TargetObjectName)���󂩂��m�F���܂�"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObjectName)が空かを確認します"
 
 
             If ($TargetObject.Object.GetFileSystemInfos().Count -eq 0){
      
-                Logging -EventID $InfoEventID -EventType Information -EventMessage  "�t�H���_$($TargetObjectName)�͋�ł�"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObjectName)は空です"
                 TryAction -ActionType Delete -ActionFrom $TargetObjectName -ActionError $TargetObjectName
 
 
                 }else{
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "�t�H���_$($TargetObjectName)�͋�ł͂���܂���" 
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "フォルダ$($TargetObjectName)は空ではありません" 
                 }
             }
 
 
-    #����5 NullClear
+    #分岐5 NullClear
     '^NullClear$'
             {
             TryAction -ActionType NullClear -ActionFrom $TargetObject -ActionError $TargetObject          
             }
 
-    #����6 KeepFilesCount
+    #分岐6 KeepFilesCount
     '^KeepFilesCount$'
             {
             IF (($TargetObjects.Length -$InLoopDeletedFilesCount) -gt $KeepFiles  ){
-                Logging -EventID $InfoEventID -EventType Information -EventMessage  "�w�萢�㐔[$($KeepFiles)]�ȏ�̃}�b�`�����t�@�C�������邽�߁A�ł��Â�[$($TargetObject)]���폜���܂�"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage  "指定世代数[$($KeepFiles)]以上のマッチしたファイルがあるため、最も古い[$($TargetObject)]を削除します"
                 TryAction -ActionType Delete -ActionFrom $TargetObject -ActionError $TargetObject
 
-                #$TryAction���ُ�I��&-Continue $TRUE����$Continue $TRUE�ɂȂ�̂ŁA���̏ꍇ�͌㑱�����͂��Ȃ��Ŏ���Object�����ɐi��
+                #$TryActionが異常終了&-Continue $TRUEだと$Continue $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
                 IF($ContinueFlag){
                     Break                
                     }
                 $InLoopDeletedFilesCount ++
             
                 }else{
-                Logging -EventID $InfoEventID -EventType Information -EventMessage  "�w�萢�㐔[$($KeepFiles)]�ȏ�̃}�b�`�����t�@�C���͖�������[$($TargetObject)]�͑��삵�܂���"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage  "指定世代数[$($KeepFiles)]以上のマッチしたファイルは無いため[$($TargetObject)]は操作しません"
                 }
             }
 
-    #����7 $Action���������̂ǂꂩ�ɓK�����Ȃ��ꍇ�́A�v���O�����~�X
+    #分岐7 $Actionが条件式のどれかに適合しない場合は、プログラムミス
     Default 
             {
-            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Action����̓����G���[�B���莮��bug������܂�"
+            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Action判定の内部エラー。判定式にbugがあります"
             Finalize $InternalErrorReturnCode
             }
     }
@@ -1167,50 +1167,50 @@ Do
 
     Switch -Regex ($PostAction){
 
-    #����1 �������Ȃ�
+    #分岐1 何もしない
     '^none$'
             {
             
             }
 
-    #����2 Rename Rename��̓��ꖼ�̃t�@�C�����ɑ��݂��Ȃ����Ƃ��m�F���Ă��珈��
+    #分岐2 Rename Rename後の同一名称ファイルがに存在しないことを確認してから処理
     '^Rename$'
             {
             $NewFilePath = Join-Path $TargetFileParentFolder -ChildPath  ((Split-Path -Leaf $TargetObject) -replace "$RegularExpression" , "$RenameToRegularExpression")
 
-            $NewFilePath = ConvertToAbsolutePath -CheckPath $NewFilePath -ObjectName 'Rename��̃t�@�C����'
+            $NewFilePath = ConvertToAbsolutePath -CheckPath $NewFilePath -ObjectName 'Rename後のファイル名'
 
                     If(CheckLeafNotExists $NewFilePath){
 
                         TryAction -ActionType Rename -ActionFrom $TargetObject -ActionTo $NewFilePath -ActionError $TargetObject
                         }else{
-                        Logging -EventID $InfoEventID -EventType Information -EventMessage  "Rename��̃t�@�C����[$($NewFilePath)]�����݂��邽��[$($TargetObject)]��Rename�͂��܂���B"
+                        Logging -EventID $InfoEventID -EventType Information -EventMessage  "Rename後のファイル名[$($NewFilePath)]が存在するため[$($TargetObject)]のRenameはしません。"
                         }
             }
 
-    #����3 NullClear
+    #分岐3 NullClear
     '^NullClear$'
             {
             TryAction -ActionType NullClear -ActionFrom $TargetObject -ActionError $TargetObject          
             }
 
 
-    #����4 $Action���������̂ǂꂩ�ɓK�����Ȃ��ꍇ�́A�v���O�����~�X
+    #分岐4 $Actionが条件式のどれかに適合しない場合は、プログラムミス
     Default 
             {
-            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "PostAction����̓����G���[�B���莮��bug������܂�"
+            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "PostAction判定の内部エラー。判定式にbugがあります"
             Finalize $InternalErrorReturnCode
             }
     }
 
 
 
-#�ُ�I���Ȃǂ�Break���ăt�@�C�������I�[�֔�����B
+#異常終了などはBreakしてファイル処理終端へ抜ける。
 }
 While($False)
 
 
-#�ُ�A�x�����m�F�B�ُ�>�x��>����̏��ʂŎ��s���ʐ��J�E���g�A�b�v
+#異常、警告を確認。異常>警告>正常の順位で実行結果数カウントアップ
 
     IF($ErrorFlag){
         $ErrorCount ++
@@ -1224,7 +1224,7 @@ While($False)
         $ContinueCount ++
         }
          
-    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- �Ώ�Object $($TargetObjectName) �����I�� Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
+    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
   
 
     IF($ForceFinalize){
@@ -1232,12 +1232,12 @@ While($False)
         Finalize $ErrorReturnCode
         }
 
-#�ΏیQ�̏������[�v�I�[
+#対象群の処理ループ終端
    
 }
 
 
-#�I�����b�Z�[�W�o��
+#終了メッセージ出力
 
 Finalize $NormalReturnCode
 
