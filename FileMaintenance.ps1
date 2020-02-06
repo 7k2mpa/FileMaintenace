@@ -143,9 +143,11 @@ NullClear:ファイルの内容削除 NullClearします。PostActionのため、Actionと併用可能
 　処理対象のファイル、フォルダを更新経過日数でフィルタします。
 デフォルトは0日で全てのファイルが対象となります。
 
-.PARAMETER KBSize
-　処理対象のファイルをKBサイズでフィルタします。
+.PARAMETER Size
+　処理対象のファイルを容量でフィルタします。
 デフォルトは0KBで全てのファイルが対象となります。
+整数表記に加えて、KB,MB,GBの接尾辞が利用可能です。
+例えば-Size 10MBは、自動的に10*1024^6に換算してくれます。
 
 .PARAMETER RegularExpression
 　処理対象のファイル、フォルダを正規表現でフィルタします。
@@ -223,7 +225,7 @@ Recurseパラメータより優先します。
 -PreAction Compress , AddTimeStampを指定した際に生成される別ファイルを-MoveToFolderの指定先に保存します。
 デフォルトは対象ファイルと同一ディレクトリへ保存します。
 
-.PARAMETER NullOriginalFile
+.PARAMETER NullOriginalFilei
 このパラメータは廃止予定です。後方互換性のために残していますが、-PostAction NullClearまたは-Action NullClearを使用してください。
 対象ファイルの内容消去（ヌルクリア）します。
 -PostAction NullClearと等価です。
@@ -351,7 +353,8 @@ Param(
 
 [int][ValidateRange(0,2147483647)]$KeepFiles = 1,
 [int][ValidateRange(0,2147483647)]$Days = 0,
-[int][ValidateRange(0,2147483647)]$KBsize = 0,
+#[int][ValidateRange(0,2147483647)]$KBsize = 0,
+[int64][ValidateRange(0,9223372036854775807)]$Size = 0,
 
 #[Regex]$RegularExpression ='applog([0-9][0-9])([0-9][0-9])([0-9][0-9])',
 #[Regex]$RegularExpression ='\.txt$',
@@ -535,7 +538,7 @@ Return $true
 
 #最終変更日時が$Dayより古い
 #(ファイル|フォルダ)名が正規表現$RegularExpressionにマッチ
-#ファイル容量が $KBsizeより大きい
+#ファイル容量が $Sizeより大きい
 #C:\TargetFolder                    :TargetFolder
 #C:\TargetFolder\A\B\C\target.txt   :TargetObject
 #上記の時\A\B\C\部分が正規表現$ParentRegularExpressionにマッチ
@@ -544,7 +547,7 @@ filter ComplexFilter{
 
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
     IF ($_.Name -match ${RegularExpression}){
-    IF ($_.Length -ge (1024*$KBsize)){
+    IF ($_.Length -ge ($Size)){
     IF (($_.FullName).Substring($TargetFolder.Length , (Split-Path -Parent $_.FullName).Length - $TargetFolder.Length +1) -match ${ParentRegularExpression})
         {Return $_}
     }
@@ -753,7 +756,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
         
         }else{
         Logging -EventID $InfoEventID -EventType Information `
-        -EventMessage "指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする$($KBSize)KB以上のファイルを移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]にAction[$($Action)]、PostAction[$($PostAction)]します。"
+        -EventMessage ("指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする"+($Size / 1KB)+"KB以上のファイルを移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]にAction[$($Action)]、PostAction[$($PostAction)]します。")
         }
 
     IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
@@ -862,7 +865,7 @@ Param(
             }else{
 
             Logging -EventID $InfoEventID -EventType Information `
-            -EventMessage "指定フォルダ${TargetFolder}の${Days}日以前の正規表現 ${RegularExpression} にマッチする${KBSize}KB以上の全てのファイルを移動先フォルダ${MoveToFolder}へ再帰的[${Recurse}]にAction[${Action}]、PostAction[$($PostAction)]しました"
+            -EventMessage ("指定フォルダ${TargetFolder}の${Days}日以前の正規表現 ${RegularExpression} にマッチする"+($Size / 1KB)+"KB以上の全てのファイルを移動先フォルダ${MoveToFolder}へ再帰的[${Recurse}]にAction[${Action}]、PostAction[$($PostAction)]しました")
             }
 
     IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
