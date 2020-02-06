@@ -353,7 +353,6 @@ Param(
 
 [int][ValidateRange(0,2147483647)]$KeepFiles = 1,
 [int][ValidateRange(0,2147483647)]$Days = 0,
-#[int][ValidateRange(0,2147483647)]$KBsize = 0,
 [int64][ValidateRange(0,9223372036854775807)]$Size = 0,
 
 #[Regex]$RegularExpression ='applog([0-9][0-9])([0-9][0-9])([0-9][0-9])',
@@ -570,17 +569,17 @@ $Objects = @()
 
     If($Recurse){
 
-        $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse -Include *      
+        $CandidateObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse -Include *      
 
         }else{
-        $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Include * 
+        $CandidateObjects = Get-ChildItem -LiteralPath $TargetFolder -Include * 
         }
 
 
 #フィルタ後のオブジェクト群を配列に入れる
 #ソートに備えて必要な情報も配列に追加
  
-ForEach ($Object in ($TargetObjects | ComplexFilter))
+ForEach ($Object in ($CandidateObjects | ComplexFilter))
           
     {
     $Objects += New-Object PSObject -Property @{
@@ -599,8 +598,8 @@ ForEach ($Object in ($TargetObjects | ComplexFilter))
             Return ($Objects | Sort-Object -Property Time | ForEach-Object {$_.Object.FullName})
             }
 
-        #DeleteEmptyFolder配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
-        '^DeleteEmptyFolders'{
+        #DeleteEmptyFolders配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
+        '^DeleteEmptyFolders$'{
             Return ($Objects | Sort-Object -Property Depth -Descending | ForEach-Object {$_.Object.FullName})        
             }
 
@@ -672,7 +671,7 @@ IF($Compress){$Script:PreAction +='Compress'}
         
         IF( $ArchiveFileName -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "-ArchiveFileNameにNTFSで使用できない文字を指定しています"
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "-ArchiveFileNameにNTFSで使用できない文字が含まれています"
 				Finalize $ErrorReturnCode
                 } 
         }
@@ -720,7 +719,7 @@ IF($Compress){$Script:PreAction +='Compress'}
 
     IF ($TimeStampFormat -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "-TimeStampFormatにNTFSで使用できない文字を指定しています"
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "-TimeStampFormatにNTFSで使用できない文字が含まれています"
 				Finalize $ErrorReturnCode
                 }
 
@@ -762,21 +761,6 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
 
 }
 
-function GetTargetObjectName{
-
-Param(
-[parameter(mandatory=$true)]$TargetObject
-)
-
-    IF ($Action -eq "DeleteEmptyFolders"){
-
-        Return $TargetObject.Object.Fullname
-        
-     }else{
-        Return $TargetObject
-        }
-
-}
 
 #圧縮フラグまたはタイムスタンプ付加フラグがTrueの処理
 
@@ -897,7 +881,7 @@ ${THIS_PATH}=Split-Path -Parent ($PSScriptRoot)          #このファイルのパス
 ${SHELLNAME}=Split-Path -Leaf ($PSScriptRoot)  # シェル名
 
 
-${Version} = '20200205_1420'
+${Version} = '20200206_2045'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
@@ -958,7 +942,7 @@ IF( ($PreAction -contains 'Archive') ){
         $ArchivePath = Join-Path -Path $ArchiveToFolder -ChildPath $ArchiveFileName
         }
 
-    $ArchivePath = ConvertToAbsolutePath -CheckPath $ArchivePath -ObjectName  'Archive出力先'
+    $ArchivePath = ConvertToAbsolutePath -CheckPath $ArchivePath -ObjectName "ArchiveFile出力先"
 
     IF(-NOT(CheckLeafNotExists -CheckLeaf $ArchivePath)){
         
@@ -1206,8 +1190,7 @@ While($False)
         }
          
     Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象[$($FilterType)] $($TargetObject) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
-  
-#    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
+
     IF($ForceFinalize){
     
         Finalize $ErrorReturnCode
