@@ -471,13 +471,13 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
  
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に$($CheckLeaf)が存在するため、${SHELLNAME}を終了します"
             
-            IF($ForceEndLoop){
-                $Script:ErrorFlag = $TRUE
-                $Script:ForceFinalize = $TRUE
-                Break
-                }else{
-                Finalize $ErrorReturnCode
-                }
+                IF($ForceEndLoop){
+                    $Script:ErrorFlag = $TRUE
+                    $Script:ForceFinalize = $TRUE
+                    Break
+                    }else{
+                    Finalize $ErrorReturnCode
+                    }
             }else{
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]のため処理を継続します。"
             $Script:ContinueFlag = $true
@@ -488,7 +488,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
 
       #既にファイルがあるが、OverRide指定がある。よって継続  
 
-     }elseif( (Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -AND ($OverRide) ){
+     }elseIF( (Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -AND ($OverRide) ){
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "既に$($CheckLeaf)が存在しますが-OverRide[$OverRide]のため上書きします"
             $Script:OverRideFlag = $TRUE
@@ -496,7 +496,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
             #ここまで来ればファイルが存在しないは確定。同一名称のフォルダが存在する可能性は残っている
             #同一名称のフォルダが存在するとOverRide出来ないので、Continue指定ありの場合は継続。指定なしで異常終了
 
-            }elseif(Test-Path -LiteralPath $CheckLeaf -PathType Container){
+            }elseIF(Test-Path -LiteralPath $CheckLeaf -PathType Container){
 
                 Logging -EventID $WarningEventID -EventType Warning -EventMessage "既に同一名称フォルダ$($CheckLeaf)が存在します"
                 $Script:WarningFlag = $TRUE
@@ -525,7 +525,6 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
             #同一名称のファイル、フォルダ共に存在しない
 
             }else{
-
             Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf)は存在しません"            
             }
 
@@ -579,15 +578,15 @@ $Objects = @()
 #フィルタ後のオブジェクト群を配列に入れる
 #ソートに備えて必要な情報も配列に追加
  
-ForEach ($Object in ($CandidateObjects | ComplexFilter))
+    ForEach ($Object in ($CandidateObjects | ComplexFilter))
           
-    {
-    $Objects += New-Object PSObject -Property @{
-      Object = $Object
-      Time = $Object.LastWriteTime
-      Depth = ($Object.FullName.Split("\\")).Count
+        {
+        $Objects += New-Object PSObject -Property @{
+            Object = $Object
+            Time = $Object.LastWriteTime
+            Depth = ($Object.FullName.Split("\\")).Count
+        }
     }
-}
 
 #一部のActionはObjectを特定の順序で処理するため、必要に応じてソートする
 
@@ -612,7 +611,6 @@ ForEach ($Object in ($CandidateObjects | ComplexFilter))
 
 
 function Initialize {
-
 
 
 #イベントソース未設定時の処理
@@ -644,8 +642,7 @@ IF($Compress){$Script:PreAction +='Compress'}
 
     $TargetFolder = ConvertToAbsolutePath -CheckPath $TargetFolder -ObjectName  '指定フォルダ-TargetFolder'
 
-   CheckContainer -CheckPath $TargetFolder -ObjectName '指定フォルダ-TargetFolder' -IfNoExistFinalize > $NULL
-
+    CheckContainer -CheckPath $TargetFolder -ObjectName '指定フォルダ-TargetFolder' -IfNoExistFinalize > $NULL
 
 
 #移動先フォルダの要不要と有無を確認
@@ -656,9 +653,8 @@ IF($Compress){$Script:PreAction +='Compress'}
 
         CheckContainer -CheckPath $MoveToFolder -ObjectName '移動先フォルダ-MoveToFolder' -IfNoExistFinalize > $NULL
  
-
-                  
-     }elseif(-NOT (CheckNullOrEmpty -CheckPath $MoveToFolder)){
+       
+     }elseIF(-NOT (CheckNullOrEmpty -CheckPath $MoveToFolder)){
                 Logging -EventID $ErrorEventID -EventType Error -EventMessage "Action[$($Action)]の時、-MoveToFolder指定は不要です"
                 Finalize $ErrorReturnCode
                 }
@@ -685,7 +681,6 @@ IF($Compress){$Script:PreAction +='Compress'}
 				Finalize $ErrorReturnCode
                 }
 
-
     If (($Action -match "^(Move|Delete|KeepFilesCount)$") -AND  ($PostAction -ne 'none')){
 
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "対象ファイルを削除または移動後、-PostAction[$($PostAction)]することは出来ません"
@@ -710,7 +705,7 @@ IF($Compress){$Script:PreAction +='Compress'}
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時、ファイル操作は行えません"
 				Finalize $ErrorReturnCode
 
-        }elseif($Size -ne 0){
+        }elseIF($Size -ne 0){
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時、ファイル容量指定-sizeは設定できません"
 				Finalize $ErrorReturnCode
                 }
@@ -755,9 +750,10 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
 
     If($ContinueAsNormal){
         Logging -EventID $InfoEventID -EventType Information -EventMessage "-ContinueAsNormal[$($ContinueAsNormal)]が指定されているため生成したファイルと同名のものがあった場合は正常扱いで次のファイルを処理します。ファイル名同一以外の処理異常は警告しますが、次のファイル、フォルダを処理します"
+        
         }elseIF($Continue){
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]が指定されているため生成したファイル、フォルダと同名のものがあった場合等の処理異常で異常終了せず警告後、次のファイル、フォルダを処理します"
-        }
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]が指定されているため生成したファイル、フォルダと同名のものがあった場合等の処理異常で異常終了せず警告後、次のファイル、フォルダを処理します"
+            }
 
 }
 
@@ -782,6 +778,7 @@ Param(
                 $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )+$CompressedExtString )
                 $Script:ActionType = "CompressAndAddTimeStamp"
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮&タイムスタンプ付加した[$(Split-Path -Leaf $ArchiveFile)]を作成します"
+
             }else{
                 $ArchiveFile = $TargetObject+$CompressedExtString
                 $Script:ActionType = "Compress"
@@ -789,7 +786,6 @@ Param(
             }          
  
         }else{
-
 
 #タイムスタンプ付加のみTrueの時
 
@@ -807,8 +803,7 @@ Param(
         Return ( Join-Path $MoveToNewFolder (Split-Path -Leaf $ArchiveFile) )
 
         }else{
-        Return $ArchiveFile        
-
+        Return $ArchiveFile
         }
 
 }
@@ -848,7 +843,6 @@ Param(
             }
     }
 
-
 EndingProcess $ReturnCode
 
 }
@@ -880,14 +874,12 @@ ${THIS_FILE}=$PSScriptRoot
 ${THIS_PATH}=Split-Path -Parent ($PSScriptRoot)          #このファイルのパス
 ${SHELLNAME}=Split-Path -Leaf ($PSScriptRoot)  # シェル名
 
-
 ${Version} = '20200206_2045'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
 
 . Initialize
-
 
 
 #対象のフォルダまたはファイルを探して配列に入れる
@@ -934,7 +926,6 @@ IF( ($PreAction -contains 'Archive') ){
         $ArchiveToFolder = $TargetFolder
         }
 
-
     IF($PreAction -contains 'AddTimeStamp'){  
 
         $ArchivePath = Join-Path -Path $ArchiveToFolder -ChildPath ( AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $ArchiveFileName )
@@ -976,7 +967,6 @@ ForEach ($TargetObject in $TargetObjects)
 
 Do
 {
-
     [boolean]$ErrorFlag = $False
     [boolean]$WarningFlag = $False
     [boolean]$NormalFlag = $False
@@ -984,7 +974,6 @@ Do
     [boolean]$ContinueFlag = $False
     [Boolean]$ForceEndloop = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
     [int]$InLoopOverRideCount = 0    ;#$OverRideCountは処理全体のOverRide回数。$InLoopOverRideCountは1処理ループ内でのOverRide回数。1オブジェクトで複数回OverRideがあり得るため
-
 
     [String]$TargetFileParentFolder = Split-Path $TargetObject -Parent
 
@@ -1088,7 +1077,6 @@ Do
                 Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObject)は空です"
                 TryAction -ActionType Delete -ActionFrom $TargetObject -ActionError $TargetObject
 
-
                 }else{
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "フォルダ$($TargetObject)は空ではありません" 
                 }
@@ -1191,8 +1179,7 @@ While($False)
          
     Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象[$($FilterType)] $($TargetObject) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
 
-    IF($ForceFinalize){
-    
+    IF($ForceFinalize){    
         Finalize $ErrorReturnCode
         }
 
