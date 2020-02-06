@@ -586,8 +586,8 @@ ForEach ($Folder in ($TargetFolders | ComplexFilter))
 
 #配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
 
-Return ($Folders | Sort-Object -Property Depth -Descending)
-
+#Return ($Folders | Sort-Object -Property Depth -Descending)
+Return ($Folders | Sort-Object -Property Depth -Descending | ForEach-Object {$_.Object.FullName})
 }
 
 
@@ -730,7 +730,7 @@ IF($Compress){$Script:PreAction +='Compress'}
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時、ファイル操作は行えません"
 				Finalize $ErrorReturnCode
 
-        }elseif($KBSize -ne 0){
+        }elseif($Size -ne 0){
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時、ファイル容量指定-sizeは設定できません"
 				Finalize $ErrorReturnCode
                 }
@@ -934,12 +934,14 @@ Write-Output '処理対象は以下です'
     IF($Action -eq "DeleteEmptyFolders"){
 
         $TargetObjects = GetFolders $TargetFolder
-        Write-Output $TargetObjects.Object.Fullname
+#        Write-Output $TargetObjects.Object.Fullname
 
         }else{
         $TargetObjects = GetFiles $TargetFolder
-        Write-Output $TargetObjects
+ #       Write-Output $TargetObjects
         }
+
+Write-Output $TargetObjects
 
     If ($null -eq $TargetObjects){
 
@@ -1020,10 +1022,11 @@ Do
 
     [String]$TargetFileParentFolder = Split-Path $TargetObject -Parent
 
-    $TargetObjectName = GetTargetObjectName -TargetObject $TargetObject
+#    $TargetObjectName = GetTargetObjectName -TargetObject $TargetObject
+#    $TargetObjectName =  $TargetObject
 
-    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理開始---"
-
+    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObject) 処理開始---"
+#    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理開始---"
 
 #移動元のファイルパスから移動先のファイルパスを生成。
 #再帰的でなければ、移動先パスは確実に存在するのでスキップ
@@ -1115,17 +1118,22 @@ Do
     #分岐4 空フォルダを判定して削除
     '^DeleteEmptyFolders$'
             {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObjectName)が空かを確認します"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObject)が空かを確認します"
 
+#            Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObjectName)が空かを確認します"
+#            If ($TargetObject.Object.GetFileSystemInfos().Count -eq 0){
 
-            If ($TargetObject.Object.GetFileSystemInfos().Count -eq 0){
-     
-                Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObjectName)は空です"
-                TryAction -ActionType Delete -ActionFrom $TargetObjectName -ActionError $TargetObjectName
+                        If ((Get-Item -LiteralPath $TargetObject).GetFileSystemInfos().Count -eq 0){ 
+
+#                Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObjectName)は空です"
+#                TryAction -ActionType Delete -ActionFrom $TargetObjectName -ActionError $TargetObjectName     
+                Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObject)は空です"
+                TryAction -ActionType Delete -ActionFrom $TargetObject -ActionError $TargetObject
 
 
                 }else{
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "フォルダ$($TargetObjectName)は空ではありません" 
+#                                Logging -EventID $InfoEventID -EventType Information -EventMessage "フォルダ$($TargetObjectName)は空ではありません" 
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "フォルダ$($TargetObject)は空ではありません" 
                 }
             }
 
@@ -1224,9 +1232,9 @@ While($False)
         $ContinueCount ++
         }
          
-    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
+    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象Object $($TargetObject) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
   
-
+#    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
     IF($ForceFinalize){
     
         Finalize $ErrorReturnCode
