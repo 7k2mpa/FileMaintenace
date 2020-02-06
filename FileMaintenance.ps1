@@ -727,11 +727,11 @@ IF($Compress){$Script:PreAction +='Compress'}
     IF ($Action -eq "DeleteEmptyFolders"){
         IF( ($Compress) -OR ($AddTimeStamp) -OR ($MoveNewFile) -OR ($PostAction -ne 'none' )){
     
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時はファイル操作は行えません"
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時、ファイル操作は行えません"
 				Finalize $ErrorReturnCode
 
         }elseif($KBSize -ne 0){
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時はファイル容量指定-KBsizeは行えません"
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時、ファイル容量指定-sizeは設定できません"
 				Finalize $ErrorReturnCode
                 }
     }
