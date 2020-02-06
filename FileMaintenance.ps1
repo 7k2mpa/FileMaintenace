@@ -536,25 +536,13 @@ Return $true
 
 #オブジェクトを複数条件でフィルタ
 
+#$FileTypeの指定に基づき、フォルダ、ファイルを抽出
 #最終変更日時が$Dayより古い
 #(ファイル|フォルダ)名が正規表現$RegularExpressionにマッチ
 #ファイル容量が $Sizeより大きい
 #C:\TargetFolder                    :TargetFolder
 #C:\TargetFolder\A\B\C\target.txt   :TargetObject
 #上記の時\A\B\C\部分が正規表現$ParentRegularExpressionにマッチ
-
-filter Old_ComplexFilter{
-
-    IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
-    IF ($_.Name -match ${RegularExpression}){
-    IF ($_.Length -ge ($Size)){
-    IF (($_.FullName).Substring($TargetFolder.Length , (Split-Path -Parent $_.FullName).Length - $TargetFolder.Length +1) -match ${ParentRegularExpression})
-        {Return $_}
-    }
-    } 
-    }                                                                              
-
-}
 
 filter ComplexFilter{
     IF (($_.PSIsContainer -eq ($FilterType -eq 'Folder')) -OR ( -NOT($_.PSIsContainer) -eq ($FilterType -eq 'File'))) {
@@ -569,6 +557,9 @@ filter ComplexFilter{
     }
 }
 
+
+#指定フォルダからオブジェクト群（ファイル|フォルダ）を抽出
+ 
 function GetObjects{
 
 Param(
@@ -577,41 +568,19 @@ Param(
 
 $Objects = @()
 
-#IF($FilterType -eq 'File'){
+    If($Recurse){
 
- #   If($Recurse){
+        $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse -Include *      
 
- #           $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse -Include * -File     
- #                           
- #           }else{
-
- #           $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Include * -File
- #           }
-
-#}else{
-#    If($Recurse){
-
- #           $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse -Directory 
-                            
- #           }else{
-
- #           $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Directory
- #           }
+        }else{
+        $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Include * 
+        }
 
 
-#}
-
-  If($Recurse){
-
-          $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse -Include *      
-           }else{
-
-           $TargetObjects = Get-ChildItem -LiteralPath $TargetFolder -Include * 
-            }
-
-#echo $TargetObjects   
+#フィルタ後のオブジェクト群を配列に入れる
+#ソートに備えて必要な情報も配列に追加
+ 
 ForEach ($Object in ($TargetObjects | ComplexFilter))
-#ForEach ($Object in ($TargetObjects | ComplexFilter))
           
     {
     $Objects += New-Object PSObject -Property @{
@@ -621,102 +590,27 @@ ForEach ($Object in ($TargetObjects | ComplexFilter))
     }
 }
 
+#一部のActionはObjectを特定の順序で処理するため、必要に応じてソートする
 
- Switch -Regex ($Action){
+    Switch -Regex ($Action){
  
- '^KeepFilesCount$'{
-        Return ($Objects | Sort-Object -Property Time | ForEach-Object {$_.Object.FullName})
- }
- '^DeleteEmptyFolders'{
-    Return ($Objects | Sort-Object -Property Depth -Descending | ForEach-Object {$_.Object.FullName})
-        
- }
- Default{
-    Return ($Objects | ForEach-Object {$_.Object.FullName})
- }
-
-
- }
-
-
-
-
-}
-
-
-function GetFolders{
-
-Param(
-[parameter(mandatory=$true)][String]$TargetFolder
-)
-
-$Folders = @()
-
-    If($Recurse){
-
-            $TargetFolders = Get-ChildItem -LiteralPath $TargetFolder -Directory -Recurse      
-                           
-            }else{
-
-            $TargetFolders = Get-ChildItem -LiteralPath $TargetFolder -Directory
+        #KeepFilesCount配列に入れたパス一式を古い順に整列
+        '^KeepFilesCount$'{
+            Return ($Objects | Sort-Object -Property Time | ForEach-Object {$_.Object.FullName})
             }
-    
 
-ForEach ($Folder in ($TargetFolders | ComplexFilter))
-          
-    {
-    $Folders += New-Object PSObject -Property @{
-      Object = $Folder
-      Depth = ($Folder.FullName.Split("\\")).Count
-    }
-}
-
-#配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
-
-#Return ($Folders | Sort-Object -Property Depth -Descending)
-Return ($Folders | Sort-Object -Property Depth -Descending | ForEach-Object {$_.Object.FullName})
-}
-
-
-
-function GetFiles{
-
-Param(
-[parameter(mandatory=$true)][String]$TargetFolder
-)
-
-$Files = @()
-
-    If($Recurse){
-
-            $TargetFiles = Get-ChildItem -LiteralPath $TargetFolder -File -Recurse -Include *      
-                            
-            }else{
-
-            $TargetFiles = Get-ChildItem -LiteralPath $TargetFolder -File -Include *
+        #DeleteEmptyFolder配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
+        '^DeleteEmptyFolders'{
+            Return ($Objects | Sort-Object -Property Depth -Descending | ForEach-Object {$_.Object.FullName})        
             }
-    
 
-ForEach ($File in ($TargetFiles | ComplexFilter))
-          
-    {
-    $Files += New-Object PSObject -Property @{
-      Object = $File
-      Time = $File.LastWriteTime
+
+        Default{
+            Return ($Objects | ForEach-Object {$_.Object.FullName})
+            }
     }
 }
 
-
-#KeepFilesCountのみ配列に入れたパス一式を古い順にソート
-
-IF($Action -eq 'KeepFilesCount'){
-
-    Return ($Files | Sort-Object -Property Time | ForEach-Object {$_.Object.FullName})
-    }else{
-    Return ($Files | ForEach-Object {$_.Object.FullName})
-    }
-
-}
 
 function Initialize {
 
@@ -996,12 +890,12 @@ EndingProcess $ReturnCode
 [int][ValidateRange(0,2147483647)]$ContinueCount = 0
 [int][ValidateRange(0,2147483647)]$InLoopDeletedFilesCount = 0
 
-#${THIS_FILE}=$MyInvocation.MyCommand.Path       　
+
 ${THIS_FILE}=$PSScriptRoot
-#${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
+
 ${THIS_PATH}=Split-Path -Parent ($PSScriptRoot)          #このファイルのパス
 ${SHELLNAME}=Split-Path -Leaf ($PSScriptRoot)  # シェル名
-#${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
+
 
 ${Version} = '20200205_1420'
 
@@ -1014,31 +908,26 @@ ${Version} = '20200205_1420'
 
 #対象のフォルダまたはファイルを探して配列に入れる
 
-$TargetObjects = @()
-
-Write-Output '処理対象は以下です'
 
     IF($Action -eq "DeleteEmptyFolders"){
 
         $FilterType = "Folder"
 
-#        $TargetObjects = GetFolders $TargetFolder
-#        Write-Output $TargetObjects.Object.Fullname
-
         }else{
-
         $FilterType = "File"
- #       $TargetObjects = GetFiles $TargetFolder
- #       Write-Output $TargetObjects
         }
 
+$TargetObjects = @()
+
 $TargetObjects = GetObjects -TargetFolder $TargetFolder
+
+Write-Output "処理対象は以下の[$($FilterType)]です"
 
 Write-Output $TargetObjects
 
     If ($null -eq $TargetObjects){
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($TargetFolder)に処理対象となるファイル、またはフォルダはありません"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($TargetFolder)に処理対象となる[$($FilterType)]はありません"
 
         IF($NoneTargetAsWarning){
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "-NoneTargetAsWarningが指定されているため、警告終了扱いにします"
@@ -1115,11 +1004,8 @@ Do
 
     [String]$TargetFileParentFolder = Split-Path $TargetObject -Parent
 
-#    $TargetObjectName = GetTargetObjectName -TargetObject $TargetObject
-#    $TargetObjectName =  $TargetObject
+    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象[$($FilterType)] $($TargetObject) 処理開始---"
 
-    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObject) 処理開始---"
-#    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理開始---"
 
 #移動元のファイルパスから移動先のファイルパスを生成。
 #再帰的でなければ、移動先パスは確実に存在するのでスキップ
@@ -1213,19 +1099,13 @@ Do
             {
             Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObject)が空かを確認します"
 
-#            Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObjectName)が空かを確認します"
-#            If ($TargetObject.Object.GetFileSystemInfos().Count -eq 0){
+            If ((Get-Item -LiteralPath $TargetObject).GetFileSystemInfos().Count -eq 0){ 
 
-                        If ((Get-Item -LiteralPath $TargetObject).GetFileSystemInfos().Count -eq 0){ 
-
-#                Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObjectName)は空です"
-#                TryAction -ActionType Delete -ActionFrom $TargetObjectName -ActionError $TargetObjectName     
                 Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObject)は空です"
                 TryAction -ActionType Delete -ActionFrom $TargetObject -ActionError $TargetObject
 
 
                 }else{
-#                                Logging -EventID $InfoEventID -EventType Information -EventMessage "フォルダ$($TargetObjectName)は空ではありません" 
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "フォルダ$($TargetObject)は空ではありません" 
                 }
             }
@@ -1325,7 +1205,7 @@ While($False)
         $ContinueCount ++
         }
          
-    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象Object $($TargetObject) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
+    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象[$($FilterType)] $($TargetObject) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
   
 #    Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象Object $($TargetObjectName) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
     IF($ForceFinalize){
