@@ -335,16 +335,19 @@ Param(
 
 #[parameter(position=0, mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String]$TargetFolder,  #Validation debug用に用意してあります。通常は使わない
 #[parameter(position=0, mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
+ 
 
-[String][parameter(position=1)][ValidateSet("Move", "Copy", "Delete" , "none" , "DeleteEmptyFolders" , "NullClear" , "KeepFilesCount")]$Action='none',
+[Array][parameter(position=1)][ValidateSet("AddTimeStamp", "Compress", "MoveNewFile" , "none" , "Archive")]$PreAction = 'none',
 
-[Array][parameter(position=2)][ValidateSet("AddTimeStamp", "Compress", "MoveNewFile" , "none" , "Archive")]$PreAction = 'none',
+[String][parameter(position=2)][ValidateSet("Move", "Copy", "Delete" , "none" , "DeleteEmptyFolders" , "NullClear" , "KeepFilesCount")]$Action='none',
 
 [String][parameter(position=3)][ValidateSet("none"  , "NullClear" , "Rename")]$PostAction='none',
 
+
 [String][parameter(position=4)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$MoveToFolder,
 
-[String]$ArchiveFileName  ,
+
+[String][ValidatePattern('^(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$ArchiveFileName = "archive.zip" ,
 
 [int][ValidateRange(0,2147483647)]$KeepFiles = 1,
 [int][ValidateRange(0,2147483647)]$Days = 0,
@@ -361,6 +364,7 @@ Param(
 [boolean]$Recurse = $TRUE,
 [Switch]$NoRecurse,
 
+
 [Switch]$OverRide,
 [Switch]$Continue,
 [Switch]$ContinueAsNormal,
@@ -371,12 +375,12 @@ Param(
 
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss',
 
-
+#以下スイッチ群は廃止予定
 [Switch]$Compress,
 [Switch]$AddTimeStamp,
 [Switch]$MoveNewFile,
 [Switch]$NullOriginalFile,
-
+#以上スイッチ群は廃止予定
 
 
 [boolean]$Log2EventLog = $TRUE,
@@ -677,8 +681,16 @@ IF($Compress){$Script:PreAction +='Compress'}
                 }
 
 
+#ArchiveFileNameの要不要と有無、Validationを確認
+
     IF($PreAction -contains 'Archive'){
-        CheckNullOrEmpty -CheckPath $ArchiveFileName -ObjectName '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL    
+        CheckNullOrEmpty -CheckPath $ArchiveFileName -ObjectName '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL
+        
+        IF( $ArchiveFileName -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
+    
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "-ArchiveFileNameにNTFSで使用できない文字を指定しています"
+				Finalize $ErrorReturnCode
+                } 
         }
 
 
