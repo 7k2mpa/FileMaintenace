@@ -1,0 +1,73 @@
+﻿
+
+MICROSOFT LIMITED PUBLIC LICENSE version 1.1
+
+This license governs use of code marked as “sample” or “example” available on this web site without a license agreement, as provided under the section above titled “NOTICE SPECIFIC TO SOFTWARE AVAILABLE ON THIS WEB SITE.” If you use such code (the “software”), you accept this license. If you do not accept the license, do not use the software.
+
+1. Definitions
+
+The terms “reproduce,” “reproduction,” “derivative works,” and “distribution” have the same meaning here as under U.S. copyright law.
+
+A “contribution” is the original software, or any additions or changes to the software.
+
+A “contributor” is any person that distributes its contribution under this license.
+
+“Licensed patents” are a contributor’s patent claims that read directly on its contribution.
+
+2. Grant of Rights
+
+(A) Copyright Grant - Subject to the terms of this license, including the license conditions and limitations in section 3, each contributor grants you a non-exclusive, worldwide, royalty-free copyright license to reproduce its contribution, prepare derivative works of its contribution, and distribute its contribution or any derivative works that you create.
+
+(B) Patent Grant - Subject to the terms of this license, including the license conditions and limitations in section 3, each contributor grants you a non-exclusive, worldwide, royalty-free license under its licensed patents to make, have made, use, sell, offer for sale, import, and/or otherwise dispose of its contribution in the software or derivative works of the contribution in the software.
+
+3. Conditions and Limitations
+
+(A) No Trademark License- This license does not grant you rights to use any contributors’ name, logo, or trademarks.
+
+(B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, your patent license from such contributor to the software ends automatically.
+
+(C) If you distribute any portion of the software, you must retain all copyright, patent, trademark, and attribution notices that are present in the software.
+
+(D) If you distribute any portion of the software in source code form, you may do so only under this license by including a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object code form, you may only do so under a license that complies with this license.
+
+(E) The software is licensed “as-is.” You bear the risk of using it. The contributors give no express warranties, guarantees or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular purpose and non-infringement.
+
+(F) Platform Limitation - The licenses granted in sections 2(A) and 2(B) extend only to the software or derivative works that you create that run directly on a Microsoft Windows operating system product, Microsoft run-time technology (such as the .NET Framework or Silverlight), or Microsoft application platform (such as Microsoft Office or Microsoft Dynamics).
+
+
+
+ 別紙 B
+
+Microsoft Limited Public License
+
+本ライセンスは、上記の「本 Web サイトで入手可能なソフトウェアに関する注意」の規定に従い、ライセンス契約なしで本 Web サイトで入手可能な「サンプル」または「例」と表示されているコードの使用について規定するものです。お客様は、かかるコード (以下「ソフトウェア」といいます) を使用した場合、本ライセンスに同意したことになります。 本ライセンスに同意されない場合、そのソフトウェアを使用することはできません。
+
+1. 定義
+
+「複製する」、「複製」、「二次的著作物」、「頒布」という用語はそれぞれ、アメリカ合衆国著作権法における場合と同様の意味を有します。
+
+「投稿物」とは、オリジナルのソフトウェア、またはソフトウェアへの追加もしくは変更を意味します。
+
+「投稿者」とは、本ライセンスに基づいて投稿を行う人を意味します。
+
+「使用許諾された特許」とは、投稿物が直接抵触する投稿者の特許クレームを意味します。
+
+2. 権利の許可
+
+(A) 著作権の許諾 – 第 3 条の使用許諾条件および制限を含む本ライセンスの規定に従い、各投稿者はお客様に対して、それぞれの投稿物を複製し、投稿物の二次的著作物を作成し、投稿物またはお客様が作成した二次的著作物を頒布するための非独占的かつ地域無制限の著作権を無償で許諾します。
+
+(B) 特許許諾 – 第 3 条の使用許諾条件および制限を含む本契約書の規定に従い、各投稿者はお客様に対して、本ソフトウェア内の投稿物もしくは本ソフトウェア内の投稿物の二次的著作物につき、使用許諾された特許に基づいて作成、第三者による作成、使用、販売、輸入その他の手段による処分を実施するための非独占的かつ地域無制限の著作権を無償で許諾します。
+
+3. 条件と制限
+
+(A) 商標使用許諾の排除 – 本ライセンスはお客様に対し、投稿者の名称、ロゴまたは商標を使用する権利を付与するものではありません。
+
+(B) 本ソフトウェアによって特許が侵害されたとして、お客様が投稿者に対して特許権に基づく請求を申し立てる場合、かかる投稿者からお客様に付与されていた特許ライセンスは自動的に終了するものとします。
+
+(C) 本ソフトウェアの一部を頒布する場合、お客様は、本ソフトウェアにある著作権、特許権、商標、帰属権に関するすべての通知をそのまま表示するものとします。
+
+(D) 本ソフトウェアの一部をソース コード形式で頒布する場合、お客様は、本ライセンスの完全な写しをお客様の頒布物に組み入れることにより、本ライセンスに基づいてのみ頒布を行うことができます。 本ソフトウェアの一部をコンパイル済みコード形式またはオブジェクト コード形式で頒布する場合、お客様は、本ライセンスに準拠したライセンスに基づいてのみ頒布を行うことができます。
+
+(E) 本ソフトウェアは「現状有姿のまま」で使用許諾されます。本サービスの使用から生じる危険は、お客様が負担するものとします。 投稿者は、他の明示的な保証、担保、または条件については一切の責任を負いません。 お客様の地域の法令によっては、本ライセンスによって変更することのできない、その他の消費者としての権利が存在する場合があります。 お客様の地域の法律によって認められる範囲において、投稿者は、商品性、特定目的適合性および第三者の権利の非侵害性に関する黙示の保証をいたしません。
+
+(F) プラットフォームの限定 – 第 2 条 (A) 項および第 2 条 (B) 項で付与されるライセンスは、お客様が作成し、Microsoft Windows オペレーティング システム製品上で動作するソフトウェアまたは二次的著作物のみに適用されます。
