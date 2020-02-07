@@ -207,6 +207,8 @@ Try{
 
 function Initialize {
 
+$SHELLNAME=Split-Path $PSCommandPath -Leaf
+$THIS_PATH = $PSScriptRoot
 
 
 #イベントソース未設定時の処理
@@ -271,13 +273,8 @@ EndingProcess $ReturnCode
 
 
 #####################   ここから本体  ######################
-
-
-${THIS_FILE}=$MyInvocation.MyCommand.Path       　　                    #フルパス
-${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
-${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
-
-${Version} = '0.9.0'
+ 
+$Version = '20200207_1615'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力

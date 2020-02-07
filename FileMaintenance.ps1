@@ -615,6 +615,9 @@ $Objects = @()
 
 function Initialize {
 
+$SHELLNAME = Split-Path $PSCommandPath -Leaf
+$THIS_PATH = $PSScriptRoot
+
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -879,13 +882,7 @@ EndingProcess $ReturnCode
 [int][ValidateRange(0,2147483647)]$ContinueCount = 0
 [int][ValidateRange(0,2147483647)]$InLoopDeletedFilesCount = 0
 
-
-${THIS_FILE}=$PSScriptRoot
-
-${THIS_PATH}=Split-Path -Parent ($PSScriptRoot)          #このファイルのパス
-${SHELLNAME}=Split-Path -Leaf ($PSScriptRoot)  # シェル名
-
-${Version} = '20200206_2045'
+$Version = '20200207_1615'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力

@@ -75,6 +75,9 @@ Try{
 
 function Initialize {
 
+$SHELLNAME=Split-Path $PSCommandPath -Leaf
+$THIS_PATH = $PSScriptRoot
+
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -192,14 +195,12 @@ EndingProcess $ReturnCode
 [Boolean]$NeedToStartListener = $TRUE
 [String]$ListenerStatus = $Null
 
-${THIS_FILE}=$MyInvocation.MyCommand.Path       　　                    #フルパス
-${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
-${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
+$Version = '20200207_1615'
+
 
 
 $FormattedDate = (Get-Date).ToString($TimeStampFormat)
 
-${Version} = '20200120_1025'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力

@@ -198,6 +198,9 @@ Try{
 
 function Initialize {
 
+$SHELLNAME=Split-Path $PSCommandPath -Leaf
+$THIS_PATH = $PSScriptRoot
+
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -258,12 +261,8 @@ EndingProcess $ReturnCode
 
 #####################   ここから本体  ######################
 
+$Version = '20200207_1615'
 
-${THIS_FILE}=$MyInvocation.MyCommand.Path       　　                    #フルパス
-${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
-${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
-
-${Version} = '0.9.13'
 
 [String]$Computer = "localhost" 
 [String]$Class = "win32_service" 
@@ -350,7 +349,7 @@ $Counter = 0
       #チェック回数の上限に達していない場合は、指定秒待機
 
       Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($Service)]は存在しますが停止できませんでした。$($RetrySpanSec)秒待機します。"
-      sleep $RetrySpanSec
+      Start-Sleep $RetrySpanSec
 
       # 無限ループに戻る
 

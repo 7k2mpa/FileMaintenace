@@ -215,6 +215,10 @@ Try{
 
 function Initialize {
 
+$SHELLNAME=Split-Path $PSCommandPath -Leaf
+$THIS_PATH = $PSScriptRoot
+
+
 #イベントソース未設定時の処理
 #ログファイル出力先確認
 #ReturnCode確認
@@ -242,11 +246,6 @@ function Initialize {
     $CommandFile = ConvertToAbsolutePath -CheckPath $CommandFile -ObjectName 'コマンドファイル -CommandFile'
 
     CheckLeaf -CheckPath $CommandFile -ObjectName 'コマンドファイル -CommandFile' -IfNoExistFinalize > $NULL
-
-
-
-
-
 
 
 #処理開始メッセージ出力
@@ -278,25 +277,17 @@ Param(
 
 EndingProcess $ReturnCode
 
-
-
 }
 
 
 
 #####################   ここから本体  ######################
 
-
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
 
-${THIS_FILE}=$MyInvocation.MyCommand.Path       　　                    #フルパス
-${THIS_PATH}=Split-Path -Parent ($MyInvocation.MyCommand.Path)          #このファイルのパス
-${SHELLNAME}=[System.IO.Path]::GetFileNameWithoutExtension($THIS_FILE)  # シェル名
-
-
-${Version} = '20200115_2345'
+$Version = '20200207_1615'
 
 #初期設定、パラメータ確認、起動メッセージ出力
 
