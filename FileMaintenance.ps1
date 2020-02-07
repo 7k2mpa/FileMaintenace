@@ -535,7 +535,7 @@ Return $true
 #オブジェクトを複数条件でフィルタ
 
 #$FileTypeの指定に基づき、フォルダ、ファイルを抽出
-#最終変更日時が$Dayより古い
+#最終変更日時が$Daysより古い
 #(ファイル|フォルダ)名が正規表現$RegularExpressionにマッチ
 #ファイル容量が $Sizeより大きい
 #C:\TargetFolder                    :TargetFolder
@@ -660,7 +660,7 @@ IF($Compress){$Script:PreAction +='Compress'}
                 }
 
 
-#ArchiveFileNameの要不要と有無、Validationを確認
+#ArchiveFileNameの要不要と有無、Validation
 
     IF($PreAction -contains 'Archive'){
         CheckNullOrEmpty -CheckPath $ArchiveFileName -ObjectName '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL
@@ -700,7 +700,7 @@ IF($Compress){$Script:PreAction +='Compress'}
                 }
 
     IF ($Action -eq "DeleteEmptyFolders"){
-        IF( ($Compress) -OR ($AddTimeStamp) -OR ($MoveNewFile) -OR ($PostAction -ne 'none' )){
+        IF( ($PreAction -match '^(Compress|Archive|AddTimeStamp)$') -OR ($PostAction -ne 'none' )){
     
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時、ファイル操作は行えません"
 				Finalize $ErrorReturnCode
@@ -730,15 +730,55 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
         Logging -EventID $InfoEventID -EventType Information -EventMessage "指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする空フォルダを再帰的[$($Recurse)]に削除します"
         
         }else{
-        Logging -EventID $InfoEventID -EventType Information `
-        -EventMessage ("指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする"+($Size / 1KB)+"KB以上のファイルを移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]にAction[$($Action)]、PostAction[$($PostAction)]します。")
+
+        Logging -EventID $InfoEventID -EventType Information -EventMessage ("指定フォルダ[$($TargetFolder)]の[$($Days)日以前][正規表現 $($RegularExpression) にマッチ][指定フォルダ以後のパスが正規表現 $($ParentRegularExpression) にマッチ]["+($Size / 1KB)+"KB以上]にマッチしたファイルを抽出します")
+
+        IF( $PreAction -notcontains 'none'){
+
+            $Message = "マッチしたファイルを"
+            IF ($PreAction -contains 'MoveNewFile'){ $Message += "移動先フォルダ[$($MoveToFolder)]へ"}
+            $Message += "再帰的[$($Recurse)]にPreAction( ファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"] | 圧縮["+[Boolean]($PreAction -contains 'Compress')+"] | 1ファイルにアーカイヴ["+[Boolean]($PreAction -contains 'Archive')+"] )します"
+
+            Logging -EventID $InfoEventID -EventType Information -EventMessage $Message
+            }
+
+#            Logging -EventID $InfoEventID -EventType Information `
+#            -EventMessage ("マッチしたファイルはPreAction（ファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -contains 'Compress')+"]、1ファイルにアーカイヴ["+[Boolean]($PreAction -contains 'Archive')+"]）　して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -contains 'MoveNewFile')+"]します")
+
+
+
+#        $Message = "指定フォルダ[$($TargetFolder)]の[$($Days)日以前][正規表現 $($RegularExpression) にマッチ][指定フォルダ以後のパスが正規表現 $($ParentRegularExpression) にマッチ]["+($Size / 1KB)+"KB以上]"
+
+        IF ($Action -ne 'none'){
+
+            $Message = "マッチしたファイルを"
+            IF ($Action -eq 'KeepFilesCount') { $Message += "[世代数($($KeepFiles))]まで"}
+            IF ($Action -match '^(Copy|Move)$'){ $Message += "移動先フォルダ[$($MoveToFolder)]へ"}
+            $Message += "再帰的[$($Recurse)]にAction[$($Action)]します。"
+
+            Logging -EventID $InfoEventID -EventType Information -EventMessage $Message
+            }
+
+        IF ($PostAction -ne 'none'){
+
+            $Message = "マッチしたファイルを"
+            IF ($PostAction -eq 'Rename') { $Message += "リネーム規則[($($RenameToRegularExpression))]を用いて"}
+            $Message += "再帰的[$($Recurse)]にPostAction[$($PostAction)]します。"
+
+            Logging -EventID $InfoEventID -EventType Information -EventMessage $Message
+            }
+
+
+
+#        Logging -EventID $InfoEventID -EventType Information `
+#        -EventMessage ("指定フォルダ$($TargetFolder)の[$($Days)日以前],[正規表現 $($RegularExpression) にマッチ][指定フォルダ以後のパスが正規表現 $($ParentRegularExpression) にマッチ]["+($Size / 1KB)+"KB以上]"+(IF($Action -eq 'KeepFilesCount'){"[世代数($($KeepFiles))]"})+"にマッチしたファイルを移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]にAction[$($Action)]、PostAction[$($PostAction)]します。")
         }
 
-    IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
+#    IF( $PreAction -notcontains 'none'){
 
-        Logging -EventID $InfoEventID -EventType Information `
-        -EventMessage ("マッチしたファイルはファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -contains 'Compress')+"]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -contains 'MoveNewFile')+"]します")
-        }
+#        Logging -EventID $InfoEventID -EventType Information `
+#        -EventMessage ("マッチしたファイルはファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -contains 'Compress')+"]、1ファイルにアーカイヴ["+[Boolean]($PreAction -contains 'Archive')+"]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -contains 'MoveNewFile')+"]します")
+#        }
 
     IF($NoAction){
         Logging -EventID $InfoEventID -EventType Information -EventMessage "-NoAction[${NoAction}]が指定されているため実際にはファイル/フォルダの処理をしません"
@@ -819,20 +859,20 @@ Param(
 
        Logging -EventID $InfoEventID -EventType Information -EventMessage "実行結果は正常終了[$($NormalCount)]、警告終了[$($WarningCount)]、異常終了[$($ErrorCount)]です"
 
-       IF ($Action -eq "DeleteEmptyFolders"){
+#       IF ($Action -eq "DeleteEmptyFolders"){
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする空フォルダを再帰的[$($Recurse)]に削除しました"
-            }else{
+#            Logging -EventID $InfoEventID -EventType Information -EventMessage "指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする空フォルダを再帰的[$($Recurse)]に削除しました"
+#            }else{
 
-            Logging -EventID $InfoEventID -EventType Information `
-            -EventMessage ("指定フォルダ${TargetFolder}の${Days}日以前の正規表現 ${RegularExpression} にマッチする"+($Size / 1KB)+"KB以上の全てのファイルを移動先フォルダ${MoveToFolder}へ再帰的[${Recurse}]にAction[${Action}]、PostAction[$($PostAction)]しました")
-            }
+#            Logging -EventID $InfoEventID -EventType Information `
+#            -EventMessage ("指定フォルダ${TargetFolder}の${Days}日以前の正規表現 ${RegularExpression} にマッチする"+($Size / 1KB)+"KB以上の全てのファイルを移動先フォルダ${MoveToFolder}へ再帰的[${Recurse}]にAction[${Action}]、PostAction[$($PostAction)]しました")
+#            }
 
-    IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
+#    IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
 
-        Logging -EventID $InfoEventID -EventType Information `
-        -EventMessage ("マッチしたファイルはファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -contains 'Compress')+"]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -contains 'MoveNewFile')+"]しました")
-        }
+#        Logging -EventID $InfoEventID -EventType Information `
+#        -EventMessage ("マッチしたファイルはファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -contains 'Compress')+"]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -contains 'MoveNewFile')+"]しました")
+#        }
 
         IF($OverRide -and ($OverRideCount -gt 0)){
             Logging -EventID $InfoEventID -EventType Information -EventMessage "-OverRide[${OverRide}]が指定されているため生成したファイルと同名のものを[$($OverRideCount)]回、上書きしました"
