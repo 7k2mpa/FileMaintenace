@@ -745,13 +745,6 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
             Logging -EventID $InfoEventID -EventType Information -EventMessage $Message
             }
 
-#            Logging -EventID $InfoEventID -EventType Information `
-#            -EventMessage ("マッチしたファイルはPreAction（ファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -contains 'Compress')+"]、1ファイルにアーカイヴ["+[Boolean]($PreAction -contains 'Archive')+"]）　して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -contains 'MoveNewFile')+"]します")
-
-
-
-#        $Message = "指定フォルダ[$($TargetFolder)]の[$($Days)日以前][正規表現 $($RegularExpression) にマッチ][指定フォルダ以後のパスが正規表現 $($ParentRegularExpression) にマッチ]["+($Size / 1KB)+"KB以上]"
-
         IF ($Action -ne 'none'){
 
             $Message = "マッチしたファイルを"
@@ -770,21 +763,10 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage $Message
             }
-
-
-
-#        Logging -EventID $InfoEventID -EventType Information `
-#        -EventMessage ("指定フォルダ$($TargetFolder)の[$($Days)日以前],[正規表現 $($RegularExpression) にマッチ][指定フォルダ以後のパスが正規表現 $($ParentRegularExpression) にマッチ]["+($Size / 1KB)+"KB以上]"+(IF($Action -eq 'KeepFilesCount'){"[世代数($($KeepFiles))]"})+"にマッチしたファイルを移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]にAction[$($Action)]、PostAction[$($PostAction)]します。")
-        }
-
-#    IF( $PreAction -notcontains 'none'){
-
-#        Logging -EventID $InfoEventID -EventType Information `
-#        -EventMessage ("マッチしたファイルはファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -contains 'Compress')+"]、1ファイルにアーカイヴ["+[Boolean]($PreAction -contains 'Archive')+"]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -contains 'MoveNewFile')+"]します")
-#        }
+    }
 
     IF($NoAction){
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "-NoAction[${NoAction}]が指定されているため実際にはファイル/フォルダの処理をしません"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "-NoAction[${NoAction}]が指定されているため実際にはファイル/フォルダを処理をしません"
         }
 
     IF($OverRide){
@@ -862,20 +844,6 @@ Param(
 
        Logging -EventID $InfoEventID -EventType Information -EventMessage "実行結果は正常終了[$($NormalCount)]、警告終了[$($WarningCount)]、異常終了[$($ErrorCount)]です"
 
-#       IF ($Action -eq "DeleteEmptyFolders"){
-
-#            Logging -EventID $InfoEventID -EventType Information -EventMessage "指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする空フォルダを再帰的[$($Recurse)]に削除しました"
-#            }else{
-
-#            Logging -EventID $InfoEventID -EventType Information `
-#            -EventMessage ("指定フォルダ${TargetFolder}の${Days}日以前の正規表現 ${RegularExpression} にマッチする"+($Size / 1KB)+"KB以上の全てのファイルを移動先フォルダ${MoveToFolder}へ再帰的[${Recurse}]にAction[${Action}]、PostAction[$($PostAction)]しました")
-#            }
-
-#    IF( $PreAction -match '^(Compress|AddTimeStamp)$'){
-
-#        Logging -EventID $InfoEventID -EventType Information `
-#        -EventMessage ("マッチしたファイルはファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"]、圧縮["+[Boolean]($PreAction -contains 'Compress')+"]して、移動先フォルダ$($MoveToFolder)へ再帰的[$($Recurse)]に移動["+[Boolean]($PreAction -contains 'MoveNewFile')+"]しました")
-#        }
 
         IF($OverRide -and ($OverRideCount -gt 0)){
             Logging -EventID $InfoEventID -EventType Information -EventMessage "-OverRide[${OverRide}]が指定されているため生成したファイルと同名のものを[$($OverRideCount)]回、上書きしました"
@@ -1045,7 +1013,7 @@ Do
         #String.Substringメソッドは文字列から、引数位置から最後までを取り出す
         #MoveToNewFolderはNoRecurseでもMove|Copyで一律使用するので作成
 
-        $MoveToNewFolder = Join-Path $MoveToFolder ($TargetFileParentFolder).Substring($TargetFolder.Length)
+        $MoveToNewFolder = Join-Path $MoveToFolder -ChildPath ($TargetFileParentFolder).Substring($TargetFolder.Length)
         If($Recurse){
 
             If (-NOT(CheckContainer -CheckPath $MoveToNewFolder -ObjectName '移動先フォルダ')){
