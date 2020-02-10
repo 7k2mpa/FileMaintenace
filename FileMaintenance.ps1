@@ -328,7 +328,7 @@ Log2File‚æ‚è—Dæ‚µ‚Ü‚·B
 
 
 .NOTE
-The original of [Delete Empty Folders] function comes from Martin Pugh (https://github.com/martin9700/Remove-EmptyFolders/blob/master/Remove-EmptyFolders.ps1)
+The origin of [Delete Empty Folders] function comes from Martin Pugh (https://github.com/martin9700/Remove-EmptyFolders/blob/master/Remove-EmptyFolders.ps1)
 See also LICENSE_Remove-EmptyFolders.txt File.
 
 #>
