@@ -343,7 +343,7 @@ Param(
        
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は相対パス表記です"
 
-        $ConvertedCheckPath = Join-Path ${THIS_PATH} $CheckPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
+        $ConvertedCheckPath = Join-Path -Path ${THIS_PATH} -ChildPath $CheckPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
          
         Logging -EventID $InfoEventID -EventType Information -EventMessage "スクリプトが配置されているフォルダ[${THIS_PATH}]、[$($CheckPath)]とを結合した絶対パス表記[$($ConvertedCheckPath)]に変換します"
 
@@ -775,9 +775,9 @@ Param(
 
 )
 
-    $ScriptExecUser = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+    $ScriptExecUser = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name
 
-    $ScriptExecUser = $ScriptExecUser.Name
+#    $ScriptExecUser = $ScriptExecUser.Name
 
     $LogFormattedDate = (Get-Date).ToString($LogDateFormat)
 
@@ -1010,63 +1010,3 @@ Param(
 #ValidHostnameRegex = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$";
 
 }
-
-#https://github.com/mnaoumov/Invoke-NativeApplication
-
-function Invoke-NativeApplication
-{
-    param
-    (
-        [ScriptBlock] $ScriptBlock,
-        [int[]] $AllowedExitCodes = @(0),
-        [switch] $IgnoreExitCode
-    )
-
-    $backupErrorActionPreference = $ErrorActionPreference
-
-    $ErrorActionPreference = "Continue"
-    try
-    {
-        if (Test-CalledFromPrompt)
-        {
-            $wrapperScriptBlock = { & $ScriptBlock }
-        }
-        else
-        {
-            $wrapperScriptBlock = { & $ScriptBlock 2>&1 }
-        }
-
-        & $wrapperScriptBlock | ForEach-Object -Process `
-            {
-                $isError = $_ -is [System.Management.Automation.ErrorRecord]
-                "$_" | Add-Member -Name IsError -MemberType NoteProperty -Value $isError -PassThru
-            }
-        if ((-not $IgnoreExitCode) -and (Test-Path -LiteralPath -Path Variable:LASTEXITCODE) -and ($AllowedExitCodes -notcontains $LASTEXITCODE))
-        {
-            throw "Execution failed with exit code $LASTEXITCODE"
-        }
-    }
-    finally
-    {
-        $ErrorActionPreference = $backupErrorActionPreference
-    }
-}
-
-function Invoke-NativeApplicationSafe
-{
-    param
-    (
-        [ScriptBlock] $ScriptBlock
-    )
-
-    Invoke-NativeApplication -ScriptBlock $ScriptBlock -IgnoreExitCode | `
-        Where-Object -FilterScript { -not $_.IsError }
-}
-
-function Test-CalledFromPrompt
-{
-    (Get-PSCallStack)[-2].Command -eq "prompt"
-}
-
-Set-Alias -Name exec -Value Invoke-NativeApplication
-Set-Alias -Name safeexec -Value Invoke-NativeApplicationSafe
