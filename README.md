@@ -4,7 +4,7 @@ A set of useful utility scripts written in Powershell for Microsoft Windows Plat
 
 ##### FileMaintenance.ps1
 
-You can manage log and temp files with varios method including delete , copy , move , compress , archive , rename , nullclear and delete empty folders.
+Manage log and temp files with varios method including delete , copy , move , compress , archive , rename , nullclear and delete empty folders.
 You can select files and folders with file size , number of days elapsed , regular expression , path regular expression.
 
 At onece you can manage one folder. With Wrapper.ps1 you can manage multi folders.
@@ -22,7 +22,7 @@ Mount and UnMount UNC path SMB file share.
 
 ##### OracleDB2BackUpMode.ps1 / OracleDB2NormalMode.ps1 / OracleArchiveLogDelete.ps1 / OracleExport.ps1
 
-You can start/stop Listener , change Oracle Mode (BackUp or Normal) , export control files.
+Start/stop Listener , change Oracle Mode (BackUp or Normal) , export control files.
 After or before backup software execute , you run the script.
 
 
