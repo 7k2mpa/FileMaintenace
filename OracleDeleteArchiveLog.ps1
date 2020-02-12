@@ -262,8 +262,6 @@ Try{
 function Initialize {
 
 $SHELLNAME=Split-Path $PSCommandPath -Leaf
-$THIS_PATH = $PSScriptRoot 
-
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -291,16 +289,10 @@ $THIS_PATH = $PSScriptRoot
 
     CheckLogPath -CheckPath $OracleRmanLogPath -ObjectName '-OracleRMANLLogPath' > $NULL
 
-#    If(-NOT(CheckLeaf -CheckPath $OracleRmanLogPath -ObjectName 'ログファイル -OracleRmanLogPath')){
-
-#        TryAction -ActionType MakeNewFileWithValue -ActionFrom $OracleRmanLogPath -ActionError $OracleRmanLogPath -FileValue $Null
-#        }
-
 
 #実行するRMANファイルの存在確認
    
     $ExecRmanPath = ConvertToAbsolutePath -CheckPath $ExecRmanPath -ObjectName '-ExecRmanPath'
-
 
     CheckLeaf -CheckPath $ExecRmanPath -ObjectName '-ExecRmanPath' -IfNoExistFinalize > $Null
 
@@ -347,6 +339,8 @@ EndingProcess $ReturnCode
 }
 
 #####################   ここから本体  ######################
+
+$DatumPath = $PSScriptRoot
 
 $Version = '20200207_1615'
 
