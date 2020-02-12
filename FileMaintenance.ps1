@@ -329,7 +329,8 @@ Log2Fileより優先します。
 .NOTES
 
 
-The origin of [Delete Empty Folders] function comes from Martin Pugh (https://github.com/martin9700/Remove-EmptyFolders)
+The origin of [Delete Empty Folders] function comes from Martin Pugh's Remove-EmptyFolders released under MIT License.
+ (https://github.com/martin9700/Remove-EmptyFolders)
 See also LICENSE_Remove-EmptyFolders.txt File.
 
 Copyright 2020 Masayuki Sudo
@@ -635,8 +636,6 @@ $Objects = @()
 function Initialize {
 
 $SHELLNAME = Split-Path $PSCommandPath -Leaf
-$THIS_PATH = $PSScriptRoot
-
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -900,6 +899,8 @@ EndingProcess $ReturnCode
 [int][ValidateRange(0,2147483647)]$OverRideCount = 0
 [int][ValidateRange(0,2147483647)]$ContinueCount = 0
 [int][ValidateRange(0,2147483647)]$InLoopDeletedFilesCount = 0
+
+$DatumPath = $PSScriptRoot
 
 $Version = '20200207_1615'
 

@@ -232,8 +232,6 @@ Try{
 function Initialize {
 
 $SHELLNAME=Split-Path $PSCommandPath -Leaf
-$THIS_PATH = $PSScriptRoot
-
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -302,6 +300,8 @@ EndingProcess $ReturnCode
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
+
+$DatumPath = $PSScriptRoot
 
 $Version = '20200207_1615'
 

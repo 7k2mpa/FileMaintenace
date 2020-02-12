@@ -365,9 +365,9 @@ Param(
        
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は相対パス表記です"
 
-        $ConvertedCheckPath = Join-Path -Path ${THIS_PATH} -ChildPath $CheckPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
+        $ConvertedCheckPath = Join-Path -Path $DatumPath -ChildPath $CheckPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
          
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "スクリプトが配置されているフォルダ[${THIS_PATH}]、[$($CheckPath)]とを結合した絶対パス表記[$($ConvertedCheckPath)]に変換します"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "スクリプトが配置されているフォルダ[$($DatumPath)]、[$($CheckPath)]とを結合した絶対パス表記[$($ConvertedCheckPath)]に変換します"
 
         $CheckPath = $ConvertedCheckPath
 
@@ -405,6 +405,7 @@ Param(
 
     IF($CheckPath.Substring($CheckPath.Length -1 , 1) -eq '\'){
     
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Windowsパス指定で末尾\は許容されていますが、本プログラムでは都合上使用しません。末尾\を削除します"
             $CheckPath = $CheckPath.Substring(0 , $CheckPath.Length -1)
             }
 

@@ -170,6 +170,23 @@ Log2Fileより優先します。
 記述はシングルクオーテーションで括って下さい。
 正規表現のため、ドメインのバックスラッシュは[domain\\.*]の様にバックスラッシュでエスケープして下さい。　
 
+.NOTES
+
+Copyright 2020 Masayuki Sudo
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
 
 
 #>
@@ -252,8 +269,6 @@ Try{
 function Initialize {
 
 $SHELLNAME=Split-Path $PSCommandPath -Leaf
-$THIS_PATH = $PSScriptRoot
-
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -365,6 +380,8 @@ EndingProcess $ReturnCode
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
 [int][ValidateRange(0,2147483647)]$OverRideCount = 0
 [int][ValidateRange(0,2147483647)]$ContinueCount = 0
+
+$DatumPath = $PSScriptRoot
 
 $Version = '20200207_1615'
 
