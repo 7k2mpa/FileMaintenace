@@ -1,5 +1,27 @@
 #Requires -Version 5.0
 
+
+<#
+
+.NOTES
+
+Copyright 2020 Masayuki Sudo
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
+#>
+
 $Script:CommonFunctionsVersion = '20200130_1050'
 
 #ログ等の変数を一括設定したい場合は以下を利用して下さい。
@@ -343,7 +365,7 @@ Param(
        
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は相対パス表記です"
 
-        $ConvertedCheckPath = Join-Path ${THIS_PATH} $CheckPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
+        $ConvertedCheckPath = Join-Path -Path ${THIS_PATH} -ChildPath $CheckPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
          
         Logging -EventID $InfoEventID -EventType Information -EventMessage "スクリプトが配置されているフォルダ[${THIS_PATH}]、[$($CheckPath)]とを結合した絶対パス表記[$($ConvertedCheckPath)]に変換します"
 
@@ -776,9 +798,9 @@ Param(
 
 )
 
-    $ScriptExecUser = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+    $ScriptExecUser = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name
 
-    $ScriptExecUser = $ScriptExecUser.Name
+#    $ScriptExecUser = $ScriptExecUser.Name
 
     $LogFormattedDate = (Get-Date).ToString($LogDateFormat)
 
@@ -1011,63 +1033,3 @@ Param(
 #ValidHostnameRegex = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$";
 
 }
-
-#https://github.com/mnaoumov/Invoke-NativeApplication
-
-function Invoke-NativeApplication
-{
-    param
-    (
-        [ScriptBlock] $ScriptBlock,
-        [int[]] $AllowedExitCodes = @(0),
-        [switch] $IgnoreExitCode
-    )
-
-    $backupErrorActionPreference = $ErrorActionPreference
-
-    $ErrorActionPreference = "Continue"
-    try
-    {
-        if (Test-CalledFromPrompt)
-        {
-            $wrapperScriptBlock = { & $ScriptBlock }
-        }
-        else
-        {
-            $wrapperScriptBlock = { & $ScriptBlock 2>&1 }
-        }
-
-        & $wrapperScriptBlock | ForEach-Object -Process `
-            {
-                $isError = $_ -is [System.Management.Automation.ErrorRecord]
-                "$_" | Add-Member -Name IsError -MemberType NoteProperty -Value $isError -PassThru
-            }
-        if ((-not $IgnoreExitCode) -and (Test-Path -LiteralPath -Path Variable:LASTEXITCODE) -and ($AllowedExitCodes -notcontains $LASTEXITCODE))
-        {
-            throw "Execution failed with exit code $LASTEXITCODE"
-        }
-    }
-    finally
-    {
-        $ErrorActionPreference = $backupErrorActionPreference
-    }
-}
-
-function Invoke-NativeApplicationSafe
-{
-    param
-    (
-        [ScriptBlock] $ScriptBlock
-    )
-
-    Invoke-NativeApplication -ScriptBlock $ScriptBlock -IgnoreExitCode | `
-        Where-Object -FilterScript { -not $_.IsError }
-}
-
-function Test-CalledFromPrompt
-{
-    (Get-PSCallStack)[-2].Command -eq "prompt"
-}
-
-Set-Alias -Name exec -Value Invoke-NativeApplication
-Set-Alias -Name safeexec -Value Invoke-NativeApplicationSafe
