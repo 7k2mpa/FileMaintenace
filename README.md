@@ -2,7 +2,7 @@
 
 A set of useful utility scripts written in Powershell for Microsoft Windows Platform.
 
-## Scripts Functions Detail
+## Scripts' Functions Detail
 
 
 #### FileMaintenance.ps1
