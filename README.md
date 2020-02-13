@@ -26,12 +26,14 @@ Mount and UnMount UNC path SMB file share.
 #### OracleDB2BackUpMode.ps1 / OracleDB2NormalMode.ps1 / OracleArchiveLogDelete.ps1 / OracleExport.ps1
 
 Start/stop Listener , change Oracle Mode (BackUp or Normal) , export control files.
-After or before backup software execute , you run the script.
+After or before executing backup software , you run the scripts.
+Delete RMAN archive log.
+Export Oracle Database with datapump.
 
 
 #### arcserveUDPbackup.ps1
 
-Execute arcserveUDP CLI.
+Execute arcserveUDP CLI and kick backup job.
 
 
 #### Wrapper.ps1
