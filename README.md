@@ -27,7 +27,9 @@ Mount and UnMount UNC path SMB file share.
 
 Start/stop Listener , change Oracle Mode (BackUp or Normal) , export control files.
 After or before executing backup software , you run the scripts.
+
 Delete RMAN archive log.
+
 Export Oracle Database with datapump.
 
 
