@@ -87,7 +87,7 @@ Incr:‘•ªƒoƒbƒNƒAƒbƒv
 
 
 
-.PARAMETER BackupFlagFilePath = '.\SC_Logs\BackUp.flg' ,
+.PARAMETER BackupFlagFilePath
 ƒoƒbƒNƒAƒbƒv’†‚ğ¦‚·ƒoƒbƒNƒAƒbƒvƒtƒ@ƒCƒ‹‚Ì•Û‘¶æƒpƒX‚ğw’è‚µ‚Ü‚·B
 ƒtƒ@ƒCƒ‹–¼.Šg’£q‚Åw’è‚µ‚Ü‚·‚ªAƒtƒ@ƒCƒ‹–¼‚É©“®“I‚É_Plan–¼_ƒoƒbƒNƒAƒbƒv‘ÎÛƒT[ƒo–¼‚ğ•t‰Á‚µ‚½ƒtƒ@ƒCƒ‹–¼‚Å•Û‘¶‚µ‚Ü‚·B
 AllServers‚ğw’è‚µ‚½ê‡AƒoƒbƒNƒAƒbƒvƒT[ƒo–¼‚ÍAll‚Æ‚È‚è‚Ü‚·B
@@ -340,55 +340,55 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
 #ƒpƒ‰ƒ[ƒ^‚ÌŠm”F
 
-IF(-NOT($AllServers)){
+    IF(-NOT($AllServers)){
 
-    CheckHostname -CheckHostName $Server -ObjectName 'ƒoƒbƒNƒAƒbƒv‘ÎÛ -Server' > $NULL
-    }
+        CheckHostname -CheckHostName $Server -ObjectName 'ƒoƒbƒNƒAƒbƒv‘ÎÛ -Server' > $NULL
+        }
 
-    CheckHostname -CheckHostName $UDPConsoleServerName -ObjectName 'arcserveUDP Console Server -UDPConsoleServerName' > $NULL
+        CheckHostname -CheckHostName $UDPConsoleServerName -ObjectName 'arcserveUDP Console Server -UDPConsoleServerName' > $NULL
 
 #[String][ValidateSet("JobExecUserAndPasswordFile","FixedPasswordFile" , "PlanText")]$AuthorizationType = 'JobExecUserAndPasswordFile' ,
 
 
-IF($AuthorizationType -match '^(FixedPasswordFile|PlainText)$' ){
+    IF($AuthorizationType -match '^(FixedPasswordFile|PlainText)$' ){
 
-    CheckDomainName -CheckDomainName $ExecUserDomain -ObjectName 'Àsƒ†[ƒU‚ªŠ‘®‚·‚éƒhƒƒCƒ“ -ExecUserDomain'  > $NULL
+        CheckDomainName -CheckDomainName $ExecUserDomain -ObjectName 'Àsƒ†[ƒU‚ªŠ‘®‚·‚éƒhƒƒCƒ“ -ExecUserDomain'  > $NULL
     
-    CheckUserName -CheckUserName $ExecUser -ObjectName 'Àsƒ†[ƒU -ExecUser ' > $NULL
+        CheckUserName -CheckUserName $ExecUser -ObjectName 'Àsƒ†[ƒU -ExecUser ' > $NULL
 
-    }
+        }
 
 #UDPConsole‚Ì‘¶İ‚ğŠm”F
 
     IF(Test-Connection -ComputerName $UDPConsoleServerName -Quiet){
     
-    Logging -EventID $SuccessEventID -EventType Success -EventMessage "UDPƒRƒ“ƒ\[ƒ‹ƒT[ƒo[$($UDPConsoleServerName)]‚ª‰“š‚µ‚Ü‚µ‚½B"
-    }else{
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "UDPƒRƒ“ƒ\[ƒ‹ƒT[ƒo[$($UDPConsoleServerName)]‚ª‰“š‚µ‚Ü‚¹‚ñB -UDPConsoleServerName‚ª³‚µ‚­İ’è‚³‚ê‚Ä‚¢‚é‚©Šm”F‚µ‚Ä‰º‚³‚¢B"
-    Exit $ErrorReturnCode
-    }
+        Logging -EventID $SuccessEventID -EventType Success -EventMessage "UDPƒRƒ“ƒ\[ƒ‹ƒT[ƒo[$($UDPConsoleServerName)]‚ª‰“š‚µ‚Ü‚µ‚½B"
+        }else{
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "UDPƒRƒ“ƒ\[ƒ‹ƒT[ƒo[$($UDPConsoleServerName)]‚ª‰“š‚µ‚Ü‚¹‚ñB -UDPConsoleServerName‚ª³‚µ‚­İ’è‚³‚ê‚Ä‚¢‚é‚©Šm”F‚µ‚Ä‰º‚³‚¢B"
+        Exit $ErrorReturnCode
+        }
 
 
 #Password File‚Ì—L–³‚ğŠm”F
 
-IF($AuthorizationType -match '^FixedPasswordFile$' ){
+    IF($AuthorizationType -match '^FixedPasswordFile$' ){
 
-    $FixedPasswordFilePath  = ConvertToAbsolutePath -CheckPath $FixedPasswordFilePath -ObjectName '-FixedPasswordFilePath'
+        $FixedPasswordFilePath  = ConvertToAbsolutePath -CheckPath $FixedPasswordFilePath -ObjectName '-FixedPasswordFilePath'
 
-    CheckLeaf -CheckPath $FixedPasswordFilePath -ObjectName '-FixedPasswordFilePath' -IfNoExistFinalize > $NULL
-    }
+        CheckLeaf -CheckPath $FixedPasswordFilePath -ObjectName '-FixedPasswordFilePath' -IfNoExistFinalize > $NULL
+        }
 
-IF($AuthorizationType -match '^JobExecUserAndPasswordFile$' ){
+    IF($AuthorizationType -match '^JobExecUserAndPasswordFile$' ){
 
-    $ExecUserPasswordFilePath  = ConvertToAbsolutePath -CheckPath $ExecUserPasswordFilePath -ObjectName '-ExecUserPasswordFilePath'
+        $ExecUserPasswordFilePath  = ConvertToAbsolutePath -CheckPath $ExecUserPasswordFilePath -ObjectName '-ExecUserPasswordFilePath'
     
-    CheckContainer -CheckPath (Split-Path -Parent -Path $ExecUserPasswordFilePath) -ObjectName '-ExecUserPasswordFilePath‚ÌeƒtƒHƒ‹ƒ_'  -IfNoExistFinalize > $NULL
+        CheckContainer -CheckPath (Split-Path -Parent -Path $ExecUserPasswordFilePath) -ObjectName '-ExecUserPasswordFilePath‚ÌeƒtƒHƒ‹ƒ_'  -IfNoExistFinalize > $NULL
 
-    }
+        }
 
-    $BackupFlagFilePath  = ConvertToAbsolutePath -CheckPath $BackupFlagFilePath -ObjectName '-BackupFlagFilePath'
+        $BackupFlagFilePath  = ConvertToAbsolutePath -CheckPath $BackupFlagFilePath -ObjectName '-BackupFlagFilePath'
     
-    CheckContainer -CheckPath (Split-Path -Parent -Path $BackupFlagFilePath) -ObjectName '-BackupFlagFilePath‚ÌeƒtƒHƒ‹ƒ_'  -IfNoExistFinalize > $NULL
+        CheckContainer -CheckPath (Split-Path -Parent -Path $BackupFlagFilePath) -ObjectName '-BackupFlagFilePath‚ÌeƒtƒHƒ‹ƒ_'  -IfNoExistFinalize > $NULL
 
 
 #arcserveUDP CLI‚Ì—L–³‚ğŠm”F
@@ -411,16 +411,15 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "arcserve UDP
 
 function GetUserAndDomain{
 
-$UserInfo = @()
+    $UserInfo = @()
 
 #ƒ†[ƒU–¼‚Ídomain\user‚ÌŒ`®‚Åo—Í‚³‚ê‚é‚Ì‚ÅAƒoƒbƒNƒXƒ‰ƒbƒVƒ…\‚ğ‹æØ‚è‹L†‚Æ‚µ‚ÄA”z—ñ‚É‘ã“ü
 #-Split‚Í³‹K•\Œ»‚È‚Ì‚ÅƒGƒXƒP[ƒv‹L†‚ÍƒoƒbƒNƒXƒ‰ƒbƒVƒ…\@Powershell‚ÌƒGƒXƒP[ƒv‚Å‚ ‚éƒoƒbƒNƒNƒI[ƒg`‚Å‚Í‚È‚¢
 
-$UserInfo = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name -split '\\'
+    $UserInfo = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name -split '\\'
 
-
-$Script:DoDomain = $UserInfo[0]
-$Script:DoUser = $UserInfo[1]
+    $Script:DoDomain = $UserInfo[0]
+    $Script:DoUser = $UserInfo[1]
 
 }
 
@@ -436,32 +435,14 @@ Param(
         TryAction -ActionType Delete -ActionFrom  $BackupFlagFilePath -ActionError "BackUp Flag [$($BackupFlagFilePath)]"
         }
 
-    IF(-NOT(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))){
-
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "ÀsŒ‹‰Ê‚Í³íI—¹[$($NormalCount)]AŒxI—¹[$($WarningCount)]AˆÙíI—¹[$($ErrorCount)]‚Å‚·"
-
-        If(($Continue) -and ($ErrorCount -gt 0)){
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]‚ªw’è‚³‚ê‚Ä‚¢‚é‚½‚ßˆ—ˆÙí‚ÅˆÙíI—¹‚¹‚¸Ÿ‚Ì’è‹`‚ğˆ—‚µ‚Ü‚µ‚½"
-            }
-
-
-    }
-
 
 EndingProcess $ReturnCode
-
-
 
 }
 
 
 
 #####################   ‚±‚±‚©‚ç–{‘Ì  ######################
-
-
-[int][ValidateRange(0,2147483647)]$NormalCount = 0
-[int][ValidateRange(0,2147483647)]$WarningCount = 0
-[int][ValidateRange(0,2147483647)]$ErrorCount = 0
 
 $DatumPath = $PSScriptRoot
 
@@ -475,25 +456,26 @@ $Version = '20200207_1615'
 . GetUserAndDomain
 
 
+#Create Invoke Command Strings
+
        $Command = "$UDPCLIPath -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
 
 
-IF($AllServers){
+    IF($AllServers){
 
        Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒoƒbƒNƒAƒbƒv‚Íƒvƒ‰ƒ“[$($Plan)]‚ÉŠÜ‚Ü‚ê‚é‘SƒT[ƒo‚ª‘ÎÛ‚Å‚·B"
        $Command +=  " -PlanName $Plan "
        $Server = 'All'
+       
+       }else{
+       Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒoƒbƒNƒAƒbƒv‚Íƒvƒ‰ƒ“[$($Plan)]‚ÉŠÜ‚Ü‚ê‚éƒT[ƒo[$($Server)]‚ª‘ÎÛ‚Å‚·B"
+       $Command += " -NodeName $Server "
+
        }
-       else{
-      Logging -EventID $InfoEventID -EventType Information -EventMessage "ƒoƒbƒNƒAƒbƒv‚Íƒvƒ‰ƒ“[$($Plan)]‚ÉŠÜ‚Ü‚ê‚éƒT[ƒo[$($Server)]‚ª‘ÎÛ‚Å‚·B"    
-
-      $Command += " -NodeName $Server "
-
-       }
 
 
 
-Switch -Regex ($AuthorizationType){
+    Switch -Regex ($AuthorizationType){
 
     '^JobExecUser$'
         {
@@ -503,9 +485,11 @@ Switch -Regex ($AuthorizationType){
     '^JobExecUserAndPasswordFile$'
         {
         Logging -EventID $InfoEventID -EventType Information -EventMessage "”FØ•û–@‚Í[$($AuthorizationType)]‚Å‚·BƒWƒ‡ƒuÀs’†ƒ†[ƒU–¼A—\‚ß—pˆÓ‚µ‚½Àsƒ†[ƒU–¼‚ğŠÜ‚ŞƒpƒXƒ[ƒhƒtƒ@ƒCƒ‹‚Å”FØ‚µ‚Ü‚·B"
-        $ExecUserPasswordFileName = Split-Path -Path $ExecUserPasswordFilePath -Leaf 
-        $ExtensionString = [System.IO.Path]::GetExtension($ExecUserPasswordFileName)
-        $FileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension($ExecUserPasswordFileName)
+
+
+        $ExtensionString = [System.IO.Path]::GetExtension((Split-Path -Path $ExecUserPasswordFilePath -Leaf))
+        $FileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension((Split-Path -Path $ExecUserPasswordFilePath -Leaf))
+
         $ExecUserPasswordFileName = $FileNameWithOutExtentionString + "_"+$DoUser+$ExtensionString
         
         $ExecUserPasswordFilePath = Join-Path (Split-Path -Path $ExecUserPasswordFilePath -Parent ) $ExecUserPasswordFileName
@@ -530,35 +514,38 @@ Switch -Regex ($AuthorizationType){
         Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "“à•”ƒGƒ‰[B-AuthorizationType‚Ìw’è‚ª³‚µ‚­‚ ‚è‚Ü‚¹‚ñ"
         Finalize $ErrorReturnCode
         }
-}
+    }
 
-        $BackupFlagFileName = Split-Path -Path $BackupFlagFilePath -Leaf 
-        $ExtensionString = [System.IO.Path]::GetExtension($BackupFlagFileName)
-        $FileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension($BackupFlagFileName)
-        $BackupFlagFileName = $FileNameWithOutExtentionString + "_"+$Plan+"_"+$Server+$ExtensionString
+#BackUp Flag Check and Create
+
+
+     $ExtensionString = [System.IO.Path]::GetExtension((Split-Path -Path $BackupFlagFilePath -Leaf))
+     $FileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension((Split-Path -Path $BackupFlagFilePath -Leaf))
+
+     $BackupFlagFileName = $FileNameWithOutExtentionString + "_"+$Plan+"_"+$Server+$ExtensionString
         
-        $BackupFlagFilePath = Join-Path (Split-Path -Path $BackupFlagFilePath -Parent ) $BackupFlagFileName
+     $BackupFlagFilePath = Join-Path (Split-Path -Path $BackupFlagFilePath -Parent ) -ChildPath $BackupFlagFileName
 
 
 
-IF(CheckLeaf -CheckPath $BackupFlagFilePath -ObjectName 'ƒoƒbƒNƒAƒbƒvÀs’†ƒtƒ‰ƒO'){
+    IF(CheckLeaf -CheckPath $BackupFlagFilePath -ObjectName 'ƒoƒbƒNƒAƒbƒvÀs’†ƒtƒ‰ƒO'){
 
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "Back UpÀs’†‚Å‚·Bd•¡Às‚Ío—ˆ‚Ü‚¹‚ñ"
             Finalize $ErrorReturnCode
             }
 
-CheckLogPath -CheckPath $BackupFlagFilePath -ObjectName 'ƒoƒbƒNƒAƒbƒvÀs’†ƒtƒ‰ƒOŠi”[ƒtƒHƒ‹ƒ_'
+    CheckLogPath -CheckPath $BackupFlagFilePath -ObjectName 'ƒoƒbƒNƒAƒbƒvÀs’†ƒtƒ‰ƒOŠi”[ƒtƒHƒ‹ƒ_'
 
 
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "arcserveUDP CLI [$($UDPCLIPath)]‚ğ‹N“®‚µ‚Ü‚·"
+#Invoke PowerCLI command
 
-        Try{
+    Logging -EventID $InfoEventID -EventType Information -EventMessage "arcserveUDP CLI [$($UDPCLIPath)]‚ğ‹N“®‚µ‚Ü‚·"
 
-
-         $Return = Invoke-Expression $Command 2>$ErrorMessage -ErrorAction Stop
-        
+    Try{
+        $Return = Invoke-Expression $Command 2>$ErrorMessage -ErrorAction Stop 
         }
+
         catch [Exception]{
 
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "arcserveUDP CLI [$($UDPCLIPath)]‚Ì‹N“®‚É¸”s‚µ‚Ü‚µ‚½B"
@@ -570,11 +557,10 @@ CheckLogPath -CheckPath $BackupFlagFilePath -ObjectName 'ƒoƒbƒNƒAƒbƒvÀs’†ƒtƒ‰ƒ
 
         IF ($Return -ne 0){
                    
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "[$($Plan)]‚ÉŠÜ‚Ü‚ê‚éƒT[ƒo[$($Server)]‚ÌƒoƒbƒNƒAƒbƒv•û®[$($BackUpJobType)]‚É¸”s‚µ‚Ü‚µ‚½B"
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Error Message [$($ErrorMessage)]"
-
-        Finalize $ErrorReturnCode         
-        }
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "[$($Plan)]‚ÉŠÜ‚Ü‚ê‚éƒT[ƒo[$($Server)]‚ÌƒoƒbƒNƒAƒbƒv•û®[$($BackUpJobType)]‚É¸”s‚µ‚Ü‚µ‚½B"
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Error Message [$($ErrorMessage)]"
+            Finalize $ErrorReturnCode         
+            }
 
 Logging -EventID $SuccessEventID -EventType Success -EventMessage "[$($Plan)]‚ÉŠÜ‚Ü‚ê‚éƒT[ƒo[$($Server)]‚ÌƒoƒbƒNƒAƒbƒv•û®[$($BackUpJobType)]‚ÌŠJn‚É¬Œ÷‚µ‚Ü‚µ‚½B"
 
