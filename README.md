@@ -54,5 +54,8 @@ Execute .ps1 script with every line command in the command file like batch.
 
 
 ## Copyright & License
+Copyright &copy; 2020 Masayuki Sudo
+Licensed under the [Apache License, Version 2.0][Apache]
+see [LICENSE](./License.txt)also
 
-They are released under Apache License 2.0 , see [LICENSE](./License.txt)
+[Apache]: http://www.apache.org/licenses/LICENSE-2.0
