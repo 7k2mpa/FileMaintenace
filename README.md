@@ -3,7 +3,7 @@
 A set of useful utility scripts written in Powershell for Microsoft Windows Platform.
 
  - [FileMaintenance](#FileMaintenance.ps1)
- - [Windows Service Control](#StopService.ps1 / StartService.ps1)
+ - [Windows Service Control](#StopService.ps1)
  - [FAQ](#faq)
  - [Windows builds overview](#windows-builds-overview)
  - [Advanced usage](#advanced-usage)
