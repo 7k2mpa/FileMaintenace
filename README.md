@@ -2,13 +2,11 @@
 
 A set of useful utility scripts written in Powershell for Microsoft Windows Platform.
 
- - [FileMaintenance](#FileMaintenance.ps1)
- - [Windows Service Control](#StopService.ps1)
- - [FAQ](#faq)
- - [Windows builds overview](#windows-builds-overview)
- - [Advanced usage](#advanced-usage)
- - [Maintaining own forks](#maintaining-own-forks)
- - [Contribution guidelines](#contribution-guidelines)
+ - [FileMaintenance](#filemaintenanceps1)
+ - [Windows Service Control](#stopserviceps1--startserviceps1)
+ - [UNC Path Mount](#mountdriveps1--unmountdriveps1)
+ - [Oracle](#oracledb2backupmodeps1--oracledb2normalmodeps1--oraclearchivelogdeleteps1--oracleexportps1)
+ - [arcserveUDP](#arcserveudpbackupps1)
 
 ## Scripts' Functions Detail
 
