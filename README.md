@@ -56,6 +56,6 @@ Copyright &copy; 2020 Masayuki Sudo
 
 Licensed under the [Apache License, Version 2.0][Apache]
 
-see [LICENSE](./License.txt)also
+see [LICENSE](./License.txt) also
 
 [Apache]: http://www.apache.org/licenses/LICENSE-2.0
