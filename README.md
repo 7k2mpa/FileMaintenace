@@ -8,7 +8,7 @@ A set of useful utility scripts written in Powershell for Microsoft Windows Plat
  - [Oracle](#oracledb2backupmodeps1--oracledb2normalmodeps1--oraclearchivelogdeleteps1--oracleexportps1)
  - [arcserveUDP](#arcserveudpbackupps1)
 
-## Scripts' Functions Detail
+## Functions Detail
 
 ### FileMaintenance.ps1
 
