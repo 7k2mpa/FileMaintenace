@@ -2,8 +2,15 @@
 
 A set of useful utility scripts written in Powershell for Microsoft Windows Platform.
 
-## Scripts' Functions Detail
+ - [FileMaintenance](#FileMaintenance.ps1)
+ - [Windows Service Control](#StopService.ps1 / StartService.ps1)
+ - [FAQ](#faq)
+ - [Windows builds overview](#windows-builds-overview)
+ - [Advanced usage](#advanced-usage)
+ - [Maintaining own forks](#maintaining-own-forks)
+ - [Contribution guidelines](#contribution-guidelines)
 
+## Scripts' Functions Detail
 
 ### FileMaintenance.ps1
 
