@@ -251,7 +251,7 @@ Param(
 [Switch]$AllServers,
 [String][ValidateSet("Full", "Incr")]$BackUpJobType = 'Incr',
 
-[String]$BackupFlagFilePath = '.\SC_Logs\BackUp.flg' ,
+[String]$BackupFlagFilePath = '.\Lock\BackUp.flg' ,
 
 
 [String][ValidateSet("http", "https")]$PROTOCOL = 'http' ,
