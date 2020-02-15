@@ -1,4 +1,5 @@
 #Requires -Version 5.0
+#If you wolud NOT use '-PreAction compress or archive' in FileMaintenance.ps1 , you could change '-Version 5.0' to '-Version 3.0'
 
 <#
 .SYNOPSIS
@@ -925,10 +926,6 @@ $TargetObjects = @()
 
 $TargetObjects = GetObjects -TargetFolder $TargetFolder
 
-Write-Output "処理対象は以下の[$($FilterType)]です"
-
-Write-Output $TargetObjects
-
     If ($null -eq $TargetObjects){
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$($TargetFolder)に処理対象となる[$($FilterType)]はありません"
@@ -942,6 +939,9 @@ Write-Output $TargetObjects
             }
     }
 
+Write-Output "処理対象は以下の[$($FilterType)]です"
+
+Write-Output $TargetObjects
     　
 #-PreAction Archiveは複数ファイルを1ファイルに圧縮する。よって、ループ前に圧縮先の1ファイルのフルパスを確定しておく
 

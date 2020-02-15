@@ -1,5 +1,5 @@
 #Requires -Version 5.0
-
+#If you wolud NOT use '-PreAction compress or archive' in FileMaintenance.ps1 , you could change '-Version 5.0' to '-Version 3.0'
 
 <#
 
@@ -71,31 +71,32 @@ $Script:CommonFunctionsVersion = '20200130_1050'
 
 function Logging{
 
-    Param(
-    [parameter(mandatory=$true)][ValidateRange(1,65535)][int]$EventID,
-    [parameter(mandatory=$true)][String][ValidateSet("Information", "Warning", "Error" ,"Success")]$EventType,
-    [parameter(mandatory=$true)][String]$EventMessage
-    )
+Param(
+[parameter(mandatory=$true)][ValidateRange(1,65535)][int]$EventID,
+[parameter(mandatory=$true)][String][ValidateSet("Information", "Warning", "Error" ,"Success")]$EventType,
+[parameter(mandatory=$true)][String]$EventMessage
+)
 
 
     IF(($Log2EventLog -OR $ForceConsoleEventLog) -and -NOT($ForceConsole) ){
 
-    Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType $EventType -EventId $EventID -Message "[$($SHELLNAME)] $($EventMessage)"
-    }
+        Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType $EventType -EventId $EventID -Message "[$($SHELLNAME)] $($EventMessage)"
+        }
 
 
     IF($Log2Console -or $ForceConsole -or $ForceConsoleEventLog){
 
-    $ConsoleWrite = $EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
-    Write-Host $ConsoleWrite
-    }   
+        $ConsoleWrite = $EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
+        Write-Host $ConsoleWrite
+        }   
 
 
     IF($Log2File -and -NOT($ForceConsole -or $ForceConsoleEventLog )){
-    $LogFormattedDate = (Get-Date).ToString($LogDateFormat)
-    $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" "+$EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
-    Write-Output $LogWrite | Out-File -FilePath $LogPath -Append -Encoding $LogFileEncode
-    }   
+
+        $LogFormattedDate = (Get-Date).ToString($LogDateFormat)
+        $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" "+$EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
+        Write-Output $LogWrite | Out-File -FilePath $LogPath -Append -Encoding $LogFileEncode
+        }   
 
 }
 
@@ -189,9 +190,9 @@ function TryAction {
 
     IF (-NOT($ActionType -match "^(Delete|NullClear|MakeNewFolder|Rename)$" ) -and ($Null -eq $ActionTo)){
 
-    Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Function TryAction内部エラー。${ActionType}では$'$ActionTo'の指定が必要です"
-    Finalize $InternalErrorReturnCode
-    }
+        Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Function TryAction内部エラー。${ActionType}では$'$ActionTo'の指定が必要です"
+        Finalize $InternalErrorReturnCode
+        }
 
 
     IF($NoAction){
@@ -351,11 +352,10 @@ Param(
     IF(Test-Path -LiteralPath $CheckPath -IsValid){
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は有効なパス表記です"
    
-    }else{
-       Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]は有効なパス表記ではありません。存在しないドライブを指定している、NTFSに使用できない文字列が含まれてないか等を確認して下さい"
-       Finalize $ErrorReturnCode
-
-    }
+        }else{
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]は有効なパス表記ではありません。存在しないドライブを指定している、NTFSに使用できない文字列が含まれてないか等を確認して下さい"
+        Finalize $ErrorReturnCode
+        }
 
 
 
@@ -547,7 +547,7 @@ $Counter = 0
         Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($ServiceName)]は存在します。Status[$($Service.Status)]"
         Return $true
        
-        }elseif ($Counter -eq $Upto){
+        }elseIF($Counter -eq $Upto){
 
             IF(($SPAN -eq 0) -AND ($UpTo -eq 1)){
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($ServiceName)]は存在します。Status[$($Service.Status)]"
@@ -585,19 +585,19 @@ Param(
 )
 
 
-   If (-NOT([String]::IsNullOrEmpty($CheckPath))){
-                    Return $False
-                    }else{
+    If (-NOT([String]::IsNullOrEmpty($CheckPath))){
+        Return $False
+        }else{
 
-                    IF($IfNullOrEmptyFinalize){
+        IF($IfNullOrEmptyFinalize){
            
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) の指定は必須です"
-                    Finalize $ErrorReturnCode
-                    }
+               Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) の指定は必須です"
+               Finalize $ErrorReturnCode
+               }
                
-              }
+        }
 
-              Return $true
+    Return $true
        
 }
 
@@ -612,7 +612,7 @@ Param(
 
 )
 
-            If (Test-Path -LiteralPath $CheckPath -PathType Container){
+    If (Test-Path -LiteralPath $CheckPath -PathType Container){
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]は存在します"
             Return $true
@@ -626,7 +626,7 @@ Param(
                     }else{
                     Return $false
                     }
-        }
+    }
 }
 
 
@@ -640,7 +640,7 @@ Param(
 
 )
 
-            If (Test-Path -LiteralPath $CheckPath -PathType Leaf){
+    If (Test-Path -LiteralPath $CheckPath -PathType Leaf){
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]は存在します"
             Return $true
@@ -654,7 +654,7 @@ Param(
                     }else{
                     Return $false
                     }
-        }
+    }
 }
 
 
@@ -801,8 +801,6 @@ Param(
 
     $ScriptExecUser = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name
 
-#    $ScriptExecUser = $ScriptExecUser.Name
-
     $LogFormattedDate = (Get-Date).ToString($LogDateFormat)
 
     $SQLLog = $Null
@@ -879,8 +877,6 @@ function CheckOracleBackUpMode {
    
     #文字列配列に変換する
     $SQLLog = $SQLLog -replace "`r","" |  ForEach-Object {$_ -split "`n"}
-#    $SQLLog = $SQLLog -replace "`r",""
-#    $SQLLog = $SQLLog -split "`n"
 
     $NormalModeCount = 0
     $BackUpModeCount = 0
