@@ -3,28 +3,19 @@
 
 <#
 .SYNOPSIS
-Oracle Databaseをバックアップ前にバックアップモードへ切替するスクリプトです。
+Oracle DatabaseからDatapumpを使用してexportを実行します。
 
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
-Oracle Databaseをバックアップするには、予めデータベースの停止、またはバックアップモードへ切替が必要です。
-従来はデータベースの停止(Shutdown Immediate)で実装する例が大半ですが、停止はセッションが存在すると停止しない等で障害となる例もあります。
-そのため本スクリプトはOracle Databaseを停止するのではなく、表領域をバックアップモードへ切替してバックアップを開始する運用を前提として作成しています。
 
-セットで使用するSQLs.PS1を読み込み、実行します。予め配置してください。
-対になるバックアップモードから通常モードへ切替するスクリプトを用意しておりますので、セットで運用してください。
 
 
 配置例
 
-.\OracleDB2NormalMode.ps1
-.\OracleDB2BackUpMode.ps1
-.\StartService.ps1
+.\OracleExport.ps1
 .\CommonFunctions.ps1
-..\SQL\SQLs.PS1
-..\Log\SQL.LOG
-..\Lock\BkUp.flg
+
 
 
 
@@ -46,6 +37,9 @@ OracleDatabaseの認証はパスワード認証を用いています。ユーザID BackUpUpser、パスワ
 
 
 
+
+
+
 .PARAMETER OracleService
 制御するORACLEのサービス名（通常はOracleServiceにSIDを付加したもの）を指定します。
 通常は環境変数ORACLE_SIDで良いですが、未設定の環境では個別に指定が必要です。
@@ -57,16 +51,8 @@ Oracleの各種BINが格納されているフォルダパスを指定します。
 実行するSQL文群のログ出力先を指定します。
 指定は必須です。
 
-
-.PARAMETER SQLCommandsPath
-予め用意した、実行するSQL文群を記述したps1ファイルのパスを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
-
-.PARAMETER BackUpFlagPath
-バックアップ中を示すフラグファイルのパスを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
+.PARAMETER Schema
+Datapump出力対象のスキーマを指定します。
 
 
 .PARAMETER ExecUser
@@ -82,16 +68,8 @@ Oracleへユーザ/パスワード認証でログオンする事を指定します。
 OS認証が使えない時に使用する事を推奨します。
 
 
-.PARAMETER NoChangeToBackUpMode
-バックアップモードへの切替不要を指定します。
-バックアップソフトウエアによっては、バックアップソフトウエアがOracleをバックアップモードへ切替します。
-その場合は当スイッチをOnにして下さい。
-
-.PARAMETER NoStopListener
-リスナー停止不要を指定します。
-業務断面が必要な場合、バックアップ前にリスナーを停止しますが、業務断面が不要or無停止とする場合は当スイッチをOnにして下さい。
-
-
+.PARAMETER DumpDirectoryObject
+Datapumpを出力するOracleに設定したDirectory Objectを指定します。
 
 
 .PARAMETER Log2EventLog
@@ -188,6 +166,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+.LINK
+
+https://github.com/7k2mpa/FileMaintenace
 
 #>
 
@@ -196,8 +177,8 @@ Param(
 
 [String]$ExecUser = 'foo',
 [String]$ExecUserPassword = 'hogehoge',
-[parameter(mandatory=$true , HelpMessage = 'Oracle Service(ex. MCDB) 全てのHelpはGet-Help FileMaintenance.ps1')][String]$OracleService ,
-#[String]$OracleService = 'MCDB',
+[String]$OracleService = $Env:ORACLE_SID,
+#[parameter(mandatory=$true , HelpMessage = 'Oracle Service(ex. MCDB) 全てのHelpはGet-Help FileMaintenance.ps1')][String]$OracleService ,
 
 #[parameter(mandatory=$true)][String]$Schema  ,
 [String]$Schema = 'MCFRAME' ,
@@ -206,7 +187,6 @@ Param(
 
 [String]$DumpDirectoryObject='MCFDATA_PUMP_DIR' ,
 
-#[String]$OracleHomeBinPath = 'D:\TEST' ,
 [String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
 
 [Switch]$PasswordAuthorization ,

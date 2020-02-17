@@ -149,7 +149,9 @@ limitations under the License.
 
 MICROSOFT LIMITED PUBLIC LICENSE version 1.1
 
+.LINK
 
+https://github.com/7k2mpa/FileMaintenace
 
 #>
 
@@ -157,11 +159,12 @@ MICROSOFT LIMITED PUBLIC LICENSE version 1.1
 
 Param(
 
-[parameter(mandatory=$true , HelpMessage = '開始対象のWindowsサービス名を指定(ex. spooler) 全てのHelpはGet-Help StartService.ps1')][String]$Service  ,
+[parameter(position=0, mandatory=$true , HelpMessage = '開始対象のWindowsサービス名を指定(ex. spooler) 全てのHelpはGet-Help StartService.ps1')][String]$Service  ,
 #[String]$Service = "ScDevice" ,
 
-[int][ValidateRange(1,65535)]$RetrySpanSec = 3,
-[int][ValidateRange(1,65535)]$RetryTimes = 5,
+[int][parameter(position=1)][ValidateRange(1,65535)]$RetrySpanSec = 3,
+[int][parameter(position=2)][ValidateRange(1,65535)]$RetryTimes = 5,
+
 
 
 

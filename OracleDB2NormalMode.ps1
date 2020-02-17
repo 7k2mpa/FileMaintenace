@@ -68,6 +68,12 @@ Oracleの各種BINが格納されているフォルダパスを指定します�
 相対、絶対パスで指定可能です。
 
 
+.PARAMETER ControlFileDotCtlPATH
+.CTL形式のコントロールファイルを出力するパスを指定します。
+
+.PARAMETER ControlFileDotBkPATH
+.BK形式のコントロールファイルを出力するパスを指定します。
+
 .PARAMETER ExecUser
 Oracleユーザ認証時のユーザ名を指定します。
 OS認証使えない時に使用する事を推奨します。
@@ -187,6 +193,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+.LINK
+
+https://github.com/7k2mpa/FileMaintenace
 
 #>
 

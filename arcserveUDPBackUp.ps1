@@ -242,6 +242,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+.LINK
+
+https://github.com/7k2mpa/FileMaintenace
+
 #>
 
 Param(
@@ -386,9 +390,9 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
         }
 
-        $BackupFlagFilePath  = ConvertToAbsolutePath -CheckPath $BackupFlagFilePath -ObjectName '-BackupFlagFilePath'
+    $BackupFlagFilePath  = ConvertToAbsolutePath -CheckPath $BackupFlagFilePath -ObjectName '-BackupFlagFilePath'
     
-        CheckContainer -CheckPath (Split-Path -Parent -Path $BackupFlagFilePath) -ObjectName '-BackupFlagFilePathの親フォルダ'  -IfNoExistFinalize > $NULL
+    CheckContainer -CheckPath (Split-Path -Parent -Path $BackupFlagFilePath) -ObjectName '-BackupFlagFilePathの親フォルダ'  -IfNoExistFinalize > $NULL
 
 
 #arcserveUDP CLIの有無を確認
