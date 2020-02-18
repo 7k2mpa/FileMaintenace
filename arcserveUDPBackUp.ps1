@@ -349,7 +349,7 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
         CheckHostname -CheckHostName $Server -ObjectName 'バックアップ対象 -Server' > $NULL
         }
 
-        CheckHostname -CheckHostName $UDPConsoleServerName -ObjectName 'arcserveUDP Console Server -UDPConsoleServerName' > $NULL
+    CheckHostname -CheckHostName $UDPConsoleServerName -ObjectName 'arcserveUDP Console Server -UDPConsoleServerName' > $NULL
 
 #[String][ValidateSet("JobExecUserAndPasswordFile","FixedPasswordFile" , "PlanText")]$AuthorizationType = 'JobExecUserAndPasswordFile' ,
 
@@ -462,7 +462,7 @@ $Version = '20200207_1615'
 
 #Create Invoke Command Strings
 
-       $Command = "$UDPCLIPath -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
+    $Command = "$UDPCLIPath -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
 
 
     IF($AllServers){

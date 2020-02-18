@@ -247,7 +247,7 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
     $FlagFolder = ConvertToAbsolutePath -CheckPath $FlagFolder -ObjectName  'Flagフォルダ-FlagFolder'
 
-   CheckContainer -CheckPath $FlagFolder -ObjectName 'FLagフォルダ-FlagFolder' -IfNoExistFinalize > $NULL
+    CheckContainer -CheckPath $FlagFolder -ObjectName 'FLagフォルダ-FlagFolder' -IfNoExistFinalize > $NULL
 
 
 #フラグファイル名のValidation
