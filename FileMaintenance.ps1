@@ -363,7 +363,7 @@ Param(
 #[parameter(position=0, mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
  
 
-[Array][parameter(position=1)][ValidateSet("AddTimeStamp", "Compress", "MoveNewFile" , "none" , "Archive")]$PreAction = 'none',
+[Array][parameter(position=1)][ValidateSet("AddTimeStamp", "Compress", "MoveNewFile" , "none" , "Archive" , "7zCompress")]$PreAction = 'none',
 
 [String][parameter(position=2)][ValidateSet("Move", "Copy", "Delete" , "none" , "DeleteEmptyFolders" , "NullClear" , "KeepFilesCount")]$Action='none',
 
@@ -818,7 +818,7 @@ Param(
 #圧縮フラグTrueの時
 
 
-        IF($PreAction -contains 'Compress'){
+        IF($PreAction -match '^(Compress|7zCompress)$'){
 
             IF($PreAction -contains 'AddTimeStamp'){
 
@@ -1050,7 +1050,7 @@ Do
 
 #Pre Action
 
-   IF(( $PreAction -match '^(Compress|AddTimeStamp)$') -AND ($PreAction -notcontains 'Archive')){
+   IF(( $PreAction -match '^(Compress|AddTimeStamp|7zCompress)$') -AND ($PreAction -notcontains 'Archive')){
 
       $ArchivePath = CompressAndAddTimeStamp -TargetObject $TargetObject
 
