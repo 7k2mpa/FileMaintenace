@@ -189,7 +189,7 @@ function TryAction {
 #     , "7zCompress" , "7zZipCompress" , "7zArchive" , "7zZipArchive")]$ActionType,
 
     [parameter(mandatory=$true)][String]
-    [ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|MakeNew(FileWithValue|Folder)|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$")]$ActionType,
+    [ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|MakeNew(FileWithValue|Folder)|(7z|7zZip|^)(Compress(AndAddTimeStamp|$)|Archive))$")]$ActionType,
 
 #    [ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|(MakeNew(FileWithValue|Folder))|((7z|7zZip|$)(Compress|Archive)(AndAddTimeStamp|$))$")]$ActionType,
 
