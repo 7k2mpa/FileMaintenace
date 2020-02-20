@@ -363,7 +363,7 @@ Param(
 #[parameter(position=0, mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
  
 
-[Array][parameter(position=1)][ValidateSet("AddTimeStamp", "Compress", "MoveNewFile" , "none" , "Archive" , "7zCompress")]$PreAction = 'none',
+[Array][parameter(position=1)][ValidateSet("AddTimeStamp", "Compress", "MoveNewFile" , "none" , "Archive" , "7z" , "7zZip")]$PreAction = 'none',
 
 [String][parameter(position=2)][ValidateSet("Move", "Copy", "Delete" , "none" , "DeleteEmptyFolders" , "NullClear" , "KeepFilesCount")]$Action='none',
 
@@ -398,6 +398,7 @@ Param(
 [Switch]$NoneTargetAsWarning,
 
 [String]$CompressedExtString = '.zip',
+[String]$7zFolderPath = 'C:\Program Files\7-Zip',
 
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss',
 
@@ -818,7 +819,73 @@ Param(
 #圧縮フラグTrueの時
 
 
-        IF($PreAction -match '^(Compress|7zCompress)$'){
+        IF($PreAction -match '^(Compress)$'){
+
+            IF($PreAction -match '^7z$'){
+                $Script:ActionType = "7z"
+                $ExtString = '.7z'
+                
+                }elseIF($PreAction -match '^7zZip$'){
+                    $Script:ActionType = "7zZip"
+                    $ExtString = '.zip'
+
+                    }else{
+                    $ExtString = $CompressedExtString
+                    }
+                                       
+                
+                            
+
+
+            IF($PreAction -contains 'AddTimeStamp'){
+
+                $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )+$ExtString )
+                $Script:ActionType += "CompressAndAddTimeStamp"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮&タイムスタンプ付加した[$(Split-Path -Leaf $ArchiveFile)]を作成します"
+
+            }else{
+                $ArchiveFile = $TargetObject+$ExtString
+                $Script:ActionType += "Compress"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮した[$(Split-Path -Leaf $ArchiveFile)]を作成します" 
+            }          
+ 
+        }else{
+
+#タイムスタンプ付加のみTrueの時
+
+                $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath (AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )
+                $Script:ActionType = "AddTimeStamp"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "タイムスタンプ付加した[$(Split-Path -Leaf $ArchiveFile)]を作成します"
+                }
+
+
+#移動フラグがTrueならば、作成した圧縮orタイムスタンプ付加したファイルを移動する
+
+    IF($PreAction -contains 'MoveNewFile'){
+
+        Logging -EventID $InfoEventID -EventType Information -EventMessage ("-PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"]のため、作成したファイルは$($MoveToNewFolder)に配置します")
+        Return ( Join-Path $MoveToNewFolder (Split-Path -Leaf $ArchiveFile) )
+
+        }else{
+        Return $ArchiveFile
+        }
+
+}
+
+#圧縮フラグまたはタイムスタンプ付加フラグがTrueの処理
+
+function OLDCompressAndAddTimeStamp{
+
+Param(
+[parameter(mandatory=$true)][String]$TargetObject
+) 
+
+        [String]$TargetFileParentFolder = Split-Path $TargetObject -Parent
+
+#圧縮フラグTrueの時
+
+
+        IF($PreAction -match '^(Compress)$'){
 
             IF($PreAction -contains 'AddTimeStamp'){
 
@@ -1050,11 +1117,16 @@ Do
 
 #Pre Action
 
-   IF(( $PreAction -match '^(Compress|AddTimeStamp|7zCompress)$') -AND ($PreAction -notcontains 'Archive')){
+   IF(( $PreAction -match '^(Compress|AddTimeStamp)$') -AND ($PreAction -notcontains 'Archive')){
 
       $ArchivePath = CompressAndAddTimeStamp -TargetObject $TargetObject
 
       If(CheckLeafNotExists $ArchivePath){
+
+#            echo 'Type' ; echo $ActionType
+#            echo 'From' ; echo $TargetObject
+#            echo 'To' ; echo $ArchivePath
+
 
             TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
             }

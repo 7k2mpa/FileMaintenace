@@ -183,7 +183,7 @@ function TryAction {
     
     Param(
 
-    [parameter(mandatory=$true)][String][ValidateSet("Move", "Copy", "Delete" , "AddTimeStamp" , "NullClear" ,"Compress" , "CompressAndAddTimeStamp" , "MakeNewFolder" ,"MakeNewFileWithValue" , "Rename" , "Archive" , "ArchiveAndAddTimeStamp" , "7zCompress")]$ActionType,
+    [parameter(mandatory=$true)][String][ValidateSet("Move", "Copy", "Delete" , "AddTimeStamp" , "NullClear" ,"Compress" , "CompressAndAddTimeStamp" , "MakeNewFolder" ,"MakeNewFileWithValue" , "Rename" , "Archive" , "ArchiveAndAddTimeStamp" , "7zCompress" , "7zZipCompress")]$ActionType,
     [parameter(mandatory=$true)][String]$ActionFrom,
     [String]$ActionTo,
     [parameter(mandatory=$true)][String]$ActionError,
@@ -271,22 +271,26 @@ function TryAction {
             Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Update > $Null  -ErrorAction Stop
             }                  
 
-        '^7zCompress'
+        '^(7zCompress|7zZipCompress)$'
             {
             
 #            echo '7zip'
-            $7zPath = 'C:\Program Files\7-Zip'
-            Push-Location -LiteralPath $7zPath
+
+            Push-Location -LiteralPath $7zFolderPath
  #           .\7z a $ActionTo $ActionFrom | Tee-Object -Variable ProcessError
-             [String]$ErrorDetail = .\7z a $ActionTo $ActionFrom 2>&1 
-            echo $ErrorDetail
+
+            IF($ActionType -match '7zZip'){$7zType = 'zip'}else{$7zType = '7z'}
+
+#             echo $7zType
+             [String]$ErrorDetail = .\7z a $ActionTo $ActionFrom -t"$7zType" 2>&1 
+#            echo $ErrorDetail
 #            $ErrorDetail = .\7z a $ActionToo $ActionFromm | ForEach-Object {Write-Output $_}
 #            $ErrorDetail = .\7z a $ActionToo $ActionFromm
 
             Pop-Location
             $ProcessError = $TRUE
             IF($LASTEXITCODE -ne 0){
-            Throw "error"
+            Throw "error in 7zip"
             
             }
 
