@@ -183,7 +183,16 @@ function TryAction {
     
     Param(
 
-    [parameter(mandatory=$true)][String][ValidateSet("Move", "Copy", "Delete" , "AddTimeStamp" , "NullClear" ,"Compress" , "CompressAndAddTimeStamp" , "MakeNewFolder" ,"MakeNewFileWithValue" , "Rename" , "Archive" , "ArchiveAndAddTimeStamp" , "7zCompress" , "7zZipCompress")]$ActionType,
+#    [parameter(mandatory=$true)][String]
+#    [ValidateSet("Move", "Copy", "Delete" , "AddTimeStamp" , "NullClear" ,"Compress" , "CompressAndAddTimeStamp" `
+#     , "MakeNewFolder" ,"MakeNewFileWithValue" , "Rename" , "Archive" , "ArchiveAndAddTimeStamp" `
+#     , "7zCompress" , "7zZipCompress" , "7zArchive" , "7zZipArchive")]$ActionType,
+
+    [parameter(mandatory=$true)][String]
+    [ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|MakeNew(FileWithValue|Folder)|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$")]$ActionType,
+
+#    [ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|(MakeNew(FileWithValue|Folder))|((7z|7zZip|$)(Compress|Archive)(AndAddTimeStamp|$))$")]$ActionType,
+
     [parameter(mandatory=$true)][String]$ActionFrom,
     [String]$ActionTo,
     [parameter(mandatory=$true)][String]$ActionError,
@@ -271,31 +280,78 @@ function TryAction {
             Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Update > $Null  -ErrorAction Stop
             }                  
 
-        '^(7zCompress|7zZipCompress)$'
+
+        '^((7z|7zZip)(Archive|Compress))$'
             {
-            
-#            echo '7zip'
 
             Push-Location -LiteralPath $7zFolderPath
- #           .\7z a $ActionTo $ActionFrom | Tee-Object -Variable ProcessError
 
-            IF($ActionType -match '7zZip'){$7zType = 'zip'}else{$7zType = '7z'}
+            IF($ActionType -match '7zZip'){
+                
+                $7zType = 'zip'
+                
+                }else{
+                $7zType = '7z'
+                }
 
-#             echo $7zType
-             [String]$ErrorDetail = .\7z a $ActionTo $ActionFrom -t"$7zType" 2>&1 
-#            echo $ErrorDetail
-#            $ErrorDetail = .\7z a $ActionToo $ActionFromm | ForEach-Object {Write-Output $_}
-#            $ErrorDetail = .\7z a $ActionToo $ActionFromm
+            Switch -Regex ($ActionType){
+            
+                'Compress'{
+                    [String]$ErrorDetail = .\7z a $ActionTo $ActionFrom -t"$7zType" 2>&1 
+                    }
+
+                'Archive'{
+                    [String]$ErrorDetail = .\7z u $ActionTo $ActionFrom -t"$7zType" 2>&1  
+                    }
+            
+                Default{
+                    Pop-Location
+                    Throw "internal error in 7Zip Section"
+                    }            
+                }
+
+#            IF($ActionType -match 'Compress'){
+
+#                [String]$ErrorDetail = .\7z a $ActionTo $ActionFrom -t"$7zType" 2>&1 
+#                }elseIF($ActionType -match 'Archive'){
+            
+#            [String]$ErrorDetail = .\7z u $ActionTo $ActionFrom -t"$7zType" 2>&1             
+#            }else{Throw "internal error in 7ZipSection"}
+
 
             Pop-Location
             $ProcessError = $TRUE
             IF($LASTEXITCODE -ne 0){
-            Throw "error in 7zip"
+
+                Throw "error in 7zip"            
+                }
+            }
+
+#        '^(7zCompress|7zZipCompress)$'
+#            {
             
-            }
+#            echo '7zip'
+
+#            Push-Location -LiteralPath $7zFolderPath
+ #           .\7z a $ActionTo $ActionFrom | Tee-Object -Variable ProcessError
+
+#            IF($ActionType -match '7zZip'){$7zType = 'zip'}else{$7zType = '7z'}
+
+#             echo $7zType
+#             [String]$ErrorDetail = .\7z a $ActionTo $ActionFrom -t"$7zType" 2>&1 
+#            echo $ErrorDetail
+#            $ErrorDetail = .\7z a $ActionToo $ActionFromm | ForEach-Object {Write-Output $_}
+#            $ErrorDetail = .\7z a $ActionToo $ActionFromm
+
+#            Pop-Location
+#            $ProcessError = $TRUE
+#            IF($LASTEXITCODE -ne 0){
+#            Throw "error in 7zip"
+            
+#            }
 
 
-            }
+ #           }
                                            
         Default                                 
             {
@@ -310,9 +366,9 @@ function TryAction {
     catch [Exception]{
        
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "${ActionError}の[${ActionType}]に失敗しました"
-        IF($ProcessError){}else{
-        $ErrorDetail = $Error[0] | Out-String
-        }
+        IF(-NOT($ProcessError)){
+            $ErrorDetail = $Error[0] | Out-String
+            }
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $ErrorDetail"
         $Script:ErrorFlag = $TRUE
 
@@ -644,6 +700,7 @@ Param(
 
 )
 
+
     If (Test-Path -LiteralPath $CheckPath -PathType Container){
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]は存在します"
@@ -659,6 +716,7 @@ Param(
                     Return $false
                     }
     }
+
 }
 
 

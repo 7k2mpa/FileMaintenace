@@ -821,17 +821,42 @@ Param(
 
         IF($PreAction -match '^(Compress)$'){
 
-            IF($PreAction -match '^7z$'){
+        Switch -Regex ($PreAction){
+        
+        
+          '^7z$'{
                 $Script:ActionType = "7z"
                 $ExtString = '.7z'
                 
-                }elseIF($PreAction -match '^7zZip$'){
+                }
+                
+           '^7zZip$'{
                     $Script:ActionType = "7zZip"
                     $ExtString = '.zip'
 
-                    }else{
+                    }
+                    
+             Default{
+                    $Script:ActionType = ""
                     $ExtString = $CompressedExtString
                     }
+        
+        }
+
+
+
+#            IF($PreAction -match '^7z$'){
+#                $Script:ActionType = "7z"
+#                $ExtString = '.7z'
+                
+#                }elseIF($PreAction -match '^7zZip$'){
+#                    $Script:ActionType = "7zZip"
+#                    $ExtString = '.zip'
+
+ #                   }else{
+ #                   $Script:ActionType = ""
+ #                   $ExtString = $CompressedExtString
+ #                   }
                                        
                 
                             
@@ -1133,8 +1158,30 @@ Do
 
         
     }elseIF($PreAction -contains 'Archive'){
+
+
+        Switch -Regex ($PreAction){
+        
+        
+          '^7z$'{
+                $ActionType = "7zArchive"
+
+                }
+                
+           '^7zZip$'{
+                    $ActionType = "7zZipArchive"
+
+                    }
+                    
+             Default{
+                    $ActionType = "Archive"
+
+                    }       
+        }        
+
+
        
-        TryAction -ActionType Archive -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
+        TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
         }
 
 
