@@ -464,7 +464,7 @@ $Version = '20200207_1615'
 
 #Create Invoke Command Strings
 
-    $Command = '.\`"' + (Split-Path -LiteralPath $UDPCLIPath -Leaf ) + '`"'
+    $Command = '.\"' + (Split-Path $UDPCLIPath -Leaf ) + '"'
 
     $Command += " -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
 
@@ -546,13 +546,11 @@ $Version = '20200207_1615'
 
     CheckLogPath -CheckPath $BackupFlagFilePath -ObjectName 'バックアップ実行中フラグ格納フォルダ'
 
-#echo $Command
-
 #Invoke PowerCLI command
 
     Logging -EventID $InfoEventID -EventType Information -EventMessage "arcserveUDP CLI [$($UDPCLIPath)]を起動します"
 
-    Push-Location (Split-Path -LiteralPath $UDPCLIPath)
+    Push-Location (Split-Path $UDPCLIPath -Parent)
 
     Try{
         $Return = Invoke-Expression $Command 2>$ErrorMessage -ErrorAction Stop 
