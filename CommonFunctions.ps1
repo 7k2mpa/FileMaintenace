@@ -26,7 +26,8 @@ https://github.com/7k2mpa/FileMaintenace
 
 #>
 
-$Script:CommonFunctionsVersion = '20200130_1050'
+$Script:CommonFunctionsVersion = '20200221_1045'
+
 
 #ÉçÉOìôÇÃïœêîÇàÍäáê›íËÇµÇΩÇ¢èÍçáÇÕà»â∫ÇóòópÇµÇƒâ∫Ç≥Ç¢ÅB
 #
@@ -189,9 +190,8 @@ function TryAction {
 #     , "7zCompress" , "7zZipCompress" , "7zArchive" , "7zZipArchive")]$ActionType,
 
     [parameter(mandatory=$true)][String]
-    [ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|MakeNew(FileWithValue|Folder)|(7z|7zZip|^)(Compress(AndAddTimeStamp|$)|Archive))$")]$ActionType,
+    [ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|MakeNew(FileWithValue|Folder)|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$")]$ActionType,
 
-#    [ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|(MakeNew(FileWithValue|Folder))|((7z|7zZip|$)(Compress|Archive)(AndAddTimeStamp|$))$")]$ActionType,
 
     [parameter(mandatory=$true)][String]$ActionFrom,
     [String]$ActionTo,
@@ -281,10 +281,10 @@ function TryAction {
             }                  
 
 
-        '^((7z|7zZip)(Archive|Compress))$'
+        '^((7z|7zZip)(Archive|Compress)($|AndAddTimeStamp))$'
             {
 
-            Push-Location -LiteralPath $7zFolderPath
+            Push-Location -LiteralPath $7zFolder
 
             IF($ActionType -match '7zZip'){
                 
@@ -297,27 +297,20 @@ function TryAction {
             Switch -Regex ($ActionType){
             
                 'Compress'{
-                    [String]$ErrorDetail = .\7z a $ActionTo $ActionFrom -t"$7zType" 2>&1 
+                    [String]$ErrorDetail = .\7z a $ActionTo $ActionFrom -t"$7zType" 2>&1
+                    Break
                     }
 
                 'Archive'{
-                    [String]$ErrorDetail = .\7z u $ActionTo $ActionFrom -t"$7zType" 2>&1  
+                    [String]$ErrorDetail = .\7z u $ActionTo $ActionFrom -t"$7zType" 2>&1
+                    Break
                     }
             
                 Default{
-                    Pop-Location
-                    Throw "internal error in 7Zip Section"
+                    Pop-Location 
+                    Throw "internal error in 7Zip Section with Action Type"
                     }            
                 }
-
-#            IF($ActionType -match 'Compress'){
-
-#                [String]$ErrorDetail = .\7z a $ActionTo $ActionFrom -t"$7zType" 2>&1 
-#                }elseIF($ActionType -match 'Archive'){
-            
-#            [String]$ErrorDetail = .\7z u $ActionTo $ActionFrom -t"$7zType" 2>&1             
-#            }else{Throw "internal error in 7ZipSection"}
-
 
             Pop-Location
             $ProcessError = $TRUE
@@ -326,32 +319,6 @@ function TryAction {
                 Throw "error in 7zip"            
                 }
             }
-
-#        '^(7zCompress|7zZipCompress)$'
-#            {
-            
-#            echo '7zip'
-
-#            Push-Location -LiteralPath $7zFolderPath
- #           .\7z a $ActionTo $ActionFrom | Tee-Object -Variable ProcessError
-
-#            IF($ActionType -match '7zZip'){$7zType = 'zip'}else{$7zType = '7z'}
-
-#             echo $7zType
-#             [String]$ErrorDetail = .\7z a $ActionTo $ActionFrom -t"$7zType" 2>&1 
-#            echo $ErrorDetail
-#            $ErrorDetail = .\7z a $ActionToo $ActionFromm | ForEach-Object {Write-Output $_}
-#            $ErrorDetail = .\7z a $ActionToo $ActionFromm
-
-#            Pop-Location
-#            $ProcessError = $TRUE
-#            IF($LASTEXITCODE -ne 0){
-#            Throw "error in 7zip"
-            
-#            }
-
-
- #           }
                                            
         Default                                 
             {
@@ -390,8 +357,8 @@ function TryAction {
    
     }
 
-
-   IF($ActionType -match '^(Compress|CompressAndAddTimeStamp|AddTimeStamp|Copy|Move|Rename|Archive|ArchiveAndAddTimeStamp)$' ){
+#   IF($ActionType -match '^(Compress|CompressAndAddTimeStamp|AddTimeStamp|Copy|Move|Rename|Archive|ArchiveAndAddTimeStamp)$' ){
+   IF($ActionType -match '^(Copy|AddTimeStamp|Rename|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$' ){
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ActionTo)ÇçÏê¨ÇµÇ‹ÇµÇΩ"
         }
 

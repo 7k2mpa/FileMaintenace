@@ -398,7 +398,7 @@ Param(
 [Switch]$NoneTargetAsWarning,
 
 [String]$CompressedExtString = '.zip',
-[String]$7zFolderPath = 'C:\Program Files\7-Zip',
+[String]$7zFolder = 'C:\Program Files\7-Zip',
 
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss',
 
@@ -699,6 +699,15 @@ IF($Compress){$Script:PreAction +='Compress'}
         }
 
 
+#7zフォルダの要不要と有無を確認
+
+    If ( $PreAction -match "^(7z|7zZip)$"){    
+
+        $7zFolder = ConvertToAbsolutePath -CheckPath $7zFolder -ObjectName '-7zFolder'
+
+        CheckContainer -CheckPath $7zFolder -ObjectName '-7zFolder' -IfNoExistFinalize > $NULL
+        }
+
 #組み合わせが不正な指定を確認
 
 
@@ -725,7 +734,19 @@ IF($Compress){$Script:PreAction +='Compress'}
 				Finalize $ErrorReturnCode
                 }
 
-    IF ($Action -eq "DeleteEmptyFolders"){
+   If (($PreAction -contains '7z' ) -AND  ($PreAction -Contains '7zZip')){
+
+				Logging -EventType Error -EventID $ErrorEventID -EventMessage "-PreActionで圧縮方式指定7zと7zZipとを同時に指定はできません"
+				Finalize $ErrorReturnCode
+                }
+
+   If (($PreAction -match "^(7z|7zZip)$" ) -AND  (-NOT($PreAction -match "^(Compress|Archive)$"))){
+
+				Logging -EventType Error -EventID $ErrorEventID -EventMessage "-PreActionで圧縮方式指定7zと7zZipは単独で指定できません。CompressまたはArchiveの指定が必要です"
+				Finalize $ErrorReturnCode
+                }
+
+   IF ($Action -eq "DeleteEmptyFolders"){
         IF( ($PreAction -match '^(Compress|Archive|AddTimeStamp)$') -OR ($PostAction -ne 'none' )){
     
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時、ファイル操作は行えません"
@@ -763,10 +784,26 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
 
             $Message = "マッチしたファイルを"
             IF ($PreAction -contains 'MoveNewFile'){ $Message += "移動先フォルダ[$($MoveToFolder)]へ"}
+
+            IF ($PreAction -match "^(Compress|Archive)$"){
+                
+
+                IF($PreAction -ccontains '7z'){
+                        $Message += "圧縮方式[7z]で"            
+                        }elseIF($PreAction -contains '7zZIP'){
+                            $Message += "圧縮方式[7zZip]で"
+                            }else{
+                            $Message += "圧縮方式[Powershell cmdlet Compress-Archive]で"
+                            }
+                               
+            }
+            
             $Message += "再帰的[$($Recurse)]にPreAction( ファイル名に日付付加["+[Boolean]($PreAction -contains 'AddTimeStamp')+"] | 圧縮["+[Boolean]($PreAction -contains 'Compress')+"] | 1ファイルにアーカイヴ["+[Boolean]($PreAction -contains 'Archive')+"] )します"
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage $Message
             }
+
+
 
         IF ($Action -ne 'none'){
 
@@ -821,47 +858,29 @@ Param(
 
         IF($PreAction -match '^(Compress)$'){
 
-        Switch -Regex ($PreAction){
-        
+        #$PreActionは配列である。それをSwitch処理すると1要素づつループする。
+        #'Compress'等は一旦Defaultに落ちるが、'7z' or '7zZip'があれば$ActionTypeは上書きされる
+
+        Switch -Regex ($PreAction){    
         
           '^7z$'{
                 $Script:ActionType = "7z"
                 $ExtString = '.7z'
-                
+                Break                
                 }
                 
            '^7zZip$'{
-                    $Script:ActionType = "7zZip"
-                    $ExtString = '.zip'
-
-                    }
+                $Script:ActionType = "7zZip"
+                $ExtString = '.zip'
+                Break
+                }
                     
              Default{
-                    $Script:ActionType = ""
-                    $ExtString = $CompressedExtString
-                    }
-        
+                $Script:ActionType = ""
+                $ExtString = $CompressedExtString
+                }    
         }
-
-
-
-#            IF($PreAction -match '^7z$'){
-#                $Script:ActionType = "7z"
-#                $ExtString = '.7z'
-                
-#                }elseIF($PreAction -match '^7zZip$'){
-#                    $Script:ActionType = "7zZip"
-#                    $ExtString = '.zip'
-
- #                   }else{
- #                   $Script:ActionType = ""
- #                   $ExtString = $CompressedExtString
- #                   }
-                                       
-                
-                            
-
-
+                        
             IF($PreAction -contains 'AddTimeStamp'){
 
                 $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )+$ExtString )
@@ -897,55 +916,6 @@ Param(
 
 }
 
-#圧縮フラグまたはタイムスタンプ付加フラグがTrueの処理
-
-function OLDCompressAndAddTimeStamp{
-
-Param(
-[parameter(mandatory=$true)][String]$TargetObject
-) 
-
-        [String]$TargetFileParentFolder = Split-Path $TargetObject -Parent
-
-#圧縮フラグTrueの時
-
-
-        IF($PreAction -match '^(Compress)$'){
-
-            IF($PreAction -contains 'AddTimeStamp'){
-
-                $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )+$CompressedExtString )
-                $Script:ActionType = "CompressAndAddTimeStamp"
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮&タイムスタンプ付加した[$(Split-Path -Leaf $ArchiveFile)]を作成します"
-
-            }else{
-                $ArchiveFile = $TargetObject+$CompressedExtString
-                $Script:ActionType = "Compress"
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮した[$(Split-Path -Leaf $ArchiveFile)]を作成します" 
-            }          
- 
-        }else{
-
-#タイムスタンプ付加のみTrueの時
-
-                $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath (AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )
-                $Script:ActionType = "AddTimeStamp"
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "タイムスタンプ付加した[$(Split-Path -Leaf $ArchiveFile)]を作成します"
-                }
-
-
-#移動フラグがTrueならば、作成した圧縮orタイムスタンプ付加したファイルを移動する
-
-    IF($PreAction -contains 'MoveNewFile'){
-
-        Logging -EventID $InfoEventID -EventType Information -EventMessage ("-PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"]のため、作成したファイルは$($MoveToNewFolder)に配置します")
-        Return ( Join-Path $MoveToNewFolder (Split-Path -Leaf $ArchiveFile) )
-
-        }else{
-        Return $ArchiveFile
-        }
-
-}
 
 function Finalize{
 
@@ -995,7 +965,7 @@ EndingProcess $ReturnCode
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200207_1615'
+$Version = '20200221_1045'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
@@ -1148,38 +1118,28 @@ Do
 
       If(CheckLeafNotExists $ArchivePath){
 
-#            echo 'Type' ; echo $ActionType
-#            echo 'From' ; echo $TargetObject
-#            echo 'To' ; echo $ArchivePath
-
-
             TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
             }
 
         
     }elseIF($PreAction -contains 'Archive'){
 
-
-        Switch -Regex ($PreAction){
-        
+        Switch -Regex ($PreAction){        
         
           '^7z$'{
                 $ActionType = "7zArchive"
-
+                Break
                 }
                 
            '^7zZip$'{
-                    $ActionType = "7zZipArchive"
-
-                    }
+                $ActionType = "7zZipArchive"
+                Break
+                }
                     
              Default{
-                    $ActionType = "Archive"
-
-                    }       
+                $ActionType = "Archive"
+                }       
         }        
-
-
        
         TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
         }
