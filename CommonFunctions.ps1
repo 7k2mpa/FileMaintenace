@@ -26,7 +26,7 @@ https://github.com/7k2mpa/FileMaintenace
 
 #>
 
-$Script:CommonFunctionsVersion = '20200221_1045'
+$Script:CommonFunctionsVersion = '20200221_2145'
 
 
 #ログ等の変数を一括設定したい場合は以下を利用して下さい。
@@ -184,14 +184,8 @@ function TryAction {
     
     Param(
 
-#    [parameter(mandatory=$true)][String]
-#    [ValidateSet("Move", "Copy", "Delete" , "AddTimeStamp" , "NullClear" ,"Compress" , "CompressAndAddTimeStamp" `
-#     , "MakeNewFolder" ,"MakeNewFileWithValue" , "Rename" , "Archive" , "ArchiveAndAddTimeStamp" `
-#     , "7zCompress" , "7zZipCompress" , "7zArchive" , "7zZipArchive")]$ActionType,
-
     [parameter(mandatory=$true)][String]
     [ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|MakeNew(FileWithValue|Folder)|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$")]$ActionType,
-
 
     [parameter(mandatory=$true)][String]$ActionFrom,
     [String]$ActionTo,
@@ -313,7 +307,7 @@ function TryAction {
                 }
 
             Pop-Location
-            $ProcessError = $TRUE
+            $ProcessErrorFlag = $TRUE
             IF($LASTEXITCODE -ne 0){
 
                 Throw "error in 7zip"            
@@ -333,7 +327,7 @@ function TryAction {
     catch [Exception]{
        
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "${ActionError}の[${ActionType}]に失敗しました"
-        IF(-NOT($ProcessError)){
+        IF(-NOT($ProcessErrorFlag)){
             $ErrorDetail = $Error[0] | Out-String
             }
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $ErrorDetail"
@@ -357,7 +351,6 @@ function TryAction {
    
     }
 
-#   IF($ActionType -match '^(Compress|CompressAndAddTimeStamp|AddTimeStamp|Copy|Move|Rename|Archive|ArchiveAndAddTimeStamp)$' ){
    IF($ActionType -match '^(Copy|AddTimeStamp|Rename|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$' ){
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ActionTo)を作成しました"
         }
@@ -416,29 +409,27 @@ Param(
 
     Switch -Regex ($CheckPath){
 
-    "^\.+\\.*"{
+        "^\.+\\.*"{
        
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は相対パス表記です"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は相対パス表記です"
 
-        $ConvertedCheckPath = Join-Path -Path $DatumPath -ChildPath $CheckPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
+            $ConvertedCheckPath = Join-Path -Path $DatumPath -ChildPath $CheckPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
          
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "スクリプトが配置されているフォルダ[$($DatumPath)]、[$($CheckPath)]とを結合した絶対パス表記[$($ConvertedCheckPath)]に変換します"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "スクリプトが配置されているフォルダ[$($DatumPath)]、[$($CheckPath)]とを結合した絶対パス表記[$($ConvertedCheckPath)]に変換します"
 
-        $CheckPath = $ConvertedCheckPath
-
-        }
+            $CheckPath = $ConvertedCheckPath
+            }
 
         "^[c-zC-Z]:\\.*"{
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は絶対パス表記です"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は絶対パス表記です"
+            }
 
-
-        }
         Default{
       
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]は相対パス、絶対パス表記ではありません"
-        Finalize $ErrorReturnCode
-        }
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]は相対パス、絶対パス表記ではありません"
+            Finalize $ErrorReturnCode
+            }
     }
 
     #パス末尾に\\が連続すると処理が複雑になるので、使わせない
@@ -481,10 +472,6 @@ Param(
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName のパスにWindows予約語を含んでいます。以下は予約語のためWindowsでファイル、フォルダ名称に使用できません(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
                 Finalize $ErrorReturnCode
                 }        
-
-
-
-
 
     Return $CheckPath
 

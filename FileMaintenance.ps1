@@ -57,19 +57,19 @@ C:\TEST以下のファイルを非再帰的に削除します（子フォルダは対象外）
 
 .EXAMPLE
 
-FileMaintenace.ps1 -TargetFolder C:\TEST -Action Copy -MoveToFolder C:\TEST1 -KBsize 10 -continue
+FileMaintenace.ps1 -TargetFolder C:\TEST -Action Copy -MoveToFolder C:\TEST1 -Size 10KB -continue
 C:\TEST以下のファイルで10KB以上のものを再帰的にC:\TEST1へ複製します。移動先に子フォルダが無ければ作成します
 移動先に同一名称のファイルがあった場合はスキップして処理を継続します
 
 .EXAMPLE
 
-FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -Compress -Action none -AddTimeStamp -NullOriginalFile
+FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -PreAction Compress,AddTimeStamp -Action NullClear
 C:\TEST以下のファイルを再帰的に 「.logで終わる」ものへファイル名に日付を付加して圧縮します。
 元ファイルは残りますが、内容消去（ヌルクリア）します。
 
 .EXAMPLE
 
-FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -Compress $True -Action Delete -MoveNewFile $True -MoveToFolder C:\TEST1 -OverRide -Days 10
+FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -PreAction Compress,MoveNewFile -Action Delete -MoveToFolder C:\TEST1 -OverRide -Days 10
 
 C:\TEST以下のファイルを再帰的に 「.logで終わる」かつ10日以前のものを圧縮後C:\TEST1へ移動します。
 移動先に同一名称のものがあった場合は上書きします。
@@ -109,7 +109,8 @@ Compress:対象ファイルから圧縮したファイルを新規生成します。
 AddTimeStamp:対象ファイルからファイル名に-TimeStampFormatで定められた書式でタイムスタンプ付加したファイルを新規生成します。
 Archive:対象ファイル群をまとめた1アーカイブファイルを新規生成します。-OverRideを指定すると、既存アーカイブファイルへ対象ファイル群を追加します。アーカイブファイルは-ArchiveFileNameで指定したファイル名です。
 MoveNewFile:-PreActionの新規生成ファイルを-TargetFolderと同一ではなく、-MoveToFolderへ配置します。
-
+7z:Compress,Archiveに使用する圧縮に7z.exeを用います。圧縮方法は7z.exeの標準LZMA2を用います。
+7zZip:Compress,Archiveに使用する圧縮に7z.exeを用います。圧縮方法はZip(Deflate)を用います。
 
 .PARAMETER Action
 処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
@@ -139,6 +140,11 @@ NullClear:ファイルの内容削除 NullClearします。PostActionのため、Actionと併用可能
 
 .PARAMETER ArchiveFileName
 -PreAction Archive指定時のアーカイブファイル名を指定します。
+
+
+.PARAMETER 7zFolder 
+Compress,Archiveに外部プログラム7z.exeを使用する際に、7-Zipがインストールされているフォルダを指定します。
+デフォルトは[C:\Program Files\7-Zip]です。
 
 .PARAMETER Days
 　処理対象のファイル、フォルダを更新経過日数でフィルタします。
@@ -730,7 +736,7 @@ IF($Compress){$Script:PreAction +='Compress'}
 
    If (($PreAction -contains 'Compress') -AND  ($PreAction -contains 'Archive') ){
 
-				Logging -EventType Error -EventID $ErrorEventID "-PreActionでCompressとArchiveとを同時に指定する事はできません"
+				Logging -EventType Error -EventID $ErrorEventID "-PreActionでCompressとArchiveとを同時に指定はできません"
 				Finalize $ErrorReturnCode
                 }
 
@@ -787,7 +793,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
 
             IF ($PreAction -match "^(Compress|Archive)$"){
                 
-
+                #$PreActionは配列なのでSwitchで処理すると複数回実行されるので、IFで処理
                 IF($PreAction -ccontains '7z'){
                         $Message += "圧縮方式[7z]で"            
                         }elseIF($PreAction -contains '7zZIP'){
@@ -965,7 +971,7 @@ EndingProcess $ReturnCode
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200221_1045'
+$Version = '20200221_2145'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力

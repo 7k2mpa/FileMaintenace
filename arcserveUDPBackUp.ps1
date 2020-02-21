@@ -452,9 +452,9 @@ EndingProcess $ReturnCode
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200207_1615'
+$Version = '20200221_2145'
  
-
+ 
 #初期設定、パラメータ確認、起動メッセージ出力
 
 . Initialize
@@ -468,7 +468,6 @@ $Version = '20200207_1615'
 
     $Command += " -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
 
-#   $Command = "$UDPCLIPath -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
 
 
     IF($AllServers){
@@ -492,6 +491,7 @@ $Version = '20200207_1615'
         #今のところ、この認証方式はarcserve UDPでは出来ない。実行ユーザが権限を持っていても(パスワードファイル|パスワード)を与える必要がある
         Logging -EventID $InfoEventID -EventType Information -EventMessage "認証方法は[$($AuthorizationType)]です。ジョブ実行中ユーザ名と認証情報で認証します。"
         }
+
     '^JobExecUserAndPasswordFile$'
         {
         Logging -EventID $InfoEventID -EventType Information -EventMessage "認証方法は[$($AuthorizationType)]です。ジョブ実行中ユーザ名、予め用意した実行ユーザ名を含むパスワードファイルで認証します。"
@@ -514,11 +514,13 @@ $Version = '20200207_1615'
         Logging -EventID $InfoEventID -EventType Information -EventMessage "認証方法は[$($AuthorizationType)]です。指定したユーザ名、予め用意したパスワードファイルで認証します。"
         $Command += "-UDPConsoleDomainName `'$ExecUserDomain`' -UDPConsoleUserName `'$ExecUser`' -UDPConsolePasswordFile `'$FixedPasswordFilePath`' "
         }
+
     '^PlainText$'
         {
         Logging -EventID $InfoEventID -EventType Information -EventMessage "認証方法は[$($AuthorizationType)]です。指定したユーザ名、指定した平文パスワードで認証します。。"
         $Command += "-UDPConsoleDomainName `'$ExecUserDomain`' -UDPConsoleUserName `'$ExecUser`' -UDPConsolePassword `'$ExecUserPassword`' "
         }
+
     Default
         {
         Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "内部エラー。-AuthorizationTypeの指定が正しくありません"
