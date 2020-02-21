@@ -435,6 +435,8 @@ Param(
 [parameter(mandatory=$true)][int]$ReturnCode
 )
 
+    Pop-Location
+
     IF(CheckLeaf -CheckPath $BackupFlagFilePath -ObjectName 'BackUp Flag'){
         TryAction -ActionType Delete -ActionFrom  $BackupFlagFilePath -ActionError "BackUp Flag [$($BackupFlagFilePath)]"
         }
@@ -462,7 +464,11 @@ $Version = '20200207_1615'
 
 #Create Invoke Command Strings
 
-    $Command = "$UDPCLIPath -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
+    $Command = '.\`"' + (Split-Path -LiteralPath $UDPCLIPath -Leaf ) + '`"'
+
+    $Command += " -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
+
+#   $Command = "$UDPCLIPath -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
 
 
     IF($AllServers){
@@ -540,11 +546,13 @@ $Version = '20200207_1615'
 
     CheckLogPath -CheckPath $BackupFlagFilePath -ObjectName 'バックアップ実行中フラグ格納フォルダ'
 
-
+#echo $Command
 
 #Invoke PowerCLI command
 
     Logging -EventID $InfoEventID -EventType Information -EventMessage "arcserveUDP CLI [$($UDPCLIPath)]を起動します"
+
+    Push-Location (Split-Path -LiteralPath $UDPCLIPath)
 
     Try{
         $Return = Invoke-Expression $Command 2>$ErrorMessage -ErrorAction Stop 
