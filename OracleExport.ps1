@@ -9,6 +9,7 @@ Oracle DatabaseからDatapumpを使用してexportを実行します。
 
 .DESCRIPTION
 
+Oracle DatabaseからDatapumpを使用してexportを実行します。
 
 
 配置例
@@ -21,22 +22,10 @@ Oracle DatabaseからDatapumpを使用してexportを実行します。
 
 .EXAMPLE
 
-.\OracleDB2BackUpMode -OracleSerivce MCDB -BackUpFlagPath ..\Flag\BackUp.FLG
+.\OracleExport.ps1 -Schema MCFRAME -DumpDirectoryObject MCFDATA_PUMP_DIR 
 
-Windowsサービス名OracleServiceMCDB、インスタンス名MCDBのOracle Databaseの全ての表領域をバックアップモードへ切替します。
-Oracle Databaseの認証はOS認証を用います。このスクリプトが実行されるOSユーザで認証します。
-バックアップ中フラグ..\Flag\BackUp.FLGの存在を確認し、存在した場合はバックアップ中と判定して異常終了します。
-切替後にListenerを停止します。
-
-.\OracleDB2BackUpMode -OracleSerivce MCDB -BackUpFlagPath ..\Flag\BackUp.FLG -NoStopListener -ExecUser BackUpUser -ExecUserPassword FOOBAR -PasswordAuthorization
-
-Windowsサービス名OracleServiceMCDB、インスタンス名MCDBのOracle Databaseの全ての表領域をバックアップモードへ切替します。
-OracleDatabaseの認証はパスワード認証を用いています。ユーザID BackUpUpser、パスワード FOOBARでログイン認証します。
-バックアップ中フラグ..\Flag\BackUp.FLGの存在を確認し、存在した場合はバックアップ中と判定して異常終了します。
-切替後にListenerは停止しません。
-
-
-
+Oracle Datapumpを用いて、スキーマ名MCFRAMEのデータをexportします。
+出力先ディレクトリはOracle Directory Object名MCDATA_PUMP_DIRに指定したものとします。
 
 
 
