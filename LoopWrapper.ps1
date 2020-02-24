@@ -175,6 +175,11 @@ Param(
 [parameter(position=1, mandatory=$true , HelpMessage = 'powershellプログラムに指定するコマンドファイルを指定(ex. .\Command.txt) 全てのHelpはGet-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommandFile,
 
 
+
+[int]$UpTo = 1000,
+[int]$Span = 10,
+
+
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$CommandFileEncode = 'Default', #Default指定はShift-Jis
 
 [Switch]$Continue,
@@ -280,16 +285,7 @@ Param(
 [parameter(mandatory=$true)][int]$ReturnCode
 )
 
-    IF(-NOT(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))){
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "実行結果は正常終了[$($NormalCount)]、警告終了[$($WarningCount)]、異常終了[$($ErrorCount)]です"
-
-        If(($Continue) -and ($ErrorCount -gt 0)){
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]が指定されているため処理異常で異常終了せず次の定義を処理しました"
-            }
-
-
-    }
 
 
 EndingProcess $ReturnCode
@@ -299,10 +295,6 @@ EndingProcess $ReturnCode
 
 
 #####################   ここから本体  ######################
-
-[int][ValidateRange(0,2147483647)]$NormalCount = 0
-[int][ValidateRange(0,2147483647)]$WarningCount = 0
-[int][ValidateRange(0,2147483647)]$ErrorCount = 0
 
 $DatumPath = $PSScriptRoot
 
@@ -314,7 +306,8 @@ $Version = '20200224_1640'
 
     Try{
 
-        $Lines = @(Get-Content $CommandFile -Encoding $CommandFileEncode -ErrorAction Stop)  
+        $Line = @(Get-Content $CommandFile -Encoding $CommandFileEncode -TotalCount 1  -ErrorAction Stop)
+
         }
                     catch [Exception]
                     {
@@ -325,29 +318,15 @@ $Version = '20200224_1640'
                     }
 
 
-For ( $i = 0 ; $i -lt $Lines.Count; $i++ )
-
-{
-
-    $Line = $Lines[$i]
-
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CommandFile)]の$($i+1)行目を実行します。"
 
 
+For ( $i = 1 ; $i -le $UpTo ; $i++ ){
 
-    Switch -Regex ($Line){
 
-        #分岐1 行頭#でコメント
-        '^#.*$'
-                {Logging -EventID $InfoEventID -EventType Information -EventMessage "コメント[$($Line)]"}
+    Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CommandFile)]の1行目を実行します。"
+    Logging -EventID $InfoEventID -EventType Information -EventMessage "試行回数[$($i)/$($UpTo)]"
 
-        #分岐2 空白
-        '^$'
-                {Logging -EventID $InfoEventID -EventType Information -EventMessage "空白行"}
 
-        #分岐3 コマンド実行
-        default 
-                {
                    Try{
         
                     Logging -EventID $InfoEventID -EventType Information -EventMessage "実行コマンドは[$($CommandPath)]、引数は[$($Line)]です"
@@ -362,7 +341,7 @@ For ( $i = 0 ; $i -lt $Lines.Count; $i++ )
                     Finalize $ErrorReturnCode
                     }
 
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CommandFile)]の$($i+1)行目の実行結果は[$($LastExitCode)]です"
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CommandFile)]の1行目の実行結果は[$($LastExitCode)]です"
                     
 
                     #終了コードで分岐
@@ -371,8 +350,8 @@ For ( $i = 0 ; $i -lt $Lines.Count; $i++ )
                         #条件1 異常終了
                         {$_ -ge $ErrorReturnCode}{
  
-                            $ErrorCount ++
-                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "[$($CommandFile)]の$($i+1)行目は異常終了しました"
+
+                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "[$($CommandFile)]の1行目は異常終了しました"
        
 
                             IF($Continue){
@@ -387,29 +366,27 @@ For ( $i = 0 ; $i -lt $Lines.Count; $i++ )
                         #条件2 警告終了
                         {$_ -ge $WarningReturnCode}{
                             
-                            $WarningCount ++
-                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "[$($CommandFile)]の$($i+1)行目は警告終了しました。継続します" 
-                            ;Break        
+
+                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "[$($CommandFile)]の1行目は警告終了しました。再試行します" 
+                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "指定[$($Span)]秒待機します"
+                            Start-Sleep -Seconds $Span 
+                            
                         }
                         
                         #条件3 正常終了
                         Default {
-                        $NormalCount ++
-                        Logging -EventID $SuccessEventID -EventType Success -EventMessage "[$($CommandFile)]の$($i+1)行目は正常終了しました"
+
+                        Logging -EventID $SuccessEventID -EventType Success -EventMessage "[$($i)]回試行で正常終了しました"
+                        
+                        Finalize $NormalReturnCode
                         }
                    }
     
-   
-                # 分岐3 コマンド実行 default終端 
-                }
-
-    #Switch -Regex ($Line)終端
-    }
+  
 
 #対象群の処理ループ終端
 }
 
+Logging -EventID $WarningEventID -EventType Warning -EventMessage "[$($UpTo)]回試行しましたが、正常終了しませんでした。警告終了します" 
 
-#終了メッセージ出力。ここではNormalReturnCodeで呼び出すが、Finalizeでエラーカウントを見て処理してくれる
-
-Finalize $NormalReturnCode
+Finalize $WarningReturnCode
