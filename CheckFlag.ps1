@@ -162,7 +162,7 @@ https://github.com/7k2mpa/FileMaintenace
 Param(
 
 [String][parameter(position=0)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$FlagFolder = '.\',
-#[parameter(mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder,
+#[parameter(mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$FlagFolder,
 
 
 [String][parameter(position=1)][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
@@ -289,6 +289,10 @@ EndingProcess $ReturnCode
 
 
 #####################   ここから本体  ######################
+
+[int][ValidateRange(0,2147483647)]$ErrorCount = 0
+[int][ValidateRange(0,2147483647)]$WarningCount = 0
+[int][ValidateRange(0,2147483647)]$NormalCount = 0
 
 $DatumPath = $PSScriptRoot
 
