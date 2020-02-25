@@ -51,6 +51,10 @@ Check Flag File and if file dose not exist make new flag file.
 Execute .ps1 script with every line command in the command file like batch.
 
 
+## Documents
+
+[Wiki](https://github.com/7k2mpa/FileMaintenace/wiki)
+
 ## Copyright & License
 Copyright &copy; 2020 Masayuki Sudo
 
