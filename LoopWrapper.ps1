@@ -2,48 +2,77 @@
 
 <#
 .SYNOPSIS
-指定したプログラムを設定ファイルに書かれたパラメータを読み込んで、順次呼び出すプログラムです。
+指定したプログラムを設定ファイルに書かれたパラメータを読み込んで実行します。
+正常終了に遷移するまで、指定秒数間隔で指定回数実行します。
+
+
 実行にはCommonFunctions.ps1が必要です。
-セットで開発しているFileMaintenance.ps1と併用すると複数のログ処理を一括実行できます。
+
 
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
-設定ファイルから1行づつパラメータを読み込み、指定したプログラムに順次実行させます。
+指定したプログラムを設定ファイルに書かれたパラメータを読み込んで実行します。
+正常終了に遷移するまで、指定秒数間隔で指定回数実行します。
+指定したプログラムが正常終了した場合、本プログラムは正常終了します。
+指定したプログラムが警告終了した場合、本プログラムは指定秒数間隔で指定回数指定したプログラムを再実行します。
+指定回数を超過した場合は警告終了します。
+
+指定したプログラムが異常終了した場合、本プログラムは異常終了します。
+
 
 設定ファイルは任意に設定可能です。
-設定ファイルの行頭を#とすると当該行はコメントとして処理されます。
-設定ファイルの空白行はスキップします。
+設定ファイルの1行目のみを指定したプログラムに渡して実行します。
 
 ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
 
 
 
-設定ファイル例です。例えば以下をDailyMaintenance.txtに保存して-CommandFile .\DailyMaintenance.txtと指定して下さい。
+設定ファイル例です。
+例えば以下をLoopWrapperCommand.txtに保存します。
+これを-CommandPath .\CheckFlag.ps1 -CommandFile .\LoopWrapperCommand.txtを引数として本プログラムを実行しますｌ
 
----
-#14日経過した.logで終わるファイルを削除
--TargetFolder D:\IIS\LOG -RegularExpression '^.*\.log$' -Action Delete -Days 14
-
-#7日経過したアクセスログをOld_Logへ退避
--TargetFolder D:\AccessLog -MoveToFolder .\Old_Log -Days 7
+---　
+-CheckFolder .\Lock -CheckFile BkupDB.flg
 ---
 
 
 
 .EXAMPLE
 
-Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt
-　このプログラムと同一フォルダに存在するFileMaintenance.ps1を起動します。
-起動する際に渡すパラメータは設定ファイルComman.txtを1行づつ読み込み、順次実行します。
+LoopWrapper.ps1 -CommandPath .\CheckFlag.ps1 -CommandFile .\Command.txt
+　このプログラムと同一フォルダに存在するCheckFlag.ps1を起動します。
+起動する際に渡すパラメータは設定ファイルComman.txtの1行目です。
+
+CheckFlag.ps1が正常終了すると、本プログラムは正常終了します。
+
+CheckFlag.ps1が警告終了すると、本プログラムは指定秒数間隔で指定回数CheckFlag.ps1を再実行します。
+CheckFlag.ps1はフラグファイルが存在しないと正常終了、存在すると警告終了します。
+この設定では、フラグファイルが削除されるまで本プログラムは指定回数ループ継続します。
+指定回数を超過した場合は警告終了します。
+
+
+CheckFlag.ps1が異常終了すると、本プログラムは異常終了します。
 
 
 .EXAMPLE
 
-Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt -Continue
-　このプログラムと同一フォルダに存在するFileMaintenance.ps1を起動します。
-起動する際に渡すパラメータは設定ファイルComman.txtを1行づつ読み込み、順次実行します。
-もし、FileMaintenance.ps1を実行した結果が異常終了となった場合は、Wrapper.ps1を異常終了させず、Command.txtの次行を読み込み継続処理をします。
+LoopWrapper.ps1 -CommandPath .\CheckFlag.ps1 -CommandFile .\Command.txt -Span 60 -UpTo 120
+　このプログラムと同一フォルダに存在するCheckFlag.ps1を起動します。
+起動する際に渡すパラメータは設定ファイルComman.txtの1行目です。
+
+CheckFlag.ps1が正常終了すると、本プログラムは正常終了します。
+
+CheckFlag.ps1が警告終了すると、本プログラムは指定秒数間隔で指定回数CheckFlag.ps1を再実行します。
+60秒間隔で120回試行します。
+
+CheckFlag.ps1はフラグファイルが存在しないと正常終了、存在すると警告終了します。
+この設定では、フラグファイルが削除されるまで本プログラムは指定回数ループ継続します。
+
+指定回数を超過した場合は警告終了します。
+
+
+CheckFlag.ps1が異常終了すると、本プログラムは異常終了します。
 
 
 
@@ -64,9 +93,16 @@ Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt -Conti
 デフォルトは[Default]でShif-Jisです。
 
 
+.PARAMETER Span
+再実行時の間隔を秒数で指定します。
+デフォルトは10秒です。
+
+.PARAMETER UpTo
+再実行の試行回数を指定します。
+デフォルトは1000回です。
+
 .PARAMETER Continue
-　起動したプログラムが異常終了しても、コマンドファイルの次行を継続処理します。
-デフォルトではそのまま異常終了します。
+起動したプログラムが異常終了してもループ処理を継続します。
 
 
 
@@ -175,15 +211,13 @@ Param(
 [parameter(position=1, mandatory=$true , HelpMessage = 'powershellプログラムに指定するコマンドファイルを指定(ex. .\Command.txt) 全てのHelpはGet-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommandFile,
 
 
+[parameter(position=2)][ValidateRange(1,65535)][int]$Span = 10,
+[parameter(position=3)][ValidateRange(1,65535)][int]$UpTo = 1000,
 
-[int]$UpTo = 1000,
-[int]$Span = 10,
-
+[Switch]$Continue,
 
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$CommandFileEncode = 'Default', #Default指定はShift-Jis
 
-[Switch]$Continue,
-[Switch]$Script:NoAction,
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
@@ -322,46 +356,46 @@ $Version = '20200224_1640'
 
 For ( $i = 1 ; $i -le $UpTo ; $i++ ){
 
-
     Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CommandFile)]の1行目を実行します。"
     Logging -EventID $InfoEventID -EventType Information -EventMessage "試行回数[$($i)/$($UpTo)]"
 
-
-                   Try{
+        Try{
         
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "実行コマンドは[$($CommandPath)]、引数は[$($Line)]です"
-                    Invoke-Expression "$CommandPath $Line" -ErrorAction Stop
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "実行コマンドは[$($CommandPath)]、引数は[$($Line)]です"
+            Invoke-Expression "$CommandPath $Line" -ErrorAction Stop
 
-                    }
-                    catch [Exception]
-                    {
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "[$($CommandPath)]の起動に失敗しました。"
-                    $ErrorDetail = $Error[0] | Out-String
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $ErrorDetail"
-                    Finalize $ErrorReturnCode
-                    }
+            }
 
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CommandFile)]の1行目の実行結果は[$($LastExitCode)]です"
+            catch [Exception]{
+
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "[$($CommandPath)]の起動に失敗しました。"
+            $ErrorDetail = $Error[0] | Out-String
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $ErrorDetail"
+            Finalize $ErrorReturnCode
+            }
+
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CommandFile)]の1行目の実行結果は[$($LastExitCode)]です"
                     
 
-                    #終了コードで分岐
-                    Switch ($LastExitCode){
+        #終了コードで分岐
+        Switch ($LastExitCode){
 
                         #条件1 異常終了
                         {$_ -ge $ErrorReturnCode}{
  
-
                             Logging -EventID $WarningEventID -EventType Warning -EventMessage "[$($CommandFile)]の1行目は異常終了しました"
        
-
                             IF($Continue){
-                                Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]のため処理を継続します。"   
+                                Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]のため処理を継続します。" 
+                                Logging -EventID $WarningEventID -EventType Warning -EventMessage "指定[$($Span)]秒待機します"
+                                Start-Sleep -Seconds $Span
                                 ;Break     
      
                                 }else{
                                 Finalize $ErrorReturnCode
                                 }
-                        }
+                            }
+
                     
                         #条件2 警告終了
                         {$_ -ge $WarningReturnCode}{
@@ -369,18 +403,17 @@ For ( $i = 1 ; $i -le $UpTo ; $i++ ){
 
                             Logging -EventID $WarningEventID -EventType Warning -EventMessage "[$($CommandFile)]の1行目は警告終了しました。再試行します" 
                             Logging -EventID $WarningEventID -EventType Warning -EventMessage "指定[$($Span)]秒待機します"
-                            Start-Sleep -Seconds $Span 
-                            
-                        }
+                            Start-Sleep -Seconds $Span                             
+                            }
+
                         
                         #条件3 正常終了
                         Default {
 
-                        Logging -EventID $SuccessEventID -EventType Success -EventMessage "[$($i)]回試行で正常終了しました"
-                        
-                        Finalize $NormalReturnCode
-                        }
-                   }
+                            Logging -EventID $SuccessEventID -EventType Success -EventMessage "[$($i)]回試行で正常終了しました"                        
+                            Finalize $NormalReturnCode
+                            }
+        }
     
   
 
