@@ -13,7 +13,7 @@ cd D:\Scripts\Infra
 set P_NAME=OracleDB2NormalMode.ps1
 
 
-powershell -Noninteractive -Command ".\OracleDB2NormalMode.ps1 -OracleService SSDBT ; exit $LASTEXITCODE"
+powershell -Noninteractive -Command ".\OracleDB2NormalMode.ps1 ; exit $LASTEXITCODE"
 
 	IF %errorlevel%==8 (
 	call %SC_DIR%MSGPRINT.bat %P_NAME%が異常終了しました。エラーレベル＝%errorlevel% ERROR 100
@@ -23,7 +23,7 @@ powershell -Noninteractive -Command ".\OracleDB2NormalMode.ps1 -OracleService SS
 
 set P_NAME=OracleDeleteArchiveLog.ps1
 
-powershell -Noninteractive -Command ".\OracleDeleteArchiveLog.ps1 -OracleService SSDBT -Days 1 ; exit $LASTEXITCODE"
+powershell -Noninteractive -Command ".\OracleDeleteArchiveLog.ps1 -Days 1 ; exit $LASTEXITCODE"
 
 
 	IF %errorlevel%==8 (
@@ -44,7 +44,16 @@ powershell -Noninteractive -Command ".\Wrapper.ps1 -CommandPath .\FileMaintenanc
 
 )
 
+set P_NAME=LoopWrapper.ps1
 
+powershell -Noninteractive -Command ".\LoopWrapper.ps1 -CommandPath .\CheckFlag.ps1 -CommandFile .\Config\LoopWrapperCommand.txt ; exit $LASTEXITCODE"
+
+
+	IF %errorlevel%==1 (
+
+		set P_NAME=FileMaintenance.ps1
+		powershell -Noninteractive -Command ".\FileMaintenance.ps1 -TargetFolder .\Lock -Action Delete ; exit $LASTEXITCODE"
+		)
 
 exit /B
 

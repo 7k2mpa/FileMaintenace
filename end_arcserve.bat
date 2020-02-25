@@ -11,7 +11,7 @@ cd D:\Scripts\Infra
 
 set P_NAME=FileMaintenance.ps1
 
-powershell -Noninteractive -Command ".\FileMaintenance.ps1 -TargetFolder .\Lock -RegularExpression '^BkupDB.flg$' -Action Delete ; exit $LASTEXITCODE"
+powershell -Noninteractive -Command ".\FileMaintenance.ps1 -TargetFolder .\Lock -Action Delete ; exit $LASTEXITCODE"
 
 
 
