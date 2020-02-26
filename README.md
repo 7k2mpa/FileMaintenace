@@ -48,8 +48,11 @@ Check Flag File and if file dose not exist make new flag file.
 
 ### Wrapper.ps1
 
-Execute .ps1 script with every line command in the command file like batch.
+Execute .ps1 script with every line command in the command file in order.
 
+### LoopWrapper.ps1
+
+Execute .ps1 script at fixed intervals untill the script is ended in normal return code.
 
 ## Documents
 
