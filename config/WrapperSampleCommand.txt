@@ -17,18 +17,19 @@
 -TargetFolder 'D:\TEST\TEST 4'
 
 
-#こんな命名は無いと思いますが引用符が含まれている場合は二重引用符で括って下さい。
+#こんな命名は無いと思いますが引用符'が含まれている場合は二重引用符で括って下さい。
 
 -TargetFolder "D:\TEST\TEST' 5"
 
-#なお、二重引用符はNTFSで使用出来ません
+#なお、二重引用符"はNTFSで使用出来ません
 
 
-#[]を含む場合は、そのまま記述して下さい。Powershellワイルドカードとして認識はされません。バッククオート`でのエスケープは不要です
+#ブラケット[]を含む場合は、そのまま記述して下さい。Powershellワイルドカードとして認識はされません。バッククオート`でのエスケープは不要です
 
 -TargetFolder D:\TEST\LOG[OLD]
 
 #NTFSに使用できない文字（ワイルドカード*,?を含む）を指定すると異常終了判定します。
+#複数のフォルダを指定するには、-ParentRegularExpressionを使用してください。
 
 -TargetFolder D:\TEST*
 
@@ -37,8 +38,7 @@
 
 #Wrapper.ps1 , FileMaintenace.ps1は絶対パスと相対パス表記とをサポートします。
 #相対パス表記はカレントディレクトを基準にしません。プログラムが配置されたディレクトを基準にします。
-#JP1 AJSでジョブの「ワークパス」を設定しないと、カレントディレクトリはどうなりますか？
-#相対パス表記の場合、ドット.で始まる表記にして下さい。
+#相対パス表記はドット.で始まる表記にして下さい。
 #
 # D:\TEST\infra\Shell\Wrapper.ps1
 # D:\TEST\infra\Shell\FileMaintenance.ps1
@@ -70,6 +70,7 @@
 #Powershellワイルドカード文字を正規表現経由で入力させても、ワイルドカード処理しません。
 #以下の例ではLog[*].txtをそのまま対象フォルダのファイル群へマッチさせます。アスタリスク*はPowershellワイルドカードとしては機能しません。
 #検索対象のファイルシステムがNTFSであればアスタリスク*を含むファイル名は存在しえないので、結果として何もマッチしません。
+
 -TargetFolder D:\TEST -RegularExpression '^Log\[\*\]\.txt$'
 
 # D:\TEST\Log[0].txt
@@ -80,3 +81,16 @@
 # D:\TEST\Log[5].txt
 # D:\TEST\Log[6].txt
 
+
+#-ParentRegularExpressionはパス文字のみを正規表現でマッチさせます。
+#以下の例ではD:\TESTフォルダ以下のパスに\OLD\を含むもののみがマッチします。ファイル名はマッチ対象外です。
+#これは本番、検証でフォルダ名が微妙に異なる環境でコマンドファイルを統一するのに便利です。
+#一方、大量のファイルを処理することになるので、十分にテストしてください。
+
+-TargetFolder D:\TEST -ParentRegularExpression '\\OLD\\'
+
+
+# D:\TEST\APP\Current\log.log
+# D:\TEST\APP\OLD\log.log
+# D:\TEST\BATCH\Current\log.log
+# D:\TEST\BATCH\OLD\log.log
