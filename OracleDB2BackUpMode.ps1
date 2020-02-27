@@ -201,9 +201,9 @@ Param(
 [String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
 
 [String]$SQLLogPath = '.\SC_Logs\SQL.log',
-#[String]$BackUpFlagPath = '.\Lock\BkUpDB.flg',
+[String]$BackUpFlagPath = '.\Lock\BkUpDB.flg',
 
-#[Switch]$NoCheckBackUpFlag = $TRUE ,
+[Switch]$NoCheckBackUpFlag = $TRUE ,
 
 [String]$SQLCommandsPath = '.\SQL\SQLs.ps1',
 
@@ -291,16 +291,16 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
     CheckContainer -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
 
 
-#BackUpFlagフォルダの指定、存在確認
+BackUpFlagフォルダの指定、存在確認
 
 
-#    IF(-NOT($NoCheckBackUpFlag)){
+    IF(-NOT($NoCheckBackUpFlag)){
 
-#        $BackUpFlagPath = ConvertToAbsolutePath -CheckPath $BackUpFlagPath -ObjectName  '-BackUpFlagPath'
+        $BackUpFlagPath = ConvertToAbsolutePath -CheckPath $BackUpFlagPath -ObjectName  '-BackUpFlagPath'
 
-#        Split-Path $BackUpFlagPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName '-BackUpFlagPathのParentフォルダ' -IfNoExistFinalize > $NULL}
+        Split-Path $BackUpFlagPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName '-BackUpFlagPathのParentフォルダ' -IfNoExistFinalize > $NULL}
 
-#        }
+        }
 
 
 #SQLLogファイルの指定、存在、書き込み権限確認
@@ -397,19 +397,19 @@ $Version = '20200207_1615'
   Push-Location $OracleHomeBinPath
 
 
-#バックアップ実行中かを確認
+バックアップ実行中かを確認
 
 
-#    IF ($NoCheckBackUpFlag){
+    IF ($NoCheckBackUpFlag){
 
-#        Logging -EventID $InfoEventID -EventType Information -EventMessage "-NoCheckBackUpFlagが指定されているため、バックアップフラグを用いた状態確認はしません"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "-NoCheckBackUpFlagが指定されているため、バックアップフラグを用いた状態確認はしません"
         
         
-#        }elseIF(CheckLeaf -CheckPath $BackUpFlagPath -ObjectName 'バックアップ実行中フラグ'){
+        }elseIF(CheckLeaf -CheckPath $BackUpFlagPath -ObjectName 'バックアップ実行中フラグ'){
 
-#            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Back Up実行中です。重複実行は出来ません"
-#            Finalize $ErrorReturnCode
-#            }
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Back Up実行中です。重複実行は出来ません"
+            Finalize $ErrorReturnCode
+            }
     
 
 #セッション情報を出力
