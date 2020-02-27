@@ -44,16 +44,16 @@ powershell -Noninteractive -Command ".\Wrapper.ps1 -CommandPath .\FileMaintenanc
 
 )
 
-set P_NAME=LoopWrapper.ps1
+#set P_NAME=LoopWrapper.ps1
 
-powershell -Noninteractive -Command ".\LoopWrapper.ps1 -CommandPath .\CheckFlag.ps1 -CommandFile .\Config\LoopWrapperCommand.txt ; exit $LASTEXITCODE"
+#powershell -Noninteractive -Command ".\LoopWrapper.ps1 -CommandPath .\CheckFlag.ps1 -CommandFile .\Config\LoopWrapperCommand.txt ; exit $LASTEXITCODE"
 
 
-	IF %errorlevel%==1 (
+#	IF %errorlevel%==1 (
 
-		set P_NAME=FileMaintenance.ps1
-		powershell -Noninteractive -Command ".\FileMaintenance.ps1 -TargetFolder .\Lock -Action Delete ; exit $LASTEXITCODE"
-		)
+#		set P_NAME=FileMaintenance.ps1
+#		powershell -Noninteractive -Command ".\FileMaintenance.ps1 -TargetFolder .\Lock -Action Delete ; exit $LASTEXITCODE"
+#		)
 
 exit /B
 
