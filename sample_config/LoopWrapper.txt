@@ -1,2 +1,0 @@
--FlagFolder .\TEST -FlagFile Flag.txt -NoLog2Console
--FlagFolder C:\TEST -FlagFile Flag.flg2
