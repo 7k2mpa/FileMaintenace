@@ -1,0 +1,5 @@
+-TargetFolder C:\TEST -Action Delete -ErrorAsWarning -Continue -NoAction
+-TargetFolder C:\TEST -Action NullClear -ErrorAsWarning -Continue -NoAction
+-TargetFolder C:\TEST -Action Copy -MoveToFolder C:\TEST1 -ErrorAsWarning -Continue -NoAction
+-TargetFolder C:\TEST -Action Delete -ErrorAsWarning -Continue -NoAction
+-TargetFolder C:\TEST -Action Delete -ErrorAsWarning -Continue -NoAction
