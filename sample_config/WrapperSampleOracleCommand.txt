@@ -1,0 +1,53 @@
+#Sample config for Oracle Database log maintenance
+
+#File path
+
+#D:\Infra\Shell\Wrapper.ps1
+#D:\Infra\Shell\FileMaintenance.ps1
+#D:\Infra\Shell\CommonFunctions.ps1
+
+#Oracle ,SQL and RMAN dump Control Files and logs to the folder blow
+#D:\Infra\Logs
+
+#copy various Oracle logs and Control Files to the folder blow and store for 90days
+#D:\Infra\Bk_Logs\Oracle
+
+#copy RMAN and SQL scripts' log to the folder blow and store for 90days
+#D:\Infra\Bk_Logs\Scripts
+
+#Oracle Database runs in archive log mode
+
+
+#Move Oracle Alert,Listener Logs To BK_Logs Folder
+
+-TargetFolder D:\oracle\oraclehome\diag\rdbms\[sample SID]\[sample SID]\trace -RegularExpression '^alert_[sample SID]\.log$' -PreAction AddTimeStamp,MoveNewFile -MoveToFolder ..\Bk_Logs\Oracle -Action NullClear
+
+-TargetFolder D:\oracle\oraclehome\diag\tnslsnr\[db_hostname]\listener\trace -RegularExpression '^listener\.log$' -PreAction AddTimeStamp,MoveNewFile -MoveToFolder ..\Bk_Logs\Oracle -Action NullClear
+
+
+#Move Script Logs To Bk_Logs Folder
+
+
+-TargetFolder ..\Logs -RegularExpression '^(SQL|RMAN)\.log$' -PreAction AddTimeStamp,MoveNewFile -MoveToFolder ..\BK_Logs\Scripts -Action Delete
+
+
+#Move Control File To Bk_Logs Folder
+
+-TargetFolder ..\Logs -RegularExpression '^(CONTROLFILE\.BK|FILE_BK\.CTL)$' -PreAction AddTimeStamp, MoveNewFile -MoveToFolder ..\BK_Logs\Oracle -Action Delete
+
+
+#Delete Oracle Old Trace Logs
+
+-TargetFolder D:\oracle\oraclehome\diag\rdbms\[sample SID]\[sample SID]\trace -RegularExpression '\.(trc|trm)$' -Action Delete -Days 90
+
+
+#Delete Expired Archive Logs and Empty Folders
+
+-TargetFolder E:\oracle\fast_recovery_area\[sample SID]\ARCHIVELOG -Action Delete -Days 3
+
+-TargetFolder E:\oracle\fast_recovery_area\[sample SID]\ARCHIVELOG -Action DeleteEmptyFolders
+
+
+#Delete Old Bk_Logs
+
+-TargetFolder D:\Scripts\Infra\BK_Logs -Action Delete -Days 90
