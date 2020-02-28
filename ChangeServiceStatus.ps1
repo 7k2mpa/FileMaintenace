@@ -159,9 +159,10 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[String][parameter(position=0, mandatory=$true , HelpMessage = 'Enter IIS site name. To view all help , Get-Help ChangeIIS.ps1')]$Site ,
+[parameter(position=0, mandatory=$true , HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help StartService.ps1')][String]$Service  ,
 
-[String][parameter(position=1)][ValidateSet("Started", "Stopped")]$TargetState = 'Stopped' , 
+[String][parameter(position=1)][ValidateSet("Running", "Stopped")]$TargetStatus = 'Stopped' , 
+
 [int][parameter(position=2)][ValidateRange(1,65535)]$RetrySpanSec = 3,
 [int][parameter(position=3)][ValidateRange(1,65535)]$RetryTimes = 5,
 
@@ -233,25 +234,21 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
 #パラメータの確認
 
-    IF(-NOT(CheckServiceExist -ServiceName 'W3SVC')){
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Web Service [W3SVC] dose not exist."
+
+    IF(-NOT(CheckServiceExist -ServiceName $Service -NoMessage)){
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Service [$($Service)] dose not exist."
         Finalize $ErrorReturnCode
         }
- 
-     IF($TargetState -notmatch ' ^(Started|Stopped)$'){
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "-TargetState is invalid."
+
+
+     IF($TargetStatus -notmatch '(Running|Stopped)'){
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "-TargetStatus is invalid."
         Finalize $ErrorReturnCode   
         }
-       
-
-    IF(Get-Website | Where-Object{$_.Name -ne $Site}){
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Site [$($Site)] dose not exist."
-        Finalize $ErrorReturnCode
-        }
 
 
-    IF (Get-Website | Where-Object{$_.Name -eq $Site} | Where-Object {$_.State -eq $TargetState}){
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Site [$($Site)] state is already [$($TargetState)]."
+    IF (CheckServiceStatus -ServiceName $Service -Health $TargetStatus -Span 0 -UpTo 1 ){
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Service [$($Service)] status is already [$($TargetStatus)]"
         Finalize $WarningReturnCode
         }
         
@@ -263,7 +260,7 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
 Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Starting to change IIS Site [$($Site)] state."
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Starting to change Service [$($Service)] status."
 
 }
 
@@ -287,51 +284,41 @@ $DatumPath = $PSScriptRoot
 
 $Version = '20200207_1615'
 
+[String]$Computer = "localhost" 
+[String]$Class = "win32_service" 
+[Object]$WmiService = Get-Wmiobject -Class $Class -computer $Computer -filter "name = '$Service'" 
+
 
 #初期設定、パラメータ確認、起動メッセージ出力
 
 . Initialize
 
-
- Switch -Regex ($TargetState){
+ Switch -Regex ($TargetStatus){
  
     'Stopped'{
-        $OriginalState = 'Started'    
-    }
+        $OriginalStatus = 'Running'    
+        }
     
-    'Started'{
-        $OriginalState = 'Stopped'
-    }
+    'Running'{
+        $OriginalStatus = 'Stopped'
+        }
 
     Default{
-        Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetState is invalid. '
+        Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetStatus is invalid.'
         Finalize $InternalErrorReturnCode
-    
-    }
+        }
  
  
  }
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "With Powershell Cmdlet , Starting to change site [$($Site)] state from [$($OriginalState)] to [$($TargetState)]"
-        
- Switch -Regex ($TargetState){
- 
-    'Stopped'{
-        Stop-Website -Name $Site
-    }
-    
-    'Started'{
-        Start-Website -Name $Site
-    }
 
-    Default{
-        Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetState is invalid. '
-        Finalize $InternalErrorReturnCode
-    
-    }
-    }
+#以下のコードはMSのサンプルを参考
+#MICROSOFT LIMITED PUBLIC LICENSE version 1.1
+#https://gallery.technet.microsoft.com/scriptcenter/aa73bb75-38a6-4bd4-b72e-a6aede76d6ad
 
+
+Logging -EventID $InfoEventID -EventType Information -EventMessage "With WMIService.(start|stop)Service , starting to change Service [$($Service)] status from [$($OriginalStatus)] to [$($TargetStatus)]"
 
 # カウント用変数初期化
 $Counter = 0
@@ -342,45 +329,75 @@ $Counter = 0
       # チェック回数カウントアップ
       $Counter++
 
-      $SiteState = Get-Website | Where-Object{$_.Name -eq $Site} | ForEach-Object{$_.State}
+      # サービス存在確認
+      IF(-NOT(CheckServiceExist $Service)){
+      Finalize $ErrorReturnCode
+      }
 
-           Switch ($SiteState)  {
+
+
+    Switch -Regex ($TargetStatus){
+ 
+        'Stopped'{
+            $Return = $WMIService.stopService()   
+            }
+    
+        'Running'{
+            $Return = $WMIService.startService()
+            }
+
+        Default{
+            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetStatus is invalid. '
+            Finalize $InternalErrorReturnCode    
+            }
+    }
+
+
+
+           Switch ($Return.returnvalue)  {
         
-                $TargetState{
+                0{
+                $ServiceStatus = CheckServiceStatus -ServiceName $Service -Health $TargetStatus -Span $RetrySpanSec -UpTo $RetryTimes
 
-                    Logging -EventID $SuccessEventID -EventType Success -EventMessage "Site[$($Site)] state was [$($SiteState)]."
+                    IF ($ServiceStatus){
+                    Logging -EventID $SuccessEventID -EventType Success -EventMessage "Service [$($Service)] is [$($TargetStatus)]"
                     Finalize $NormalReturnCode
-                    
-
+                    }else{
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] is not [$($TargetStatus)] Retry."
+                    }
                 }
 
 
-                $OriginalState {
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] state is still [$($SiteState)]. "
+                2 {
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] reports access denied."
                 }
 
+                5 { 
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] can not accept control at this time."
+                } 
+            
+                10 {
+                Logging -EventID $WarningEventID -EventType Warning -EventMessage "Service [$($Service)] is already [$($TargetStatus)]"
+                Finalize $WarningErrorCode
+                }
               
                 DEFAULT {
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "Site [$($site)] state is [$($SiteState)]"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] reports ERROR $($Return.returnValue)"
                 } 
             }  
     
+    
 
-
-
-
-
-        IF ($Counter -eq $RetryTimes){ 
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , site [$($Site)] state did not change to [$($TargetState)]."
+        IF ($Counter -eq $RetryTimes){
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , service [$($Service)] status is not change to [$($TargetStatus)]"
         Finalize $ErrorReturnCode
         }
 
       #チェック回数の上限に達していない場合は、指定秒待機
 
-      Logging -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] exists and site state did not change to [$($TargetState)]. Wait for $($RetrySpanSec) seconds."
+      Logging -EventID $InfoEventID -EventType Information -EventMessage "Serivce [$($Service)] exists and service status dose not change to [$($TargetStatus)] Wait for $($RetrySpanSec) seconds."
       Start-Sleep $RetrySpanSec
 
       # 無限ループに戻る
 
     }
-
