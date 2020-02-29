@@ -167,6 +167,9 @@ Param(
 [String][parameter(position=0, mandatory=$true , HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help StartService.ps1')]$Service  ,
 
 [String][parameter(position=1 , mandatory=$true)][ValidateSet("Running", "Stopped")]$TargetStatus , 
+#[String][parameter(position=1)][ValidateSet("Running", "Stopped")]$TargetStatus = 'Running', 
+#[String][parameter(position=1)][ValidateSet("Running", "Stopped")]$TargetStatus = 'Stopped', 
+
 
 [int][parameter(position=2)][ValidateRange(1,65535)]$RetrySpanSec = 3,
 [int][parameter(position=3)][ValidateRange(1,65535)]$RetryTimes = 5,
