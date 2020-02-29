@@ -399,7 +399,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
       #チェック回数の上限に達していない場合は、指定秒待機
 
       Logging -EventID $InfoEventID -EventType Information -EventMessage "Serivce [$($Service)] exists and service status dose not change to [$($TargetStatus)] Wait for $($RetrySpanSec) seconds."
-
+      Start-Sleep $RetrySpanSec  
 }
 
 
