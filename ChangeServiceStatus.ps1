@@ -3,22 +3,22 @@
 
 <#
 .SYNOPSIS
-指定したサービスを停止するプログラムです。
+指定したサービスを起動,停止するプログラムです。
 実行にはCommonFunctions.ps1が必要です。
-セットで開発しているFileMaintenance.ps1と併用すると複数のサービスを一括停止できます。
+セットで開発しているFileMaintenance.ps1と併用すると複数のサービスを一括起動,停止できます。
 
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
 
-指定したサービスを停止するプログラムです。
-停止済サービスを停止指定すると警告終了します。
+指定したサービスを起動,停止するプログラムです。
+(停止|起動)済サービスを(停止|起動)指定すると警告終了します。
 
 ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
 
 
 .EXAMPLE
-StartService.ps1 -Service Spooler -RetrySpanSec 5 -RetryTimes 5
+ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Stopped -RetrySpanSec 5 -RetryTimes 5
 
 サービス名:Spooler（表示名はPrint Spooler）を停止します。
 直ぐに停止しない場合は、5秒間隔で最大5回試行します。
@@ -28,19 +28,24 @@ StartService.ps1 -Service Spooler -RetrySpanSec 5 -RetryTimes 5
 
 
 .EXAMPLE
-StartService.ps1 -Service Spooler -RetrySpanSec 5 -RetryTimes 5 -WarningAsNormal
+ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Running -RetrySpanSec 5 -RetryTimes 5 -WarningAsNormal
 
-サービス名:Spooler（表示名はPrint Spooler）を停止します。
-直ぐに停止しない場合は、5秒間隔で最大5回試行します。
+サービス名:Spooler（表示名はPrint Spooler）を起動します。
+直ぐに起動しない場合は、5秒間隔で最大5回試行します。
 
-停止済サービスを停止しようとした場合は、正常終了します。
+起動済サービスを停止しようとした場合は、正常終了します。
 
 
 
 .PARAMETER Service
-　停止するサービス名を指定します。
-「サービス名」と（サービスの）「表示名」は異なりますので留意して下さい。。
+　(停止|起動)するサービス名を指定します。
+「サービス名」と（サービスの）「表示名」は異なりますので留意して下さい。
 例えば「表示名:Print Spooler」は「サービス名:Spooler」となっています。
+指定必須です。
+
+.PARAMETER TargetStatus
+遷移するサービス状態を指定します。
+(Stopped|Running)どちらかを指定して下さい。
 指定必須です。
 
 .PARAMETER RetrySpanSec
@@ -159,9 +164,9 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[parameter(position=0, mandatory=$true , HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help StartService.ps1')][String]$Service  ,
+[String][parameter(position=0, mandatory=$true , HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help StartService.ps1')]$Service  ,
 
-[String][parameter(position=1)][ValidateSet("Running", "Stopped")]$TargetStatus = 'Stopped' , 
+[String][parameter(position=1 , mandatory=$true)][ValidateSet("Running", "Stopped")]$TargetStatus , 
 
 [int][parameter(position=2)][ValidateRange(1,65535)]$RetrySpanSec = 3,
 [int][parameter(position=3)][ValidateRange(1,65535)]$RetryTimes = 5,
@@ -306,9 +311,7 @@ $Version = '20200207_1615'
     Default{
         Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetStatus is invalid.'
         Finalize $InternalErrorReturnCode
-        }
- 
- 
+        } 
  }
 
 
@@ -316,20 +319,12 @@ $Version = '20200207_1615'
 #以下のコードはMSのサンプルを参考
 #MICROSOFT LIMITED PUBLIC LICENSE version 1.1
 #https://gallery.technet.microsoft.com/scriptcenter/aa73bb75-38a6-4bd4-b72e-a6aede76d6ad
-
+#https://devblogs.microsoft.com/scripting/hey-scripting-guy-how-can-i-use-windows-powershell-to-stop-services/
 
 Logging -EventID $InfoEventID -EventType Information -EventMessage "With WMIService.(start|stop)Service , starting to change Service [$($Service)] status from [$($OriginalStatus)] to [$($TargetStatus)]"
 
 For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
 {
-# カウント用変数初期化
-#$Counter = 0
-
-    # 無限ループ
-#    While ($true) {
-
-      # チェック回数カウントアップ
-#      $Counter++
 
       # サービス存在確認
       IF(-NOT(CheckServiceExist $Service)){
@@ -337,14 +332,23 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
       }
 
 
-
     Switch -Regex ($TargetStatus){
  
         'Stopped'{
-            $Return = $WMIService.stopService()   
+            IF($WMIService.AcceptStop){
+                $Return = $WMIService.stopService()
+                }else{
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] will not accept a stop request. Wait for $($RetrySpanSec) seconds."
+                Start-Sleep $RetrySpanSec
+                Continue
+                }
             }
     
         'Running'{
+
+            #https://docs.microsoft.com/ja-jp/windows/win32/cimwin32prov/win32-service
+            #No AcceptStart Class
+
             $Return = $WMIService.startService()
             }
 
@@ -356,12 +360,12 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
 
 
 
-           Switch ($Return.returnvalue)  {
+     Switch ($Return.returnvalue)  {
         
                 0{
                 $ServiceStatus = CheckServiceStatus -ServiceName $Service -Health $TargetStatus -Span $RetrySpanSec -UpTo $RetryTimes
 
-                    IF ($ServiceStatus){
+                IF ($ServiceStatus){
                     Logging -EventID $SuccessEventID -EventType Success -EventMessage "Service [$($Service)] is [$($TargetStatus)]"
                     Finalize $NormalReturnCode
                     }else{
@@ -386,25 +390,15 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
                 DEFAULT {
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] reports ERROR $($Return.returnValue)"
                 } 
-            }  
+      }  
     
-    
-
-#        IF ($Counter -eq $RetryTimes){
-#        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , service [$($Service)] status is not change to [$($TargetStatus)]"
-#        Finalize $ErrorReturnCode
-#        }
 
       #チェック回数の上限に達していない場合は、指定秒待機
 
       Logging -EventID $InfoEventID -EventType Information -EventMessage "Serivce [$($Service)] exists and service status dose not change to [$($TargetStatus)] Wait for $($RetrySpanSec) seconds."
-      Start-Sleep $RetrySpanSec
 
-      # 無限ループに戻る
-
-    }
+}
 
 
- 
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , service [$($Service)] status is not change to [$($TargetStatus)]"
-        Finalize $ErrorReturnCode
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , service [$($Service)] status is not change to [$($TargetStatus)]"
+    Finalize $ErrorReturnCode
