@@ -3,55 +3,61 @@
 
 <#
 .SYNOPSIS
-指定したサービスを起動するプログラムです。
+指定したサービスを起動,停止するプログラムです。
 実行にはCommonFunctions.ps1が必要です。
-セットで開発しているFileMaintenance.ps1と併用すると複数のサービスを一括起動できます。
+セットで開発しているFileMaintenance.ps1と併用すると複数のサービスを一括起動,停止できます。
 
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
 
-指定したサービスを起動するプログラムです。
-起動済サービスを起動指定すると警告終了します。
+指定したサービスを起動,停止するプログラムです。
+(停止|起動)済サービスを(停止|起動)指定すると警告終了します。
 
 ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
 
 
 .EXAMPLE
-StartService.ps1 -Service Spooler -RetrySpanSec 5 -RetryTimes 5
+ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Stopped -RetrySpanSec 5 -RetryTimes 5
 
-サービス名:Spooler（表示名はPrint Spooler）を起動します。
-直ぐに起動しない場合は、5秒間隔で最大5回試行します。
+サービス名:Spooler（表示名はPrint Spooler）を停止します。
+直ぐに停止しない場合は、5秒間隔で最大5回試行します。
 
-起動済サービスを起動しようとした場合は、警告終了します。
+停止済サービスを停止しようとした場合は、警告終了します。
 
 
 
 .EXAMPLE
-StartService.ps1 -Service Spooler -RetrySpanSec 5 -RetryTimes 5 -WarningAsNormal
+ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Running -RetrySpanSec 5 -RetryTimes 5 -WarningAsNormal
 
 サービス名:Spooler（表示名はPrint Spooler）を起動します。
 直ぐに起動しない場合は、5秒間隔で最大5回試行します。
 
-起動済サービスを起動しようとした場合は、正常終了します。
+起動済サービスを停止しようとした場合は、正常終了します。
 
 
 
 .PARAMETER Service
-　起動するサービス名を指定します。
-「サービス名」と（サービスの）「表示名」は異なりますので留意して下さい。。
+　(停止|起動)するサービス名を指定します。
+「サービス名」と（サービスの）「表示名」は異なりますので留意して下さい。
 例えば「表示名:Print Spooler」は「サービス名:Spooler」となっています。
 指定必須です。
 
+.PARAMETER TargetStatus
+遷移するサービス状態を指定します。
+(Stopped|Running)どちらかを指定して下さい。
+指定必須です。
+
 .PARAMETER RetrySpanSec
-　サービス起動再確認の間隔秒数を指定します。
+　サービス停止再確認の間隔秒数を指定します。
 サービスによっては数秒必要なものもあるので適切な秒数に設定して下さい。
 デフォルトは3秒です。
 
 .PARAMETER RetryTimes
-　サービス起動再確認の回数を指定します。
+　サービス停止再確認の回数を指定します。
 サービスによっては数秒必要なものもあるので適切な回数に設定して下さい。
 デフォルトは5回です。
+
 
 
 
@@ -156,16 +162,17 @@ https://github.com/7k2mpa/FileMaintenace
 #>
 
 
-
 Param(
 
-[parameter(position=0, mandatory=$true , HelpMessage = '開始対象のWindowsサービス名を指定(ex. spooler) 全てのHelpはGet-Help StartService.ps1')][String]$Service  ,
-#[String]$Service = "ScDevice" ,
+[String][parameter(position=0, mandatory=$true , HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help StartService.ps1')]$Service  ,
 
-[int][parameter(position=1)][ValidateRange(1,65535)]$RetrySpanSec = 3,
-[int][parameter(position=2)][ValidateRange(1,65535)]$RetryTimes = 5,
+#[String][parameter(position=1 , mandatory=$true)][ValidateSet("Running", "Stopped")]$TargetStatus , 
+[String][parameter(position=1)][ValidateSet("Running", "Stopped")]$TargetStatus = 'Running', 
+#[String][parameter(position=1)][ValidateSet("Running", "Stopped")]$TargetStatus = 'Stopped', 
 
 
+[int][parameter(position=2)][ValidateRange(1,65535)]$RetrySpanSec = 3,
+[int][parameter(position=3)][ValidateRange(1,65535)]$RetryTimes = 5,
 
 
 [boolean]$Log2EventLog = $TRUE,
@@ -177,7 +184,7 @@ Param(
 [Switch]$NoLog2Console,
 [boolean]$Log2File = $False,
 [Switch]$NoLog2File,
-[String][ValidatePattern('^(\.+\\|[C-Z]:\\).*')]$LogPath ,
+[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath ,
 [String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
 
@@ -209,7 +216,7 @@ Try{
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
-    Write-Output "CommonFunctions.ps1 のLoadに失敗しました。CommonFunctions.ps1がこのファイルと同一フォルダに存在するか確認してください"
+    Write-Output "Fail to load CommonFunctions.ps1 Please verfy existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
 
@@ -233,34 +240,35 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
 
-
 #パラメータの確認
 
-    $ServiceExist = CheckServiceExist -ServiceName $Service -NoMessage
 
-    IF(-NOT($ServiceExist)){
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "サービス[$($Service)]が存在しません"
+    IF(-NOT(CheckServiceExist -ServiceName $Service -NoMessage)){
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Service [$($Service)] dose not exist."
         Finalize $ErrorReturnCode
         }
-        
-       
-
-    $ServiceStatus = CheckServiceStatus -ServiceName $Service -Health Running -Span 0 -UpTo 1
 
 
-    IF ($ServiceStatus){
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "サービス[$($Service)]は既に起動しています"
+     IF($TargetStatus -notmatch '(Running|Stopped)'){
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "-TargetStatus is invalid."
+        Finalize $ErrorReturnCode   
+        }
+
+
+    IF (CheckServiceStatus -ServiceName $Service -Health $TargetStatus -Span 0 -UpTo 1 ){
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Service [$($Service)] status is already [$($TargetStatus)]"
         Finalize $WarningReturnCode
         }
         
 
 
+
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは正常です"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($Service)]の起動処理を開始します"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Starting to change Service [$($Service)] status."
 
 }
 
@@ -284,7 +292,6 @@ $DatumPath = $PSScriptRoot
 
 $Version = '20200207_1615'
 
-
 [String]$Computer = "localhost" 
 [String]$Class = "win32_service" 
 [Object]$WmiService = Get-Wmiobject -Class $Class -computer $Computer -filter "name = '$Service'" 
@@ -294,21 +301,33 @@ $Version = '20200207_1615'
 
 . Initialize
 
+ Switch -Regex ($TargetStatus){
+ 
+    'Stopped'{
+        $OriginalStatus = 'Running'    
+        }
+    
+    'Running'{
+        $OriginalStatus = 'Stopped'
+        }
+
+    Default{
+        Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetStatus is invalid.'
+        Finalize $InternalErrorReturnCode
+        } 
+ }
+
+
+
 #以下のコードはMSのサンプルを参考
 #MICROSOFT LIMITED PUBLIC LICENSE version 1.1
 #https://gallery.technet.microsoft.com/scriptcenter/aa73bb75-38a6-4bd4-b72e-a6aede76d6ad
+#https://devblogs.microsoft.com/scripting/hey-scripting-guy-how-can-i-use-windows-powershell-to-stop-services/
 
+Logging -EventID $InfoEventID -EventType Information -EventMessage "With WMIService.(start|stop)Service , starting to change Service [$($Service)] status from [$($OriginalStatus)] to [$($TargetStatus)]"
 
-
-# カウント用変数初期化
-$Counter = 0
-
-
-    # 無限ループ
-    While ($true) {
-
-      # チェック回数カウントアップ
-      $Counter++
+For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
+{
 
       # サービス存在確認
       IF(-NOT(CheckServiceExist $Service)){
@@ -316,58 +335,73 @@ $Counter = 0
       }
 
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "WMIService.startServiceでサービス[$($Service)]の起動を開始します..."
-        
-        $Return = $WMIService.startService() 
+    Switch -Regex ($TargetStatus){
+ 
+        'Stopped'{
+            IF($WMIService.AcceptStop){
+                $Return = $WMIService.stopService()
+                }else{
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] will not accept a stop request. Wait for $($RetrySpanSec) seconds."
+                Start-Sleep $RetrySpanSec
+                Continue
+                }
+            }
+    
+        'Running'{
+
+            #https://docs.microsoft.com/ja-jp/windows/win32/cimwin32prov/win32-service
+            #No AcceptStart Class
+
+            $Return = $WMIService.startService()
+            }
+
+        Default{
+            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetStatus is invalid. '
+            Finalize $InternalErrorReturnCode    
+            }
+    }
 
 
-           Switch ($Return.returnvalue)  {
+
+     Switch ($Return.returnvalue)  {
         
                 0{
-                $ServiceStatus = CheckServiceStatus -ServiceName $Service -Health Running -Span $RetrySpanSec -UpTo $RetryTimes
+                $ServiceStatus = CheckServiceStatus -ServiceName $Service -Health $TargetStatus -Span $RetrySpanSec -UpTo $RetryTimes
 
-                    
-                    IF ($ServiceStatus){
-                    Logging -EventID $SuccessEventID -EventType Success -EventMessage "サービス[$($Service)]は正常に起動しました"
+                IF ($ServiceStatus){
+                    Logging -EventID $SuccessEventID -EventType Success -EventMessage "Service [$($Service)] is [$($TargetStatus)]"
                     Finalize $NormalReturnCode
                     }else{
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($Service)]は未だ正常に起動していません。再試行します"
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] is not [$($TargetStatus)] Retry."
                     }
-
                 }
 
 
                 2 {
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($Service)]から「アクセスが許可されていない」とレポートが出力されました"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] reports access denied."
                 }
 
                 5 { 
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($Service)]は現在制御を受付しません"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] can not accept control at this time."
                 } 
             
                 10 {
-                Logging -EventID $WarningEventID -EventType Warning -EventMessage "サービス[$($Service)]は既に起動しています"
+                Logging -EventID $WarningEventID -EventType Warning -EventMessage "Service [$($Service)] is already [$($TargetStatus)]"
                 Finalize $WarningErrorCode
                 }
               
                 DEFAULT {
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($Service)]から以下のレポートが出力されました。ERROR $($Return.returnValue)"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] reports ERROR $($Return.returnValue)"
                 } 
-            }  
+      }  
     
-    
-
-        IF ($Counter -eq $RetryTimes){
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "指定期間、回数が経過しましたがサービス[$($Service)]が起動出来ませんでした"
-        Finalize $ErrorReturnCode
-        }
 
       #チェック回数の上限に達していない場合は、指定秒待機
 
-      Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($Service)]は存在しますが起動できませんでした。$($RetrySpanSec)秒待機します。"
-      Start-Sleep $RetrySpanSec
+      Logging -EventID $InfoEventID -EventType Information -EventMessage "Serivce [$($Service)] exists and service status dose not change to [$($TargetStatus)] Wait for $($RetrySpanSec) seconds."
 
-      # 無限ループに戻る
+}
 
-    }
 
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , service [$($Service)] status is not change to [$($TargetStatus)]"
+    Finalize $ErrorReturnCode
