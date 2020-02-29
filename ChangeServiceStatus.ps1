@@ -320,14 +320,16 @@ $Version = '20200207_1615'
 
 Logging -EventID $InfoEventID -EventType Information -EventMessage "With WMIService.(start|stop)Service , starting to change Service [$($Service)] status from [$($OriginalStatus)] to [$($TargetStatus)]"
 
+For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
+{
 # カウント用変数初期化
-$Counter = 0
+#$Counter = 0
 
     # 無限ループ
-    While ($true) {
+#    While ($true) {
 
       # チェック回数カウントアップ
-      $Counter++
+#      $Counter++
 
       # サービス存在確認
       IF(-NOT(CheckServiceExist $Service)){
@@ -388,10 +390,10 @@ $Counter = 0
     
     
 
-        IF ($Counter -eq $RetryTimes){
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , service [$($Service)] status is not change to [$($TargetStatus)]"
-        Finalize $ErrorReturnCode
-        }
+#        IF ($Counter -eq $RetryTimes){
+#        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , service [$($Service)] status is not change to [$($TargetStatus)]"
+#        Finalize $ErrorReturnCode
+#        }
 
       #チェック回数の上限に達していない場合は、指定秒待機
 
@@ -401,3 +403,8 @@ $Counter = 0
       # 無限ループに戻る
 
     }
+
+
+ 
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , service [$($Service)] status is not change to [$($TargetStatus)]"
+        Finalize $ErrorReturnCode
