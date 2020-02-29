@@ -324,8 +324,6 @@ $Version = '20200207_1615'
 #https://gallery.technet.microsoft.com/scriptcenter/aa73bb75-38a6-4bd4-b72e-a6aede76d6ad
 #https://devblogs.microsoft.com/scripting/hey-scripting-guy-how-can-i-use-windows-powershell-to-stop-services/
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "With WMIService.(start|stop)Service , starting to change Service [$($Service)] status from [$($OriginalStatus)] to [$($TargetStatus)]"
-
 For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
 {
 
@@ -334,6 +332,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
       Finalize $ErrorReturnCode
       }
 
+    Logging -EventID $InfoEventID -EventType Information -EventMessage "With WMIService.(start|stop)Service , starting to change Service [$($Service)] status from [$($OriginalStatus)] to [$($TargetStatus)]"
 
     Switch -Regex ($TargetStatus){
  
