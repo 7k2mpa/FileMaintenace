@@ -167,7 +167,7 @@ Param(
 
 [String][parameter(position=1)][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
 
-[Switch]$CreateFlag ,
+[Switch][parameter(position=2)]$CreateFlag ,
 
 
 [boolean]$Log2EventLog = $TRUE,
