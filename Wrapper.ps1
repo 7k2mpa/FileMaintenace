@@ -178,7 +178,6 @@ Param(
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$CommandFileEncode = 'Default', #DefaultŽw’è‚ÍShift-Jis
 
 [Switch]$Continue,
-[Switch]$Script:NoAction,
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
