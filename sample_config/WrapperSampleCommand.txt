@@ -14,24 +14,24 @@
 
 #スペースが含まれている場合は引用符で括って下さい。
 
--TargetFolder 'D:\TEST\TEST 4'
+-TargetFolder '.\TEST\C C\'
 
 
 #こんな命名は無いと思いますが引用符'が含まれている場合は二重引用符で括って下さい。
 
--TargetFolder "D:\TEST\TEST' 5"
+-TargetFolder ".\TEST\D' 'D\"
 
 #なお、二重引用符"はNTFSで使用出来ません
 
 
 #ブラケット[]を含む場合は、そのまま記述して下さい。Powershellワイルドカードとして認識はされません。バッククオート`でのエスケープは不要です
 
--TargetFolder D:\TEST\LOG[OLD]
+-TargetFolder .\TEST\[LOG]
 
 #NTFSに使用できない文字（ワイルドカード*,?を含む）を指定すると異常終了判定します。
 #複数のフォルダを指定するには、-ParentRegularExpressionを使用してください。
 
--TargetFolder D:\TEST*
+-TargetFolder .\TEST*
 
 
 #相対パスと絶対パス
