@@ -220,7 +220,7 @@ Try{
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
-    Write-Output "CommonFunctions.ps1 のLoadに失敗しました。CommonFunctions.ps1がこのファイルと同一フォルダに存在するか確認してください"
+    Write-Output "Fail to load CommonFunctions.ps1 Please verfy existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
 
@@ -252,24 +252,24 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 #コマンドの有無を確認
 
 
-    $CommandPath = ConvertToAbsolutePath -CheckPath $CommandPath -ObjectName '実行コマンド -CommandPath'
+    $CommandPath = ConvertToAbsolutePath -CheckPath $CommandPath -ObjectName ' -CommandPath'
 
-    CheckLeaf -CheckPath $CommandPath -ObjectName '実行コマンド -CommandPath' -IfNoExistFinalize > $NULL
+    CheckLeaf -CheckPath $CommandPath -ObjectName '-CommandPath' -IfNoExistFinalize > $NULL
 
 #コマンドファイルの有無を確認
     
 
-    $CommandFile = ConvertToAbsolutePath -CheckPath $CommandFile -ObjectName 'コマンドファイル -CommandFile'
+    $CommandFile = ConvertToAbsolutePath -CheckPath $CommandFile -ObjectName '-CommandFile'
 
-    CheckLeaf -CheckPath $CommandFile -ObjectName 'コマンドファイル -CommandFile' -IfNoExistFinalize > $NULL
+    CheckLeaf -CheckPath $CommandFile -ObjectName '-CommandFile' -IfNoExistFinalize > $NULL
 
 
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは正常です"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "実行コマンドは[$($CommandPath)]です"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute Command path is [$($CommandPath)]"
 
 }
 
@@ -281,10 +281,10 @@ Param(
 
     IF(-NOT(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))){
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "実行結果は正常終了[$($NormalCount)]、警告終了[$($WarningCount)]、異常終了[$($ErrorCount)]です"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "Execution Results NORMAL[$($NormalCount)], WARNING[$($WarningCount)], ERROR[$($ErrorCount)]"
 
         If(($Continue) -and ($ErrorCount -gt 0)){
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]が指定されているため処理異常で異常終了せず次の定義を処理しました"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "An ERROR termination occurred, but did not terminate as ERROR and execute command of the next lines  because option -Continue[${Continue}] is used."
             }
 
 
@@ -317,9 +317,9 @@ $Version = '20200224_1640'
         }
                     catch [Exception]
                     {
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "-CommandFile読み込みに失敗しました。"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to load -CommandFile"
                     $ErrorDetail = $Error[0] | Out-String
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $ErrorDetail"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $ErrorDetail"
                     Finalize $ErrorReturnCode
                     }
 
@@ -330,7 +330,7 @@ For ( $i = 0 ; $i -lt $Lines.Count; $i++ )
 
     $Line = $Lines[$i]
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CommandFile)]の$($i+1)行目を実行します。"
+    Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute line [$($i+1)/$($Lines.Count)] in -CommandFile [$($CommandFile)]"
 
 
 
@@ -338,30 +338,30 @@ For ( $i = 0 ; $i -lt $Lines.Count; $i++ )
 
         #分岐1 行頭#でコメント
         '^#.*$'
-                {Logging -EventID $InfoEventID -EventType Information -EventMessage "コメント[$($Line)]"}
+                {Logging -EventID $InfoEventID -EventType Information -EventMessage "Comment[$($Line)]"}
 
         #分岐2 空白
         '^$'
-                {Logging -EventID $InfoEventID -EventType Information -EventMessage "空白行"}
+                {Logging -EventID $InfoEventID -EventType Information -EventMessage "Empty Line"}
 
         #分岐3 コマンド実行
         default 
                 {
                    Try{
         
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "実行コマンドは[$($CommandPath)]、引数は[$($Line)]です"
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute Command is [$($CommandPath)], arguments are [$($Line)]"
                     Invoke-Expression "$CommandPath $Line" -ErrorAction Stop
 
                     }
                     catch [Exception]
                     {
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "[$($CommandPath)]の起動に失敗しました。"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Faild to execute [$($CommandPath)] and force to exit."
                     $ErrorDetail = $Error[0] | Out-String
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $ErrorDetail"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $ErrorDetail"
                     Finalize $ErrorReturnCode
                     }
 
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($CommandFile)]の$($i+1)行目の実行結果は[$($LastExitCode)]です"
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Execution Result is [$($LastExitCode)] at line [$($i+1)/$($Lines.Count)] in -CommandFile [$($CommandFile)]"
                     
 
                     #終了コードで分岐
@@ -371,11 +371,10 @@ For ( $i = 0 ; $i -lt $Lines.Count; $i++ )
                         {$_ -ge $ErrorReturnCode}{
  
                             $ErrorCount ++
-                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "[$($CommandFile)]の$($i+1)行目は異常終了しました"
+                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred at line [$($i+1)/$($Lines.Count)] in -CommandFile [$($CommandFile)]"
        
-
                             IF($Continue){
-                                Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]のため処理を継続します。"   
+                                Logging -EventID $WarningEventID -EventType Warning -EventMessage "Will execute next line, because option -Continue[$($Continue)] is used."   
                                 ;Break     
      
                                 }else{
@@ -387,14 +386,14 @@ For ( $i = 0 ; $i -lt $Lines.Count; $i++ )
                         {$_ -ge $WarningReturnCode}{
                             
                             $WarningCount ++
-                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "[$($CommandFile)]の$($i+1)行目は警告終了しました。継続します" 
+                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred at line [$($i+1)/$($Lines.Count)] in -CommandFile [$($CommandFile)] Will execute next line." 
                             ;Break        
                         }
                         
                         #条件3 正常終了
                         Default {
                         $NormalCount ++
-                        Logging -EventID $SuccessEventID -EventType Success -EventMessage "[$($CommandFile)]の$($i+1)行目は正常終了しました"
+                        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully at line [$($i+1)/$($Lines.Count)] in -CommandFile [$($CommandFile)]"
                         }
                    }
     

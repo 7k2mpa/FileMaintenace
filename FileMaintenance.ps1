@@ -944,6 +944,8 @@ Param(
             }
     }
 
+    $Countinue = $Continue[0..($Continue.Length-2)]
+
 EndingProcess $ReturnCode
 
 }

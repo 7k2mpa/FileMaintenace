@@ -297,50 +297,40 @@ $Version = '20200207_1615'
  
     'Stopped'{
         $OriginalState = 'Started'    
-    }
+        }
     
     'Started'{
         $OriginalState = 'Stopped'
-    }
+        }
 
     Default{
         Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetState is invalid. '
-        Finalize $InternalErrorReturnCode
-    
-    }
- 
- 
+        Finalize $InternalErrorReturnCode    
+        }
  }
 
 
 Logging -EventID $InfoEventID -EventType Information -EventMessage "With Powershell Cmdlet , Starting to change site [$($Site)] state from [$($OriginalState)] to [$($TargetState)]"
         
- Switch -Regex ($TargetState){
+    Switch -Regex ($TargetState){
  
-    'Stopped'{
-        Stop-Website -Name $Site
-    }
+        'Stopped'{
+            Stop-Website -Name $Site
+            }
     
-    'Started'{
-        Start-Website -Name $Site
+        'Started'{
+            Start-Website -Name $Site
+            }
+
+        Default{
+            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetState is invalid. '
+            Finalize $InternalErrorReturnCode
+            }
     }
 
-    Default{
-        Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetState is invalid. '
-        Finalize $InternalErrorReturnCode
-    
-    }
-    }
 
-
-# カウント用変数初期化
-$Counter = 0
-
-    # 無限ループ
-    While ($true) {
-
-      # チェック回数カウントアップ
-      $Counter++
+For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
+{
 
       $SiteState = Get-Website | Where-Object{$_.Name -eq $Site} | ForEach-Object{$_.State}
 
@@ -350,37 +340,26 @@ $Counter = 0
 
                     Logging -EventID $SuccessEventID -EventType Success -EventMessage "Site[$($Site)] state was [$($SiteState)]."
                     Finalize $NormalReturnCode
-                    
-
-                }
+                    }
 
 
                 $OriginalState {
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] state is still [$($SiteState)]. "
-                }
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] state is still [$($SiteState)]. "
+                    }
 
               
                 DEFAULT {
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "Site [$($site)] state is [$($SiteState)]"
-                } 
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Site [$($site)] state is [$($SiteState)]"
+                    } 
             }  
     
-
-
-
-
-
-        IF ($Counter -eq $RetryTimes){ 
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , site [$($Site)] state did not change to [$($TargetState)]."
-        Finalize $ErrorReturnCode
-        }
 
       #チェック回数の上限に達していない場合は、指定秒待機
 
       Logging -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] exists and site state did not change to [$($TargetState)]. Wait for $($RetrySpanSec) seconds."
       Start-Sleep $RetrySpanSec
+}
 
-      # 無限ループに戻る
 
-    }
-
+Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , site [$($Site)] state did not change to [$($TargetState)]."
+Finalize $ErrorReturnCode

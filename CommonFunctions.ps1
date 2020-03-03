@@ -59,6 +59,8 @@ $Script:CommonFunctionsVersion = '20200221_2145'
 #[int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16,
 
 #[int][ValidateRange(1,65535)]$InfoEventID = 1,
+[int][ValidateRange(1,65535)]$StartEventID = 8
+[int][ValidateRange(1,65535)]$EndEventID = 9
 #[int][ValidateRange(1,65535)]$WarningEventID = 10,
 #[int][ValidateRange(1,65535)]$SuccessEventID = 73,
 #[int][ValidateRange(1,65535)]$InternalErrorEventID = 99,
@@ -492,32 +494,32 @@ Param(
     IF(($ErrorCount -gt 0) -OR ($ReturnCode -ge $ErrorReturnCode)){
 
         IF($ErrorAsWarning){
-            Logging -EventID $WarningEventID -EventType Warning -EventMessage "異常終了が発生しましたが、-ErrorAsWarning[$($ErrorAsWarning)]が指定されているため終了コードは[$($WarningReturnCode)]です"  
+            Logging -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred, but the exit code is [$($WarningReturnCode)] because option -ErrorAsWarning[$($ErrorAsWarning)] is used."  
             $ReturnCode = $WarningReturnCode
            
             }else{
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "異常終了が発生したため終了コードは[$($ErrorReturnCode)]です"
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "An ERROR termination occurred, the exit code is [$($ErrorReturnCode)]"
             $ReturnCode = $ErrorReturnCode
             }
 
         }elseIF(($WarningCount -gt 0) -OR ($ReturnCode -ge $WarningReturnCode)){
 
             IF($WarningAsNormal){
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "警告終了が発生しましたが、-WarningAsNormal[$($WarningAsNormal)]が指定されているため終了コードは[$($NormalReturnCode)]です" 
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "A WARNING termination occurred, but the exit code is [$($NormalReturnCode)] because option -WarningAsNormal[$($WarningAsNormal)] is used." 
                 $ReturnCode = $NormalReturnCode
            
                 }else{
-                Logging -EventID $WarningEventID -EventType Warning -EventMessage "警告終了が発生したため終了コードは[$($WarningReturnCode)]です"
+                Logging -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred, the exit code is [$($WarningReturnCode)]"
                 $ReturnCode = $WarningReturnCode
                 }
         
         }else{
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "正常終了しました。終了コードは[$($NormalReturnCode)]です"
+        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully. The exit code is [$($NormalReturnCode)]"
         $ReturnCode = $NormalReturnCode
                
         }
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "${SHELLNAME} Version $($Version)を終了します"
+    Logging -EventID $EndEventID -EventType Information -EventMessage "Exit $($SHELLNAME) Version $($Version)"
 
 Exit $ReturnCode
 
@@ -541,12 +543,12 @@ Param(
 
 
     IF($Service.Status -Match "^$"){
-        IF(-NOT($NoMessage)){Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($ServiceName)]が存在しません"}
+        IF(-NOT($NoMessage)){Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] dose not exists."}
         Return $False
 
         }else{
 
-        IF(-NOT($NoMessage)){Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($ServiceName)]は存在します"}
+        IF(-NOT($NoMessage)){Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists"}
         Return $TRUE
         }
 }
@@ -566,53 +568,43 @@ Param(
 [int][ValidateRange(0,2147483647)]$UpTo = 10
 )
 
+    For ( $i = 0 ; $i -lt $UpTo; $i++ )
+    {
+        # サービス存在確認
+        IF(-NOT(CheckServiceExist $ServiceName -NoMessage)){
+            Return $False
+            }
 
-# カウント用変数初期化
-$Counter = 0
 
+        # サービス状態判定
+        $Service = Get-Service | Where-Object {$_.Name -eq $ServiceName}
 
-    # 無限ループ
-    While ($true) {
+        IF ($Service.Status -eq $Health) {
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)]"
+            Return $TRUE     
+            }
 
-      # チェック回数カウントアップ
-      $Counter++
-
-      # サービス存在確認
-      IF(-NOT(CheckServiceExist $ServiceName -NoMessage)){
-      Return $False
-      }
-
-      $Service = Get-Service | Where-Object {$_.Name -eq $ServiceName}
-
-      # サービス状態判定
-      IF ($Service.Status -eq $Health) {
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($ServiceName)]は存在します。Status[$($Service.Status)]"
-        Return $true
-       
-        }elseIF($Counter -eq $Upto){
-
-            IF(($SPAN -eq 0) -AND ($UpTo -eq 1)){
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($ServiceName)]は存在します。Status[$($Service.Status)]"
+        IF(($SPAN -eq 0) -AND ($UpTo -eq 1)){
+                
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)]"
                 Return $False
-                }else{
-
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($ServiceName)]は存在します。指定期間、回数が経過しましたがStatus[$($Health)]には遷移しませんでした。"
-                return $false
                 }
-        }
-     
 
-      # 期待値でなく、チェック回数の上限に達していない場合は、指定間隔(秒)待機
+        # 指定間隔(秒)待機
 
-      Logging -EventID $InfoEventID -EventType Information -EventMessage "サービス[$($ServiceName)]は存在します。Status[$($Health)]ではありません。$($SPAN)秒待機します。"
-      Start-sleep $Span
-
-      # 無限ループに戻る
-
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)] , is not [$($Health)] Wait for $($SPAN)seconds."
+        Start-sleep $Span
     }
 
-}
+    # サービスは指定状態へ遷移しなかった
 
+
+
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)] now. The specified number of seconds has elapsed but the service has not transitioned to status [$($Health)]"
+                return $False
+                
+
+}
 
 
 function CheckNullOrEmpty {
@@ -778,10 +770,10 @@ function CheckExecUser {
 
     $Script:ScriptExecUser = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "実行ユーザは$($ScriptExecUser.Name)です"
+    Logging -EventID $InfoEventID -EventType Information -EventMessage "Executed in user [$($ScriptExecUser.Name)]"
 
     IF(-NOT($ScriptExecUser.Name -match $ExecutableUser)){
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "実行許可されていないユーザで起動しています。"
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "Executed in an unauthorized user."
                 Finalize $ErrorReturnCode
                 }
 
@@ -820,11 +812,11 @@ IF($NoLog2Console){[boolean]$Script:Log2Console = $False}
 IF($NoLog2File){[boolean]$Script:Log2File = $False}
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "${SHELLNAME} Version $($Version)を起動します"
+Logging -EventID $StartEventID -EventType Information -EventMessage "Start $($SHELLNAME) Version $($Version)"
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "CommonFunctions.ps1 Version $($CommonFunctionsVersion)をLoadしました"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Loaded CommonFunctions.ps1 Version $($CommonFunctionsVersion)"
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータの確認を開始します"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Start to validate parameters."
 
 . CheckExecUser
 
