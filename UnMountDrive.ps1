@@ -173,7 +173,7 @@ Try{
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
-    Write-Output "CommonFunctions.ps1 のLoadに失敗しました。CommonFunctions.ps1がこのファイルと同一フォルダに存在するか確認してください"
+    Write-Output "Fail to load CommonFunctions.ps1 Please verfy existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
 
@@ -208,18 +208,18 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
     IF($DriveLetters.Contains($MountedDrive)){
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage  "ドライブ$($MountedDrive)が既に存在します"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage  "Drive $($MountedDrive) exists already."
 
 
         [Object]$Drive = Get-WMIObject Win32_LogicalDisk | Where-Object { $_.DeviceID -eq $MountedDrive }
         IF($Drive.DriveType -ne 4){
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "ドライブ$($MountedDrive)はネットワークドライブではありません"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Drive $($MountedDrive) is not network drive."
                     Finalize $ErrorReturnCode
                     }
 
     }else{
 
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "ドライブ$($MountedDrive)は存在しません"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Drive $($MountedDrive) dose not exists."
         Finalize $ErrorReturnCode
         }
 
@@ -231,9 +231,9 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは正常です"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "ドライブ${MountedDrive}をアンマウントします"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Start to unmount drive ${MountedDrive}"
 
 
 }
@@ -276,13 +276,13 @@ Try{
         catch [Exception]
     {
     $ErrorDetail = $Error[0] | Out-String
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $ErrorDetail"
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "ドライブ${MountedDrive}のアンマウントに失敗しました"
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $ErrorDetail"
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to unmount drive ${MountedDrive}"
 	Finalize $ErrorReturnCode
     }
 
 
 
 
-Logging -EventID $SuccessEventID -EventType Success -EventMessage "ドライブ${MountedDrive}のアンマウントに成功しました"
+Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed to unmount drive ${MountedDrive} successfully."
 Finalize $NormalReturnCode     

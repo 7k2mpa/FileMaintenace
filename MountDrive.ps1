@@ -179,7 +179,7 @@ Try{
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
-    Write-Output "CommonFunctions.ps1 のLoadに失敗しました。CommonFunctions.ps1がこのファイルと同一フォルダに存在するか確認してください"
+    Write-Output "Fail to load CommonFunctions.ps1 Please verfy existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
 
@@ -212,13 +212,13 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
     IF($DriveLetters.Contains($MountDrive)){
 
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "ドライブ$($MountDrive)が既に存在します"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Drive $($MountDrive) exists already."
         Finalize $ErrorReturnCode
 
 
     }else{
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "ドライブ$($MountDrive)は存在しません"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "Drive $($MountDrive) dose not exists."
         }
 
 
@@ -228,10 +228,10 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
     IF(Test-Path -LiteralPath FileSystem::$TargetPath){
         
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath$($TargetPath)は存在します"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath $($TargetPath) exists."
         
         }else{
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath$($TargetPath)は存在しません"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath $($TargetPath) dose not exists."
         Finalize $ErrorReturnCode
         }
 
@@ -239,9 +239,9 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは正常です"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "UNCパス${TargetPath}をドライブ${MountDrive}へマウントします"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Start to mount UNC Path $($TargetPath) as drive ${MountDrive}"
 
 }
 
@@ -277,12 +277,12 @@ Try{
     catch [Exception]
     {
     $ErrorDetail = $Error[0] | Out-String
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $ErrorDetail"
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "ドライブ${MountDrive}のマウントに失敗しました"
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $ErrorDetail"
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to mount drive ${MountDrive}"
 	Finalize $ErrorReturnCode
     }
 
  
 
-Logging -EventID $SuccessEventID -EventType Success -EventMessage "ドライブ${MountDrive}のマウントに成功しました"
+Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed to mount drive ${MountDrive} successfully."
 Finalize $NormalReturnCode
