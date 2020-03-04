@@ -15,11 +15,12 @@ rem 引数確認
 set argc=0
 
 for %%a in ( %* ) do set /a argc=argc+1
+
 if not %argc% == 3 (
 rem 引数個数違い
 	eventcreate /L Application /T WARNING /SO Infra /D %MYSELF_NAME%＝エラー処理の引数個数が違います。 /ID 99
   	exit /b 1
-)
+	)
 
 eventcreate /L Application /T "%2" /SO Infra /D %MYSELF_NAME%＝%1 /ID %3
 

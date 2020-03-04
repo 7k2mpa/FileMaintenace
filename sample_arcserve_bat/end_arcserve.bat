@@ -13,15 +13,10 @@ set P_NAME=FileMaintenance.ps1
 
 powershell -Noninteractive -Command ".\FileMaintenance.ps1 -TargetFolder .\Lock -Action Delete ; exit $LASTEXITCODE"
 
-
-
 	IF %errorlevel%==8 (
-	call %SC_DIR%MSGPRINT.bat %P_NAME%が異常終了しました。エラーレベル＝%errorlevel% ERROR 100
-	goto :ERR
-
-)
-
-
+		call %SC_DIR%MSGPRINT.bat %P_NAME%が異常終了しました。エラーレベル＝%errorlevel% ERROR 100
+		goto :ERR
+		)
 
 exit /B
 
