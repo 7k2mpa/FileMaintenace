@@ -595,16 +595,9 @@ Param(
 [parameter(mandatory=$true)][String]$TargetFolder
 )
 
+    $CandidateObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse:$Recurse -Include * 
+
 $Objects = @()
-
-    If($Recurse){
-
-        $CandidateObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse -Include *      
-
-        }else{
-        $CandidateObjects = Get-ChildItem -LiteralPath $TargetFolder -Include * 
-        }
-
 
 #フィルタ後のオブジェクト群を配列に入れる
 #ソートに備えて必要な情報も配列に追加
@@ -861,8 +854,7 @@ Param(
 
 #圧縮フラグTrueの時
 
-
-        IF($PreAction -match '^(Compress)$'){
+    IF($PreAction -match '^(Compress)$'){
 
         #$PreActionは配列である。それをSwitch処理すると1要素づつループする。
         #'Compress'等は一旦Defaultに落ちるが、'7z' or '7zZip'があれば$ActionTypeは上書きされる
@@ -887,19 +879,19 @@ Param(
                 }    
         }
                         
-            IF($PreAction -contains 'AddTimeStamp'){
+        IF($PreAction -contains 'AddTimeStamp'){
 
                 $ArchiveFile = Join-Path $TargetFileParentFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )+$ExtString )
                 $Script:ActionType += "CompressAndAddTimeStamp"
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮&タイムスタンプ付加した[$(Split-Path -Leaf $ArchiveFile)]を作成します"
 
-            }else{
+                }else{
                 $ArchiveFile = $TargetObject+$ExtString
                 $Script:ActionType += "Compress"
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮した[$(Split-Path -Leaf $ArchiveFile)]を作成します" 
-            }          
+                }          
  
-        }else{
+    }else{
 
 #タイムスタンプ付加のみTrueの時
 
@@ -973,7 +965,7 @@ EndingProcess $ReturnCode
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200221_2145'
+$Version = '20200305_1030'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
