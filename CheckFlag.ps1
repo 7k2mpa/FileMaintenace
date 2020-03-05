@@ -211,7 +211,7 @@ Try{
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
-    Write-Output "CommonFunctions.ps1 のLoadに失敗しました。CommonFunctions.ps1がこのファイルと同一フォルダに存在するか確認してください"
+    Write-Output "Fail to load CommonFunctions.ps1 Please verfy existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
 
@@ -245,9 +245,9 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 #フラグフォルダの有無を確認
 
 
-    $FlagFolder = ConvertToAbsolutePath -CheckPath $FlagFolder -ObjectName  'Flagフォルダ-FlagFolder'
+    $FlagFolder = ConvertToAbsolutePath -CheckPath $FlagFolder -ObjectName  '-FlagFolder'
 
-    CheckContainer -CheckPath $FlagFolder -ObjectName 'FLagフォルダ-FlagFolder' -IfNoExistFinalize > $NULL
+    CheckContainer -CheckPath $FlagFolder -ObjectName '-FlagFolder' -IfNoExistFinalize > $NULL
 
 
 #フラグファイル名のValidation
@@ -255,7 +255,7 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
     IF ($FlagFile -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "-FlagFileにNTFSで使用できない文字を指定しています"
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "The path -FlagFile contains some characters that can not be used by NTFS"
 				Finalize $ErrorReturnCode
                 }
 
@@ -264,9 +264,9 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは正常です"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid"
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "フラグファイル[$($FlagFile)]の有無確認を開始します"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Starting to check existence of the flag file [$($FlagFile)]"
 
 }
 
@@ -306,20 +306,20 @@ $Version = '20200207_1615'
 [String]$FlagValue = ${SHELLNAME} + (Get-Date).ToString($LogDateFormat)
 [String]$FlagPath = Join-Path -Path $FlagFolder -ChildPath $FlagFile
 
-    IF(CheckLeaf -CheckPath $FlagPath -ObjectName 'フラグファイル'){
+    IF(CheckLeaf -CheckPath $FlagPath -ObjectName 'Flag File'){
 
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "フラグファイル[$($FlagPath)]が存在するため警告終了扱いにします"
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($FlagPath)] exists already and terminate as WARNING."
         Finalize $WarningReturnCode
     
         }else{
        
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "フラグファイル[$($FlagPath)]が存在しないため正常終了扱いにします"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($FlagPath)] dose not exists and terminate as NORMAL."
                 
             IF($CreateFlag){
     
                 TryAction -ActionType MakeNewFileWithValue -ActionFrom $FlagPath -ActionError $FlagPath -FileValue $FlagValue
-                Logging -EventID $SuccessEventID -EventType Success -EventMessage "フラグファイル[$($FlagPath)]の生成に成功しました"
+                Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed to create the flag file [$($FlagPath)] successfully."
     
                 }
         }
