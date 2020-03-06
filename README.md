@@ -45,7 +45,7 @@ Export Oracle Database with datapump.
 
 ### arcserveUDPbackup.ps1
 
-Execute [arcserveUDP] -(# https://www.arcserve.com/data-protection-solutions/arcserve-udp/) CLI and kick backup job.
+Execute [arcserveUDP] -(https://www.arcserve.com/data-protection-solutions/arcserve-udp/) CLI and kick backup job.
 
 ### CheckFlag.ps1
 
