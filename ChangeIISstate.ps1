@@ -238,7 +238,7 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
         Finalize $ErrorReturnCode
         }
  
-     IF($TargetState -notmatch ' ^(Started|Stopped)$'){
+     IF($TargetState -notmatch '^(Started|Stopped)$'){
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "-TargetState is invalid."
         Finalize $ErrorReturnCode   
         }
