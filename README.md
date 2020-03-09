@@ -22,7 +22,7 @@ At onece you can manage one folder. With Wrapper.ps1 you can manage multi folder
 ### StopService.ps1 / StartService.ps1 / ChangeServiceStatus.ps1
 
 Start and stop Windows service.
-These scripts are same. Difference of scripts are only one line at the parameter section.
+These scripts are same. Difference of them is only one line at the parameter section.
 
 ### ChangeIISstate.ps1
 
