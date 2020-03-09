@@ -266,7 +266,7 @@ $psDrive = $MountedDrive -replace ":"
 
 Try{
 
-    Remove-SmbMapping -LocalPath $MountedDrive -Force -UpdateProfile  -ErrorAction Stop
+    Remove-SmbMapping -LocalPath $MountedDrive -Force -UpdateProfile  -ErrorAction Continue
     If ( (Get-PSDrive -Name $psDrive) 2>$Null ) {
         Remove-PSDrive -Name $psDrive -Force  -ErrorAction Stop
         }
