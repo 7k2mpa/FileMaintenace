@@ -607,8 +607,8 @@ $Objects = @()
         {
         $Objects += New-Object PSObject -Property @{
             Object = $Object
-            Time = $Object.LastWriteTime
-            Depth = ($Object.FullName.Split("\\")).Count
+            Time   = $Object.LastWriteTime
+            Depth  = ($Object.FullName.Split("\\")).Count
         }
     }
 
@@ -1000,6 +1000,8 @@ $TargetObjects = GetObjects -TargetFolder $TargetFolder
             Finalize $NormalReturnCode
             }
     }
+
+Logging -EventID $InfoEventID -EventType Information -EventMessage "ˆ—‘ÎÛ‚Æ‚È‚é[$($FilterType)]‚Í[$($TargetObjects.Length)]ŒÂ‘¶İ‚µ‚Ü‚·"
 
 Write-Output "ˆ—‘ÎÛ‚ÍˆÈ‰º‚Ì[$($FilterType)]‚Å‚·"
 

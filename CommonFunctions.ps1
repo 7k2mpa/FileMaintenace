@@ -167,7 +167,7 @@ function CheckLogFilePath{
         Return
         }
 
-$ForceConsleEventLog = $TRUE    
+$ForceConsoleEventLog = $TRUE    
 
     $LogPath = ConvertToAbsolutePath -CheckPath $LogPath -ObjectName '-LogPath'
 
