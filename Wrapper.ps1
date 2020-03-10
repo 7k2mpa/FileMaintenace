@@ -349,7 +349,7 @@ For ( $i = 0 ; $i -lt $Lines.Count; $i++ )
                 {
                    Try{
         
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute Command is [$($CommandPath)], arguments are [$($Line)]"
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute Command [$($CommandPath)] with arguments [$($Line)]"
                     Invoke-Expression "$CommandPath $Line" -ErrorAction Stop
 
                     }
