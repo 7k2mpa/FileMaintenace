@@ -179,7 +179,7 @@ https://docs.microsoft.com/ja-jp/dotnet/standard/base-types/substitutions-in-reg
 デフォルトは$TRUEで再帰的処理です。
 
 .PARAMETER NoRecurse
-　-TargetFolderの直下のみを処理対象とします。-Recurse $Falseと等価です。
+　-TargetFolderの直下のみを処理対象とします。-Recurse $FALSEと等価です。
 Recurseパラメータより優先します。
 
 .PARAMETER OverRide
@@ -244,7 +244,7 @@ Recurseパラメータより優先します。
 デフォルトは$TRUEでEvent Log出力します。
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $Falseと等価です。
+　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
 Log2EventLogより優先します。
 
 .PARAMETER ProviderName
@@ -260,15 +260,15 @@ Log2EventLogより優先します。
 デフォルトは$TRUEでコンソール出力します。
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $Falseと等価です。
+　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
 Log2Consoleより優先します。
 
 .PARAMETER Log2File
 　ログフィルへの出力を制御します。
-デフォルトは$Falseでログファイル出力しません。
+デフォルトは$FALSEでログファイル出力しません。
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $Falseと等価です。
+　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
 Log2Fileより優先します。
 
 .PARAMETER LogPath
@@ -363,10 +363,10 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[parameter(position=0, mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$TargetFolder,
+[parameter(position=0, mandatory=$TRUE , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$TargetFolder,
 
-#[parameter(position=0, mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String]$TargetFolder,  #Validation debug用に用意してあります。通常は使わない
-#[parameter(position=0, mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
+#[parameter(position=0, mandatory=$TRUE , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String]$TargetFolder,  #Validation debug用に用意してあります。通常は使わない
+#[parameter(position=0, mandatory=$TRUE , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
  
 
 [Array][parameter(position=1)][ValidateSet("AddTimeStamp", "Compress", "MoveNewFile" , "none" , "Archive" , "7z" , "7zZip")]$PreAction = 'none',
@@ -424,7 +424,7 @@ Param(
 [Boolean]$Log2Console = $TRUE,
 [Switch]$NoLog2Console,
 
-[Boolean]$Log2File = $false,
+[Boolean]$Log2File = $FALSE,
 [Switch]$NoLog2File,
 #[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath = '.\SC_Logs\Infra.log',
 #[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath = ..\Log\FileMaintenance.log ,
@@ -482,34 +482,34 @@ function CheckLeafNotExists {
 .OUTPUT
 　Boolean
     チェック対象のファイルが存在するが、-OverRideを指定...$TRUE　（この指定は-Continueに優先する）なおTryActionは既にファイルが存在する場合は強制上書き
-    チェック対象のファイルが存在するが、-Continueを指定...$False
+    チェック対象のファイルが存在するが、-Continueを指定...$FALSE
     チェック対象のファイルが存在する...$ErrorReturnCode でFinalizeへ進む、またはBreak
     チェック対象の同一名称のフォルダが存在するが、-OverRideを指定...上書きが出来ないので$ErrorReturnCode でFinalizeへ進む、またはBreak
-    チェック対象と同一名称のフォルダが存在するが、-Continueを指定...$False
+    チェック対象と同一名称のフォルダが存在するが、-Continueを指定...$FALSE
     チェック対象と同一名称のフォルダが存在する...$ErrorReturnCode でFinalizeへ進む、またはBreak
     チェック対象のファイル、フォルダが存在しない...$TRUE
 #>
 
 Param(
-[parameter(mandatory=$true)][String]$CheckLeaf
+[parameter(mandatory=$TRUE)][String]$CheckLeaf
 )
 
 Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf)の存在を確認します"
 
     #既にファイルがあるが、OverRide指定は無い。よって、異常終了 or Continue指定ありで継続
 
-    If( (Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -and (-not($OverRide)) ){
+    If ((Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -and (-not($OverRide))) {
 
         Logging -EventID $WarningEventID -EventType Warning -EventMessage "既に$($CheckLeaf)が存在します"
 
-        IF(-not($ContinueAsNormal)){
+        IF (-not($ContinueAsNormal)) {
             $Script:WarningFlag = $TRUE
             }    
-        If(-not($Continue)){
+        If (-not($Continue)) {
  
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に$($CheckLeaf)が存在するため、${SHELLNAME}を終了します"
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に$($CheckLeaf)が存在するため、${ShellName}を終了します"
             
-                IF($ForceEndLoop){
+                IF ($ForceEndLoop) {
                     $Script:ErrorFlag = $TRUE
                     $Script:ForceFinalize = $TRUE
                     Break
@@ -518,15 +518,15 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
                     }
             }else{
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]のため処理を継続します。"
-            $Script:ContinueFlag = $true
+            $Script:ContinueFlag = $TRUE
 
-            #既存ファイルがあるので$Falseを返してファイル処理させない
-            Return $False
+            #既存ファイルがあるので$FALSEを返してファイル処理させない
+            Return $FALSE
             }
 
       #既にファイルがあるが、OverRide指定がある。よって継続  
 
-     }elseIF( (Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -and ($OverRide) ){
+     }elseIF ((Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -and ($OverRide)) {
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "既に$($CheckLeaf)が存在しますが-OverRide[$OverRide]のため上書きします"
             $Script:OverRideFlag = $TRUE
@@ -534,16 +534,16 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
             #ここまで来ればファイルが存在しないは確定。同一名称のフォルダが存在する可能性は残っている
             #同一名称のフォルダが存在するとOverRide出来ないので、Continue指定ありの場合は継続。指定なしで異常終了
 
-            }elseIF(Test-Path -LiteralPath $CheckLeaf -PathType Container){
+            }elseIF (Test-Path -LiteralPath $CheckLeaf -PathType Container) {
 
                 Logging -EventID $WarningEventID -EventType Warning -EventMessage "既に同一名称フォルダ$($CheckLeaf)が存在します"
                 $Script:WarningFlag = $TRUE
 
-                IF(-not($Continue)){
+                IF (-not($Continue)) {
 
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称フォルダ$($CheckLeaf)が存在するため、${SHELLNAME}を終了します"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称フォルダ$($CheckLeaf)が存在するため、${ShellName}を終了します"
 
-                    IF($ForceEndLoop){
+                    IF ($ForceEndLoop) {
                         $Script:ErrorFlag = $TRUE
                         $Script:ForceFinalize = $TRUE
                         Break
@@ -553,10 +553,10 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
             
                     }else{
                     Logging -EventID $WarningEventID -EventType Warning -EventMessage "-Continue[$($Continue)]のため処理を継続します。"
-                    $Script:ContinueFlag = $true
+                    $Script:ContinueFlag = $TRUE
 
-                    #既存フォルダがあるので$Falseを返してファイル処理させない
-                    Return $False
+                    #既存フォルダがあるので$FALSEを返してファイル処理させない
+                    Return $FALSE
                     }
 
             
@@ -566,7 +566,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf
             Logging -EventID $InfoEventID -EventType Information -EventMessage "$($CheckLeaf)は存在しません"            
             }
 
-Return $true
+Return $TRUE
 }
 
 
@@ -595,8 +595,8 @@ PSobject passed the filter
  
     IF (($_.PSIsContainer -eq ($FilterType -eq 'Folder')) -or ( -not($_.PSIsContainer) -eq ($FilterType -eq 'File'))) {
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
-    IF ($_.Name -match $RegularExpression){
-    IF ($_.Length -ge ($Size)){
+    IF ($_.Name -match $RegularExpression) {
+    IF ($_.Length -ge $Size) {
     IF (($_.FullName).Substring($TargetFolder.Length , (Split-Path -Parent $_.FullName).Length - $TargetFolder.Length +1) -match $ParentRegularExpression)
         {Return $_}
     }
@@ -620,7 +620,7 @@ Strings Array of Objects's path
 #>
 
 Param(
-[parameter(mandatory=$true)][String]$TargetFolder
+[parameter(mandatory=$TRUE)][String]$TargetFolder
 )
 
     $candidateObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse:$Recurse -Include * 
@@ -642,15 +642,15 @@ Param(
 
 #一部のActionはObjectを特定の順序で処理するため、必要に応じてソートする
 
-    Switch -Regex ($Action){
+    Switch -Regex ($Action) {
  
         #KeepFilesCount配列に入れたパス一式を古い順に整列
-        '^KeepFilesCount$'{
+        '^KeepFilesCount$' {
             Return ($objects | Sort-Object -Property Time | ForEach-Object {$_.object.FullName})
             }
 
         #DeleteEmptyFolders配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
-        '^DeleteEmptyFolders$'{
+        '^DeleteEmptyFolders$' {
             Return ($objects | Sort-Object -Property Depth -Descending | ForEach-Object {$_.object.FullName})        
             }
 
@@ -679,19 +679,19 @@ $ShellName = Split-Path $PSCommandPath -Leaf
 
 #Switch処理
 
-IF($NoRecurse){[Boolean]$Script:Recurse = $false}
-IF($NullOriginalFile){[String]$Script:PostAction = 'NullClear'}
-IF($ContinueAsNormal){[Switch]$Script:Continue = $TRUE}
+IF ($NoRecurse) {[Boolean]$Script:Recurse = $FALSE}
+IF ($NullOriginalFile) {[String]$Script:PostAction = 'NullClear'}
+IF ($ContinueAsNormal) {[Switch]$Script:Continue = $TRUE}
 
-IF($AddTimeStamp){$Script:PreAction +='AddTimeStamp'}
-IF($MoveNewFile){$Script:PreAction +='MoveNewFile'}
-IF($Compress){$Script:PreAction +='Compress'}
+IF ($AddTimeStamp) {$Script:PreAction +='AddTimeStamp'}
+IF ($MoveNewFile) {$Script:PreAction +='MoveNewFile'}
+IF ($Compress) {$Script:PreAction +='Compress'}
 
 #パラメータの確認
 
 
 #指定フォルダの有無を確認
-#CheckContainer functionは$True,$Falseが戻値なので$Nullへ捨てる。捨てないとコンソール出力される
+#CheckContainer functionは$TRUE,$FALSEが戻値なので$NULLへ捨てる。捨てないとコンソール出力される
 
     $TargetFolder = ConvertToAbsolutePath -CheckPath $TargetFolder -ObjectName  '指定フォルダ-TargetFolder'
 
@@ -700,14 +700,14 @@ IF($Compress){$Script:PreAction +='Compress'}
 
 #移動先フォルダの要不要と有無を確認
 
-    If (  ($Action -match "^(Move|Copy)$") -or ($PreAction -contains 'MoveNewFile')  ){    
+    If ( ($Action -match "^(Move|Copy)$") -or ($PreAction -contains 'MoveNewFile') ) {    
 
         $MoveToFolder = ConvertToAbsolutePath -CheckPath $MoveToFolder -ObjectName '移動先フォルダ-MoveToFolder'
 
         CheckContainer -CheckPath $MoveToFolder -ObjectName '移動先フォルダ-MoveToFolder' -IfNoExistFinalize > $NULL
  
        
-     }elseIF(-not (CheckNullOrEmpty -CheckPath $MoveToFolder)){
+     }elseIF (-not (CheckNullOrEmpty -CheckPath $MoveToFolder)) {
                 Logging -EventID $ErrorEventID -EventType Error -EventMessage "Action[$($Action)]の時、-MoveToFolder指定は不要です"
                 Finalize $ErrorReturnCode
                 }
@@ -715,10 +715,10 @@ IF($Compress){$Script:PreAction +='Compress'}
 
 #ArchiveFileNameの要不要と有無、Validation
 
-    IF($PreAction -contains 'Archive'){
+    IF ($PreAction -contains 'Archive') {
         CheckNullOrEmpty -CheckPath $ArchiveFileName -ObjectName '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL
         
-        IF( $ArchiveFileName -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
+        IF ($ArchiveFileName -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "-ArchiveFileNameにNTFSで使用できない文字が含まれています"
 				Finalize $ErrorReturnCode
@@ -728,7 +728,7 @@ IF($Compress){$Script:PreAction +='Compress'}
 
 #7zフォルダの要不要と有無を確認
 
-    If ( $PreAction -match "^(7z|7zZip)$"){    
+    If ( $PreAction -match "^(7z|7zZip)$") {    
 
         $7zFolder = ConvertToAbsolutePath -CheckPath $7zFolder -ObjectName '-7zFolder'
 
@@ -738,48 +738,48 @@ IF($Compress){$Script:PreAction +='Compress'}
 #組み合わせが不正な指定を確認
 
 
-    If(($TargetFolder -eq $MoveToFolder) -and (($Action -match "move|copy") -or  ($PreAction -contains 'MoveNewFile'))){
+    If (($TargetFolder -eq $MoveToFolder) -and (($Action -match "move|copy") -or  ($PreAction -contains 'MoveNewFile'))) {
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "移動先フォルダと移動先フォルダとが同一の時に、ファイルの移動、複製は出来ません"
 				Finalize $ErrorReturnCode
                 }
 
-    If (($Action -match "^(Move|Delete|KeepFilesCount)$") -and  ($PostAction -ne 'none')){
+    If (($Action -match "^(Move|Delete|KeepFilesCount)$") -and  ($PostAction -ne 'none')) {
 
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "対象ファイルを削除または移動後、-PostAction[$($PostAction)]することは出来ません"
 				Finalize $ErrorReturnCode
                 }
 
-   If (($PreAction -contains 'MoveNewFile' ) -and  (-not($PreAction -match "^(Compress|AddTimeStamp|Archive)$") )){
+   If (($PreAction -contains 'MoveNewFile' ) -and (-not($PreAction -match "^(Compress|AddTimeStamp|Archive)$") )) {
 
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "-PreActionでMoveNewFileは、Compres , AddTimeStamp , Archiveと併用する必要があります。元ファイルの移動には-Action Moveを指定してください"
 				Finalize $ErrorReturnCode
                 }
 
-   If (($PreAction -contains 'Compress') -and  ($PreAction -contains 'Archive') ){
+   If (($PreAction -contains 'Compress') -and  ($PreAction -contains 'Archive')) {
 
 				Logging -EventType Error -EventID $ErrorEventID "-PreActionでCompressとArchiveとを同時に指定はできません"
 				Finalize $ErrorReturnCode
                 }
 
-   If (($PreAction -contains '7z' ) -and  ($PreAction -Contains '7zZip')){
+   If (($PreAction -contains '7z' ) -and  ($PreAction -Contains '7zZip')) {
 
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "-PreActionで圧縮方式指定7zと7zZipとを同時に指定はできません"
 				Finalize $ErrorReturnCode
                 }
 
-   If (($PreAction -match "^(7z|7zZip)$" ) -and  (-not($PreAction -match "^(Compress|Archive)$"))){
+   If (($PreAction -match "^(7z|7zZip)$" ) -and  (-not($PreAction -match "^(Compress|Archive)$"))) {
 
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "-PreActionで圧縮方式指定7zと7zZipは単独で指定できません。CompressまたはArchiveの指定が必要です"
 				Finalize $ErrorReturnCode
                 }
 
-   IF ($Action -eq "DeleteEmptyFolders"){
-        IF( ($PreAction -match '^(Compress|Archive|AddTimeStamp)$') -or ($PostAction -ne 'none' )){
+   IF ($Action -eq "DeleteEmptyFolders") {
+        IF ( ($PreAction -match '^(Compress|Archive|AddTimeStamp)$') -or ($PostAction -ne 'none' )) {
     
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時、ファイル操作は行えません"
 				Finalize $ErrorReturnCode
 
-        }elseIF($Size -ne 0){
+        }elseIF ($Size -ne 0) {
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "空フォルダ削除-Action[$Action]を指定した時、ファイル容量指定-sizeは設定できません"
 				Finalize $ErrorReturnCode
                 }
@@ -799,7 +799,7 @@ IF($Compress){$Script:PreAction +='Compress'}
 
 Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは正常です"
 
-    IF ($Action -eq "DeleteEmptyFolders"){
+    IF ($Action -eq "DeleteEmptyFolders") {
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "指定フォルダ$($TargetFolder)の$($Days)日以前の正規表現 $($RegularExpression) にマッチする空フォルダを再帰的[$($Recurse)]に削除します"
         
@@ -807,17 +807,17 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage ("指定フォルダ[$($TargetFolder)]の[$($Days)日以前][正規表現 $($RegularExpression) にマッチ][指定フォルダ以後のパスが正規表現 $($ParentRegularExpression) にマッチ]["+($Size / 1KB)+"KB以上]にマッチしたファイルを抽出します")
 
-        IF( $PreAction -notcontains 'none'){
+        IF ($PreAction -notcontains 'none') {
 
             $message = "マッチしたファイルを"
-            IF ($PreAction -contains 'MoveNewFile'){ $message += "移動先フォルダ[$($MoveToFolder)]へ"}
+            IF ($PreAction -contains 'MoveNewFile') { $message += "移動先フォルダ[$($MoveToFolder)]へ"}
 
-            IF ($PreAction -match "^(Compress|Archive)$"){
+            IF ($PreAction -match "^(Compress|Archive)$") {
                 
                 #$PreActionは配列なのでSwitchで処理すると複数回実行されるので、IFで処理
-                IF($PreAction -contains '7z'){
+                IF ($PreAction -contains '7z') {
                         $message += "圧縮方式[7z]で"            
-                        }elseIF($PreAction -contains '7zZIP'){
+                        }elseIF ($PreAction -contains '7zZIP') {
                             $message += "圧縮方式[7zZip]で"
                             }else{
                             $message += "圧縮方式[Powershell cmdlet Compress-Archive]で"
@@ -832,17 +832,17 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
 
 
 
-        IF ($Action -ne 'none'){
+        IF ($Action -ne 'none') {
 
             $message = "マッチしたファイルを"
             IF ($Action -eq 'KeepFilesCount') { $message += "[世代数($($KeepFiles))]まで"}
-            IF ($Action -match '^(Copy|Move)$'){ $message += "移動先フォルダ[$($MoveToFolder)]へ"}
+            IF ($Action -match '^(Copy|Move)$') { $message += "移動先フォルダ[$($MoveToFolder)]へ"}
             $message += "再帰的[$($Recurse)]にAction[$($Action)]します。"
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage $message
             }
 
-        IF ($PostAction -ne 'none'){
+        IF ($PostAction -ne 'none') {
 
             $message = "マッチしたファイルを"
             IF ($PostAction -eq 'Rename') { $message += "リネーム規則[$($RenameToRegularExpression)]を用いて"}
@@ -852,18 +852,18 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
             }
     }
 
-    IF($NoAction){
+    IF ($NoAction) {
         Logging -EventID $InfoEventID -EventType Information -EventMessage "-NoAction[${NoAction}]が指定されているため実際にはファイル/フォルダを処理をしません"
         }
 
-    IF($OverRide){
+    IF ($OverRide) {
         Logging -EventID $InfoEventID -EventType Information -EventMessage "-OverRide[${OverRide}]が指定されているため生成したファイルと同名のものがあった場合は上書きします"
         }
 
-    If($ContinueAsNormal){
+    If ($ContinueAsNormal) {
         Logging -EventID $InfoEventID -EventType Information -EventMessage "-ContinueAsNormal[$($ContinueAsNormal)]が指定されているため生成したファイルと同名のものがあった場合は正常扱いで次のファイルを処理します。ファイル名同一以外の処理異常は警告しますが、次のファイル、フォルダを処理します"
         
-        }elseIF($Continue){
+        }elseIF ($Continue) {
             Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]が指定されているため生成したファイル、フォルダと同名のものがあった場合等の処理異常で異常終了せず警告後、次のファイル、フォルダを処理します"
             }
 
@@ -872,42 +872,42 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは
 
 #圧縮フラグまたはタイムスタンプ付加フラグがTrueの処理
 
-function CompressAndAddTimeStamp{
+function CompressAndAddTimeStamp {
 
 Param(
-[parameter(mandatory=$true)][String]$TargetObject
+[parameter(mandatory=$TRUE)][String]$TargetObject
 ) 
 
     [String]$targetFileParentFolder = Split-Path $TargetObject -Parent
 
 #圧縮フラグTrueの時
 
-    IF($PreAction -match '^(Compress)$'){
+    IF ($PreAction -match '^(Compress)$') {
 
         #$PreActionは配列である。それをSwitch処理すると1要素づつループする。
         #'Compress'等は一旦Defaultに落ちるが、'7z' or '7zZip'があれば$ActionTypeは上書きされる
 
-        Switch -Regex ($PreAction){    
+        Switch -Regex ($PreAction) {    
         
-          '^7z$'{
+          '^7z$' {
                 $Script:ActionType = "7z"
                 $extString = '.7z'
                 Break                
                 }
                 
-           '^7zZip$'{
+           '^7zZip$' {
                 $Script:ActionType = "7zZip"
                 $extString = '.zip'
                 Break
                 }
                     
-             Default{
+             Default {
                 $Script:ActionType = ""
                 $extString = $CompressedExtString
                 }    
         }
                         
-        IF($PreAction -contains 'AddTimeStamp'){
+        IF ($PreAction -contains 'AddTimeStamp') {
 
                 $archiveFile = Join-Path $targetFileParentFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )+$extString )
                 $Script:ActionType += "CompressAndAddTimeStamp"
@@ -931,7 +931,7 @@ Param(
 
 #移動フラグがTrueならば、作成した圧縮orタイムスタンプ付加したファイルを移動する
 
-    IF($PreAction -contains 'MoveNewFile'){
+    IF ($PreAction -contains 'MoveNewFile') {
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage ("-PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"]のため、作成したファイルは$($MoveToNewFolder)に配置します")
         Return ( Join-Path $MoveToNewFolder (Split-Path -Leaf $archiveFile) )
@@ -946,20 +946,20 @@ Param(
 function Finalize{
 
 Param(
-[parameter(mandatory=$true)][Int]$ReturnCode
+[parameter(mandatory=$TRUE)][Int]$ReturnCode
 )
-    $ForceFinalize = $False
+    $ForceFinalize = $FALSE
  
-    IF( ($NormalCount + $WarningCount + $ErrorCount) -ne 0 ){    
+    IF ( ($NormalCount + $WarningCount + $ErrorCount) -ne 0 ) {    
 
        Logging -EventID $InfoEventID -EventType Information -EventMessage "実行結果は正常終了[$($NormalCount)]、警告終了[$($WarningCount)]、異常終了[$($ErrorCount)]です"
 
 
-        IF($OverRide -and ($OverRideCount -gt 0)){
+        IF ($OverRide -and ($OverRideCount -gt 0)) {
             Logging -EventID $InfoEventID -EventType Information -EventMessage "-OverRide[${OverRide}]が指定されているため生成したファイルと同名のものを[$($OverRideCount)]回、上書きしました"
             }
 
-        IF(($Continue) -and ($ContinueCount -gt 0)){
+        IF (($Continue) -and ($ContinueCount -gt 0)) {
             Logging -EventID $InfoEventID -EventType Information -EventMessage "-Continue[${Continue}]が指定されているため生成したファイルと同名のものがあった場合等の処理異常で異常終了せず次のファイル、フォルダを[$($ContinueCount)]回処理しました"
             }
     }
@@ -974,13 +974,13 @@ EndingProcess $ReturnCode
 
 #####################   ここから本体  ######################
 
-[Boolean]$ErrorFlag = $false
-[Boolean]$WarningFlag = $False
-[Boolean]$NormalFlag = $False
-[Boolean]$OverRideFlag = $False
-[Boolean]$ContinueFlag = $False
-[Boolean]$ForceFinalize = $False          ;#$TRUEでオブジェクト処理ループを強制終了。
-[Boolean]$ForceEndloop = $False           ;#$FalseではFinalize , $TRUEではループ内でBreak
+[Boolean]$ErrorFlag = $FALSE
+[Boolean]$WarningFlag = $FALSE
+[Boolean]$NormalFlag = $FALSE
+[Boolean]$OverRideFlag = $FALSE
+[Boolean]$ContinueFlag = $FALSE
+[Boolean]$ForceFinalize = $FALSE          ;#$TRUEでオブジェクト処理ループを強制終了。
+[Boolean]$ForceEndloop = $FALSE           ;#$FALSEではFinalize , $TRUEではループ内でBreak
 [Int][ValidateRange(0,2147483647)]$ErrorCount = 0
 [Int][ValidateRange(0,2147483647)]$WarningCount = 0
 [Int][ValidateRange(0,2147483647)]$NormalCount = 0
@@ -1001,7 +1001,7 @@ $Version = '20200305_1030'
 #対象のフォルダまたはファイルを探して配列に入れる
 
 
-    IF($Action -eq "DeleteEmptyFolders"){
+    IF ($Action -eq "DeleteEmptyFolders") {
 
         $FilterType = "Folder"
 
@@ -1013,15 +1013,15 @@ $TargetObjects = @()
 
 $TargetObjects = GetObjects -TargetFolder $TargetFolder
 
-    If ($null -eq $TargetObjects){
+    If ($NULL -eq $TargetObjects) {
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "$($TargetFolder)に処理対象となる[$($FilterType)]はありません"
 
-        IF($NoneTargetAsWarning){
+        IF ($NoneTargetAsWarning) {
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "-NoneTargetAsWarningが指定されているため、警告終了扱いにします"
             Finalize $WarningReturnCode
-            }
-            else{
+
+            }else{
             Finalize $NormalReturnCode
             }
     }
@@ -1034,27 +1034,27 @@ Write-Output $TargetObjects
     　
 #-PreAction Archiveは複数ファイルを1ファイルに圧縮する。よって、ループ前に圧縮先の1ファイルのフルパスを確定しておく
 
-IF( ($PreAction -contains 'Archive') ){
+IF ($PreAction -contains 'Archive') {
 
-    IF($PreAction -contains 'MoveNewFile'){
+    IF ($PreAction -contains 'MoveNewFile') {
         
-        $ArchiveToFolder = $MoveToFolder
+        $archiveToFolder = $MoveToFolder
         }else{
-        $ArchiveToFolder = $TargetFolder
+        $archiveToFolder = $TargetFolder
         }
 
-    IF($PreAction -contains 'AddTimeStamp'){  
+    IF ($PreAction -contains 'AddTimeStamp') {  
 
-        $ArchivePath = Join-Path -Path $ArchiveToFolder -ChildPath ( AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $ArchiveFileName )
+        $archivePath = Join-Path -Path $archiveToFolder -ChildPath ( AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $archiveFileName )
         }else{
-        $ArchivePath = Join-Path -Path $ArchiveToFolder -ChildPath $ArchiveFileName
+        $archivePath = Join-Path -Path $archiveToFolder -ChildPath $archiveFileName
         }
 
-    $ArchivePath = ConvertToAbsolutePath -CheckPath $ArchivePath -ObjectName "ArchiveFile出力先"
+    $archivePath = ConvertToAbsolutePath -CheckPath $archivePath -ObjectName "ArchiveFile出力先"
 
-    IF(-not(CheckLeafNotExists -CheckLeaf $ArchivePath)){
+    IF (-not(CheckLeafNotExists -CheckLeaf $ArchivePath)) {
         
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称ファイルまたはフォルダ$($ArchivePath)が存在するため、${SHELLNAME}を終了します"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称ファイルまたはフォルダ$($archivePath)が存在するため、$($ShellName)を終了します"
         Finalize $ErrorReturnCode        
         }
 
@@ -1069,14 +1069,14 @@ ForEach ($TargetObject in $TargetObjects)
 #PowershellはGOTO文が存在せず処理分岐ができない。
 #そのためDo/Whileを用いて処理途中でエラーが発生した場合の分岐を実装している
 
-#Do/While()は最後に評価が行われるループ。最後の評価がFalseとなるとループを終了する。ここでWhile($false)としてあるので、
+#Do/While()は最後に評価が行われるループ。最後の評価がFalseとなるとループを終了する。ここでWhile($FALSE)としてあるので、
 #Do/Whileの間は1回だけ実行される。
 #Do/Whileはループのため、処理途中でBreakすると、Whileへjumpする。
 
 #ファイル群処理ループ中のエラー（例えば、ファイルをDelete試行したが、権限が無くて削除できない等）で想定される処理、指定方法は以下である。
 
 #1.While以降の処理終了メッセージ出力へJumpして、次のファイルを処理継続
-# Break , $ForceEndloog = $TRUE , $ForceFinalize = $False 
+# Break , $ForceEndloog = $TRUE , $ForceFinalize = $FALSE 
 #2.While以降の処理終了メッセージ出力へJumpして、次のファイルは処理せずにFinalizeへ進む（処理打ち切り）
 # Break , $ForceEndloog = $TRUE , $ForceFinalize = $TRUE
 #3.処理終了メッセージ出力しない。Finalizeへ進む（処理打ち切り）
@@ -1084,11 +1084,11 @@ ForEach ($TargetObject in $TargetObjects)
 
 Do
 {
-    [Boolean]$ErrorFlag = $False
-    [Boolean]$WarningFlag = $False
-    [Boolean]$NormalFlag = $False
-    [Boolean]$OverRideFlag = $False
-    [Boolean]$ContinueFlag = $False
+    [Boolean]$ErrorFlag = $FALSE
+    [Boolean]$WarningFlag = $FALSE
+    [Boolean]$NormalFlag = $FALSE
+    [Boolean]$OverRideFlag = $FALSE
+    [Boolean]$ContinueFlag = $FALSE
     [Boolean]$ForceEndloop = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
     [Int]$InLoopOverRideCount = 0    ;#$OverRideCountは処理全体のOverRide回数。$InLoopOverRideCountは1処理ループ内でのOverRide回数。1オブジェクトで複数回OverRideがあり得るため
 
@@ -1103,7 +1103,7 @@ Do
 #Action[(Move|Copy)]以外はファイル移動が無い。移動先パスを確認する必要がないのでスキップ
 #PreAction[Archive]はMoveNewFile[TRUE]でも出力ファイルは1個で階層構造を取らない。よってスキップ
 
-    If( (($Action -match "^(Move|Copy)$")) -or (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive') )) {
+    If ( (($Action -match "^(Move|Copy)$")) -or (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive')) ) {
 
         #ファイルが移動するAction用にファイル移動先の親フォルダパス$MoveToNewFolderを生成する
         
@@ -1120,16 +1120,16 @@ Do
         #MoveToNewFolderはNoRecurseでもMove|Copyで一律使用するので作成
 
         $MoveToNewFolder = Join-Path $MoveToFolder -ChildPath ($TargetFileParentFolder).Substring($TargetFolder.Length)
-        If($Recurse){
+        If ($Recurse) {
 
-            If (-not(CheckContainer -CheckPath $MoveToNewFolder -ObjectName '移動先フォルダ')){
+            If (-not(CheckContainer -CheckPath $MoveToNewFolder -ObjectName '移動先フォルダ')) {
 
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "新規に$($MoveToNewFolder)を作成します"
 
                 TryAction -ActionType MakeNewFolder -ActionFrom $MoveToNewFolder -ActionError $MoveToNewFolder
 
-                #$TryActionが異常終了&-Continue $TRUEだと$Continue $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
-                IF($ContinueFlag){
+                #$TryActionが異常終了&-Continue $TRUEだと$ContinueFlag $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
+                IF ($ContinueFlag) {
                     Break                
                     }
             }
@@ -1139,34 +1139,34 @@ Do
 
 #Pre Action
 
-   IF(( $PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')){
+    IF (( $PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')) {
 
-      $ArchivePath = CompressAndAddTimeStamp -TargetObject $TargetObject
+        $ArchivePath = CompressAndAddTimeStamp -TargetObject $TargetObject
 
-      If(CheckLeafNotExists $ArchivePath){
+        IF (CheckLeafNotExists $ArchivePath) {
 
             TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
             }
 
         
-    }elseIF($PreAction -contains 'Archive'){
+        }elseIF ($PreAction -contains 'Archive') {
 
-        Switch -Regex ($PreAction){        
+            Switch -Regex ($PreAction) {        
         
-          '^7z$'{
-                $ActionType = "7zArchive"
-                Break
-                }
+                '^7z$' {
+                    $ActionType = "7zArchive"
+                    Break
+                    }
                 
-           '^7zZip$'{
-                $ActionType = "7zZipArchive"
-                Break
-                }
+                '^7zZip$' {
+                    $ActionType = "7zZipArchive"
+                    Break
+                    }
                     
-             Default{
-                $ActionType = "Archive"
-                }       
-        }        
+                Default {
+                    $ActionType = "Archive"
+                    }       
+            }        
        
         TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
         }
@@ -1174,39 +1174,36 @@ Do
 
 #Main Action
 
-    Switch -Regex ($Action){
+    Switch -Regex ($Action) {
 
     #分岐1 何もしない
-    '^none$'
-            {
-            IF ( ($PostAction -eq 'none') -and ($PreAction -contains 'none') ){
+    '^none$' {
+            IF ( ($PostAction -eq 'none') -and ($PreAction -contains 'none') ) {
+
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Action[${Action}]のため対象ファイル${TargetObject}は操作しません"
                 }
             }
 
     #分岐2 削除
-    '^Delete$'
-            {
+    '^Delete$' {
             TryAction -ActionType Delete -ActionFrom $TargetObject -ActionError $TargetObject
             } 
 
     #分岐3 移動 or 複製 　同一のファイルが（移動|複製先）に存在しないことを確認してから処理
-    '^(Move|Copy)$'
-            {
+    '^(Move|Copy)$' {
             $TargetFileMoveToPath = Join-Path $MoveToNewFolder (Split-Path -Leaf $TargetObject)
 
-            If(CheckLeafNotExists $TargetFileMoveToPath){
+            IF (CheckLeafNotExists $TargetFileMoveToPath) {
 
                 TryAction -ActionType $Action -ActionFrom $TargetObject -ActionTo $TargetFileMoveToPath -ActionError $TargetObject
                 }           
             }
 
     #分岐4 空フォルダを判定して削除
-    '^DeleteEmptyFolders$'
-            {
+    '^DeleteEmptyFolders$' {
             Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObject)が空かを確認します"
 
-            If ((Get-Item -LiteralPath $TargetObject).GetFileSystemInfos().Count -eq 0){ 
+            IF ((Get-Item -LiteralPath $TargetObject).GetFileSystemInfos().Count -eq 0) {
 
                 Logging -EventID $InfoEventID -EventType Information -EventMessage  "フォルダ$($TargetObject)は空です"
                 TryAction -ActionType Delete -ActionFrom $TargetObject -ActionError $TargetObject
@@ -1218,32 +1215,29 @@ Do
 
 
     #分岐5 NullClear
-    '^NullClear$'
-            {
+    '^NullClear$' {
             TryAction -ActionType NullClear -ActionFrom $TargetObject -ActionError $TargetObject          
             }
 
     #分岐6 KeepFilesCount
-    '^KeepFilesCount$'
-            {
-            IF (($TargetObjects.Length -$InLoopDeletedFilesCount) -gt $KeepFiles  ){
+    '^KeepFilesCount$' {
+            IF (($TargetObjects.Length - $InLoopDeletedFilesCount) -gt $KeepFiles) {
                 Logging -EventID $InfoEventID -EventType Information -EventMessage  "指定世代数[$($KeepFiles)]以上のマッチしたファイルがあるため、最も古い[$($TargetObject)]を削除します"
                 TryAction -ActionType Delete -ActionFrom $TargetObject -ActionError $TargetObject
 
-                #$TryActionが異常終了&-Continue $TRUEだと$Continue $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
-                IF($ContinueFlag){
+                #$TryActionが異常終了&-Continue $TRUEだと$ContinueFlag $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
+                IF ($ContinueFlag) {
                     Break                
                     }
-                $InLoopDeletedFilesCount ++
+                $InLoopDeletedFilesCount++
             
-                }else{
+            }else{
                 Logging -EventID $InfoEventID -EventType Information -EventMessage  "指定世代数[$($KeepFiles)]以上のマッチしたファイルは無いため[$($TargetObject)]は操作しません"
                 }
             }
 
     #分岐7 $Actionが条件式のどれかに適合しない場合は、プログラムミス
-    Default 
-            {
+    Default {
             Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Action判定の内部エラー。判定式にbugがあります"
             Finalize $InternalErrorReturnCode
             }
@@ -1252,22 +1246,19 @@ Do
 
 #Post Action
 
-    Switch -Regex ($PostAction){
+    Switch -Regex ($PostAction) {
 
     #分岐1 何もしない
-    '^none$'
-            {
-            
+    '^none$' {            
             }
 
     #分岐2 Rename Rename後の同一名称ファイルがに存在しないことを確認してから処理
-    '^Rename$'
-            {
+    '^Rename$' {
             $NewFilePath = Join-Path $TargetFileParentFolder -ChildPath  ((Split-Path -Leaf $TargetObject) -replace "$RegularExpression" , "$RenameToRegularExpression")
 
             $NewFilePath = ConvertToAbsolutePath -CheckPath $NewFilePath -ObjectName 'Rename後のファイル名'
 
-                    If(CheckLeafNotExists $NewFilePath){
+                    IF (CheckLeafNotExists $NewFilePath) {
 
                         TryAction -ActionType Rename -ActionFrom $TargetObject -ActionTo $NewFilePath -ActionError $TargetObject
                         }else{
@@ -1276,15 +1267,13 @@ Do
             }
 
     #分岐3 NullClear
-    '^NullClear$'
-            {
+    '^NullClear$' {
             TryAction -ActionType NullClear -ActionFrom $TargetObject -ActionError $TargetObject          
             }
 
 
     #分岐4 $Actionが条件式のどれかに適合しない場合は、プログラムミス
-    Default 
-            {
+    Default {
             Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "PostAction判定の内部エラー。判定式にbugがあります"
             Finalize $InternalErrorReturnCode
             }
@@ -1294,26 +1283,26 @@ Do
 
 #異常終了などはBreakしてファイル処理終端へ抜ける。
 }
-While($False)
+While($FALSE)
 
 
 #異常、警告を確認。異常>警告>正常の順位で実行結果数カウントアップ
 
-    IF($ErrorFlag){
-        $ErrorCount ++
-        }elseif($WarningFlag) {
-            $WarningCount ++
-            }elseif($NormalFlag){
-                $NormalCount ++
+    IF ($ErrorFlag) {
+        $ErrorCount++
+        }elseIF ($WarningFlag) {
+            $WarningCount++
+            }elseIF ($NormalFlag) {
+                $NormalCount++
                 }
 
-    IF($ContinueFlag){
-        $ContinueCount ++
+    IF ($ContinueFlag) {
+        $ContinueCount++
         }
          
     Logging -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- 対象[$($FilterType)] $($TargetObject) 処理終了 Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)]---"
 
-    IF($ForceFinalize){    
+    IF ($ForceFinalize) {    
         Finalize $ErrorReturnCode
         }
 
