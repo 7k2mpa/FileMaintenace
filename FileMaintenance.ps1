@@ -949,8 +949,8 @@ Param(
 [parameter(mandatory=$true)][Int]$ReturnCode
 )
     $ForceFinalize = $False
-
-    IF(-not(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))){    
+ 
+    IF( ($NormalCount + $WarningCount + $ErrorCount) -ne 0 ){    
 
        Logging -EventID $InfoEventID -EventType Information -EventMessage "実行結果は正常終了[$($NormalCount)]、警告終了[$($WarningCount)]、異常終了[$($ErrorCount)]です"
 
