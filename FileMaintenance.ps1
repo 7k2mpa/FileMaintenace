@@ -382,7 +382,7 @@ Param(
 [String][ValidatePattern('^(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$ArchiveFileName = "archive.zip" ,
 
 [int][ValidateRange(0,2147483647)]$KeepFiles = 1,
-[int][ValidateRange(0,2147483647)]$Days = 0,
+[int][ValidateRange(0,730000)]$Days = 0,
 [int64][ValidateRange(0,9223372036854775807)]$Size = 0,
 
 #[Regex]$RegularExpression ='applog([0-9][0-9])([0-9][0-9])([0-9][0-9])',
@@ -470,18 +470,25 @@ Try{
 
 ################# 共通部品、関数  #######################
 
-
-#CheckLeafNotExists戻り値
-
-#チェック対象のファイルが存在するが、-OverRideを指定...$TRUE　（この指定は-Continueに優先する）なおTryActionは既にファイルが存在する場合は強制上書き
-#チェック対象のファイルが存在するが、-Continueを指定...$False
-#チェック対象のファイルが存在する...$ErrorReturnCode でFinalizeへ進む、またはBreak
-#チェック対象の同一名称のフォルダが存在するが、-OverRideを指定...上書きが出来ないので$ErrorReturnCode でFinalizeへ進む、またはBreak
-#チェック対象と同一名称のフォルダが存在するが、-Continueを指定...$False
-#チェック対象と同一名称のフォルダが存在する...$ErrorReturnCode でFinalizeへ進む、またはBreak
-#チェック対象のファイル、フォルダが存在しない...$TRUE
-
 function CheckLeafNotExists {
+
+<#
+.SYNOPSIS
+　指定したパスにファイルが存在しない事を確認する
+
+.INPUT
+　Strings of File Path
+
+.OUTPUT
+　Boolean
+    チェック対象のファイルが存在するが、-OverRideを指定...$TRUE　（この指定は-Continueに優先する）なおTryActionは既にファイルが存在する場合は強制上書き
+    チェック対象のファイルが存在するが、-Continueを指定...$False
+    チェック対象のファイルが存在する...$ErrorReturnCode でFinalizeへ進む、またはBreak
+    チェック対象の同一名称のフォルダが存在するが、-OverRideを指定...上書きが出来ないので$ErrorReturnCode でFinalizeへ進む、またはBreak
+    チェック対象と同一名称のフォルダが存在するが、-Continueを指定...$False
+    チェック対象と同一名称のフォルダが存在する...$ErrorReturnCode でFinalizeへ進む、またはBreak
+    チェック対象のファイル、フォルダが存在しない...$TRUE
+#>
 
 Param(
 [parameter(mandatory=$true)][String]$CheckLeaf
@@ -563,17 +570,29 @@ Return $true
 }
 
 
-#オブジェクトを複数条件でフィルタ
-
-#$FileTypeの指定に基づき、フォルダ、ファイルを抽出
-#最終変更日時が$Daysより古い
-#(ファイル|フォルダ)名が正規表現$RegularExpressionにマッチ
-#ファイル容量が $Sizeより大きい
-#C:\TargetFolder                    :TargetFolder
-#C:\TargetFolder\A\B\C\target.txt   :TargetObject
-#上記の時\A\B\C\部分が正規表現$ParentRegularExpressionにマッチ
-
 filter ComplexFilter{
+
+<#
+.SYNOPSIS
+　オブジェクトを複数条件でフィルタ、適合するものだけをOUTPUT
+
+.DESCRIPTION
+$FileTypeの指定に基づき、フォルダ、ファイルを抽出
+最終変更日時が$Daysより古い
+(ファイル|フォルダ)名が正規表現$RegularExpressionにマッチ
+ファイル容量が $Sizeより大きい
+C:\TargetFolder                    :TargetFolder
+C:\TargetFolder\A\B\C\target.txt   :TargetObject
+上記の時\A\B\C\部分が正規表現$ParentRegularExpressionにマッチ
+
+.INPUT
+PSobject
+
+.OUTPUT
+PSobject passed the filter
+
+#>
+ 
     IF (($_.PSIsContainer -eq ($FilterType -eq 'Folder')) -OR ( -NOT($_.PSIsContainer) -eq ($FilterType -eq 'File'))) {
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
     IF ($_.Name -match ${RegularExpression}){
@@ -586,29 +605,38 @@ filter ComplexFilter{
     }
 }
 
-
-#指定フォルダからオブジェクト群（ファイル|フォルダ）を抽出
  
 function GetObjects{
+
+<#
+.SYNOPSIS
+　指定フォルダからオブジェクト群（ファイル|フォルダ）を抽出
+
+.INPUT
+System.String. Path of the folder to get objects
+
+.OUTPUT
+Strings Array of Objects's path
+#>
 
 Param(
 [parameter(mandatory=$true)][String]$TargetFolder
 )
 
-    $CandidateObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse:$Recurse -Include * 
+    $candidateObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse:$Recurse -Include * 
 
-$Objects = @()
+$objects = @()
 
 #フィルタ後のオブジェクト群を配列に入れる
 #ソートに備えて必要な情報も配列に追加
  
-    ForEach ($Object in ($CandidateObjects | ComplexFilter))
+    ForEach ($object in ($candidateObjects | ComplexFilter))
           
         {
-        $Objects += New-Object PSObject -Property @{
-            Object = $Object
-            Time   = $Object.LastWriteTime
-            Depth  = ($Object.FullName.Split("\\")).Count
+        $objects += New-Object PSObject -Property @{
+            Object = $object
+            Time   = $object.LastWriteTime
+            Depth  = ($object.FullName.Split("\\")).Count
         }
     }
 
@@ -618,17 +646,17 @@ $Objects = @()
  
         #KeepFilesCount配列に入れたパス一式を古い順に整列
         '^KeepFilesCount$'{
-            Return ($Objects | Sort-Object -Property Time | ForEach-Object {$_.Object.FullName})
+            Return ($objects | Sort-Object -Property Time | ForEach-Object {$_.object.FullName})
             }
 
         #DeleteEmptyFolders配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
         '^DeleteEmptyFolders$'{
-            Return ($Objects | Sort-Object -Property Depth -Descending | ForEach-Object {$_.Object.FullName})        
+            Return ($objects | Sort-Object -Property Depth -Descending | ForEach-Object {$_.object.FullName})        
             }
 
 
         Default{
-            Return ($Objects | ForEach-Object {$_.Object.FullName})
+            Return ($objects | ForEach-Object {$_.object.FullName})
             }
     }
 }
