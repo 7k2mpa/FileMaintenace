@@ -221,13 +221,13 @@ Param(
 
 ################# CommonFunctions.ps1 Load  #######################
 
-Try{
+Try {
 
     #CommonFunctions.ps1の配置先を変更した場合は、ここを変更。同一フォルダに配置前提
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
-    Write-Output "CommonFunctions.ps1 のLoadに失敗しました。CommonFunctions.ps1がこのファイルと同一フォルダに存在するか確認してください"
+    Write-Output "Fail to load CommonFunctions.ps1 Please verfy existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
 
@@ -239,7 +239,7 @@ Try{
 
 function Initialize {
 
-$SHELLNAME=Split-Path $PSCommandPath -Leaf
+$ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -265,26 +265,25 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
 #対象のOracleがサービス起動しているか確認
 
-    $TargetOracleService = "OracleService"+$OracleService
+    $targetOracleService = "OracleService"+$OracleService
 
-    $ServiceStatus = CheckServiceStatus -ServiceName $TargetOracleService -Health Running
+    $serviceStatus = CheckServiceStatus -ServiceName $targetOracleService -Health Running
 
-    IF (-NOT($ServiceStatus)){
+    IF (-not($serviceStatus)) {
 
-
-        Logging -EventType Error -EventID $ErrorEventID -EventMessage "対象のOracleServiceが起動していません。"
+        Logging -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetOracleService)] is not running."
         Finalize $ErrorReturnCode
         }else{
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "対象のOracle Serviceは正常に起動しています"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetOracleService)] is running."
         }
      
 
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは正常です"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle Data Pumpを開始します"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Start to export DB with Oracle data pump command."
 
 }
 
@@ -297,13 +296,11 @@ Param(
 Pop-Location
 
 EndingProcess $ReturnCode
-
-
 }
 
 #####################   ここから本体  ######################
 
-$Version = '20200207_1615'
+$Version = '20200313_1420'
 
 $DatumPath = $PSScriptRoot
 
@@ -312,55 +309,34 @@ $DatumPath = $PSScriptRoot
 
 . Initialize
 
-
-
-    IF($AddTimeStamp){
+    IF ($AddTimeStamp) {
 
         $DumpFile = AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $DumpFile
-        $LogFile = AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $LogFile
-
-    }
-
+        $LogFile  = AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $LogFile
+        }
 
 
-    IF ($PasswordAuthorization){
+    IF ($PasswordAuthorization) {
 
         $ExecCommand = $ExecUser+"/"+$ExecUserPassword+"@"+$OracleService+" Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y"
     
-    }else{
+        }else{
 
         $ExecCommand = "`' /@"+$OracleService+" as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
+        }
 
-    }
-
-#echo $ExecCommand
-
-
-#$ExecCommand = [ScriptBlock]::Create($ExecCommand)
-
-#exit
-
-# Invoke-NativeApplication -ScriptBlock $ExecCommand
 
 Push-Location $OracleHomeBinPath
 
 $Process = Start-Process .\expdp -ArgumentList $ExecCommand -Wait -NoNewWindow -PassThru 
 
-#Invoke-NativeApplicationSafe -ScriptBlock $ExecCommand
+IF ($Process.ExitCode -ne 0) {
 
-
-IF ($Process.ExitCode -ne 0){
-
-
-#IF ($LastExitCode -ne 0){
-
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Oracle Data Pumpに失敗しました"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to export DB with Oracle data pump command."
 	    Finalize $ErrorReturnCode
 
-
-
         }else{
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Oracle Data Pumpに成功しました"
+        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to export DB with Oracle data pump command."
         Finalize $NormalReturnCode
         }
                    

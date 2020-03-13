@@ -372,6 +372,6 @@ $Version = '20200313_1415'
         }
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Completed successfully to delete Oracle archive logs older than $($Days)days. !!REMIND they were deleted in Oracle RMAN records and you need to delete log files in the file system with OS's delete command!!"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Successfully completed to delete Oracle archive logs older than $($Days)days. !!REMIND they were deleted in Oracle RMAN records and you need to delete log files in the file system with OS's delete command!!"
 
 Finalize $NormalReturnCode
