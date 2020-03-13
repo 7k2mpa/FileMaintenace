@@ -64,7 +64,7 @@
 デフォルトは$TRUEでEvent Log出力します。
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $Falseと等価です。
+　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
 Log2EventLogより優先します。
 
 .PARAMETER ProviderName
@@ -78,14 +78,14 @@ Log2EventLogより優先します。
 デフォルトは$TRUEでコンソール出力します。
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $Falseと等価です。
+　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
 Log2Consoleより優先します。
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$Falseでログファイル出力しません。
+　ログフィルへの出力を制御します。デフォルトは$FALSEでログファイル出力しません。
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $Falseと等価です。
+　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
 Log2Fileより優先します。
 
 .PARAMETER LogPath
@@ -178,7 +178,7 @@ Param(
 [boolean]$Log2Console = $TRUE,
 [Switch]$NoLog2Console,
 
-[boolean]$Log2File = $False,
+[boolean]$Log2File = $FALSE,
 [Switch]$NoLog2File,
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath ,
 #[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath = ..\Log\FileMaintenance.log ,
@@ -199,7 +199,7 @@ Param(
 [Switch]$ErrorAsWarning,
 [Switch]$WarningAsNormal,
 
-[Regex]$ExecutableUser ='.*'
+[Regex]$ExecutableUser = '.*'
 
 )
 
@@ -225,7 +225,7 @@ Try{
 
 function Initialize {
 
-$SHELLNAME=Split-Path $PSCommandPath -Leaf
+$ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -255,9 +255,9 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
     IF ($FlagFile -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "The path -FlagFile contains some characters that can not be used by NTFS"
-				Finalize $ErrorReturnCode
-                }
+        Logging -EventType Error -EventID $ErrorEventID -EventMessage "The path -FlagFile contains some characters that can not be used by NTFS"
+        Finalize $ErrorReturnCode
+        }
 
 
 
@@ -271,13 +271,11 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "Starting to 
 }
 
 
-function Finalize{
+function Finalize {
 
 Param(
 [parameter(mandatory=$true)][int]$ReturnCode
 )
-
-
 
 EndingProcess $ReturnCode
 
@@ -303,30 +301,27 @@ $Version = '20200207_1615'
 
 . Initialize
 
-[String]$FlagValue = ${SHELLNAME} + (Get-Date).ToString($LogDateFormat)
-[String]$FlagPath = Join-Path -Path $FlagFolder -ChildPath $FlagFile
+[String]$flagValue = $ShellName +" "+ (Get-Date).ToString($LogDateFormat)
+[String]$flagPath = Join-Path -Path $FlagFolder -ChildPath $FlagFile
 
-    IF(CheckLeaf -CheckPath $FlagPath -ObjectName 'Flag File'){
+    IF ((CheckLeaf -CheckPath $flagPath -ObjectName 'Flag file') -or (CheckContainer -CheckPath $flagPath -ObjectName 'Same Name folder')) {
 
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($FlagPath)] exists already and terminate as WARNING."
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] exists already and terminate as WARNING."
         Finalize $WarningReturnCode
     
         }else{
        
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($FlagPath)] dose not exists and terminate as NORMAL."
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exists and terminate as NORMAL."
                 
-            IF($CreateFlag){
+            IF ($CreateFlag) {
     
-                TryAction -ActionType MakeNewFileWithValue -ActionFrom $FlagPath -ActionError $FlagPath -FileValue $FlagValue
-                Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed to create the flag file [$($FlagPath)] successfully."
+                TryAction -ActionType MakeNewFileWithValue -ActionFrom $flagPath -ActionError $flagPath -FileValue $flagValue
+                Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to create the flag file [$($flagPath)]"
     
                 }
         }
 
-
-
 #終了メッセージ出力
 
 Finalize $NormalReturnCode
-

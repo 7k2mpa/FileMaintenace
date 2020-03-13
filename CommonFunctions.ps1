@@ -197,7 +197,7 @@ function TryAction {
 
     )
 
-    IF (-NOT($ActionType -match "^(Delete|NullClear|MakeNewFolder|Rename)$" ) -and ($Null -eq $ActionTo)){
+    IF (-NOT($ActionType -match "^(Delete|NullClear|MakeNewFolder|Rename)$" ) -and ($Null -eq $ActionTo)) {
 
         Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Function TryAction内部エラー。${ActionType}では$'$ActionTo'の指定が必要です"
         Finalize $InternalErrorReturnCode
@@ -384,76 +384,74 @@ Function ConvertToAbsolutePath {
 Param(
 [String]$CheckPath,
 [parameter(mandatory=$true)][String]$ObjectName
-
 )
 
 
-
-    IF ([String]::IsNullOrEmpty($CheckPath)){
+    IF ([String]::IsNullOrEmpty($CheckPath)) {
            
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) の指定は必須です"
-                    Finalize $ErrorReturnCode
-                    }
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
+        Finalize $ErrorReturnCode
+        }
 
     #Windowsではパス区切に/も使用できる。しかしながら、処理を簡単にするため\に統一する
 
     $CheckPath = $CheckPath.Replace('/','\')
 
-    IF(Test-Path -LiteralPath $CheckPath -IsValid){
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は有効なパス表記です"
+    IF (Test-Path -LiteralPath $CheckPath -IsValid) {
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is valid format."
    
         }else{
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]は有効なパス表記ではありません。存在しないドライブを指定している、NTFSに使用できない文字列が含まれてないか等を確認して下さい"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)] is invalid format. The path may contain a drive letter not existed or characters that can not use by NTFS."
         Finalize $ErrorReturnCode
         }
 
 
 
-    Switch -Regex ($CheckPath){
+    Switch -Regex ($CheckPath) {
 
-        "^\.+\\.*"{
+        "^\.+\\.*" {
        
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は相対パス表記です"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is relative path format"
 
-            $ConvertedCheckPath = Join-Path -Path $DatumPath -ChildPath $CheckPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
+            $convertedCheckPath = Join-Path -Path $DatumPath -ChildPath $CheckPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
          
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "スクリプトが配置されているフォルダ[$($DatumPath)]、[$($CheckPath)]とを結合した絶対パス表記[$($ConvertedCheckPath)]に変換します"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Convert to absolute path format [$($convertedCheckPath)] with joining the folder path [$($DatumPath)] the script is placed and the path [$($CheckPath)]"
 
-            $CheckPath = $ConvertedCheckPath
+            $CheckPath = $convertedCheckPath
             }
 
-        "^[c-zC-Z]:\\.*"{
+        "^[c-zC-Z]:\\.*" {
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)]は絶対パス表記です"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is absolute path format."
             }
 
-        Default{
+        Default {
       
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)]は相対パス、絶対パス表記ではありません"
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)] is neither absolute path format nor relative path format."
             Finalize $ErrorReturnCode
             }
     }
 
     #パス末尾に\\が連続すると処理が複雑になるので、使わせない
 
-    IF($CheckPath -match '\\\\'){
+    IF ($CheckPath -match '\\\\') {
  
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Windowsパス指定で区切記号\の重複は許容されていますが、本プログラムでは都合上使用しません。重複した\を削除します"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "NTFS allows multiple path separators such as '\\' , due to processing limitation, convert multiple path separators to a single."
 
             For ( $i = 0 ; $i -lt $CheckPath.Length-1 ; $i++ )        
             {
             $CheckPath = $CheckPath.Replace('\\','\')
             }
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "重複した\を削除した$ObjectName[$($CheckPath)]に変換しました"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is created by converting multiple path separators to a single."
         }
 
 
     #パスがフォルダで末尾に\が存在した場合は削除する。末尾の\有無で結果は一緒なのだが、統一しないと文字列数が異なるためパス文字列切り出しが誤動作する。
 
-    IF($CheckPath.Substring($CheckPath.Length -1 , 1) -eq '\'){
+    IF ($CheckPath.Substring($CheckPath.Length -1 , 1) -eq '\') {
     
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Windowsパス指定で末尾\は許容されていますが、本プログラムでは都合上使用しません。末尾\を削除します"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Windows path format allows the end of path with a path separator '\' , due to processing limitation, remove it."
             $CheckPath = $CheckPath.Substring(0 , $CheckPath.Length -1)
             }
 
@@ -462,7 +460,7 @@ Param(
 
     IF ((Split-Path $CheckPath -noQualifier) -match '(\/|:|\?|`"|<|>|\||\*)') {
     
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName にNTFSで使用できない文字を指定しています"
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName may contain characters that can not use by NTFS  such as BackSlash/ Colon: Question? DoubleQuote`" less or greater than<> astarisk* pipe| "
                 Finalize $ErrorReturnCode
                 }
 
@@ -471,7 +469,7 @@ Param(
 
     IF($CheckPath -match '\\(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])(\\|$|\..*$)'){
 
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName のパスにWindows予約語を含んでいます。以下は予約語のためWindowsでファイル、フォルダ名称に使用できません(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
+                Logging -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName may contain the Windows reserved words such as (AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
                 Finalize $ErrorReturnCode
                 }        
 
@@ -485,43 +483,43 @@ Param(
 
 #終了
 
-function EndingProcess{
+function EndingProcess {
 
 Param(
 [parameter(mandatory=$true)][int]$ReturnCode
 )
 
-    IF(($ErrorCount -gt 0) -OR ($ReturnCode -ge $ErrorReturnCode)){
+    IF (($ErrorCount -gt 0) -OR ($ReturnCode -ge $ErrorReturnCode)) {
 
-        IF($ErrorAsWarning){
+        IF ($ErrorAsWarning) {
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred, but the exit code is [$($WarningReturnCode)] because option -ErrorAsWarning[$($ErrorAsWarning)] is used."  
-            $ReturnCode = $WarningReturnCode
+            $returnCode = $WarningReturnCode
            
             }else{
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "An ERROR termination occurred, the exit code is [$($ErrorReturnCode)]"
-            $ReturnCode = $ErrorReturnCode
+            $returnCode = $ErrorReturnCode
             }
 
-        }elseIF(($WarningCount -gt 0) -OR ($ReturnCode -ge $WarningReturnCode)){
+        }elseIF (($WarningCount -gt 0) -OR ($ReturnCode -ge $WarningReturnCode)) {
 
-            IF($WarningAsNormal){
+            IF ($WarningAsNormal) {
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "A WARNING termination occurred, but the exit code is [$($NormalReturnCode)] because option -WarningAsNormal[$($WarningAsNormal)] is used." 
-                $ReturnCode = $NormalReturnCode
+                $returnCode = $NormalReturnCode
            
                 }else{
                 Logging -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred, the exit code is [$($WarningReturnCode)]"
-                $ReturnCode = $WarningReturnCode
+                $returnCode = $WarningReturnCode
                 }
         
         }else{
         Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully. The exit code is [$($NormalReturnCode)]"
-        $ReturnCode = $NormalReturnCode
+        $returnCode = $NormalReturnCode
                
         }
 
-    Logging -EventID $EndEventID -EventType Information -EventMessage "Exit $($SHELLNAME) Version $($Version)"
+    Logging -EventID $EndEventID -EventType Information -EventMessage "Exit $($ShellName) Version $($Version)"
 
-Exit $ReturnCode
+Exit $returnCode
 
 }
 
@@ -539,16 +537,16 @@ Param(
 
 # サービス状態取得
 
-    $Service = Get-Service | Where-Object {$_.Name -eq $serviceName}
+    $service = Get-Service | Where-Object {$_.Name -eq $serviceName}
 
 
-    IF($Service.Status -Match "^$"){
-        IF(-NOT($NoMessage)){Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] dose not exists."}
+    IF ($service.Status -Match "^$") {
+        IF (-NOT($NoMessage)) {Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] dose not exists."}
         Return $False
 
         }else{
 
-        IF(-NOT($NoMessage)){Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists"}
+        IF (-NOT($NoMessage)) {Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists"}
         Return $TRUE
         }
 }
@@ -571,22 +569,22 @@ Param(
     For ( $i = 0 ; $i -lt $UpTo; $i++ )
     {
         # サービス存在確認
-        IF(-NOT(CheckServiceExist $ServiceName -NoMessage)){
-            Return $False
+        IF (-NOT(CheckServiceExist $ServiceName -NoMessage)) {
+            Return $FALSE
             }
 
 
         # サービス状態判定
-        $Service = Get-Service | Where-Object {$_.Name -eq $ServiceName}
+        $service = Get-Service | Where-Object {$_.Name -eq $ServiceName}
 
-        IF ($Service.Status -eq $Health) {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)]"
+        IF ($service.Status -eq $Health) {
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($service.Status)]"
             Return $TRUE     
             }
 
-        IF(($SPAN -eq 0) -AND ($UpTo -eq 1)){
+        IF (($Span -eq 0) -AND ($UpTo -eq 1)) {
                 
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)]"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($service.Status)]"
                 Return $False
                 }
 
@@ -598,11 +596,8 @@ Param(
 
     # サービスは指定状態へ遷移しなかった
 
-
-
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)] now. The specified number of seconds has elapsed but the service has not transitioned to status [$($Health)]"
-                return $False
-                
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)] now. The specified number of seconds has elapsed but the service has not transitioned to status [$($Health)]"
+Return $False
 
 }
 
@@ -619,13 +614,13 @@ Param(
 )
 
 
-    If (-NOT([String]::IsNullOrEmpty($CheckPath))){
+    If (-NOT([String]::IsNullOrEmpty($CheckPath))) {
         Return $False
         }else{
 
-        IF($IfNullOrEmptyFinalize){
+        IF ($IfNullOrEmptyFinalize) {
            
-               Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) の指定は必須です"
+               Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
                Finalize $ErrorReturnCode
                }
                
@@ -646,17 +641,16 @@ Param(
 
 )
 
+    If (Test-Path -LiteralPath $CheckPath -PathType Container) {
 
-    If (Test-Path -LiteralPath $CheckPath -PathType Container){
-
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]は存在します"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] exists."
             Return $true
 
             }else{
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]は存在しません"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] dose not exist."
                 IF($IfNoExistFinalize){
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) の指定は必須です"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
                     Finalize $ErrorReturnCode
                     }else{
                     Return $false
@@ -676,16 +670,16 @@ Param(
 
 )
 
-    If (Test-Path -LiteralPath $CheckPath -PathType Leaf){
+    If (Test-Path -LiteralPath $CheckPath -PathType Leaf) {
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]は存在します"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] exists."
             Return $true
 
             }else{
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)]は存在しません"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] dose not exist."
                 IF($IfNoExistFinalize){
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) の指定は必須です"
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
                     Finalize $ErrorReturnCode
                     }else{
                     Return $false
@@ -696,7 +690,6 @@ Param(
 
 function CheckLogPath {
 
-
 Param(
 
 [String]$CheckPath,
@@ -706,30 +699,30 @@ Param(
 )
     #ログ出力先ファイルの親フォルダが存在しなければ異常終了
 
-    Split-Path $CheckPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName $ObjectName -IfNoExistFinalize > $NULL}
+    Split-Path -Path $CheckPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName $ObjectName -IfNoExistFinalize > $NULL}
 
     #ログ出力先（予定）ファイルと同一名称のフォルダが存在していれば異常終了
 
-    If(Test-Path -LiteralPath $CheckPath -PathType Container){
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称フォルダ$($CheckLeaf)が存在します"        
+    If (Test-Path -LiteralPath $CheckPath -PathType Container) {
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Same name folder $($CheckLeaf) exists already."        
         Finalize $ErrorReturnCode
         }
 
 
-    If(Test-Path -LiteralPath $CheckPath -PathType Leaf){
+    If (Test-Path -LiteralPath $CheckPath -PathType Leaf) {
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckPath)]への書込権限を確認します"
-        $LogFormattedDate = (Get-Date).ToString($LogDateFormat)
-        $LogWrite = $LogFormattedDate+" "+$SHELLNAME+" Write Permission Check"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "Check write permission of $($ObjectName) [$($CheckPath)]"
+        $logFormattedDate = (Get-Date).ToString($LogDateFormat)
+        $logWrite = $logFormattedDate+" "+$ShellName+" Write Permission Check"
         
 
         Try{
-            Write-Output $LogWrite | Out-File -FilePath $CheckPath -Append -Encoding $LogFileEncode
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckPath)]への書込に成功しました"
+            Write-Output $logWrite | Out-File -FilePath $CheckPath -Append -Encoding $LogFileEncode
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Successfully complete to write to $($ObjectName) [$($CheckPath)]"
             }
         Catch [Exception]{
-            Logging -EventType Error -EventID $ErrorEventID -EventMessage  "$($ObjectName) [$($CheckPath)]への書込に失敗しました"
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $Error[0]"
+            Logging -EventType Error -EventID $ErrorEventID -EventMessage  "Failed to write to $($ObjectName) [$($CheckPath)]"
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution error message : $Error[0]"
             Finalize $ErrorReturnCode
             }
      
@@ -740,39 +733,13 @@ Param(
 }
 
 
-
-function CheckPrivileges {
-
-Param(
-[parameter(mandatory=$true)][String]$CheckPath
-)
-
-    $FormattedDate = (Get-Date).ToString($TimeStampFormat)
-
-    $TempItemPath = Join-Path $CheckPath ($FormattedDate+".tmp")
-
-        Try{
-            New-Item -Path $TempItemPath -ErrorAction Stop -Force >$Null
-            Remove-Item -Path $TempItemPath -ErrorAction Stop -Force >$Null
-            }
-
-        catch [Exception]{
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($CheckPath)に必要な権限が付与されていません"
-        Return $false
-        }
-
-
-
-}
-
-
 function CheckExecUser {
 
     $Script:ScriptExecUser = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 
     Logging -EventID $InfoEventID -EventType Information -EventMessage "Executed in user [$($ScriptExecUser.Name)]"
 
-    IF(-NOT($ScriptExecUser.Name -match $ExecutableUser)){
+    IF (-NOT($ScriptExecUser.Name -match $ExecutableUser)) {
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "Executed in an unauthorized user."
                 Finalize $ErrorReturnCode
                 }
@@ -783,7 +750,7 @@ function CheckExecUser {
 
 function PreInitialize {
 
-$error.clear()
+$ERROR.clear()
 $ForceConsole = $false
 $ForceConsoleEventLog = $false
 
@@ -807,12 +774,12 @@ $ForceConsoleEventLog = $false
 
 #ログ抑止フラグ処理
 
-IF($NoLog2EventLog){[boolean]$Script:Log2EventLog = $False}
-IF($NoLog2Console){[boolean]$Script:Log2Console = $False}
-IF($NoLog2File){[boolean]$Script:Log2File = $False}
+IF ($NoLog2EventLog) {[boolean]$Script:Log2EventLog = $False}
+IF ($NoLog2Console)  {[boolean]$Script:Log2Console  = $False}
+IF ($NoLog2File)     {[boolean]$Script:Log2File     = $False}
 
 
-Logging -EventID $StartEventID -EventType Information -EventMessage "Start $($SHELLNAME) Version $($Version)"
+Logging -EventID $StartEventID -EventType Information -EventMessage "Start $($ShellName) Version $($Version)"
 
 Logging -EventID $InfoEventID -EventType Information -EventMessage "Loaded CommonFunctions.ps1 Version $($CommonFunctionsVersion)"
 
