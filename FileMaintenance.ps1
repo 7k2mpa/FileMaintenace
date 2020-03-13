@@ -597,7 +597,7 @@ PSobject passed the filter
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
     IF ($_.Name -match $RegularExpression) {
     IF ($_.Length -ge $Size) {
-    IF (($_.FullName).Substring($TargetFolder.Length , (Split-Path -Parent $_.FullName).Length - $TargetFolder.Length +1) -match $ParentRegularExpression)
+    IF (($_.FullName).Substring($TargetFolder.Length , (Split-Path -Path $_.FullName -Parent).Length - $TargetFolder.Length +1) -match $ParentRegularExpression)
         {Return $_}
     }
     } 
@@ -646,17 +646,17 @@ Param(
  
         #KeepFilesCount配列に入れたパス一式を古い順に整列
         '^KeepFilesCount$' {
-            Return ($objects | Sort-Object -Property Time | ForEach-Object {$_.object.FullName})
+            Return ($objects | Sort-Object -Property Time | ForEach-Object {$_.Object.FullName})
             }
 
         #DeleteEmptyFolders配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
         '^DeleteEmptyFolders$' {
-            Return ($objects | Sort-Object -Property Depth -Descending | ForEach-Object {$_.object.FullName})        
+            Return ($objects | Sort-Object -Property Depth -Descending | ForEach-Object {$_.Object.FullName})        
             }
 
 
         Default{
-            Return ($objects | ForEach-Object {$_.object.FullName})
+            Return ($objects | ForEach-Object {$_.Object.FullName})
             }
     }
 }
@@ -664,7 +664,7 @@ Param(
 
 function Initialize {
 
-$ShellName = Split-Path $PSCommandPath -Leaf
+$ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -878,7 +878,7 @@ Param(
 [parameter(mandatory=$TRUE)][String]$TargetObject
 ) 
 
-    [String]$targetFileParentFolder = Split-Path $TargetObject -Parent
+    [String]$targetFileParentFolder = Split-Path -Path $TargetObject -Parent
 
 #圧縮フラグTrueの時
 
@@ -909,23 +909,23 @@ Param(
                         
         IF ($PreAction -contains 'AddTimeStamp') {
 
-                $archiveFile = Join-Path $targetFileParentFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )+$extString )
+                $archiveFile = Join-Path -Path $targetFileParentFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )+$extString )
                 $Script:ActionType += "CompressAndAddTimeStamp"
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮&タイムスタンプ付加した[$(Split-Path -Leaf $archiveFile)]を作成します"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮&タイムスタンプ付加した[$(Split-Path -Path $archiveFile -Leaf)]を作成します"
 
                 }else{
                 $archiveFile = $TargetObject+$extString
                 $Script:ActionType += "Compress"
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮した[$(Split-Path -Leaf $archiveFile)]を作成します" 
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "圧縮した[$(Split-Path -Path $archiveFile -Leaf)]を作成します" 
                 }          
  
     }else{
 
 #タイムスタンプ付加のみTrueの時
 
-                $archiveFile = Join-Path $targetFileParentFolder -ChildPath (AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )
+                $archiveFile = Join-Path -Path $targetFileParentFolder -ChildPath (AddTimeStampToFileName -TargetFileName (Split-Path -Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )
                 $Script:ActionType = "AddTimeStamp"
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "タイムスタンプ付加した[$(Split-Path -Leaf $archiveFile)]を作成します"
+                Logging -EventID $InfoEventID -EventType Information -EventMessage "タイムスタンプ付加した[$(Split-Path -Path $archiveFile -Leaf)]を作成します"
                 }
 
 
@@ -934,7 +934,7 @@ Param(
     IF ($PreAction -contains 'MoveNewFile') {
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage ("-PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"]のため、作成したファイルは$($MoveToNewFolder)に配置します")
-        Return ( Join-Path $MoveToNewFolder (Split-Path -Leaf $archiveFile) )
+        Return ( Join-Path -Path $MoveToNewFolder -ChildPath (Split-Path -Path $archiveFile -Leaf) )
 
         }else{
         Return $archiveFile
@@ -1052,7 +1052,7 @@ IF ($PreAction -contains 'Archive') {
 
     $archivePath = ConvertToAbsolutePath -CheckPath $archivePath -ObjectName "ArchiveFile出力先"
 
-    IF (-not(CheckLeafNotExists -CheckLeaf $ArchivePath)) {
+    IF (-not(CheckLeafNotExists $ArchivePath)) {
         
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "既に同一名称ファイルまたはフォルダ$($archivePath)が存在するため、$($ShellName)を終了します"
         Finalize $ErrorReturnCode        
@@ -1092,7 +1092,7 @@ Do
     [Boolean]$ForceEndloop = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
     [Int]$InLoopOverRideCount = 0    ;#$OverRideCountは処理全体のOverRide回数。$InLoopOverRideCountは1処理ループ内でのOverRide回数。1オブジェクトで複数回OverRideがあり得るため
 
-    [String]$TargetFileParentFolder = Split-Path $TargetObject -Parent
+    [String]$TargetFileParentFolder = Split-Path -Path $TargetObject -Parent
 
     Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- 対象[$($FilterType)] $($TargetObject) 処理開始---"
 
@@ -1119,7 +1119,7 @@ Do
         #String.Substringメソッドは文字列から、引数位置から最後までを取り出す
         #MoveToNewFolderはNoRecurseでもMove|Copyで一律使用するので作成
 
-        $MoveToNewFolder = Join-Path $MoveToFolder -ChildPath ($TargetFileParentFolder).Substring($TargetFolder.Length)
+        $MoveToNewFolder = Join-Path -Path $MoveToFolder -ChildPath ($TargetFileParentFolder).Substring($TargetFolder.Length)
         If ($Recurse) {
 
             If (-not(CheckContainer -CheckPath $MoveToNewFolder -ObjectName '移動先フォルダ')) {
@@ -1141,11 +1141,11 @@ Do
 
     IF (( $PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')) {
 
-        $ArchivePath = CompressAndAddTimeStamp -TargetObject $TargetObject
+        $archivePath = CompressAndAddTimeStamp -TargetObject $TargetObject
 
-        IF (CheckLeafNotExists $ArchivePath) {
+        IF (CheckLeafNotExists $archivePath) {
 
-            TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
+            TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $archivePath -ActionError $TargetObject
             }
 
         
@@ -1154,21 +1154,21 @@ Do
             Switch -Regex ($PreAction) {        
         
                 '^7z$' {
-                    $ActionType = "7zArchive"
+                    $actionType = "7zArchive"
                     Break
                     }
                 
                 '^7zZip$' {
-                    $ActionType = "7zZipArchive"
+                    $actionType = "7zZipArchive"
                     Break
                     }
                     
                 Default {
-                    $ActionType = "Archive"
+                    $actionType = "Archive"
                     }       
             }        
        
-        TryAction -ActionType $ActionType -ActionFrom $TargetObject -ActionTo $ArchivePath -ActionError $TargetObject
+        TryAction -ActionType $actionType -ActionFrom $TargetObject -ActionTo $archivePath -ActionError $TargetObject
         }
 
 
@@ -1191,11 +1191,11 @@ Do
 
     #分岐3 移動 or 複製 　同一のファイルが（移動|複製先）に存在しないことを確認してから処理
     '^(Move|Copy)$' {
-            $TargetFileMoveToPath = Join-Path $MoveToNewFolder (Split-Path -Leaf $TargetObject)
+            $targetFileMoveToPath = Join-Path -Path $MoveToNewFolder -ChildPath (Split-Path -Path $TargetObject -Leaf)
 
-            IF (CheckLeafNotExists $TargetFileMoveToPath) {
+            IF (CheckLeafNotExists $targetFileMoveToPath) {
 
-                TryAction -ActionType $Action -ActionFrom $TargetObject -ActionTo $TargetFileMoveToPath -ActionError $TargetObject
+                TryAction -ActionType $Action -ActionFrom $TargetObject -ActionTo $targetFileMoveToPath -ActionError $TargetObject
                 }           
             }
 
@@ -1254,15 +1254,15 @@ Do
 
     #分岐2 Rename Rename後の同一名称ファイルがに存在しないことを確認してから処理
     '^Rename$' {
-            $NewFilePath = Join-Path $TargetFileParentFolder -ChildPath  ((Split-Path -Leaf $TargetObject) -replace "$RegularExpression" , "$RenameToRegularExpression")
+            $newFilePath = Join-Path -Path $TargetFileParentFolder -ChildPath  ((Split-Path -Path $TargetObject -Leaf) -replace "$RegularExpression" , "$RenameToRegularExpression")
 
-            $NewFilePath = ConvertToAbsolutePath -CheckPath $NewFilePath -ObjectName 'Rename後のファイル名'
+            $newFilePath = ConvertToAbsolutePath -CheckPath $newFilePath -ObjectName 'Rename後のファイル名'
 
-                    IF (CheckLeafNotExists $NewFilePath) {
+                    IF (CheckLeafNotExists $newFilePath) {
 
-                        TryAction -ActionType Rename -ActionFrom $TargetObject -ActionTo $NewFilePath -ActionError $TargetObject
+                        TryAction -ActionType Rename -ActionFrom $TargetObject -ActionTo $newFilePath -ActionError $TargetObject
                         }else{
-                        Logging -EventID $InfoEventID -EventType Information -EventMessage  "Rename後のファイル名[$($NewFilePath)]が存在するため[$($TargetObject)]のRenameはしません。"
+                        Logging -EventID $InfoEventID -EventType Information -EventMessage  "Rename後のファイル名[$($newFilePath)]が存在するため[$($TargetObject)]のRenameはしません。"
                         }
             }
 
