@@ -318,19 +318,19 @@ $DatumPath = $PSScriptRoot
 
     IF ($PasswordAuthorization) {
 
-        $ExecCommand = $ExecUser+"/"+$ExecUserPassword+"@"+$OracleService+" Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y"
+        $execCommand = $ExecUser+"/"+$ExecUserPassword+"@"+$OracleService+" Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y"
     
         }else{
 
-        $ExecCommand = "`' /@"+$OracleService+" as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
+        $execCommand = "`' /@"+$OracleService+" as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
         }
 
 
 Push-Location $OracleHomeBinPath
 
-$Process = Start-Process .\expdp -ArgumentList $ExecCommand -Wait -NoNewWindow -PassThru 
+$process = Start-Process .\expdp -ArgumentList $execCommand -Wait -NoNewWindow -PassThru 
 
-IF ($Process.ExitCode -ne 0) {
+IF ($process.ExitCode -ne 0) {
 
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to export DB with Oracle data pump command."
 	    Finalize $ErrorReturnCode
