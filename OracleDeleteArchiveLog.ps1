@@ -15,6 +15,10 @@ Oracleの仕様上、Oracleから古いArchive Logは認識されなくなりま
 
 ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
 
+With OS authentication, $env:ORACLE_SID is used for connecting to RMAN. If you want to connect another target,
+set $env:ORACLE_SID before start the script.
+
+
 
 配置例
 
@@ -23,8 +27,6 @@ Oracleの仕様上、Oracleから古いArchive Logは認識されなくなりま
 .\CommonFunctions.ps1
 ..\SQL\DeleteArchiveLog.rman
 ..\Log\RMAN.LOG
-
-
 
 
 .EXAMPLE
@@ -201,7 +203,7 @@ Param(
 
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$ExecRMANPath = '.\SQL\DeleteArchiveLog.rman' ,
 
-[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$OracleRmanLogPath = '.\SC_Logs\RMAN.log',
+[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$OracleRMANLogPath = '.\SC_Logs\RMAN.log',
 
 [parameter(mandatory=$true)][int][ValidateRange(1,65535)]$Days = 1,
 
@@ -247,13 +249,13 @@ Param(
 
 ################# CommonFunctions.ps1 Load  #######################
 
-Try{
+Try {
 
     #CommonFunctions.ps1の配置先を変更した場合は、ここを変更。同一フォルダに配置前提
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
-    Write-Output "CommonFunctions.ps1 のLoadに失敗しました。CommonFunctions.ps1がこのファイルと同一フォルダに存在するか確認してください"
+    Write-Output "Fail to load CommonFunctions.ps1 Please verfy existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
 
@@ -266,7 +268,7 @@ Try{
 
 function Initialize {
 
-$SHELLNAME=Split-Path $PSCommandPath -Leaf
+$ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -283,50 +285,47 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
 #OracleBINフォルダの指定、存在確認
 
-
     $OracleHomeBinPath = ConvertToAbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
 
     CheckContainer -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
 
 #OracleRmanLogファイルの指定、存在、書き込み権限確認
 
-    $OracleRmanLogPath = ConvertToAbsolutePath -CheckPath $OracleRmanLogPath -ObjectName '-OracleRmanLogPath'
+    $OracleRMANLogPath = ConvertToAbsolutePath -CheckPath $OracleRMANLogPath -ObjectName '-OracleRmanLogPath'
 
-    CheckLogPath -CheckPath $OracleRmanLogPath -ObjectName '-OracleRMANLLogPath' > $NULL
+    CheckLogPath -CheckPath $OracleRMANLogPath -ObjectName '-OracleRMANLLogPath' > $NULL
 
 
 #実行するRMANファイルの存在確認
    
     $ExecRmanPath = ConvertToAbsolutePath -CheckPath $ExecRmanPath -ObjectName '-ExecRmanPath'
 
-    CheckLeaf -CheckPath $ExecRmanPath -ObjectName '-ExecRmanPath' -IfNoExistFinalize > $Null
+    CheckLeaf -CheckPath $ExecRmanPath -ObjectName '-ExecRmanPath' -IfNoExistFinalize > $NULL
 
 
 #対象のOracleがサービス起動しているか確認
 
-    $TargetOracleService = "OracleService"+$OracleService
+    $targetOracleService = "OracleService"+$OracleService
 
-    $ServiceStatus = CheckServiceStatus -ServiceName $TargetOracleService -Health Running
+    $serviceStatus = CheckServiceStatus -ServiceName $targetOracleService -Health Running
 
-    IF (-NOT($ServiceStatus)){
+    IF (-not($serviceStatus)) {
 
-
-        Logging -EventType Error -EventID $ErrorEventID -EventMessage "対象のOracleServiceが起動していません。"
+        Logging -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetOracleService)] is not running."
         Finalize $ErrorReturnCode
         }else{
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "対象のOracle Serviceは正常に起動しています"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetOracleService)] is running."
         }
      
-
 
 
 
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "パラメータは正常です"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "$($DAYS)日前のArchiveLog削除を開始します"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Start to delete Oracle archive logs older than $($Days)days."
 
 }
 
@@ -339,44 +338,40 @@ Param(
 Pop-Location
 
 EndingProcess $ReturnCode
-
-
 }
 
 #####################   ここから本体  ######################
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200207_1615'
+$Version = '20200313_1415'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
 
 . Initialize
 
-
     Push-Location $OracleHomeBinPath
 
-    IF ($PasswordAuthorization){
+    IF ($PasswordAuthorization) {
 
-        $RmanLog = RMAN target $ExecUser/$ExecUserPassword@$OracleSerivce CMDFILE "$ExecRMANPath" $Days
-        Write-Output $RmanLog | Out-File -FilePath $OracleRmanLogPath -Append  -Encoding $LogFileEncode
+        $rmanLog = RMAN target $ExecUser/$ExecUserPassword@$OracleSerivce CMDFILE "$ExecRMANPath" $Days
+        Write-Output $rmanLog | Out-File -FilePath $OracleRMANLogPath -Append  -Encoding $LogFileEncode
+ 
         }else{
-        $RmanLog = RMAN target / CMDFILE "$ExecRMANPath" $Days
-        Write-Output $RmanLog | Out-File -FilePath $OracleRmanLogPath -Append  -Encoding $LogFileEncode
+        $rmanLog = RMAN target / CMDFILE "$ExecRMANPath" $Days
+        Write-Output $rmanLog | Out-File -FilePath $OracleRMANLogPath -Append  -Encoding $LogFileEncode
         }
 
 
-    IF ($LastExitCode -ne 0){
+    IF ($LASTEXITCODE -ne 0) {
 
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($DAYS)日前のArchiveLog削除に失敗しました"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to delete Oracle archive logs older than $($Days)days."
 
 	    Finalize $ErrorReturnCode
         }
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "$($DAYS)日前のArchiveLog削除に成功しました。なお、この削除はOracleから認識されなくする処理です。実ファイル削除は別途必要です"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Completed successfully to delete Oracle archive logs older than $($Days)days. !!REMIND they were deleted in Oracle RMAN records and you need to delete log files in the file system with OS's delete command!!"
 
-
-    Finalize $NormalReturnCode                   
-
+Finalize $NormalReturnCode
