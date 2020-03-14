@@ -1,5 +1,5 @@
 #Requires -Version 5.0
-#If you wolud NOT use '-PreAction compress or archive' in FileMaintenance.ps1 , you could change '-Version 5.0' to '-Version 3.0'
+#If you do not use '-PreAction compress or archive' without 7z in FileMaintenance.ps1, you will be able to use '-Version 3.0' insted of  '-Version 5.0'
 
 <#
 .SYNOPSIS
