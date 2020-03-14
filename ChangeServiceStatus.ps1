@@ -227,7 +227,7 @@ Try{
 
 function Initialize {
 
-$SHELLNAME=Split-Path $PSCommandPath -Leaf
+$ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -243,19 +243,19 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 #パラメータの確認
 
 
-    IF(-NOT(CheckServiceExist -ServiceName $Service -NoMessage)){
+    IF (-not(CheckServiceExist -ServiceName $Service -NoMessage)) {
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "Service [$($Service)] dose not exist."
         Finalize $ErrorReturnCode
         }
 
 
-     IF($TargetStatus -notmatch '(Running|Stopped)'){
+     IF ($TargetStatus -notmatch '(Running|Stopped)') {
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "-TargetStatus is invalid."
         Finalize $ErrorReturnCode   
         }
 
 
-    IF (CheckServiceStatus -ServiceName $Service -Health $TargetStatus -Span 0 -UpTo 1 ){
+    IF (CheckServiceStatus -ServiceName $Service -Health $TargetStatus -Span 0 -UpTo 1 ) {
         Logging -EventID $WarningEventID -EventType Warning -EventMessage "Service [$($Service)] status is already [$($TargetStatus)]"
         Finalize $WarningReturnCode
         }
@@ -292,26 +292,26 @@ $DatumPath = $PSScriptRoot
 
 $Version = '20200207_1615'
 
-[String]$Computer = "localhost" 
-[String]$Class = "win32_service" 
-[Object]$WmiService = Get-Wmiobject -Class $Class -computer $Computer -filter "name = '$Service'" 
+[String]$computer = "localhost" 
+[String]$class = "win32_service" 
+[Object]$WmiService = Get-WMIobject -Class $class -computer $computer -filter "name = '$Service'" 
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
 
 . Initialize
 
- Switch -Regex ($TargetStatus){
+ Switch -Regex ($TargetStatus) {
  
-    'Stopped'{
-        $OriginalStatus = 'Running'    
+    'Stopped' {
+        $originalStatus = 'Running'    
         }
     
-    'Running'{
-        $OriginalStatus = 'Stopped'
+    'Running' {
+        $originalStatus = 'Stopped'
         }
 
-    Default{
+    Default {
         Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetStatus is invalid.'
         Finalize $InternalErrorReturnCode
         } 
@@ -325,20 +325,19 @@ $Version = '20200207_1615'
 #https://devblogs.microsoft.com/scripting/hey-scripting-guy-how-can-i-use-windows-powershell-to-stop-services/
 
 
-For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
-{
+For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ){
 
       # サービス存在確認
-      IF(-NOT(CheckServiceExist $Service)){
+      IF (-not(CheckServiceExist $Service)) {
       Finalize $ErrorReturnCode
       }
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "With WMIService.(start|stop)Service , starting to change Service [$($Service)] status from [$($OriginalStatus)] to [$($TargetStatus)]"
+    Logging -EventID $InfoEventID -EventType Information -EventMessage "With WMIService.(start|stop)Service , starting to change Service [$($Service)] status from [$($originalStatus)] to [$($TargetStatus)]"
 
-    Switch -Regex ($TargetStatus){
+    Switch -Regex ($TargetStatus) {
  
-        'Stopped'{
-            IF($WMIService.AcceptStop){
+        'Stopped' {
+            IF ($WMIService.AcceptStop) {
                 $Return = $WMIService.stopService()
                 }else{
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] will not accept a stop request. Wait for $($RetrySpanSec) seconds."
@@ -347,7 +346,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
                 }
             }
     
-        'Running'{
+        'Running' {
 
             #https://docs.microsoft.com/ja-jp/windows/win32/cimwin32prov/win32-service
             #No AcceptStart Class
@@ -355,7 +354,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
             $Return = $WMIService.startService()
             }
 
-        Default{
+        Default {
             Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetStatus is invalid. '
             Finalize $InternalErrorReturnCode    
             }
@@ -363,12 +362,12 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
 
 
 
-     Switch ($Return.returnvalue)  {
+     Switch ($Return.returnvalue) {
         
-                0{
-                $ServiceStatus = CheckServiceStatus -ServiceName $Service -Health $TargetStatus -Span $RetrySpanSec -UpTo $RetryTimes
+                0 {
+                $serviceStatus = CheckServiceStatus -ServiceName $Service -Health $TargetStatus -Span $RetrySpanSec -UpTo $RetryTimes
 
-                IF ($ServiceStatus){
+                IF ($serviceStatus) {
                     Logging -EventID $SuccessEventID -EventType Success -EventMessage "Service [$($Service)] is [$($TargetStatus)]"
                     Finalize $NormalReturnCode
                     }else{
@@ -402,6 +401,5 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
       Start-Sleep $RetrySpanSec
 }
 
-
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , service [$($Service)] status is not change to [$($TargetStatus)]"
-    Finalize $ErrorReturnCode
+Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , service [$($Service)] status is not change to [$($TargetStatus)]"
+Finalize $ErrorReturnCode

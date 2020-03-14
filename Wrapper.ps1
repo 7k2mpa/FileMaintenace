@@ -233,7 +233,7 @@ Try{
 
 function Initialize {
 
-$SHELLNAME=Split-Path $PSCommandPath -Leaf
+$ShellNane = Split-Path -Path $PSCommandPath -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -279,11 +279,11 @@ Param(
 [parameter(mandatory=$true)][int]$ReturnCode
 )
 
-    IF(-NOT(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))){
+    IF (-NOT(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))) {
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "Execution Results NORMAL[$($NormalCount)], WARNING[$($WarningCount)], ERROR[$($ErrorCount)]"
 
-        If(($Continue) -and ($ErrorCount -gt 0)){
+        If (($Continue) -and ($ErrorCount -gt 0)){
             Logging -EventID $InfoEventID -EventType Information -EventMessage "An ERROR termination occurred, but did not terminate as ERROR and execute command of the next lines  because option -Continue[${Continue}] is used."
             }
 
@@ -311,90 +311,87 @@ $Version = '20200224_1640'
 
 . Initialize
 
-    Try{
+    Try {
 
-        $Lines = @(Get-Content $CommandFile -Encoding $CommandFileEncode -ErrorAction Stop)  
+        $lines = @(Get-Content $CommandFile -Encoding $CommandFileEncode -ErrorAction Stop)  
         }
-                    catch [Exception]
-                    {
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to load -CommandFile"
-                    $ErrorDetail = $Error[0] | Out-String
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $ErrorDetail"
-                    Finalize $ErrorReturnCode
-                    }
+        
+        catch [Exception] {
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to load -CommandFile"
+            $errorDetail = $ERROR[0] | Out-String
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
+            Finalize $ErrorReturnCode
+            }
 
 
-For ( $i = 0 ; $i -lt $Lines.Count; $i++ )
+For ( $i = 0 ; $i -lt $lines.Count; $i++ ) {
 
-{
+    $line = $lines[$i]
 
-    $Line = $Lines[$i]
-
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute line [$($i+1)/$($Lines.Count)] in -CommandFile [$($CommandFile)]"
+    Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute line [$($i+1)/$($lines.Count)] in -CommandFile [$($CommandFile)]"
 
 
-
-    Switch -Regex ($Line){
+    Switch -Regex ($line) {
 
         #分岐1 行頭#でコメント
-        '^#.*$'
-                {Logging -EventID $InfoEventID -EventType Information -EventMessage "Comment[$($Line)]"}
+        '^#.*$' {
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Comment[$($line)]"
+            }
 
         #分岐2 空白
-        '^$'
-                {Logging -EventID $InfoEventID -EventType Information -EventMessage "Empty Line"}
+        '^$' {
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Empty Line"
+            }
 
         #分岐3 コマンド実行
-        default 
-                {
-                   Try{
-        
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute Command [$($CommandPath)] with arguments [$($Line)]"
-                    Invoke-Expression "$CommandPath $Line" -ErrorAction Stop
+        default {
 
+            Try{        
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute Command [$($CommandPath)] with arguments [$($line)]"
+                    Invoke-Expression "$CommandPath $line" -ErrorAction Stop
                     }
-                    catch [Exception]
-                    {
+
+                catch [Exception] {
                     Logging -EventID $ErrorEventID -EventType Error -EventMessage "Faild to execute [$($CommandPath)] and force to exit."
-                    $ErrorDetail = $Error[0] | Out-String
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $ErrorDetail"
+                    $errorDetail = $ERROR[0] | Out-String
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
                     Finalize $ErrorReturnCode
                     }
 
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Execution Result is [$($LastExitCode)] at line [$($i+1)/$($Lines.Count)] in -CommandFile [$($CommandFile)]"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Execution Result is [$($LASTEXITCODE)] at line [$($i+1)/$($lines.Count)] in -CommandFile [$($CommandFile)]"
                     
 
-                    #終了コードで分岐
-                    Switch ($LastExitCode){
+            #終了コードで分岐
+            Switch ($LASTEXITCODE) {
 
                         #条件1 異常終了
-                        {$_ -ge $ErrorReturnCode}{
+                        {$_ -ge $ErrorReturnCode} {
  
-                            $ErrorCount ++
+                            $ErrorCount++
                             Logging -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred at line [$($i+1)/$($Lines.Count)] in -CommandFile [$($CommandFile)]"
        
-                            IF($Continue){
+                            IF ($Continue) {
                                 Logging -EventID $WarningEventID -EventType Warning -EventMessage "Will execute next line, because option -Continue[$($Continue)] is used."   
-                                ;Break     
+                                Break     
      
                                 }else{
                                 Finalize $ErrorReturnCode
                                 }
-                        }
+                            }
                     
                         #条件2 警告終了
-                        {$_ -ge $WarningReturnCode}{
+                        {$_ -ge $WarningReturnCode} {
                             
-                            $WarningCount ++
-                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred at line [$($i+1)/$($Lines.Count)] in -CommandFile [$($CommandFile)] Will execute next line." 
-                            ;Break        
-                        }
+                            $WarningCount++
+                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred at line [$($i+1)/$($lines.Count)] in -CommandFile [$($CommandFile)] Will execute next line." 
+                            Break        
+                            }
                         
                         #条件3 正常終了
                         Default {
-                        $NormalCount ++
-                        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully at line [$($i+1)/$($Lines.Count)] in -CommandFile [$($CommandFile)]"
-                        }
+                            $NormalCount++
+                            Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully at line [$($i+1)/$($lines.Count)] in -CommandFile [$($CommandFile)]"
+                            }
                    }
     
    

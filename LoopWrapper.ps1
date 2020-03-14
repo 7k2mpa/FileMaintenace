@@ -273,7 +273,7 @@ Try{
 
 function Initialize {
 
-$SHELLNAME=Split-Path $PSCommandPath -Leaf
+$ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -338,16 +338,15 @@ $Version = '20200224_1640'
 
 . Initialize
 
-    Try{
+    Try {
 
-        $Line = @(Get-Content $CommandFile -Encoding $CommandFileEncode -TotalCount 1  -ErrorAction Stop)
-
+        $line = @(Get-Content $CommandFile -Encoding $CommandFileEncode -TotalCount 1  -ErrorAction Stop)
         }
                     catch [Exception]
                     {
                     Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to load -CommandFile"
-                    $ErrorDetail = $Error[0] | Out-String
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $ErrorDetail"
+                    $errorDetail = $Error[0] | Out-String
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
                     Finalize $ErrorReturnCode
                     }
 
@@ -359,9 +358,9 @@ For ( $i = 1 ; $i -le $UpTo ; $i++ ){
     Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute 1st line in [$($CommandFile)]"
     Logging -EventID $InfoEventID -EventType Information -EventMessage "Try times [$($i)/$($UpTo)]"
 
-        Try{
+        Try {
         
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute command [$($CommandPath)] with arguments [$($Line)]です"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute command [$($CommandPath)] with arguments [$($line)]"
             Invoke-Expression "$CommandPath $Line" -ErrorAction Stop
 
             }
@@ -369,27 +368,27 @@ For ( $i = 1 ; $i -le $UpTo ; $i++ ){
             catch [Exception]{
 
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute [$($CommandPath)]"
-            $ErrorDetail = $Error[0] | Out-String
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $ErrorDetail"
+            $errorDetail = $Error[0] | Out-String
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
             Finalize $ErrorReturnCode
             }
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Result of execution [$($CommandFile)] is [$($LastExitCode)]"
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "Result of execution [$($CommandFile)] is [$($LASTEXITCODE)]"
                     
 
         #終了コードで分岐
-        Switch ($LastExitCode){
+        Switch ($LastExitCode) {
 
                         #条件1 異常終了
-                        {$_ -ge $ErrorReturnCode}{
+                        {$_ -ge $ErrorReturnCode} {
  
                             Logging -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred at line 1 in -CommandFile [$($CommandFile)]"
        
-                            IF($Continue){
+                            IF ($Continue) {
                                 Logging -EventID $WarningEventID -EventType Warning -EventMessage "Will try again, because option -Continue[$($Continue)] is used." 
                                 Logging -EventID $WarningEventID -EventType Warning -EventMessage "Wait for [$($Span)] seconds."
                                 Start-Sleep -Seconds $Span
-                                ;Break     
+                                Break     
      
                                 }else{
                                 Finalize $ErrorReturnCode
@@ -398,7 +397,7 @@ For ( $i = 1 ; $i -le $UpTo ; $i++ ){
 
                     
                         #条件2 警告終了
-                        {$_ -ge $WarningReturnCode}{
+                        {$_ -ge $WarningReturnCode} {
                             
 
                             Logging -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred at line 1 in [$($CommandFile)] , will try again. " 

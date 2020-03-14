@@ -190,7 +190,7 @@ Try{
 
 function Initialize {
 
-$SHELLNAME=Split-Path $PSCommandPath -Leaf
+$ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -208,16 +208,14 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
 #ドライブが既にマウントされているか
 
-    $DriveLetters = (Get-WmiObject Win32_LogicalDisk).DeviceID
+    $driveLetters = (Get-WmiObject Win32_LogicalDisk).DeviceID
 
-    IF($DriveLetters.Contains($MountDrive)){
+    IF ($driveLetters.Contains($MountDrive)) {
 
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "Drive $($MountDrive) exists already."
         Finalize $ErrorReturnCode
 
-
-    }else{
-
+        }else{
         Logging -EventID $InfoEventID -EventType Information -EventMessage "Drive $($MountDrive) dose not exists."
         }
 
@@ -226,7 +224,7 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 #UNCパスが存在するか
 
 
-    IF(Test-Path -LiteralPath FileSystem::$TargetPath){
+    IF (Test-Path -LiteralPath FileSystem::$TargetPath) {
         
         Logging -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath $($TargetPath) exists."
         
@@ -269,20 +267,20 @@ $psDrive = $MountDrive -replace ":"
 
 . Initialize
 
-Try{
+Try {
 
     New-PSDrive -Persist -Name $psDrive -PSProvider FileSystem -Root $TargetPath -Scope Global -ErrorAction Stop > $Null
     }
 
     catch [Exception]
     {
-    $ErrorDetail = $Error[0] | Out-String
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $ErrorDetail"
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to mount drive ${MountDrive}"
+    $errorDetail = $ERROR[0] | Out-String
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to mount drive $($MountDrive)"
 	Finalize $ErrorReturnCode
     }
 
  
 
-Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed to mount drive ${MountDrive} successfully."
+Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed to mount drive $($MountDrive) successfully."
 Finalize $NormalReturnCode

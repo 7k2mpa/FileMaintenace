@@ -207,7 +207,7 @@ Try{
 
 function Initialize {
 
-$SHELLNAME=Split-Path $PSCommandPath -Leaf
+$ShellName = Split-Path $PSCommandPath -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -222,24 +222,24 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
 #パラメータの確認
 
-    IF(-NOT(CheckServiceExist -ServiceName 'W3SVC')){
+    IF (-not(CheckServiceExist -ServiceName 'W3SVC')) {
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "Web Service [W3SVC] dose not exist."
         Finalize $ErrorReturnCode
         }
  
-     IF($TargetState -notmatch '^(Started|Stopped)$'){
+     IF ($TargetState -notmatch '^(Started|Stopped)$') {
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "-TargetState is invalid."
         Finalize $ErrorReturnCode   
         }
        
 
-    IF(Get-Website | Where-Object{$_.Name -ne $Site}){
+    IF (Get-Website | Where-Object{$_.Name -ne $Site}) {
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "Site [$($Site)] dose not exist."
         Finalize $ErrorReturnCode
         }
 
 
-    IF (Get-Website | Where-Object{$_.Name -eq $Site} | Where-Object {$_.State -eq $TargetState}){
+    IF (Get-Website | Where-Object{$_.Name -eq $Site} | Where-Object {$_.State -eq $TargetState}) {
         Logging -EventID $WarningEventID -EventType Warning -EventMessage "Site [$($Site)] state is already [$($TargetState)]."
         Finalize $WarningReturnCode
         }
@@ -282,17 +282,17 @@ $Version = '20200207_1615'
 . Initialize
 
 
- Switch -Regex ($TargetState){
+ Switch -Regex ($TargetState) {
  
-    'Stopped'{
+    'Stopped' {
         $OriginalState = 'Started'    
         }
     
-    'Started'{
+    'Started' {
         $OriginalState = 'Stopped'
         }
 
-    Default{
+    Default {
         Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetState is invalid. '
         Finalize $InternalErrorReturnCode    
         }
@@ -301,31 +301,30 @@ $Version = '20200207_1615'
 
 Logging -EventID $InfoEventID -EventType Information -EventMessage "With Powershell Cmdlet , Starting to change site [$($Site)] state from [$($OriginalState)] to [$($TargetState)]"
         
-    Switch -Regex ($TargetState){
+    Switch -Regex ($TargetState) {
  
-        'Stopped'{
+        'Stopped' {
             Stop-Website -Name $Site
             }
     
-        'Started'{
+        'Started' {
             Start-Website -Name $Site
             }
 
-        Default{
+        Default {
             Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetState is invalid. '
             Finalize $InternalErrorReturnCode
             }
     }
 
 
-For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
-{
+For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
 
       $SiteState = Get-Website | Where-Object{$_.Name -eq $Site} | ForEach-Object{$_.State}
 
-           Switch ($SiteState)  {
+           Switch ($SiteState) {
         
-                $TargetState{
+                $TargetState {
 
                     Logging -EventID $SuccessEventID -EventType Success -EventMessage "Site[$($Site)] state was [$($SiteState)]."
                     Finalize $NormalReturnCode
@@ -348,7 +347,6 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ )
       Logging -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] exists and site state did not change to [$($TargetState)]. Wait for $($RetrySpanSec) seconds."
       Start-Sleep $RetrySpanSec
 }
-
 
 Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , site [$($Site)] state did not change to [$($TargetState)]."
 Finalize $ErrorReturnCode
