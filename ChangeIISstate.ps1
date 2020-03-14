@@ -11,7 +11,7 @@ With Wrapper.ps1 start or stop multiple IIS sites.
 
 .DESCRIPTION
 Script to Stop or Start IIS site.
-If start(stop) IIS site already starting(stopping), will temrminate as WARNING.
+If start(stop) IIS site already started(stopped), will temrminate as WARNING.
 
 Output log to Windows Event Log or Console or Text Log and specify to supress or to output individually. 
 
