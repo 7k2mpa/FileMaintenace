@@ -85,7 +85,7 @@ Param(
 )
 
 
-    IF (($Log2EventLog -OR $ForceConsoleEventLog) -and -NOT($ForceConsole) ) {
+    IF (($Log2EventLog -OR $ForceConsoleEventLog) -and -not($ForceConsole) ) {
 
         Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType $EventType -EventId $EventID -Message "[$($ShellName)] $($EventMessage)"
         }
@@ -98,7 +98,7 @@ Param(
         }   
 
 
-    IF ($Log2File -and -NOT($ForceConsole -or $ForceConsoleEventLog )) {
+    IF ($Log2File -and -not($ForceConsole -or $ForceConsoleEventLog )) {
 
         $logFormattedDate = (Get-Date).ToString($LogDateFormat)
         $logWrite = $LogFormattedDate+" "+$SHELLNAME+" "+$EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
@@ -113,10 +113,10 @@ Param(
 
 function CheckReturnCode {
 
-    IF (-NOT(($InternalErrorReturnCode -ge $WarningReturnCode) -AND ($ErrorReturnCode -ge $WarningReturnCode) -AND ($WarningReturnCode -ge $NormalReturnCode))) {
+    IF (-not(($InternalErrorReturnCode -ge $WarningReturnCode) -and ($ErrorReturnCode -ge $WarningReturnCode) -and ($WarningReturnCode -ge $NormalReturnCode))) {
 
-    Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID "ReturnCodeの大小関係が正しく設定されていません。"
-    Write-Output "ReturnCodeの大小関係が正しく設定されていません。"
+    Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID "The magnitude relation of ReturnCodes' parameters is not set correctly."
+    Write-Output "The magnitude relation of ReturnCodes is not set correctly."
     Exit 1
     }
 }
@@ -128,7 +128,7 @@ function CheckReturnCode {
 
 function CheckEventLogSource {
 
-    IF (-NOT($Log2EventLog)) {
+    IF (-not($Log2EventLog)) {
         Return
         }
 
@@ -137,18 +137,18 @@ $ForceConsole = $TRUE
 
     Try {
 
-        If (-NOT([System.Diagnostics.Eventlog]::SourceExists($ProviderName) ) ) {
+        If (-not([System.Diagnostics.Eventlog]::SourceExists($ProviderName) ) ) {
         #新規イベントソースを設定
            
             New-EventLog -LogName $EventLogLogName -Source $ProviderName  -ErrorAction Stop
             $ForceConsoleEventLog = $TRUE    
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "新規イベントソース[$($ProviderName)]を[$($EventLogLogName)]へ登録しました"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Regist new source event [$($ProviderName)] to [$($EventLogLogName)]"
             }
        
     }
     Catch [Exception] {
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "EventLogにSouce $($ProviderName)が存在しないため、新規作成を試みましたが失敗しました。新規Sourceの作成は実行ユーザが管理者権限を保有している必要があります。一度Powershellを管理者権限で開いて手動でこのプログラムを実行してください。"
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $Error[0]"
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to regist new source event because no source $($ProviderName) exists in event log, must have administrator privilage for registing new source. Start Powershell with administrator privilage and start the script."
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $Error[0]"
     Exit $ErrorReturnCode
     }
 
@@ -163,7 +163,7 @@ $ForceConsoleEventLog = $FALSE
 
 function CheckLogFilePath {
 
-    IF (-NOT($Log2File)) {
+    IF (-not($Log2File)) {
         Return
         }
 
@@ -292,12 +292,12 @@ function TryAction {
             Switch -Regex ($ActionType){
             
                 'Compress'{
-                    [String]$ErrorDetail = .\7z a $ActionTo $ActionFrom -t"$7zType" 2>&1
+                    [String]$errorDetail = .\7z a $ActionTo $ActionFrom -t"$7zType" 2>&1
                     Break
                     }
 
                 'Archive'{
-                    [String]$ErrorDetail = .\7z u $ActionTo $ActionFrom -t"$7zType" 2>&1
+                    [String]$errorDetail = .\7z u $ActionTo $ActionFrom -t"$7zType" 2>&1
                     Break
                     }
             
@@ -309,7 +309,7 @@ function TryAction {
 
             Pop-Location
             $processErrorFlag = $TRUE
-            IF($LASTEXITCODE -ne 0){
+            IF ($LASTEXITCODE -ne 0) {
 
                 Throw "error in 7zip"            
                 }
@@ -329,12 +329,12 @@ function TryAction {
        
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute [$($ActionType)] to [$($ActionError)]"
         IF (-not($processErrorFlag)) {
-            $ErrorDetail = $Error[0] | Out-String
+            $errorDetail = $Error[0] | Out-String
             }
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $ErrorDetail"
+        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
         $Script:ErrorFlag = $TRUE
 
-        If (($Continue) -AND (-NOT($NoContinueOverRide))) {
+        If (($Continue) -and (-not($NoContinueOverRide))) {
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "Specified -Continue option, continue to process next objects."
             $Script:WarningFlag = $TRUE
             $Script:ContinueFlag = $TRUE
@@ -369,16 +369,33 @@ function TryAction {
 }
 
 
-
-
-#相対パスから絶対パスへ変換
-#相対パスは.\ または ..\から始めて下さい。
-#このfunctionは検査対象パスがNull , emptyの場合、異常終了します。確認が必要なパスのみを検査して下さい。
-#* ?等のNTFSに使用できない文字がパスに含まれている場合は異常終了します
-#[]のPowershellでワイルドカードとして扱われる文字は、ワイルドカードとして扱いません。LiteralPathとしてそのまま処理します
-#なおTryActionはワイルドカード[]を扱いません。LiteralPathとしてそのまま処理します
-
 Function ConvertToAbsolutePath {
+
+<#
+.SYNOPSIS
+ 相対パスから絶対パスへ変換
+
+.DESCRIPTION
+ このfunctionは検査対象パスがNull , emptyの場合、異常終了します。確認が必要なパスのみを検査して下さい。
+ * ?等のNTFSに使用できない文字がパスに含まれている場合は異常終了します
+ []のPowershellでワイルドカードとして扱われる文字は、ワイルドカードとして扱いません。LiteralPathとしてそのまま処理します
+ なおTryActionはワイルドカード[]を扱いません。LiteralPathとしてそのまま処理します
+
+.PARAMETER CheckPath
+ 相対パスまたは絶対パスを指定してください。
+ 相対パスは.\ または ..\から始めて下さい。
+
+.PARAMETER ObjectName
+ ログに出力するCheckPathの説明文を指定してください。
+
+ .INPUT
+ System.String
+
+ .OUTPUT
+ System.String
+
+#>
+
 
 Param(
 [String]$CheckPath,
@@ -499,7 +516,7 @@ Param(
             $returnCode = $ErrorReturnCode
             }
 
-        }elseIF (($WarningCount -gt 0) -OR ($ReturnCode -ge $WarningReturnCode)) {
+        }elseIF (($WarningCount -gt 0) -or ($ReturnCode -ge $WarningReturnCode)) {
 
             IF ($WarningAsNormal) {
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "A WARNING termination occurred, specified -WarningAsNormal[$($WarningAsNormal)] option, thus the exit code is [$($NormalReturnCode)]" 
@@ -523,10 +540,26 @@ Exit $returnCode
 }
 
 
-#サービス存在確認
-
-
 function CheckServiceExist {
+
+<#
+.SYNOPSIS
+ Check existence of specified Windows Service
+
+.PARAMETER ServiceName
+ 確認するWindows Serviceを指定してください。
+
+.PARAMETER NoMessage
+ ログ出力を抑止します。
+
+ .INPUT
+ System.String
+
+ .OUTPUT
+ Boolean
+
+#>
+
 
 Param(
 [parameter(mandatory=$TRUE)][String]$ServiceName,
@@ -540,12 +573,12 @@ Param(
 
 
     IF ($service.Status -Match "^$") {
-        IF (-NOT($NoMessage)) {Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] dose not exist."}
+        IF (-not($NoMessage)) {Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] dose not exist."}
         Return $FALSE
 
         }else{
 
-        IF (-NOT($NoMessage)) {Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists"}
+        IF (-not($NoMessage)) {Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists"}
         Return $TRUE
         }
 }
@@ -568,7 +601,7 @@ Param(
     For ( $i = 0 ; $i -lt $UpTo; $i++ )
     {
         # サービス存在確認
-        IF (-NOT(CheckServiceExist $ServiceName -NoMessage)) {
+        IF (-not(CheckServiceExist $ServiceName -NoMessage)) {
             Return $FALSE
             }
 
@@ -581,7 +614,7 @@ Param(
             Return $TRUE     
             }
 
-        IF (($Span -eq 0) -AND ($UpTo -eq 1)) {
+        IF (($Span -eq 0) -and ($UpTo -eq 1)) {
                 
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($service.Status)]"
                 Return $FALSE
@@ -589,7 +622,7 @@ Param(
 
         # 指定間隔(秒)待機
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)] , is not [$($Health)] Wait for $($SPAN)seconds."
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)] , is not [$($Health)] Wait for $($Span)seconds."
         Start-sleep $Span
     }
 
@@ -613,7 +646,7 @@ Param(
 )
 
 
-    If (-NOT([String]::IsNullOrEmpty($CheckPath))) {
+    If (-not([String]::IsNullOrEmpty($CheckPath))) {
         Return $FALSE
         }else{
 
@@ -715,7 +748,7 @@ Param(
         $logWrite = $logFormattedDate+" "+$ShellName+" Write Permission Check"
         
 
-        Try{
+        Try {
             Write-Output $logWrite | Out-File -FilePath $CheckPath -Append -Encoding $LogFileEncode
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Successfully complete to write to $($ObjectName) [$($CheckPath)]"
             }
@@ -738,7 +771,7 @@ function CheckExecUser {
 
     Logging -EventID $InfoEventID -EventType Information -EventMessage "Executed in user [$($ScriptExecUser.Name)]"
 
-    IF (-NOT($ScriptExecUser.Name -match $ExecutableUser)) {
+    IF (-not($ScriptExecUser.Name -match $ExecutableUser)) {
                 Logging -EventType Error -EventID $ErrorEventID -EventMessage "Executed in an unauthorized user."
                 Finalize $ErrorReturnCode
                 }
@@ -805,7 +838,7 @@ Param(
 
     $logFormattedDate = (Get-Date).ToString($LogDateFormat)
 
-    $SQLLog = $NULL
+    $sqlLog = $NULL
 
 
 
@@ -836,13 +869,13 @@ Push-Location $OracleHomeBinPath
 
     IF ($PasswordAuthorization) {
 
-    $SQLLog = $SQLCommand | SQLPlus $ExecUser/$ExecUserPassword@OracleSerivce as sysdba
+    $sqlLog = $SQLCommand | SQLPlus $ExecUser/$ExecUserPassword@OracleSerivce as sysdba
 
     }else{
-    $SQLLog = $SQLCommand | SQLPlus / as sysdba
+    $sqlLog = $SQLCommand | SQLPlus / as sysdba
     }
 
-Write-Output $SQLLog | Out-File -FilePath $SQLLogPath -Append  -Encoding $LogFileEncode
+Write-Output $sqlLog | Out-File -FilePath $SQLLogPath -Append  -Encoding $LogFileEncode
 
 
 Pop-Location
@@ -890,12 +923,12 @@ function CheckOracleBackUpMode {
 
             IF ($Line -match 'NOT ACTIVE') {
             $normalModeCount ++
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "[$line][$i]行目 Normal Mode"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "[$line] line[$i] Normal Mode"
  
  
             }elseIF ($Line -match 'ACTIVE') {
             $backUpModeCount ++
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "[$line][$i]行目 BackUp Mode"
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "[$line] line[$i] BackUp Mode"
             }
  
     $i ++

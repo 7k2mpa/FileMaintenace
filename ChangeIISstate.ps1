@@ -3,45 +3,37 @@
 
 <#
 .SYNOPSIS
-指定したサービスを停止するプログラムです。
-実行にはCommonFunctions.ps1が必要です。
-セットで開発しているFileMaintenance.ps1と併用すると複数のサービスを一括停止できます。
+Script to Stop or Start IIS site.
+CommonFunctions.ps1 is required.
+With Wrapper.ps1 start or stop multiple IIS sites.
 
-<Common Parameters>はサポートしていません
+<Common Parameters> is not supported.
 
 .DESCRIPTION
+Script to Stop or Start IIS site.
+If start(stop) IIS site already starting(stopping), will temrminate as WARNING.
 
-指定したサービスを停止するプログラムです。
-停止済サービスを停止指定すると警告終了します。
-
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
-
-
-.EXAMPLE
-StartService.ps1 -Service Spooler -RetrySpanSec 5 -RetryTimes 5
-
-サービス名:Spooler（表示名はPrint Spooler）を停止します。
-直ぐに停止しない場合は、5秒間隔で最大5回試行します。
-
-停止済サービスを停止しようとした場合は、警告終了します。
-
+Output log to Windows Event Log or Console or Text Log and specify to supress or to output individually. 
 
 
 .EXAMPLE
-StartService.ps1 -Service Spooler -RetrySpanSec 5 -RetryTimes 5 -WarningAsNormal
+ChangeIIState.ps1 -Site SSL -TargetState stopped
 
-サービス名:Spooler（表示名はPrint Spooler）を停止します。
-直ぐに停止しない場合は、5秒間隔で最大5回試行します。
-
-停止済サービスを停止しようとした場合は、正常終了します。
+Stop IIS site 'SSL'
 
 
+.EXAMPLE
+ChangeIIState.ps1 -Site SSL -TargetState started
 
-.PARAMETER Service
-　停止するサービス名を指定します。
-「サービス名」と（サービスの）「表示名」は異なりますので留意して下さい。。
-例えば「表示名:Print Spooler」は「サービス名:Spooler」となっています。
-指定必須です。
+Start IIS site 'SSL'
+
+
+.PARAMETER Site
+Specify IIS site
+
+.PARAMETER TargetState
+Specify IIS site state 'Started' or 'Stopped' 
+
 
 .PARAMETER RetrySpanSec
 　サービス停止再確認の間隔秒数を指定します。
@@ -146,9 +138,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-
-MICROSOFT LIMITED PUBLIC LICENSE version 1.1
 
 .LINK
 
