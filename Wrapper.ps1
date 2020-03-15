@@ -21,7 +21,7 @@ The configuration file can be set arbitrarily.
 A line starting with # in the configuration file, it is proccessed as a comment.
 An empty line in the configuration file, it is sikkiped.
 
-Output log to Windows Event Log or Console or Text Log and specify to supress or to output individually. 
+Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
 設定ファイルから1行づつパラメータを読み込み、指定したプログラムに順次実行させます。
 

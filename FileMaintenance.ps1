@@ -1,5 +1,6 @@
 #Requires -Version 5.0
-#If you do not use '-PreAction compress or archive' without 7z in FileMaintenance.ps1, you will be able to use '-Version 3.0' insted of  '-Version 5.0'
+#If you do not use '-PreAction compress or archive', install WMF 3.0 and place '#Requires -Version 3.0' insted of '#Requires -Version 5.0'
+#If you use '-PreAction compress or archive' with 7z, install WMF 3.0 and place '#Requires -Version 3.0' insted of '#Requires -Version 5.0'
 
 <#
 .SYNOPSIS
@@ -17,7 +18,36 @@ You can process log files in multiple folders with Wrapper.ps1
 
 .DESCRIPTION
 This script filters files and folders with multiple criterias.
-Process the files and filders filtered.
+And process the files and folders filtered in multiple methods as PreAction, Action and PostAction.
+
+Methods are for filtered objects.
+
+-PreAction:
+Create new files from filtered files. Methods [Add time stamp to file name][Compress][Archive to 1file][Move the file created to new location] are possible and can be used together.
+Without specification -MoveNewFile option, place the file created in the same folder the original file.
+
+-Action:
+Process files filtered to [Move][Copy][Delete][NullClear][KeepFilesCount] , folders filtered to [DeleteEmptyFolders]
+
+-PostAction:
+Process files filtered to [NullClear][Rename]
+
+
+Filtering functions include [(Older than)-Days][-Size][-RegularExpression][-Parent(Path)RegularExpression]
+
+This script processes 1 folder at once.
+If you process multiple folders, can do with Wrapper.ps1
+
+Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
+
+This scrpit requires Powershell 5.0 or later basically.
+
+If the script run on Windows Server 2008, 2008R2, 2012 and 2012R2 install WMF(Windows Management Framework)5.0.
+If you do not use '-PreAction compress or archive', install WMF 3.0 and place '#Requires -Version 3.0' insted of '#Requires -Version 5.0' at top of the script.
+If you use '-PreAction compress or archive' with 7z, install WMF 3.0 and place '#Requires -Version 3.0' insted of '#Requires -Version 5.0' at top of the script.
+
+https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows-powershell?view=powershell-7#upgrading-existing-windows-powershell
+
 
 
 対象のフォルダに含まれる、ファイル、フォルダを各種条件でフィルタして選択します。
@@ -45,6 +75,11 @@ https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -noLog2Console
+
+Find files in C:\TEST and child folders recuresively.
+Verbose logs are not output at console.
+You would confirm getting files to process. 
+
 C:\TEST以下のファイルを再帰的に検索だけします（子フォルダも対象）
 作業の細かい内容をコンソールに表示しません。
 先ずはメンテナンス対象のものが表示されるか確認してみて下さい。
@@ -53,33 +88,58 @@ C:\TEST以下のファイルを再帰的に検索だけします（子フォルダも対象）
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -Action Delete
+
+Delete files in C:\TEST and child folders recuresively.
+
 C:\TEST以下のファイルを再帰的に削除します（子フォルダも対象）
 
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -Action DeleteEmptyFolders
+
+Delete empty folders in C:\TEST and child folders recuresively.
+
 C:\TEST以下の空フォルダを再帰的に削除します（子フォルダも対象）
 
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -Action Delete -noRecurse
+
+Delete files only in C:\TEST non-recuresively.
+
 C:\TEST以下のファイルを非再帰的に削除します（子フォルダは対象外）
 
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -Action Copy -MoveToFolder C:\TEST1 -Size 10KB -continue
+
+Copy files over than 10KByte to C:\TEST1 recuresively.
+If no child foler in the desitination, make the new folder.
+If same name file be in the destination, skip copying and continue process a next object.
+
 C:\TEST以下のファイルで10KB以上のものを再帰的にC:\TEST1へ複製します。移動先に子フォルダが無ければ作成します
 移動先に同一名称のファイルがあった場合はスキップして処理を継続します
 
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -PreAction Compress,AddTimeStamp -Action NullClear
+
+Filter files ending with '.log' and older 10days in C:\TEST recuresively.
+Create new files compressed and added time stamp to file name from files filtered.
+New files place in the same folder.
+The filtered files dose not be deleted, but are null cleared.
+
 C:\TEST以下のファイルを再帰的に 「.logで終わる」ものへファイル名に日付を付加して圧縮します。
 元ファイルは残りますが、内容消去（ヌルクリア）します。
 
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -PreAction Compress,MoveNewFile -Action Delete -MoveToFolder C:\TEST1 -OverRide -Days 10
+
+Filter files ending with '.log' and older 10days in C:\TEST recuresively.
+Create new files compressed and move to C:\TEST1
+If same name file exists in the destination, override.
+The original files are deleted. 
 
 C:\TEST以下のファイルを再帰的に 「.logで終わる」かつ10日以前のものを圧縮後C:\TEST1へ移動します。
 移動先に同一名称のものがあった場合は上書きします。
