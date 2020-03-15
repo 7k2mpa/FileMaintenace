@@ -3,6 +3,12 @@
 
 <#
 .SYNOPSIS
+This script processes log files to delete, move, archive, etc.... with multi functions.
+CommonFunctions.ps1 is required.
+You can process log files in multiple folders with Wrapper.ps1
+<Common Parameters> is not supported.
+
+
 ログファイル圧縮、削除を始めとした色々な処理をする万能ツールです。
 実行にはCommonFunctions.ps1が必要です。
 セットで開発しているWrapper.ps1と併用すると複数処理を一括実行できます。
@@ -10,6 +16,10 @@
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
+This script filters files and folders with multiple criterias.
+Process the files and filders filtered.
+
+
 対象のフォルダに含まれる、ファイル、フォルダを各種条件でフィルタして選択します。
 フィルタ結果をパラメータに基づき、前処理、主処理、後処理します。
 

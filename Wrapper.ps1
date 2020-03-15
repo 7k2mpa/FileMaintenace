@@ -2,6 +2,12 @@
 
 <#
 .SYNOPSIS
+
+This script loads a configuration file including arguments, execute the other script with arguments in every lines.
+CommonFunctions.ps1 is required.
+You can process log files in multiple folders with FileMaintenance.ps1
+<Common Parameters> is not supported.
+
 指定したプログラムを設定ファイルに書かれたパラメータを読み込んで、順次呼び出すプログラムです。
 実行にはCommonFunctions.ps1が必要です。
 セットで開発しているFileMaintenance.ps1と併用すると複数のログ処理を一括実行できます。
@@ -9,6 +15,14 @@
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
+
+This script loads a configuration file including arguments, execute the other script with arguments in every lines.
+The configuration file can be set arbitrarily.
+A line starting with # in the configuration file, it is proccessed as a comment.
+An empty line in the configuration file, it is sikkiped.
+
+Output log to Windows Event Log or Console or Text Log and specify to supress or to output individually. 
+
 設定ファイルから1行づつパラメータを読み込み、指定したプログラムに順次実行させます。
 
 設定ファイルは任意に設定可能です。
@@ -17,7 +31,15 @@
 
 ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
 
+Sample Configuration file. 
+Save the file as DailyMaintenance.txt, execute with option '-CommandPath [TargetScript.ps1] -CommandFile .\DailyMaintenance.txt'
+---
+#delete files older than 14days and end with .log.
+-TargetFolder D:\IIS\LOG -RegularExpression '^.*\.log$' -Action Delete -Days 14
 
+#move access log older 7days to Old_Log
+-TargetFolder D:\AccessLog -MoveToFolder .\Old_Log -Days 7
+---
 
 設定ファイル例です。例えば以下をDailyMaintenance.txtに保存して-CommandFile .\DailyMaintenance.txtと指定して下さい。
 
@@ -34,7 +56,8 @@
 .EXAMPLE
 
 Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt
-　このプログラムと同一フォルダに存在するFileMaintenance.ps1を起動します。
+
+このプログラムと同一フォルダに存在するFileMaintenance.ps1を起動します。
 起動する際に渡すパラメータは設定ファイルComman.txtを1行づつ読み込み、順次実行します。
 
 
@@ -352,7 +375,7 @@ For ( $i = 0 ; $i -lt $lines.Count; $i++ ) {
                     }
 
                 catch [Exception] {
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Faild to execute [$($CommandPath)] and force to exit."
+                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute [$($CommandPath)] and force to exit."
                     $errorDetail = $ERROR[0] | Out-String
                     Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
                     Finalize $ErrorReturnCode
@@ -371,7 +394,7 @@ For ( $i = 0 ; $i -lt $lines.Count; $i++ ) {
                             Logging -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred at line [$($i+1)/$($Lines.Count)] in -CommandFile [$($CommandFile)]"
        
                             IF ($Continue) {
-                                Logging -EventID $WarningEventID -EventType Warning -EventMessage "Will execute next line, because option -Continue[$($Continue)] is used."   
+                                Logging -EventID $WarningEventID -EventType Warning -EventMessage "Specified -Continue[$($Continue)] option, thus execute next line."   
                                 Break     
      
                                 }else{
