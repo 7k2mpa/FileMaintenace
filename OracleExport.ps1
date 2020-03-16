@@ -3,16 +3,23 @@
 
 <#
 .SYNOPSIS
+
+This script export Oracle data with Data Pump.
+CommonFunctions.ps1 is required.
+
+<Common Parameters> is not supported.
+
 Oracle DatabaseからDatapumpを使用してexportを実行します。
 
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
+This script export Oracle data with Data Pump.
 
 Oracle DatabaseからDatapumpを使用してexportを実行します。
 
 
-配置例
+Sample path setting
 
 .\OracleExport.ps1
 .\CommonFunctions.ps1
@@ -23,41 +30,77 @@ Oracle DatabaseからDatapumpを使用してexportを実行します。
 .EXAMPLE
 
 .\OracleExport.ps1 -Schema MCFRAME -DumpDirectoryObject MCFDATA_PUMP_DIR 
+Export data of Schema MCFRAME with Oracle Data Pump.
+Specify export destination path with Oracle Directory Object named MCDATA_PUMP_DIR 
+
 
 Oracle Datapumpを用いて、スキーマ名MCFRAMEのデータをexportします。
 出力先ディレクトリはOracle Directory Object名MCDATA_PUMP_DIRに指定したものとします。
 
 
 
+.PARAMETER OracleSID
+Specify Oracle_SID for deleting RMAN log.
+Should set '$Env:ORACLE_SID' by default.
+
+RMAN Logを削除する対象のOracleSIDを指定します。
+
+
 .PARAMETER OracleService
-制御するORACLEのサービス名（通常はOracleServiceにSIDを付加したもの）を指定します。
-通常は環境変数ORACLE_SIDで良いですが、未設定の環境では個別に指定が必要です。
+This parameter is planed to obsolute.
+
+RMAN Logを削除する対象のOracleSIDを指定します。
+このパラメータは廃止予定です。
+
 
 .PARAMETER OracleHomeBinPath
-Oracleの各種BINが格納されているフォルダパスを指定します。
-通常は環境変数ORACLE_HOME\BINで良いですが、未設定の環境では個別に指定が必要です。
+Specify Oracle 'BIN' path in the child path Oracle home. 
+Should set "$Env:ORACLE_HOME +'\BIN'" by default.
+
+Oracle Home配下のBINフォルダまでのパスを指定します。
+通常は標準設定である$Env:ORACLE_HOME +'\BIN'（Powershellでの表記）で良いのですが、OSで環境変数%ORACLE_HOME%が未設定環境では当該を設定してください。
+
+
 .PARAMETER SQLLogPath
+Specify path of SQL log file.
+If the file dose not exist, create a new file.
+Can specify relative or absolute path format.
+
 実行するSQL文群のログ出力先を指定します。
 指定は必須です。
 
 .PARAMETER Schema
+Specify shcema to export.
+
 Datapump出力対象のスキーマを指定します。
 
 
+.PARAMETER PasswordAuthorization
+Specify authentification with password authorization.
+Should use OS authentification.
+
+パスワード認証を指定します。
+OS認証が使えない時に使用する事を推奨します。
+
 .PARAMETER ExecUser
-Oracleユーザ認証時のユーザ名を指定します。
-OS認証使えない時に使用する事を推奨します。
+Specify Oracle User to connect. 
+Should use OS authentification.
+
+パスワード認証時のユーザを設定します。
+OS認証が使えない時に使用する事を推奨します。
 
 .PARAMETER ExecUserPassword
-Oracleユーザ認証時のパスワードを指定します。
+Specify Oracle user Password to connect. 
+Should use OS authentification.
+
+パスワード認証時のユーザパスワードを設定します。
 OS認証が使えない時に使用する事を推奨します。
 
-.PARAMETER PasswordAuthorization
-Oracleへユーザ/パスワード認証でログオンする事を指定します。
-OS認証が使えない時に使用する事を推奨します。
 
 
 .PARAMETER DumpDirectoryObject
+Specify Oracle Directory Object for exporting.
+
 Datapumpを出力するOracleに設定したDirectory Objectを指定します。
 
 
@@ -166,8 +209,9 @@ Param(
 
 [String]$ExecUser = 'foo',
 [String]$ExecUserPassword = 'hogehoge',
-[String]$OracleService = $Env:ORACLE_SID,
-#[parameter(mandatory=$true , HelpMessage = 'Oracle Service(ex. MCDB) 全てのHelpはGet-Help FileMaintenance.ps1')][String]$OracleService ,
+
+[String]$OracleSID = $Env:ORACLE_SID ,
+[String]$OracleService ,
 
 #[parameter(mandatory=$true)][String]$Schema  ,
 [String]$Schema = 'MCFRAME' ,
@@ -251,6 +295,12 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
+#For Backward compatibility
+
+    IF ( (-not($OracleSID)) -and ($OracleService))  {
+            $OracleSID = $OracleSerivce
+            } 
+
 
 #パラメータの確認
 
@@ -265,17 +315,17 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #対象のOracleがサービス起動しているか確認
 
-    $targetOracleService = "OracleService"+$OracleService
+    $targetWindowsOracleService = "OracleSerivce"+$OracleSID
 
-    $serviceStatus = CheckServiceStatus -ServiceName $targetOracleService -Health Running
+    IF (-not(CheckServiceStatus -ServiceName $targetWindowsOracleService -Health Running)) {
 
-    IF (-not($serviceStatus)) {
-
-        Logging -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetOracleService)] is not running."
+        Logging -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
         Finalize $ErrorReturnCode
         }else{
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetOracleService)] is running."
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is running."
         }
+     
+
      
 
 #処理開始メッセージ出力
@@ -318,11 +368,11 @@ $DatumPath = $PSScriptRoot
 
     IF ($PasswordAuthorization) {
 
-        $execCommand = $ExecUser+"/"+$ExecUserPassword+"@"+$OracleService+" Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y"
+        $execCommand = $ExecUser+"/"+$ExecUserPassword+"@"+$OracleSID+" Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y"
     
         }else{
 
-        $execCommand = "`' /@"+$OracleService+" as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
+        $execCommand = "`' /@"+$OracleSID+" as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
         }
 
 
