@@ -57,6 +57,9 @@ Save the file as DailyMaintenance.txt, execute with option '-CommandPath [Target
 
 Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt
 
+Execute .\FileMaintenance.ps1 in the same folder.
+Load the parameter file .\Command.txt and execute .\FileMaintenance with arguments in the parameter file every lines.
+
 このプログラムと同一フォルダに存在するFileMaintenance.ps1を起動します。
 起動する際に渡すパラメータは設定ファイルComman.txtを1行づつ読み込み、順次実行します。
 
@@ -64,6 +67,11 @@ Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt
 .EXAMPLE
 
 Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt -Continue
+
+Execute .\FileMaintenance.ps1 in the same folder.
+Load the parameter file .\Command.txt and execute .\FileMaintenance with arguments in the parameter file every lines.
+If ERROR termination occur in the line, do not terminate Wrapper.ps1 and execute FileMaintenance.ps1 with argument in the next line.
+
 　このプログラムと同一フォルダに存在するFileMaintenance.ps1を起動します。
 起動する際に渡すパラメータは設定ファイルComman.txtを1行づつ読み込み、順次実行します。
 もし、FileMaintenance.ps1を実行した結果が異常終了となった場合は、Wrapper.ps1を異常終了させず、Command.txtの次行を読み込み継続処理をします。
@@ -307,7 +315,7 @@ Param(
         Logging -EventID $InfoEventID -EventType Information -EventMessage "Execution Results NORMAL[$($NormalCount)], WARNING[$($WarningCount)], ERROR[$($ErrorCount)]"
 
         If (($Continue) -and ($ErrorCount -gt 0)){
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "An ERROR termination occurred, but did not terminate as ERROR and execute command of the next lines  because option -Continue[${Continue}] is used."
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "An ERROR termination occurred. Specified -Continue[${Continue}] option, thus will terminate as ERROR and had executed command of the next lines."
             }
 
 
