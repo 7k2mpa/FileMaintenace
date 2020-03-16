@@ -4,9 +4,9 @@
 
 <#
 .SYNOPSIS
-This script processes log files to delete, move, archive, etc.... with multi functions.
+This script processes log files or temp files to delete, move, archive, etc.... with multiple methods.
 CommonFunctions.ps1 is required.
-You can process log files in multiple folders with Wrapper.ps1
+You can process files in multiple folders with Wrapper.ps1
 <Common Parameters> is not supported.
 
 
@@ -20,11 +20,11 @@ You can process log files in multiple folders with Wrapper.ps1
 This script filters files and folders with multiple criterias.
 And process the files and folders filtered in multiple methods as PreAction, Action and PostAction.
 
-Methods are for filtered objects.
+Methods are
 
 -PreAction:
-Create new files from filtered files. Methods [Add time stamp to file name][Compress][Archive to 1file][Move the file created to new location] are possible and can be used together.
-Without specification -MoveNewFile option, place the file created in the same folder the original file.
+Create new files from filtered files. Methods [Add time stamp to file name][Compress][Archive to 1file][Move the file created to new location] are offered and can be used together.
+Without specification -MoveNewFile option, place the file created in the same folder of the original file.
 
 -Action:
 Process files filtered to [Move][Copy][Delete][NullClear][KeepFilesCount] , folders filtered to [DeleteEmptyFolders]
@@ -33,16 +33,16 @@ Process files filtered to [Move][Copy][Delete][NullClear][KeepFilesCount] , fold
 Process files filtered to [NullClear][Rename]
 
 
-Filtering functions include [(Older than)-Days][-Size][-RegularExpression][-Parent(Path)RegularExpression]
+Filtering criteria are [(Older than)-Days][-Size][-RegularExpression][-Parent(Path)RegularExpression]
 
-This script processes 1 folder at once.
+This script processes only 1 folder at once.
 If you process multiple folders, can do with Wrapper.ps1
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
 This scrpit requires Powershell 5.0 or later basically.
 
-If the script run on Windows Server 2008, 2008R2, 2012 and 2012R2 install WMF(Windows Management Framework)5.0.
+If the script run on Windows Server 2008, 2008R2, 2012 and 2012R2, install WMF(Windows Management Framework)5.0.
 If you do not use '-PreAction compress or archive', install WMF 3.0 and place '#Requires -Version 3.0' insted of '#Requires -Version 5.0' at top of the script.
 If you use '-PreAction compress or archive' with 7z, install WMF 3.0 and place '#Requires -Version 3.0' insted of '#Requires -Version 5.0' at top of the script.
 
@@ -138,7 +138,7 @@ FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -PreActi
 
 Filter files ending with '.log' and older 10days in C:\TEST recuresively.
 Create new files compressed and move to C:\TEST1
-If same name file exists in the destination, override.
+If same name file exists in the destination, override old one.
 The original files are deleted. 
 
 C:\TEST以下のファイルを再帰的に 「.logで終わる」かつ10日以前のものを圧縮後C:\TEST1へ移動します。
@@ -149,6 +149,19 @@ C:\TEST以下のファイルを再帰的に 「.logで終わる」かつ10日以前のものを圧縮後C:\TES
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\OLD\Log -RegularExpression '^.*\.log$' -Action Delete -ParentRegularExpression '\\OLD\\'
+
+Filter files ending with '.log' recuresively.
+-ParentRegularExpresssion opttion is specified with regular expression, thus path's backslash\ is escaped with backslash\
+Delete them with '\OLD\' in the rest of the path characters next to the -TargetFolder(C:\OLD\Log).
+At the sample blow, 'C:\OLD\Los' is not for -ParentRegularExpression matching.
+Thus 'C:\OLD\Log\IIS\Current\Infra.log' , 'C:\OLD\Log\Java\Current\Infra.log' and 'C:\OLD\Log\Infra.log' are not deleted.
+
+C:\OLD\Log\IIS\Current\Infra.log
+C:\OLD\Log\IIS\OLD\Infra.log
+C:\OLD\Log\Java\Current\Infra.log
+C:\OLD\Log\Java\OLD\Infra.log
+C:\OLD\Log\Infra.log
+
 
 C:\OLD\Log以下のファイルで再帰的に「.logで終わる」ものを削除します。
 但し、ファイルのフルパスからC:\OLD\Logを削除したパスに「\OLD\」が含まれるファイルだけが対象になります。正規表現のため、パスに含まれる\（バックスラッシュ）が\（バックスラッシュ）でエスケープされています。
@@ -433,7 +446,8 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[parameter(position=0, mandatory=$TRUE , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$TargetFolder,
+[parameter(position=0, mandatory=$TRUE , HelpMessage = 'Specify the folder to process (ex. D:\Logs)  or Get-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$TargetFolder,
+#[parameter(position=0, mandatory=$TRUE , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$TargetFolder,
 
 #[parameter(position=0, mandatory=$TRUE , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String]$TargetFolder,  #Validation debug用に用意してあります。通常は使わない
 #[parameter(position=0, mandatory=$TRUE , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
@@ -478,12 +492,12 @@ Param(
 
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss',
 
-#以下スイッチ群は廃止予定
+#Switches planned to obsolute please use -PreAction start
 [Switch]$Compress,
 [Switch]$AddTimeStamp,
 [Switch]$MoveNewFile,
 [Switch]$NullOriginalFile,
-#以上スイッチ群は廃止予定
+#Switches planned to obsolute please use -PreAction end
 
 
 [Boolean]$Log2EventLog = $TRUE,
