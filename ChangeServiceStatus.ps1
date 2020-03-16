@@ -3,6 +3,12 @@
 
 <#
 .SYNOPSIS
+This scipt start or stop Windows Service specified.
+CommonFunctions.ps1 is required.
+You can process multiple Windows services with Wrapper.ps1
+<Common Parameters> is not supported.
+
+
 指定したサービスを起動,停止するプログラムです。
 実行にはCommonFunctions.ps1が必要です。
 セットで開発しているFileMaintenance.ps1と併用すると複数のサービスを一括起動,停止できます。
@@ -10,6 +16,11 @@
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
+This scipt start or stop Windows Service specified.
+If start(stop) Windows serivce already started(stopped), will temrminate as WARNING.
+
+Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
+
 
 指定したサービスを起動,停止するプログラムです。
 (停止|起動)済サービスを(停止|起動)指定すると警告終了します。
@@ -19,6 +30,11 @@
 
 .EXAMPLE
 ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Stopped -RetrySpanSec 5 -RetryTimes 5
+
+Stop Windows serivice(Service Name:Spooler, Print Spooler)
+If it dose not stop immediately, retry 5times every 5seconds.
+
+If the service is stoped already, terminate as WARNING.
 
 サービス名:Spooler（表示名はPrint Spooler）を停止します。
 直ぐに停止しない場合は、5秒間隔で最大5回試行します。
@@ -30,6 +46,12 @@ ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Stopped -RetrySpanSec 5 -
 .EXAMPLE
 ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Running -RetrySpanSec 5 -RetryTimes 5 -WarningAsNormal
 
+Start Windows serivice(Service Name:Spooler, Print Spooler)
+If it dose not start immediately, retry 5times every 5seconds.
+
+Specified -WarningAsNormal option and, if the service is started already, terminate as NORMAL.
+
+
 サービス名:Spooler（表示名はPrint Spooler）を起動します。
 直ぐに起動しない場合は、5秒間隔で最大5回試行します。
 
@@ -38,22 +60,41 @@ ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Running -RetrySpanSec 5 -
 
 
 .PARAMETER Service
+Specify Windows 'Service name'.  'Service name' is diffent 'Display name'.
+Sample
+Serivce Name:Spooker
+Display Name:Print Spooler
+ 
+Specification is required.
+
 　(停止|起動)するサービス名を指定します。
 「サービス名」と（サービスの）「表示名」は異なりますので留意して下さい。
 例えば「表示名:Print Spooler」は「サービス名:Spooler」となっています。
 指定必須です。
 
 .PARAMETER TargetStatus
+Specify target status (Stopped|Running) of the service.
+Specification is required.
+
 遷移するサービス状態を指定します。
 (Stopped|Running)どちらかを指定して下さい。
 指定必須です。
 
 .PARAMETER RetrySpanSec
+Specify interval to check service status.
+Some services require long time to translate serivce status, specify appropriate value.
+Default is 3seconds.
+
+
 　サービス停止再確認の間隔秒数を指定します。
 サービスによっては数秒必要なものもあるので適切な秒数に設定して下さい。
 デフォルトは3秒です。
 
 .PARAMETER RetryTimes
+Specify times to check service status.
+Some services require long time to translate serivce status, specify appropriate value.
+Default is 5times.
+
 　サービス停止再確認の回数を指定します。
 サービスによっては数秒必要なものもあるので適切な回数に設定して下さい。
 デフォルトは5回です。
@@ -325,7 +366,7 @@ $Version = '20200207_1615'
 #https://devblogs.microsoft.com/scripting/hey-scripting-guy-how-can-i-use-windows-powershell-to-stop-services/
 
 
-For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ){
+For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
 
       # サービス存在確認
       IF (-not(CheckServiceExist $Service)) {
@@ -338,7 +379,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ){
  
         'Stopped' {
             IF ($WMIService.AcceptStop) {
-                $Return = $WMIService.stopService()
+                $return = $WMIService.stopService()
                 }else{
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] will not accept a stop request. Wait for $($RetrySpanSec) seconds."
                 Start-Sleep $RetrySpanSec
@@ -351,7 +392,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ){
             #https://docs.microsoft.com/ja-jp/windows/win32/cimwin32prov/win32-service
             #No AcceptStart Class
 
-            $Return = $WMIService.startService()
+            $return = $WMIService.startService()
             }
 
         Default {
@@ -362,9 +403,9 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ){
 
 
 
-     Switch ($Return.returnvalue) {
+     Switch ($return.returnvalue) {
         
-                0 {
+            0 {
                 $serviceStatus = CheckServiceStatus -ServiceName $Service -Health $TargetStatus -Span $RetrySpanSec -UpTo $RetryTimes
 
                 IF ($serviceStatus) {
@@ -376,20 +417,20 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ){
                 }
 
 
-                2 {
+            2 {
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] reports access denied."
                 }
 
-                5 { 
+            5 { 
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] can not accept control at this time."
                 } 
             
-                10 {
+            10 {
                 Logging -EventID $WarningEventID -EventType Warning -EventMessage "Service [$($Service)] is already [$($TargetStatus)]"
                 Finalize $WarningErrorCode
                 }
               
-                DEFAULT {
+            DEFAULT {
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] reports ERROR $($Return.returnValue)"
                 } 
       }  
