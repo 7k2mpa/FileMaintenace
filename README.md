@@ -13,16 +13,16 @@ A set of useful utility scripts written in Powershell for Microsoft Windows Plat
 
 ### FileMaintenance.ps1
 
-Manage log and temp files with various method including delete , copy , move , compress , archive , rename , nullclear , add time stamp to filename , delete old generation and delete empty folders.
-You can select files and folders with file size , number of days elapsed , regular expression , path regular expression.
+Manage log and temp files with various methods including delete , copy , move , compress , archive , rename , nullclear , add time stamp to filename , delete old generation and delete empty folders.
+You can select files and folders with various creiteria such as file size , number of days elapsed , regular expression , path regular expression.
 
-At onece you can manage one folder. With Wrapper.ps1 you can manage multi folders.
+At once manage only one folder. With Wrapper.ps1 you can manage multiple folders.
 
 
 ### StopService.ps1 / StartService.ps1 / ChangeServiceStatus.ps1
 
 Start and stop Windows service.
-These scripts are same. Difference of them is only one line at the parameter section.
+These scripts have same code. Difference of them is only one line at the parameter section.
 
 ### ChangeIISstate.ps1
 
