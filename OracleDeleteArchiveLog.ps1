@@ -373,7 +373,7 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #対象のOracleがサービス起動しているか確認
 
-    $targetWindowsOracleService = "OracleSerivce"+$OracleSID
+    $targetWindowsOracleService = "OracleService"+$OracleSID
 
     IF (-not(CheckServiceStatus -ServiceName $targetWindowsOracleService -Health Running)) {
 
