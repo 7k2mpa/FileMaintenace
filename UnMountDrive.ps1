@@ -2,13 +2,21 @@
 
 <#
 .SYNOPSIS
-ネットワークドライブをアンマウントするプログラムです。
+This script unmount a network drive.
+CommonFunctions.ps1 is required.
+You can unmount multiple network drives with Wrapper.ps1
+<Common Parameters> is not supported.
+
+マウント済ネットワークドライブをアンマウントするプログラムです。
 実行にはCommonFunctions.ps1が必要です。
-セットで開発しているWrapper.ps1と併用すると複数のサービスを一括起動できます。
+セットで開発しているWrapper.ps1と併用すると複数のドライブを処理できます。
 
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
+
+This script unmount Network drive.
+Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
 マウント済ネットワークドライブをアンマウントするプログラムです。
 
@@ -16,7 +24,9 @@
 
 
 .EXAMPLE
-StopService.ps1 -MountedDrive F:
+UnMountDrive.ps1 -MountedDrive F:
+
+UnMount SMB share mapped as Drive F:
 
 マウント済ネットワークドライブのF:をアンマウントします。
 
@@ -24,6 +34,8 @@ StopService.ps1 -MountedDrive F:
 
 
 .PARAMETER MountedDrive
+Specify drive letter mapped.
+Specification is required.
 
 アンマウント対象のマウント済ドライブのF:を指定します。
 指定必須です。
@@ -130,7 +142,8 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[parameter(position=0, mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help UnMountDrive.ps1')][String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
+[parameter(position=0, mandatory=$true , HelpMessage = 'Specify Drive Letter (ex. F:) or Get-Help UnMountDrive.ps1')][String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
+#[parameter(position=0, mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help UnMountDrive.ps1')][String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
 #[String][ValidatePattern('^[d-z]:$')]$MountedDrive="F:",
 
 

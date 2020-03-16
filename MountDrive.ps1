@@ -2,13 +2,21 @@
 
 <#
 .SYNOPSIS
+This script mount a network drive.
+CommonFunctions.ps1 is required.
+You can mount multiple network drives with Wrapper.ps1
+<Common Parameters> is not supported.
+
 ネットワークドライブをマウントするプログラムです。
 実行にはCommonFunctions.ps1が必要です。
-セットで開発しているWrapper.ps1と併用すると複数のサービスを一括起動できます。
+セットで開発しているWrapper.ps1と併用すると複数のドライブを処理できます。
 
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
+
+This script mount Network drive.
+Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
 ネットワークドライブをマウントするプログラムです。
 
@@ -16,16 +24,26 @@
 
 
 .EXAMPLE
-StopService.ps1 -MountedDrive F:
+MountDrive.ps1 -UNCPath \\FileServer\share -MountDrive F:
 
-マウント済ドライブのF:をアンマウントします。
+Mount UNC path \\FileServer\share SMB share and map to Drive F:
+
+\\FileServer\shareをドライブのF:としてマウントします。
 
 
 .PARAMETER TargetPath
+
+Specify UNC Path for mount.
+Specification is required.
+
 マウント対象ネットワークドライブのUNCパスを指定します。
 指定必須です。
 
 .PARAMETER MountedDrive
+
+Specify drive letter for mapping.
+Specification is required.
+
 マウント先のドライブレター指定します。
 指定必須です。
 
@@ -132,8 +150,11 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[parameter(position=0, mandatory=$true , HelpMessage = 'UNC Pathを指定(ex. \\FileServer\Share) 全てのHelpはGet-Help MountDrive.ps1')][String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,                                                                          
-[parameter(position=1, mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help MountDrive.ps1')][String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive,
+[parameter(position=0, mandatory=$true , HelpMessage = 'Specify UNC Path to mount (ex. \\FileServer\Share) or Get-Help MountDrive.ps1')][String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,    
+[parameter(position=1, mandatory=$true , HelpMessage = 'Specify Drive Letter (ex. F:)  or Get-Help MountDrive.ps1')][String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive,
+
+#[parameter(position=0, mandatory=$true , HelpMessage = 'UNC Pathを指定(ex. \\FileServer\Share) 全てのHelpはGet-Help MountDrive.ps1')][String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,                                                                          
+#[parameter(position=1, mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help MountDrive.ps1')][String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive,
 
 #[String][validatePattern("^\\\\\w+\\\w+")]$TargetPath="\\hogehost\hogehoge",                                                                          
 #[String][ValidatePattern("^[d-z]:$")]$MountDrive= 'F:',
@@ -150,7 +171,7 @@ Param(
 [Switch]$NoLog2File,
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath ,
 [String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default for ShiftJIS
 
 [int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
 [int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
