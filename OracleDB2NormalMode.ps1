@@ -2,11 +2,22 @@
 
 <#
 .SYNOPSIS
-Oracle Databaseをバックアップ前にバックアップモードへ切替するスクリプトです。
+This script siwtch to Normal mode(Ending Backup Mode) Oracle Database after finishing backup software.
+CommonFunctions.ps1 is required.
+
+<Common Parameters> is not supported.
+
+
+Oracle Databaseをバックアップ後に通常モードへ切替するスクリプトです。
 
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
+This script siwtch to Normal mode(Ending Backup Mode) Oracle Database after finishing backup software.
+The script loads SQLs.ps1, place SQLs.ps1 previously.
+OracleDB2BackUpMode.ps1 is offered also, you may use it with this script.
+If Windows Oracle service or Listener service, start them automatically.
+
 Oracle Databaseをバックアップするには、予めデータベースの停止、またはバックアップモードへ切替が必要です。
 従来はデータベースの停止(Shutdown Immediate)で実装する例が大半ですが、停止はセッションが存在すると停止しない等で障害となる例もあります。
 そのため本スクリプトはOracle Databaseを停止するのではなく、表領域をバックアップモードへ切替してバックアップを開始する運用を前提として作成しています。
@@ -15,7 +26,7 @@ Oracle Databaseをバックアップするには、予めデータベースの�
 対になるバックアップモードから通常モードへ切替するスクリプトを用意しておりますので、セットで運用してください。
 
 
-配置例
+Sample Path setting
 
 .\OracleDB2NormalMode.ps1
 .\OracleDB2BackUpMode.ps1
@@ -29,73 +40,109 @@ Oracle Databaseをバックアップするには、予めデータベースの�
 
 .EXAMPLE
 
-.\OracleDB2BackUpMode -OracleSerivce MCDB -BackUpFlagPath ..\Flag\BackUp.FLG
+.\OracleDB2NormalMode
 
-Windowsサービス名OracleServiceMCDB、インスタンス名MCDBのOracle Databaseの全ての表領域をバックアップモードへ切替します。
+Switch all tables of Oracle SID specified at Windows enviroment variable to Normal Mode.
+Authentification to connecting to Oracle is used OS authentification with OS user running the script.
+If Windows Oracle service or Listener service, start them automatically.
+
+Windows環境変数Oracle_SIDに設定された全ての表領域を通常モードへ切替します。
 Oracle Databaseの認証はOS認証を用います。このスクリプトが実行されるOSユーザで認証します。
-バックアップ中フラグ..\Flag\BackUp.FLGの存在を確認し、存在した場合はバックアップ中と判定して異常終了します。
-切替後にListenerを停止します。
+Oracleサービス、Listenerが停止していた場合は起動します。
 
-.\OracleDB2BackUpMode -OracleSerivce MCDB -BackUpFlagPath ..\Flag\BackUp.FLG -NoStopListener -ExecUser BackUpUser -ExecUserPassword FOOBAR -PasswordAuthorization
 
-Windowsサービス名OracleServiceMCDB、インスタンス名MCDBのOracle Databaseの全ての表領域をバックアップモードへ切替します。
-OracleDatabaseの認証はパスワード認証を用いています。ユーザID BackUpUpser、パスワード FOOBARでログイン認証します。
-バックアップ中フラグ..\Flag\BackUp.FLGの存在を確認し、存在した場合はバックアップ中と判定して異常終了します。
-切替後にListenerは停止しません。
+.\OracleDBNormalMode -OracleSID MCDB -ExecUser FOO -ExecUserPassword BAR -PasswordAuthorization
 
+Switch all tables of Oracle SID MCDB to Normal Mode.
+Authentification to connecting to Oracle is used password authentification.
+Oracle user is used 'FOO', Oracle user password is used 'BAR'
+If Windows Oracle service or Listener service, start them automatically.
+
+
+Oracle SID MCDBのOracle Databaseの全ての表領域を通常モードへ切替します。
+OracleDatabaseの認証はパスワード認証を用いています。ユーザID FOO、パスワード BARでログイン認証します。
+
+
+
+.PARAMETER OracleSID
+Specify Oracle_SID.
+Should set '$Env:ORACLE_SID' by default.
+
+対象のOracleSIDを指定します。
 
 
 .PARAMETER OracleService
-制御するORACLEのサービス名（通常はOracleServiceにSIDを付加したもの）を指定します。
-通常は環境変数ORACLE_SIDで良いですが、未設定の環境では個別に指定が必要です。
+This parameter is planed to obsolute.
+
+RMAN Logを削除する対象のOracleSIDを指定します。
+このパラメータは廃止予定です。
+
 
 .PARAMETER OracleHomeBinPath
-Oracleの各種BINが格納されているフォルダパスを指定します。
-通常は環境変数ORACLE_HOME\BINで良いですが、未設定の環境では個別に指定が必要です。
-.PARAMETER SQLLogPath
-実行するSQL文群のログ出力先を指定します。
-指定は必須です。
+Specify Oracle 'BIN' path in the child path Oracle home. 
+Should set "$Env:ORACLE_HOME +'\BIN'" by default.
 
+Oracle Home配下のBINフォルダまでのパスを指定します。
+通常は標準設定である$Env:ORACLE_HOME +'\BIN'（Powershellでの表記）で良いのですが、OSで環境変数%ORACLE_HOME%が未設定環境では当該を設定してください。
 
-.PARAMETER SQLCommandsPath
-予め用意した、実行するSQL文群を記述したps1ファイルのパスを指定します。
+.PARAMETER StartServicePath
+Specify path of StartService.ps1
+Specification is required.
+Can specify relative or absolute path format.
+
+StartService.ps1のパスを指定します。
 指定は必須です。
 相対、絶対パスで指定可能です。
 
-.PARAMETER BackUpFlagPath
-バックアップ中を示すフラグファイルのパスを指定します。
+.PARAMETER SQLLogPath
+Specify path of SQL log file.
+If the file dose not exist, create a new file.
+Can specify relative or absolute path format.
+                                                                                        
+.PARAMETER SQLCommandsPath
+Specify path of SQLs.ps1
+Specification is required.
+Can specify relative or absolute path format.
+
+予め用意した、実行するSQL文群を記述したps1ファイルのパスを指定します。
 指定は必須です。
 相対、絶対パスで指定可能です。
 
 
 .PARAMETER ControlFileDotCtlPATH
+Specify to export controle file path ending with .ctl
+Specification is required.
+Can specify relative or absolute path format.
+
 .CTL形式のコントロールファイルを出力するパスを指定します。
 
 .PARAMETER ControlFileDotBkPATH
+Specify to export controle file path ending with .bk
+Specification is required.
+Can specify relative or absolute path format.
+
 .BK形式のコントロールファイルを出力するパスを指定します。
 
+.PARAMETER PasswordAuthorization
+Specify authentification with password authorization.
+Should use OS authentification.
+
+パスワード認証を指定します。
+OS認証が使えない時に使用する事を推奨します。
+
 .PARAMETER ExecUser
-Oracleユーザ認証時のユーザ名を指定します。
-OS認証使えない時に使用する事を推奨します。
+Specify Oracle User to connect. 
+Should use OS authentification.
+
+パスワード認証時のユーザを設定します。
+OS認証が使えない時に使用する事を推奨します。
 
 .PARAMETER ExecUserPassword
-Oracleユーザ認証時のパスワードを指定します。
+Specify Oracle user Password to connect. 
+Should use OS authentification.
+
+パスワード認証時のユーザパスワードを設定します。
 OS認証が使えない時に使用する事を推奨します。
-
-.PARAMETER PasswordAuthorization
-Oracleへユーザ/パスワード認証でログオンする事を指定します。
-OS認証が使えない時に使用する事を推奨します。
-
-
-.PARAMETER NoChangeToBackUpMode
-バックアップモードへの切替不要を指定します。
-バックアップソフトウエアによっては、バックアップソフトウエアがOracleをバックアップモードへ切替します。
-その場合は当スイッチをOnにして下さい。
-
-.PARAMETER NoStopListener
-リスナー停止不要を指定します。
-業務断面が必要な場合、バックアップ前にリスナーを停止しますが、業務断面が不要or無停止とする場合は当スイッチをOnにして下さい。
-
 
 
 
@@ -104,7 +151,7 @@ OS認証が使えない時に使用する事を推奨します。
 デフォルトは$TRUEでEvent Log出力します。
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $Falseと等価です。
+　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
 Log2EventLogより優先します。
 
 .PARAMETER ProviderName
@@ -118,14 +165,14 @@ Log2EventLogより優先します。
 デフォルトは$TRUEでコンソール出力します。
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $Falseと等価です。
+　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
 Log2Consoleより優先します。
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$Falseでログファイル出力しません。
+　ログフィルへの出力を制御します。デフォルトは$FALSEでログファイル出力しません。
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $Falseと等価です。
+　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
 Log2Fileより優先します。
 
 .PARAMETER LogPath
@@ -207,7 +254,6 @@ Param(
 [String]$OracleService ,
 
 [String]$SQLLogPath = '.\SC_Logs\SQL.log',
-[String]$BackUpFlagPath = '.\Lock\BkUpDB.flg',
 
 [String][String]$SQLCommandsPath = '.\SQL\SQLs.ps1',
 
@@ -236,7 +282,7 @@ Param(
 
 [boolean]$Log2Console = $TRUE,
 [Switch]$NoLog2Console,
-[boolean]$Log2File = $False,
+[boolean]$Log2File = $FALSE,
 [Switch]$NoLog2File,
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath ,
 [String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
@@ -373,7 +419,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "To start to 
 function Finalize {
 
 Param(
-[parameter(mandatory=$true)][int]$ReturnCode
+[parameter(mandatory=$TRUE)][int]$ReturnCode
 )
 
 Pop-Location
@@ -385,9 +431,9 @@ EndingProcess $ReturnCode
 
 #####################   ここから本体  ######################
 
-[boolean]$ErrorFlag = $False
-[boolean]$WarningFlag = $False
-[boolean]$ContinueFlag = $False
+[boolean]$ErrorFlag = $FALSE
+[boolean]$WarningFlag = $FALSE
+[boolean]$ContinueFlag = $FALSE
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
@@ -424,27 +470,27 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
         'インスタンスがあります' {
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Listener is running."
-            $NeedToStartListener = $False
+            $needToStartListener = $FALSE
             }
 
         'リスナーがありません' {
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Listener is stopped."
-            $NeedToStartListener = $TRUE
+            $needToStartListener = $TRUE
             }   
 
         Default {
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "Listener status is unknown."
-            $NeedToStartListener = $TRUE
+            $needToStartListener = $TRUE
             }
      
      }
 
 
-    IF ($NeedToStartListener) {
+    IF ($needToStartListener) {
     
-        $ReturnMessage = LSNRCTL.exe START
+        $returnMessage = LSNRCTL.exe START
 
-        Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
+        Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
     
  
 
@@ -466,20 +512,20 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
         Logging -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is already running."
         
         }else{
-        $ServiceCommand = "$StartServicePath -Service $TargetOracleService -RetrySpanSec $RetrySpanSec -RetryTimes $RetryTimes"
+        $serviceCommand = "$StartServicePath -Service $TargetOracleService -RetrySpanSec $RetrySpanSec -RetryTimes $RetryTimes"
 
 
         Try {
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Start Windows Serive [$($targetWindowsOracleService)] with StartService.ps1"
-            Invoke-Expression $ServiceCommand        
-        }
+            Invoke-Expression $serviceCommand        
+            }
 
         catch [Exception] {
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to start script [$($StartServicePath)]"
             $errorDetail = $ERROR[0] | Out-String
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
             Finalize $ErrorReturnCode
-        }            
+            }            
             
         IF ($LASTEXITCODE -ne 0) {
                 Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to start Windows service [$($targetWindowsOracleService)]"
@@ -512,17 +558,17 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
         }else{
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle instance [SID $($OracleSID)] is not OPEN."        
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Switch to Oracle instance [SID $($OracleSID)] OPEN."
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Switch Oracle instance [SID $($OracleSID)] to OPEN."
 
 
             $execSQLReturnCode = . ExecSQL -SQLCommand $DBStart -SQLName 'Oracle DB Instance OPEN' -SQLLogPath $SQLLogPath
 
                 IF ($execSQLReturnCode) {
 
-                    Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to switch to Oracle instance OPEN."
+                    Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to switch Oracle instance to OPEN."
                 
                     }else{
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Failed to switch to Oracle instance OPEN."
+                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Failed to switch Oracle instance to OPEN."
                     $ErrorCount ++
                     }
             }
@@ -568,7 +614,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
             Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to switch to Normal Mode(Ending Backup Mode)"
 
             }else{        
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to switch to Change to Normal Mode(Ending Backup Mode)"
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to switch to Normal Mode(Ending Backup Mode)"
             $ErrorCount ++
             }
  }

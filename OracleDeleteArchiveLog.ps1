@@ -421,11 +421,11 @@ $Version = '20200313_1415'
 
     IF ($PasswordAuthorization) {
 
-        $rmanLog = RMAN target $ExecUser/$ExecUserPassword@$OracleSID CMDFILE "$ExecRMANPath" $Days
+        $rmanLog = RMAN.exe target $ExecUser/$ExecUserPassword@$OracleSID CMDFILE "$ExecRMANPath" $Days
         Write-Output $rmanLog | Out-File -FilePath $OracleRMANLogPath -Append  -Encoding $LogFileEncode
  
         }else{
-        $rmanLog = RMAN target / CMDFILE "$ExecRMANPath" $Days
+        $rmanLog = RMAN.exe target / CMDFILE "$ExecRMANPath" $Days
         Write-Output $rmanLog | Out-File -FilePath $OracleRMANLogPath -Append  -Encoding $LogFileEncode
         }
 
@@ -438,6 +438,8 @@ $Version = '20200313_1415'
         }
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Successfully completed to delete Oracle archive logs older than $($Days)days. !!REMIND they were deleted in Oracle RMAN records and you need to delete log files in the file system with OS's delete command!!"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Successfully completed to delete Oracle archive logs older than $($Days)days."
+Logging -EventID $InfoEventID -EventType Information -EventMessage "!!REMIND they were deleted in Oracle RMAN records and you need to delete log files in the file system with OS's delete command!!"
+ 
 
 Finalize $NormalReturnCode

@@ -2,6 +2,11 @@
 
 <#
 .SYNOPSIS
+This script siwtch to Back Up mode Oracle Database before starting backup software .
+CommonFunctions.ps1 is required.
+
+<Common Parameters> is not supported.
+
 Oracle Databaseをバックアップ前にバックアップモードへ切替するスクリプトです。
 
 <Common Parameters>はサポートしていません
@@ -44,18 +49,31 @@ OracleDatabaseの認証はパスワード認証を用いています。ユーザ
 切替後にListenerは停止しません。
 
 
+.PARAMETER OracleSID
+Specify Oracle_SID.
+Should set '$Env:ORACLE_SID' by default.
+
+対象のOracleSIDを指定します。
+
 
 .PARAMETER OracleService
-制御するORACLEのサービス名（通常はOracleServiceにSIDを付加したもの）を指定します。
-通常は環境変数ORACLE_SIDで良いですが、未設定の環境では個別に指定が必要です。
+This parameter is planed to obsolute.
+
+RMAN Logを削除する対象のOracleSIDを指定します。
+このパラメータは廃止予定です。
+
 
 .PARAMETER OracleHomeBinPath
-Oracleの各種BINが格納されているフォルダパスを指定します。
-通常は環境変数ORACLE_HOME\BINで良いですが、未設定の環境では個別に指定が必要です。
-.PARAMETER SQLLogPath
-実行するSQL文群のログ出力先を指定します。
-指定は必須です。
+Specify Oracle 'BIN' path in the child path Oracle home. 
+Should set "$Env:ORACLE_HOME +'\BIN'" by default.
 
+Oracle Home配下のBINフォルダまでのパスを指定します。
+通常は標準設定である$Env:ORACLE_HOME +'\BIN'（Powershellでの表記）で良いのですが、OSで環境変数%ORACLE_HOME%が未設定環境では当該を設定してください。
+
+.PARAMETER SQLLogPath
+Specify path of SQL log file.
+If the file dose not exist, create a new file.
+Can specify relative or absolute path format.
 
 .PARAMETER SQLCommandsPath
 予め用意した、実行するSQL文群を記述したps1ファイルのパスを指定します。
@@ -68,16 +86,25 @@ Oracleの各種BINが格納されているフォルダパスを指定します�
 相対、絶対パスで指定可能です。
 
 
-.PARAMETER ExecUser
-Oracleユーザ認証時のユーザ名を指定します。
-OS認証使えない時に使用する事を推奨します。
+.PARAMETER PasswordAuthorization
+Specify authentification with password authorization.
+Should use OS authentification.
 
-.PARAMETER ExecUserPassword
-Oracleユーザ認証時のパスワードを指定します。
+パスワード認証を指定します。
 OS認証が使えない時に使用する事を推奨します。
 
-.PARAMETER PasswordAuthorization
-Oracleへユーザ/パスワード認証でログオンする事を指定します。
+.PARAMETER ExecUser
+Specify Oracle User to connect. 
+Should use OS authentification.
+
+パスワード認証時のユーザを設定します。
+OS認証が使えない時に使用する事を推奨します。
+
+.PARAMETER ExecUserPassword
+Specify Oracle user Password to connect. 
+Should use OS authentification.
+
+パスワード認証時のユーザパスワードを設定します。
 OS認証が使えない時に使用する事を推奨します。
 
 
@@ -330,7 +357,7 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
         Catch [Exception] {
         Logging -EventType Error -EventID $ErrorEventID -EventMessage  "Fail to load SQLs in -SQLCommandsPath"
         Finalize $ErrorReturnCode
-    }
+        }
 
     Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to load SQLs Version $($SQLsVersion) in -SQLCommandsPath"
 

@@ -109,7 +109,7 @@ Datapumpを出力するOracleに設定したDirectory Objectを指定します。
 デフォルトは$TRUEでEvent Log出力します。
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $Falseと等価です。
+　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
 Log2EventLogより優先します。
 
 .PARAMETER ProviderName
@@ -123,14 +123,14 @@ Log2EventLogより優先します。
 デフォルトは$TRUEでコンソール出力します。
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $Falseと等価です。
+　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
 Log2Consoleより優先します。
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$Falseでログファイル出力しません。
+　ログフィルへの出力を制御します。デフォルトは$FALSEでログファイル出力しません。
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $Falseと等価です。
+　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
 Log2Fileより優先します。
 
 .PARAMETER LogPath
@@ -213,7 +213,7 @@ Param(
 [String]$OracleSID = $Env:ORACLE_SID ,
 [String]$OracleService ,
 
-#[parameter(mandatory=$true)][String]$Schema  ,
+#[parameter(mandatory=$TRUE)][String]$Schema  ,
 [String]$Schema = 'MCFRAME' ,
 
 [String]$HostName = $Env:COMPUTERNAME,
@@ -239,7 +239,7 @@ Param(
 
 [boolean]$Log2Console =$TRUE,
 [Switch]$NoLog2Console,
-[boolean]$Log2File = $False,
+[boolean]$Log2File = $FALSE,
 [Switch]$NoLog2File,
 [String][ValidatePattern('^(\.+\\|[C-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\|)).*$')]$LogPath ,
 [String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
@@ -340,7 +340,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "Start to exp
 function Finalize {
 
 Param(
-[parameter(mandatory=$true)][int]$ReturnCode
+[parameter(mandatory=$TRUE)][int]$ReturnCode
 )
 
 Pop-Location
