@@ -378,7 +378,7 @@ $DatumPath = $PSScriptRoot
 
 Push-Location $OracleHomeBinPath
 
-$process = Start-Process .\expdp -ArgumentList $execCommand -Wait -NoNewWindow -PassThru 
+$process = Start-Process .\EXPDP.exe -ArgumentList $execCommand -Wait -NoNewWindow -PassThru 
 
 IF ($process.ExitCode -ne 0) {
 
