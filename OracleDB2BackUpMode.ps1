@@ -12,6 +12,10 @@ Oracle Databaseをバックアップ前にバックアップモードへ切替�
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
+This script siwtch to Backup mode Oracle Database before starting backup software.
+The script loads SQLs.ps1, place SQLs.ps1 previously.
+OracleDB2NormalMode.ps1 is offered also, you may use it with this script.
+
 Oracle Databaseをバックアップするには、予めデータベースの停止、またはバックアップモードへ切替が必要です。
 従来はデータベースの停止(Shutdown Immediate)で実装する例が大半ですが、停止はセッションが存在すると停止しない等で障害となる例もあります。
 そのため本スクリプトはOracle Databaseを停止するのではなく、表領域をバックアップモードへ切替してバックアップを開始する運用を前提として作成しています。
@@ -34,14 +38,25 @@ Oracle Databaseをバックアップするには、予めデータベースの�
 
 .EXAMPLE
 
-.\OracleDB2BackUpMode -oracleSerivce MCDB -BackUpFlagPath ..\Flag\BackUp.FLG
+.\OracleDB2BackUpMode -BackUpFlagPath ..\Flag\BackUp.FLG
+
+Switch all tables of Oracle SID specified at Windows enviroment variable to Backup Mode.
+At first check backup flag existence placed in ..\Flag folder.
+If the flag file exists, terminate as ERROR.
+Authentification to connecting to Oracle is used OS authentification with OS user running the script.
+At last stop Listener.
 
 Windowsサービス名OracleServiceMCDB、インスタンス名MCDBのOracle Databaseの全ての表領域をバックアップモードへ切替します。
 Oracle Databaseの認証はOS認証を用います。このスクリプトが実行されるOSユーザで認証します。
 バックアップ中フラグ..\Flag\BackUp.FLGの存在を確認し、存在した場合はバックアップ中と判定して異常終了します。
 切替後にListenerを停止します。
 
-.\OracleDB2BackUpMode -oracleSerivce MCDB -BackUpFlagPath ..\Flag\BackUp.FLG -NoStopListener -ExecUser BackUpUser -ExecUserPassword FOOBAR -PasswordAuthorization
+.\OracleDB2BackUpMode -oracleSerivce MCDB -BackUpFlagPath ..\Flag\BackUp.FLG -NoStopListener -ExecUser FOO -ExecUserPassword BAR -PasswordAuthorization
+
+Switch all tables of Oracle SID MCDB to Backup Mode.
+Authentification to connecting to Oracle is used password authentification.
+Oracle user is used 'FOO', Oracle user password is used 'BAR'
+The script dose not stop Listener.
 
 Windowsサービス名OracleServiceMCDB、インスタンス名MCDBのOracle Databaseの全ての表領域をバックアップモードへ切替します。
 OracleDatabaseの認証はパスワード認証を用いています。ユーザID BackUpUpser、パスワード FOOBARでログイン認証します。
