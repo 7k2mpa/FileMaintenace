@@ -161,14 +161,18 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[String][parameter(position=0)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$FlagFolder = '.\',
-#[parameter(mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$FlagFolder,
+#[String][parameter(position=0)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$FlagFolder = '.\',
+[String][parameter(mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$FlagFolder,
 
 
 [String][parameter(position=1)][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
+[String][parameter(position=2)][ValidateNotNullOrEmpty()][ValidateSet("Exist","NoExist")]$Status = 'NoExist',
+#[String][parameter(position=2)][ValidateSet("Exist","NoExist")]$Status = 'NoExist',
+[String][parameter(position=3)][ValidateSet("Create","Delete")]$PostAction,
 
-[Switch][parameter(position=2)]$CreateFlag ,
-
+#Planned to obsolute
+[Switch]$CreateFlag ,
+#Planned to obsolute
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
@@ -237,6 +241,11 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
+#For Backward compatibility
+
+    IF ($CreateFlag)  {
+            $PostAction = 'Create'
+            } 
 
 
 #パラメータの確認
@@ -257,6 +266,14 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
     
         Logging -EventType Error -EventID $ErrorEventID -EventMessage "The path -FlagFile contains some characters that can not be used by NTFS"
         Finalize $ErrorReturnCode
+        }
+
+#Check invalid combination -Status and -PostAction
+
+    IF (($Status -eq 'Exist' -and $PostAction -eq 'Create') -or ($Status -eq 'NoExist' -and $PostAction -eq 'Delete')) {
+        Logging -EventType Error -EventID $ErrorEventID -EventMessage "Must not specify -Status [$($Status)] and -PostAction [$($PostAction)] in the same time."
+        Finalize $ErrorReturnCode    
+    
         }
 
 
@@ -283,14 +300,7 @@ EndingProcess $ReturnCode
 
 
 
-
-
-
 #####################   ここから本体  ######################
-
-[int][ValidateRange(0,2147483647)]$ErrorCount = 0
-[int][ValidateRange(0,2147483647)]$WarningCount = 0
-[int][ValidateRange(0,2147483647)]$NormalCount = 0
 
 $DatumPath = $PSScriptRoot
 
@@ -304,23 +314,69 @@ $Version = '20200207_1615'
 [String]$flagValue = $ShellName +" "+ (Get-Date).ToString($LogDateFormat)
 [String]$flagPath = Join-Path -Path $FlagFolder -ChildPath $FlagFile
 
-    IF ((CheckLeaf -CheckPath $flagPath -ObjectName 'Flag file') -or (CheckContainer -CheckPath $flagPath -ObjectName 'Same Name folder')) {
 
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] exists already and terminate as WARNING."
-        Finalize $WarningReturnCode
-    
-        }else{
-       
+Switch -Regex ($Status) {
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exists and terminate as NORMAL."
-                
-            IF ($CreateFlag) {
-    
-                TryAction -ActionType MakeNewFileWithValue -ActionFrom $flagPath -ActionError $flagPath -FileValue $flagValue
-                Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to create the flag file [$($flagPath)]"
-    
-                }
+
+    '^NoExist$' {
+
+        IF ( -not(CheckLeaf -CheckPath $flagPath -ObjectName 'Flag file') -and -not(CheckContainer -CheckPath $flagPath -ObjectName 'Same Name folder')) {
+
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exists and terminate as NORMAL." 
+
+            }else{
+            Logging -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] exists already and terminate as WARNING."
+            Finalize $WarningReturnCode    
+            }
         }
+
+
+    '^Exist$' {
+    
+        IF (CheckLeaf -CheckPath $flagPath -ObjectName 'Flag file') {
+
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] exists and terminate as NORMAL."    
+
+            }else{
+            Logging -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] is deleted already and terminate as WARNING."
+            Finalize $WarningReturnCode
+            }        
+        }
+
+
+    Default {
+            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error at Function TryAction. Switch ActionType exception has occurred. "
+            Finalize $InternalErrorReturnCode    
+            }
+}
+
+
+Switch -Regex ($PostAction) {
+
+    '^$' {
+            Break
+            }
+
+
+    'Create' {
+    
+            TryAction -ActionType MakeNewFileWithValue -ActionFrom $flagPath -ActionError $flagPath -FileValue $flagValue
+            Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to create the flag file [$($flagPath)]"
+            }
+
+
+    'Delete' {
+    
+            TryAction -ActionType Delete -ActionFrom $flagPath -ActionError $flagPath
+            Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to delete the flag file [$($flagPath)]"
+            }
+
+    Default {
+
+            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error at Function TryAction. Switch ActionType exception has occurred. "
+            Finalize $InternalErrorReturnCode    
+            }
+}
 
 #終了メッセージ出力
 
