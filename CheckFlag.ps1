@@ -2,6 +2,12 @@
 
 <#
 .SYNOPSIS
+This script checkes existence(or non-existence)  of a flag file, and create(or delete) the flag file.
+
+CommonFunctions.ps1 is required.
+
+<Common Parameters> is not supported.
+
 バックアップ中等のフラグファイルを確認、作成するスクリプトです。
 フラグファイルが存在すると警告終了Falseを、存在しないと正常終了Trueを返します。
 -CreateFlagを指定するとフラグファイルを生成します。
@@ -9,17 +15,23 @@
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
+
+This script checkes existence(or non-existence)  of a flag file, and create(or delete) the flag file.
+If status of existence(or non-existence) is true, exit with normal return code.
+If status of existence(or non-existence) is false, exit with warning return code.
+
+If specify -PostAction option, the script create(or delete) the flag file.
+
+Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
+
+
 バックアップ中等のフラグファイルを確認、作成するスクリプトです。
 フラグファイルが存在すると警告終了Falseを、存在しないと正常終了Trueを返します。
 -CreateFlagを指定するとフラグファイルを生成します。
 
 ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
 
-フラグファイルの削除は同時に開発しているFileMaintenance.ps1をご利用ください。
-
-
-配置例
-
+Sample Path
 
 .\CheckFlag.ps1
 .\CommonFunctions.ps1
@@ -30,33 +42,56 @@
 .EXAMPLE
 .\CheckFlag -FlagFolder ..\Lock -FlagFile BackUp.Flg
 
+Check BackUp.Flg file in the ..\Lock folder.
+If the file exists, the script exit with warning return code.
+If the file dose not exist, the script exit with normal return code.
+
+For backward compatibility, run without specification -Status option, -Status will be 'NoExist' by default.
+
 ..\LockフォルダにBackUp.Flgファイルの有無を確認します。
 フラグファイルが存在すると警告終了Falseを、存在しないと正常終了Trueを返します。
 
 
 .EXAMPLE
-.\CheckFlag -FlagFolder ..\Lock -FlagFile BackUp.Flg -CreateFlag
+.\CheckFlag -FlagFolder ..\Lock -FlagFile BackUp.Flg -Status Exist -PostAction Delete
+
+Check BackUp.Flg file in the ..\Lock folder.
+If the file dose not exists, the script exit with warning return code.
+If the file exists, the script delete the flag file.
+
+If success to delete, the script exit with normal return code.
+If fail to delte, the script exit with error return code.
+
 
 ..\LockフォルダにBackUp.Flgファイルの有無を確認します。
-ファイルが存在すると警告終了Falseを返します。
-ファイルが存在しないとBackUp.Flgファイルの生成を試みます。ファイル生成に成功すると正常終了Trueを返します。生成に失敗すると異常終了Flaseを返します。
+ファイルが存在しないと警告終了Falseを返します。
+ファイルが存在するとBackUp.Flgファイルの削除を試みます。
+ファイル削除に成功すると正常終了Trueを返します。失敗すると異常終了Flaseを返します。
 
 
 
 .PARAMETER FlagFolder
+Specify the folder to check existence of flag file.
+Can specify relative or absolute path format.
 
 フラグファイルを確認、配置するフォルダを指定します。
 相対パス、絶対パスでの指定が可能です。
 
 .PARAMETER FlagFile
+Specify the name of the flag file.
 
 フラグファイル名を指定します。
 
-.PARAMETER CreateFlag
+.PARAMETER Status
+Specify 'Exist' or 'NoExist' the flag file.
+'NoExist' is by default.
 
-フラグファイルが存在しない場合、フラグファイルを生成します。
-フラグファイルの中身はシェル名+時刻となります。
+確認する状態を指定します。
 
+.PARAMETER PostAction
+Specify action to the flag file after checking.
+
+ファイル確認後、削除、生成を指定します。
 
 
 .PARAMETER Log2EventLog
@@ -345,7 +380,7 @@ Switch -Regex ($Status) {
 
 
     Default {
-            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error at Function TryAction. Switch ActionType exception has occurred. "
+            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error. Switch Status exception has occurred. "
             Finalize $InternalErrorReturnCode    
             }
 }
@@ -373,7 +408,7 @@ Switch -Regex ($PostAction) {
 
     Default {
 
-            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error at Function TryAction. Switch ActionType exception has occurred. "
+            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error. Switch PostAction exception has occurred. "
             Finalize $InternalErrorReturnCode    
             }
 }

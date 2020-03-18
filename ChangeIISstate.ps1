@@ -150,7 +150,7 @@ Param(
 
 [String][parameter(position=0, mandatory=$true , HelpMessage = 'Enter IIS site name. To view all help , Get-Help ChangeIISstate.ps1')]$Site ,
 
-[String][parameter(position=1)][ValidateSet("Started", "Stopped")]$TargetState = 'Stopped' , 
+[String][parameter(position=1)][ValidateNotNullOrEmpty()][ValidateSet("Started", "Stopped")]$TargetState = 'Stopped' , 
 [int][parameter(position=2)][ValidateRange(1,65535)]$RetrySpanSec = 3,
 [int][parameter(position=3)][ValidateRange(1,65535)]$RetryTimes = 5,
 
