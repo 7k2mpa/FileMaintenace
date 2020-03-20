@@ -175,6 +175,14 @@ C:\OLD\Log\Infra.log
 
  
 .PARAMETER TargetFolder
+Specify a folder of the target files or the folders placed.
+Specification is required.
+Can specify relative or absolute path format.
+Relative path format must be starting with 'dot.'
+The path must not contain wild cards shch as asterisk* question? bracket[]
+If the path contains bracket[] , specify path literally and do not escape.
+
+
 処理対象のファイル、フォルダが格納されているフォルダを指定します。
 指定は必須です。
 相対、絶対パスで指定可能です。
@@ -183,6 +191,8 @@ C:\OLD\Log\Infra.log
 フォルダ名に括弧 [ , ] を含む場合はエスケープせずにそのまま入力してください。
 
 .PARAMETER PreAction
+
+
 処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
 PreActionは(Action|PostAction)と異なり複数パラメータを指定できます。
 パラメータはカンマ,で区切って下さい。
@@ -215,6 +225,15 @@ NullClear:ファイルの内容削除 NullClearします。PostActionのため、Actionと併用可能
 
 
 .PARAMETER MoveToFolder
+
+Specify a desitination folder of the target files moveing to.
+Specification is required.
+Can specify relative or absolute path format.
+Relative path format must be starting with 'dot.'
+The path must not contain wild cards shch as asterisk* question? bracket[]
+If the path contains bracket[] , specify path literally and do not escape.
+
+
 　処理対象のファイルの移動、コピー先フォルダを指定します。
 相対、絶対パスで指定可能です。
 相対パス表記は、.から始める表記にして下さい。（例 .\Log , ..\Script\log）
@@ -226,6 +245,10 @@ NullClear:ファイルの内容削除 NullClearします。PostActionのため、Actionと併用可能
 
 
 .PARAMETER 7zFolder 
+
+Specify a folder of 7-Zip installed.
+[C:\Program Files\7-Zip] is default.
+
 Compress,Archiveに外部プログラム7z.exeを使用する際に、7-Zipがインストールされているフォルダを指定します。
 デフォルトは[C:\Program Files\7-Zip]です。
 
@@ -258,23 +281,40 @@ https://docs.microsoft.com/ja-jp/dotnet/standard/base-types/substitutions-in-reg
 
 
 .PARAMETER Recurse
+Specify if you want to process the files or folders in the path recursively or non-recuresively.
+[$TRUE(recuresively)] is default.
+
 　-TargetFolderの直下の再帰的または非再帰に処理の指定が可能です。
 デフォルトは$TRUEで再帰的処理です。
 
 .PARAMETER NoRecurse
+Specify if you want to process non-recursively.
+The option override -Recurse option.
+
 　-TargetFolderの直下のみを処理対象とします。-Recurse $FALSEと等価です。
 Recurseパラメータより優先します。
 
 .PARAMETER OverRide
+Specify if you want to override old same name files moved or copied.
+[terminate as ERROR and do not override] is default.
+
 　移動、コピー先に既に同名のファイルが存在しても強制的に上書きします。
 デフォルトでは上書きせずに異常終了します。
 
 .PARAMETER Continue
+Specify if you want to skip old files do not want to override.
+If has skip to process, terminate as WARNING.
+[terminate as ERROR before override] is default. 
+
 　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
 スキップすると警告終了します。
 デフォルトではスキップせずに異常終了します。
 
 .PARAMETER ContinueAsNormal
+Specify if you want to skip old files do not want to override.
+If has skip to process, terminate as NORMAL.
+[terminate as ERROR before override] is default. 
+
 　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
 -Continueと異なりスキップしても正常終了します。ファイルの差分コピー等で利用してください。
 -Continueに優先します。
@@ -287,6 +327,9 @@ Recurseパラメータより優先します。
 ログ上は警告が出力されますが、実行結果ではこの警告は無視されます。
 
 .PARAMETER NoneTargetAsWarning
+Specify if you want to terminate as WARNING with no files existed in the folder.
+[Exit as NORMAL with no files existed in the folder] is default.
+
 操作対象のファイル、フォルダが存在しない場合に警告終了します。
 このスイッチを設定しないと存在しない場合は通常終了します。
 
@@ -447,8 +490,8 @@ https://github.com/7k2mpa/FileMaintenace
 [CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
 Param(
 
-[String][parameter(position=0, mandatory=$TRUE , HelpMessage = 'Specify the folder to process (ex. D:\Logs)  or Get-Help FileMaintenance.ps1')]
-[ValidateNotNullOrEmpty()][ValidateScript({ Test-Path $_  -PathType container })][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$TargetFolder,
+[String][parameter(position=0, mandatory=$TRUE ,ValueFromPipeline, HelpMessage = 'Specify the folder to process (ex. D:\Logs)  or Get-Help FileMaintenance.ps1')]
+[ValidateNotNullOrEmpty()][ValidateScript({ Test-Path $_  -PathType container })][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath")]$TargetFolder,
 
 #[parameter(position=0, mandatory=$TRUE , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String]$TargetFolder,  #Validation debug用に用意してあります。通常は使わない
 #[parameter(position=0, mandatory=$TRUE , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
@@ -462,7 +505,7 @@ Param(
 
 
 [String][parameter(position=4)]
-[ValidateNotNullOrEmpty()][ValidateScript({ Test-Path $_  -PathType container })][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$MoveToFolder,
+[ValidateNotNullOrEmpty()][ValidateScript({ Test-Path $_  -PathType container })][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("DestinationPath")]$MoveToFolder,
 
 
 [String][ValidateNotNullOrEmpty()][ValidatePattern('^(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$ArchiveFileName = "archive.zip" ,
@@ -584,14 +627,14 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "Check existe
 
     #既にファイルがあるが、OverRide指定は無い。よって、異常終了 or Continue指定ありで継続
 
-    If ((Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -and (-not($OverRide))) {
+    IF ((Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -and (-not($OverRide))) {
 
         Logging -EventID $WarningEventID -EventType Warning -EventMessage "File $($CheckLeaf) exists already."
 
         IF (-not($ContinueAsNormal)) {
             $Script:WarningFlag = $TRUE
             }    
-        If (-not($Continue)) {
+        IF (-not($Continue)) {
  
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "File $($CheckLeaf) exists already, thus force to terminate $($ShellName)"
             
@@ -786,7 +829,7 @@ IF ($Compress) {$Script:PreAction +='Compress'}
 
 #移動先フォルダの要不要と有無を確認
 
-    If ( ($Action -match "^(Move|Copy)$") -or ($PreAction -contains 'MoveNewFile') ) {    
+    IF ( ($Action -match "^(Move|Copy)$") -or ($PreAction -contains 'MoveNewFile') ) {    
 
         $MoveToFolder = ConvertToAbsolutePath -CheckPath $MoveToFolder -ObjectName '-MoveToFolder'
 
@@ -814,7 +857,7 @@ IF ($Compress) {$Script:PreAction +='Compress'}
 
 #7zフォルダの要不要と有無を確認
 
-    If ( $PreAction -match "^(7z|7zZip)$") {    
+    IF ( $PreAction -match "^(7z|7zZip)$") {    
 
         $7zFolder = ConvertToAbsolutePath -CheckPath $7zFolder -ObjectName '-7zFolder'
 
@@ -824,36 +867,36 @@ IF ($Compress) {$Script:PreAction +='Compress'}
 #組み合わせが不正な指定を確認
 
 
-    If (($TargetFolder -eq $MoveToFolder) -and (($Action -match "move|copy") -or  ($PreAction -contains 'MoveNewFile'))) {
+    IF (($TargetFolder -eq $MoveToFolder) -and (($Action -match "move|copy") -or  ($PreAction -contains 'MoveNewFile'))) {
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "Specified -(Pre)Action option for Move or Copy files, -TargetFolder and -MoveToFolder must not be same."
 				Finalize $ErrorReturnCode
                 }
 
-    If (($Action -match "^(Move|Delete|KeepFilesCount)$") -and  ($PostAction -ne 'none')) {
+    IF (($Action -match "^(Move|Delete|KeepFilesCount)$") -and  ($PostAction -ne 'none')) {
 
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "Specified -Action[$($Action)] option for Delete or Move files, must not specify -PostAction[$($PostAction)] option."
 				Finalize $ErrorReturnCode
                 }
 
-   If (($PreAction -contains 'MoveNewFile' ) -and (-not($PreAction -match "^(Compress|AddTimeStamp|Archive)$") )) {
+   IF (($PreAction -contains 'MoveNewFile' ) -and (-not($PreAction -match "^(Compress|AddTimeStamp|Archive)$") )) {
 
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "Secified -PreAction MoveNewFile option, must specify -PreAction Compres or AddTimeStamp or Archive option also. If you move the original files, will specify -Action Move option."
 				Finalize $ErrorReturnCode
                 }
 
-   If (($PreAction -contains 'Compress') -and  ($PreAction -contains 'Archive')) {
+   IF (($PreAction -contains 'Compress') -and  ($PreAction -contains 'Archive')) {
 
 				Logging -EventType Error -EventID $ErrorEventID "Must not specify -PreAction both Compress and Archive options in the same time."
 				Finalize $ErrorReturnCode
                 }
 
-   If (($PreAction -contains '7z' ) -and  ($PreAction -Contains '7zZip')) {
+   IF (($PreAction -contains '7z' ) -and  ($PreAction -Contains '7zZip')) {
 
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "Must not specify -PreAction both 7z and 7zZip options for the archive method in the same time."
 				Finalize $ErrorReturnCode
                 }
 
-   If (($PreAction -match "^(7z|7zZip)$" ) -and  (-not($PreAction -match "^(Compress|Archive)$"))) {
+   IF (($PreAction -match "^(7z|7zZip)$" ) -and  (-not($PreAction -match "^(Compress|Archive)$"))) {
 
 				Logging -EventType Error -EventID $ErrorEventID -EventMessage "Must not specify -PreAction only 7z or 7zZip option. Must specify -PreAction Compress or Archive option with them."
 				Finalize $ErrorReturnCode
@@ -946,7 +989,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "All paramete
         Logging -EventID $InfoEventID -EventType Information -EventMessage "Specified -OverRide[$($OverRide)] option, thus if files exist with the same name, will override them."
         }
 
-    If ($ContinueAsNormal) {
+    IF ($ContinueAsNormal) {
         Logging -EventID $InfoEventID -EventType Information -EventMessage "Specified -ContinueAsNormal[$($ContinueAsNormal)] option, thus if file exist in the same name already, will process next file as NORMAL without termination."
         
         } elseIF ($Continue) {
@@ -1099,7 +1142,7 @@ $TargetObjects = @()
 
 $TargetObjects = GetObjects -TargetFolder $TargetFolder
 
-    If ($NULL -eq $TargetObjects) {
+    IF ($NULL -eq $TargetObjects) {
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "In -TargetFolder [$($TargetFolder)] no [$($FilterType)] exists for processing."
 
@@ -1189,7 +1232,7 @@ Do
 #Action[(Move|Copy)]以外はファイル移動が無い。移動先パスを確認する必要がないのでスキップ
 #PreAction[Archive]はMoveNewFile[TRUE]でも出力ファイルは1個で階層構造を取らない。よってスキップ
 
-    If ( (($Action -match "^(Move|Copy)$")) -or (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive')) ) {
+    IF ( (($Action -match "^(Move|Copy)$")) -or (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive')) ) {
 
         #ファイルが移動するAction用にファイル移動先の親フォルダパス$MoveToNewFolderを生成する
         
@@ -1206,9 +1249,9 @@ Do
         #MoveToNewFolderはNoRecurseでもMove|Copyで一律使用するので作成
 
         $MoveToNewFolder = Join-Path -Path $MoveToFolder -ChildPath ($TargetFileParentFolder).Substring($TargetFolder.Length)
-        If ($Recurse) {
+        IF ($Recurse) {
 
-            If (-not(CheckContainer -CheckPath $MoveToNewFolder -ObjectName 'Moving the file to, Folder ')) {
+            IF (-not(CheckContainer -CheckPath $MoveToNewFolder -ObjectName 'Moving the file to, Folder ')) {
 
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Create a new folder $($MoveToNewFolder)"
 

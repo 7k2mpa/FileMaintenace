@@ -370,8 +370,8 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
 
       # サービス存在確認
       IF (-not(CheckServiceExist $Service)) {
-      Finalize $ErrorReturnCode
-      }
+          Finalize $ErrorReturnCode
+          }
 
     Logging -EventID $InfoEventID -EventType Information -EventMessage "With WMIService.(start|stop)Service , starting to change Service [$($Service)] status from [$($originalStatus)] to [$($TargetStatus)]"
 
