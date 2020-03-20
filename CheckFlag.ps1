@@ -197,11 +197,13 @@ https://github.com/7k2mpa/FileMaintenace
 Param(
 
 #[String][parameter(position=0)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$FlagFolder = '.\',
-[String][parameter(mandatory=$true , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$FlagFolder,
+
+[String][parameter(position=0 , mandatory=$true , HelpMessage = 'Specify the folder of a flag file placed.(ex. D:\Logs)or Get-Help CheckFlag.ps1')]
+[ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')][ValidateScript({ Test-Path $_  -PathType container })]$FlagFolder,
 
 
-[String][parameter(position=1)][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
-[String][parameter(position=2)][ValidateNotNullOrEmpty()][ValidateSet("Exist","NoExist")]$Status = 'NoExist',
+[String][parameter(position=1 , mandatory=$true)][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
+[String][parameter(position=2 , mandatory=$true)][ValidateSet("Exist","NoExist")]$Status = 'NoExist',
 #[String][parameter(position=2)][ValidateSet("Exist","NoExist")]$Status = 'NoExist',
 [String][parameter(position=3)][ValidateSet("Create","Delete")]$PostAction,
 
