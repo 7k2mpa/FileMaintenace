@@ -187,7 +187,7 @@ C:\OLD\Log\Infra.log
 PreActionは(Action|PostAction)と異なり複数パラメータを指定できます。
 パラメータはカンマ,で区切って下さい。
 
-None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-NoActionスイッチを利用して下さい。
+None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-WhatIfスイッチを利用して下さい。
 Compress:対象ファイルから圧縮したファイルを新規生成します。
 AddTimeStamp:対象ファイルからファイル名に-TimeStampFormatで定められた書式でタイムスタンプ付加したファイルを新規生成します。
 Archive:対象ファイル群をまとめた1アーカイブファイルを新規生成します。-OverRideを指定すると、既存アーカイブファイルへ対象ファイル群を追加します。アーカイブファイルは-ArchiveFileNameで指定したファイル名です。
@@ -198,7 +198,7 @@ MoveNewFile:-PreActionの新規生成ファイルを-TargetFolderと同一ではなく、-MoveToFo
 .PARAMETER Action
 処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
 
-None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-NoActionスイッチを利用して下さい。
+None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-WhatIfスイッチを利用して下さい。
 Move:ファイルを-MoveToFolderへ移動します。
 Delete:ファイルを削除します。
 Copy:ファイルを-MoveToFolderにコピーします。
@@ -209,7 +209,7 @@ NullClear:ファイルの内容削除 NullClearします。
 .PARAMETER PostAction
 処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
 
-None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-NoActionスイッチを利用して下さい。
+None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-WhatIfスイッチを利用して下さい。
 Rename:ファイル名を正規表現-RenameToRegularExpressionで置換します。
 NullClear:ファイルの内容削除 NullClearします。PostActionのため、Actionと併用可能です。例えばファイル複製後、元ファイルを削除する、といった用途に使用して下さい。
 
@@ -281,6 +281,7 @@ Recurseパラメータより優先します。
 デフォルトではスキップせずに異常終了します。
 
 .PARAMETER NoAction
+このパラメータは廃止予定です。後方互換性のために残していますが、-Whatifを使用してください。
 ファイル、フォルダを実際に削除等の操作をせずに実行します。全ての処理は成功扱いになります。
 動作確認するときに当該スイッチを指定してください。
 ログ上は警告が出力されますが、実行結果ではこの警告は無視されます。
@@ -443,7 +444,7 @@ https://github.com/7k2mpa/FileMaintenace
 
 #>
 
-
+[CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
 Param(
 
 [parameter(position=0, mandatory=$TRUE , HelpMessage = 'Specify the folder to process (ex. D:\Logs)  or Get-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$TargetFolder,
@@ -484,7 +485,6 @@ Param(
 [Switch]$OverRide,
 [Switch]$Continue,
 [Switch]$ContinueAsNormal,
-[Switch]$NoAction,
 [Switch]$NoneTargetAsWarning,
 
 [String]$CompressedExtString = '.zip',
@@ -493,6 +493,7 @@ Param(
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss',
 
 #Switches planned to obsolute please use -PreAction start
+[Switch]$NoAction,
 [Switch]$Compress,
 [Switch]$AddTimeStamp,
 [Switch]$MoveNewFile,

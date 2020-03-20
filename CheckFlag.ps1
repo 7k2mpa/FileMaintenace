@@ -193,7 +193,7 @@ https://github.com/7k2mpa/FileMaintenace
 
 #>
 
-
+[CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
 Param(
 
 #[String][parameter(position=0)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$FlagFolder = '.\',
