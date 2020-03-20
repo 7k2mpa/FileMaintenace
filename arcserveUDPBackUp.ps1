@@ -251,7 +251,7 @@ https://github.com/7k2mpa/FileMaintenace
 Param(
 
 [String][parameter(mandatory=$true)]$Plan ,
-[String]$Server = 'hoge-hoge',
+[String][ValidateNotNullOrEmpty()]$Server = 'hoge-hoge',
 [Switch]$AllServers,
 [String][ValidateSet("Full", "Incr")]$BackUpJobType = 'Incr',
 
@@ -464,21 +464,21 @@ $Version = '20200221_2145'
 
 #Create Invoke Command Strings
 
-    $Command = '.\"' + (Split-Path $UDPCLIPath -Leaf ) + '"'
+    $command = '.\"' + (Split-Path $UDPCLIPath -Leaf ) + '"'
 
-    $Command += " -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
+    $command += " -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
 
 
 
     IF($AllServers){
 
        Logging -EventID $InfoEventID -EventType Information -EventMessage "バックアップはプラン[$($Plan)]に含まれる全サーバが対象です。"
-       $Command +=  " -PlanName $Plan "
+       $command +=  " -PlanName $Plan "
        $Server = 'All'
        
        }else{
        Logging -EventID $InfoEventID -EventType Information -EventMessage "バックアップはプラン[$($Plan)]に含まれるサーバ[$($Server)]が対象です。"
-       $Command += " -NodeName $Server "
+       $command += " -NodeName $Server "
 
        }
 
@@ -506,7 +506,7 @@ $Version = '20200221_2145'
 
         CheckLeaf -CheckPath $ExecUserPasswordFilePath -ObjectName '-ExecUserPasswordFilePath' -IfNoExistFinalize > $NULL
 
-        $Command += " -UDPConsoleUserName `'$DoUser`' -UDPConsoleDomainName `'$DoDomain`' -UDPConsolePasswordFile `'$ExecUserPasswordFilePath`' "
+        $command += " -UDPConsoleUserName `'$DoUser`' -UDPConsoleDomainName `'$DoDomain`' -UDPConsolePasswordFile `'$ExecUserPasswordFilePath`' "
         }
 
     '^FixedPasswordFile$'
@@ -555,15 +555,15 @@ $Version = '20200221_2145'
     Push-Location (Split-Path $UDPCLIPath -Parent)
 
     Try{
-        $Return = Invoke-Expression $Command 2>$ErrorMessage -ErrorAction Stop 
+        $Return = Invoke-Expression $command 2>$errorMessage -ErrorAction Stop 
         }
 
         catch [Exception]{
 
             Logging -EventID $ErrorEventID -EventType Error -EventMessage "arcserveUDP CLI [$($UDPCLIPath)]の起動に失敗しました。"
-            $ErrorDetail = $Error[0] | Out-String
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $ErrorDetail"
-            Finalize $ErrorReturnCode
+            $errorDetail = $ERROR[0] | Out-String
+            Logging -EventID $ErrorEventID -EventType Error -EventMessage "起動時エラーメッセージ : $errorDetail"
+            Finalize $errorReturnCode
         }
 
 

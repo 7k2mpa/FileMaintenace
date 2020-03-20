@@ -199,13 +199,12 @@ Param(
 #[String][parameter(position=0)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$FlagFolder = '.\',
 
 [String][parameter(position=0 , mandatory=$true , HelpMessage = 'Specify the folder of a flag file placed.(ex. D:\Logs)or Get-Help CheckFlag.ps1')]
-[ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')][ValidateScript({ Test-Path $_  -PathType container })]$FlagFolder,
+[ValidateNotNullOrEmpty()][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')][ValidateScript({ Test-Path $_  -PathType container })]$FlagFolder,
 
 
-[String][parameter(position=1 , mandatory=$true)][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
-[String][parameter(position=2 , mandatory=$true)][ValidateSet("Exist","NoExist")]$Status = 'NoExist',
-#[String][parameter(position=2)][ValidateSet("Exist","NoExist")]$Status = 'NoExist',
-[String][parameter(position=3)][ValidateSet("Create","Delete")]$PostAction,
+[String][parameter(position=1 , mandatory=$true)][ValidateNotNullOrEmpty()][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
+[String][parameter(position=2 , mandatory=$true)][ValidateNotNullOrEmpty()][ValidateSet("Exist","NoExist")]$Status = 'NoExist',
+[String][parameter(position=3)][ValidateNotNullOrEmpty()][ValidateSet("Create","Delete")]$PostAction,
 
 #Planned to obsolute
 [Switch]$CreateFlag ,
@@ -361,7 +360,7 @@ Switch -Regex ($Status) {
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exists and terminate as NORMAL." 
 
-            }else{
+            } else {
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] exists already and terminate as WARNING."
             Finalize $WarningReturnCode    
             }
@@ -374,7 +373,7 @@ Switch -Regex ($Status) {
 
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] exists and terminate as NORMAL."    
 
-            }else{
+            } else {
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] is deleted already and terminate as WARNING."
             Finalize $WarningReturnCode
             }        
