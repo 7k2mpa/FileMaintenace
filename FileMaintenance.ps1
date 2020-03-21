@@ -7,14 +7,12 @@
 This script processes log files or temp files to delete, move, archive, etc.... with multiple methods.
 CommonFunctions.ps1 is required.
 You can process files in multiple folders with Wrapper.ps1
-<Common Parameters> is not supported.
 
 
 ƒƒOƒtƒ@ƒCƒ‹ˆ³kAíœ‚ğn‚ß‚Æ‚µ‚½FX‚Èˆ—‚ğ‚·‚é–œ”\ƒc[ƒ‹‚Å‚·B
 Às‚É‚ÍCommonFunctions.ps1‚ª•K—v‚Å‚·B
 ƒZƒbƒg‚ÅŠJ”­‚µ‚Ä‚¢‚éWrapper.ps1‚Æ•¹—p‚·‚é‚Æ•¡”ˆ—‚ğˆêŠ‡Às‚Å‚«‚Ü‚·B
 
-<Common Parameters>‚ÍƒTƒ|[ƒg‚µ‚Ä‚¢‚Ü‚¹‚ñ
 
 .DESCRIPTION
 This script filters files and folders with multiple criterias.
@@ -151,7 +149,7 @@ C:\TESTˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ğÄ‹A“I‚É u.log‚ÅI‚í‚év‚©‚Â10“úˆÈ‘O‚Ì‚à‚Ì‚ğˆ³kŒãC:\TES
 FileMaintenace.ps1 -TargetFolder C:\OLD\Log -RegularExpression '^.*\.log$' -Action Delete -ParentRegularExpression '\\OLD\\'
 
 Filter files ending with '.log' recuresively.
--ParentRegularExpresssion opttion is specified with regular expression, thus path's backslash\ is escaped with backslash\
+-ParentRegularExpresssion option is specified with regular expression, thus path's backslash\ is escaped with backslash\
 Delete them with '\OLD\' in the rest of the path characters next to the -TargetFolder(C:\OLD\Log).
 At the sample blow, 'C:\OLD\Los' is not for -ParentRegularExpression matching.
 Thus 'C:\OLD\Log\IIS\Current\Infra.log' , 'C:\OLD\Log\Java\Current\Infra.log' and 'C:\OLD\Log\Infra.log' are not deleted.
@@ -192,6 +190,17 @@ If the path contains bracket[] , specify path literally and do not escape.
 
 .PARAMETER PreAction
 
+Specify methods to process files.
+-PreAction option accept multiple arguments.
+Separate arguments with comma,
+
+None:Do nothing, and is default. If you want test the action, specify -WhatIf option.
+Compress:Create compressed files from the original files.
+AddTimeStamp:Create new files with file name added time stamp.
+Archive:Create an archive file from files. Specify archive file name with -ArchiveFileName option.
+MoveNewFile:place new files to -MoveNewFolder path.
+7z:Specify to use 7-Zip and make .7z(LZMA2) for compress or archive option.
+7zZip:Specify to use 7-Zip and make .zip(Deflate) for compress or arvhice option.
 
 ˆ—‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚É‘Î‚·‚é‘€ì‚ğİ’è‚µ‚Ü‚·BˆÈ‰º‚Ìƒpƒ‰ƒ[ƒ^‚ğw’è‚µ‚Ä‰º‚³‚¢B
 PreAction‚Í(Action|PostAction)‚ÆˆÙ‚È‚è•¡”ƒpƒ‰ƒ[ƒ^‚ğw’è‚Å‚«‚Ü‚·B
@@ -206,6 +215,17 @@ MoveNewFile:-PreAction‚ÌV‹K¶¬ƒtƒ@ƒCƒ‹‚ğ-TargetFolder‚Æ“¯ˆê‚Å‚Í‚È‚­A-MoveToFo
 7zZip:Compress,Archive‚Ég—p‚·‚éˆ³k‚É7z.exe‚ğ—p‚¢‚Ü‚·Bˆ³k•û–@‚ÍZip(Deflate)‚ğ—p‚¢‚Ü‚·B
 
 .PARAMETER Action
+
+Specify method to process files.
+
+None:Do nothing, and is default. If you want test the action, specify -WhatIf option.
+Move:Move the files to -MoveNewFolder path.
+Delete:Delete the files.
+Copy:Copy the files and place to -MoveNewFolder path.
+DeleteEmptyFolders:Delete empty folders.
+KeepFilesCount:Delete old generation files.
+NullClear:Clear the files with null.
+
 ˆ—‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚É‘Î‚·‚é‘€ì‚ğİ’è‚µ‚Ü‚·BˆÈ‰º‚Ìƒpƒ‰ƒ[ƒ^‚ğw’è‚µ‚Ä‰º‚³‚¢B
 
 None:‰½‚à‘€ì‚ğ‚µ‚Ü‚¹‚ñB‚±‚Ìİ’è‚ªƒfƒtƒHƒ‹ƒg‚Å‚·B‚±‚ê‚ÍŒë‘€ì–h~‚Ì‚½‚ß‚É‚ ‚è‚Ü‚·B“®ìŒŸØ‚É‚Í-WhatIfƒXƒCƒbƒ`‚ğ—˜—p‚µ‚Ä‰º‚³‚¢B
@@ -217,6 +237,14 @@ KeepFilesCount:w’è¢‘ã”‚É‚È‚é‚Ü‚ÅAƒ}ƒbƒ`‚µ‚½ƒtƒ@ƒCƒ‹ŒQ‚ğŒÃ‚¢‡‚Éíœ‚µ‚Ü‚·B
 NullClear:ƒtƒ@ƒCƒ‹‚Ì“à—eíœ NullClear‚µ‚Ü‚·B
 
 .PARAMETER PostAction
+
+Specify method to process files.
+
+None:Do nothing, and is default. If you want test the action, specify -WhatIf option.
+Rename:Rename the files with -RenameToRegularExpression
+NullClear:Clear the files with null.
+
+
 ˆ—‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚É‘Î‚·‚é‘€ì‚ğİ’è‚µ‚Ü‚·BˆÈ‰º‚Ìƒpƒ‰ƒ[ƒ^‚ğw’è‚µ‚Ä‰º‚³‚¢B
 
 None:‰½‚à‘€ì‚ğ‚µ‚Ü‚¹‚ñB‚±‚Ìİ’è‚ªƒfƒtƒHƒ‹ƒg‚Å‚·B‚±‚ê‚ÍŒë‘€ì–h~‚Ì‚½‚ß‚É‚ ‚è‚Ü‚·B“®ìŒŸØ‚É‚Í-WhatIfƒXƒCƒbƒ`‚ğ—˜—p‚µ‚Ä‰º‚³‚¢B
@@ -227,10 +255,9 @@ NullClear:ƒtƒ@ƒCƒ‹‚Ì“à—eíœ NullClear‚µ‚Ü‚·BPostAction‚Ì‚½‚ßAAction‚Æ•¹—p‰Â”\
 .PARAMETER MoveToFolder
 
 Specify a desitination folder of the target files moveing to.
-Specification is required.
 Can specify relative or absolute path format.
 Relative path format must be starting with 'dot.'
-The path must not contain wild cards shch as asterisk* question? bracket[]
+The path must not contain wild cards shch as asterisk* question?
 If the path contains bracket[] , specify path literally and do not escape.
 
 
@@ -241,6 +268,9 @@ If the path contains bracket[] , specify path literally and do not escape.
 ƒtƒHƒ‹ƒ_–¼‚ÉŠ‡ŒÊ [ , ] ‚ğŠÜ‚Şê‡‚ÍƒGƒXƒP[ƒv‚¹‚¸‚É‚»‚Ì‚Ü‚Ü“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B
 
 .PARAMETER ArchiveFileName
+
+Specify the file name of the archive file with -PreAction Archive option.
+
 -PreAction Archivew’è‚ÌƒA[ƒJƒCƒuƒtƒ@ƒCƒ‹–¼‚ğw’è‚µ‚Ü‚·B
 
 
@@ -253,22 +283,38 @@ Compress,Archive‚ÉŠO•”ƒvƒƒOƒ‰ƒ€7z.exe‚ğg—p‚·‚éÛ‚ÉA7-Zip‚ªƒCƒ“ƒXƒg[ƒ‹‚³‚ê‚Ä‚
 ƒfƒtƒHƒ‹ƒg‚Í[C:\Program Files\7-Zip]‚Å‚·B
 
 .PARAMETER Days
+Specify how many days older than today to process files.
+0 day is default and, process all files.
+
 @ˆ—‘ÎÛ‚Ìƒtƒ@ƒCƒ‹AƒtƒHƒ‹ƒ_‚ğXVŒo‰ß“ú”‚ÅƒtƒBƒ‹ƒ^‚µ‚Ü‚·B
 ƒfƒtƒHƒ‹ƒg‚Í0“ú‚Å‘S‚Ä‚Ìƒtƒ@ƒCƒ‹‚ª‘ÎÛ‚Æ‚È‚è‚Ü‚·B
 
 .PARAMETER Size
+
+Specify size of files to process.
+0 byte is default, and process all files.
+postfix KB,MB,GB is accepted.
+
 @ˆ—‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚ğ—e—Ê‚ÅƒtƒBƒ‹ƒ^‚µ‚Ü‚·B
 ƒfƒtƒHƒ‹ƒg‚Í0KB‚Å‘S‚Ä‚Ìƒtƒ@ƒCƒ‹‚ª‘ÎÛ‚Æ‚È‚è‚Ü‚·B
 ®”•\‹L‚É‰Á‚¦‚ÄAKB,MB,GB‚ÌÚ”ö«‚ª—˜—p‰Â”\‚Å‚·B
 —á‚¦‚Î-Size 10MB‚ÍA©“®“I‚É10*1024^6‚ÉŠ·Z‚µ‚Ä‚­‚ê‚Ü‚·B
 
 .PARAMETER RegularExpression
+
+Specify regular expression to match processing files.
+'.*' is default, and process all files.
+
 @ˆ—‘ÎÛ‚Ìƒtƒ@ƒCƒ‹AƒtƒHƒ‹ƒ_‚ğ³‹K•\Œ»‚ÅƒtƒBƒ‹ƒ^‚µ‚Ü‚·B
 ƒfƒtƒHƒ‹ƒg‚Í .* ‚Å‘S‚Ä‚ª‘ÎÛ‚Æ‚È‚è‚Ü‚·B
 ‹Lq‚ÍƒVƒ“ƒOƒ‹ƒNƒI[ƒe[ƒVƒ‡ƒ“‚ÅŠ‡‚Á‚Ä‰º‚³‚¢B
 PowerShell‚Ìd—lãA‘å•¶š¬•¶š‚Ì‹æ•Ê‚Í‚µ‚È‚¢”¤‚Å‚·‚ªAÀÛ‚É‚Í‹æ•Ê‚³‚ê‚é‚Ì‚Å’ˆÓ‚µ‚Ä‰º‚³‚¢B
 
 .PARAMETER ParentRegularExpression
+
+Specify regular expression to match processing path of files.
+'.*' is default, and process all files.
+
 @ˆ—‘ÎÛ‚Ìƒtƒ@ƒCƒ‹AƒtƒHƒ‹ƒ_‚ÌãˆÊƒpƒX‚©‚ç-TargetFolder‚ÌƒpƒX‚Ü‚Å‚ğ³‹K•\Œ»‚ÅƒtƒBƒ‹ƒ^‚µ‚Ü‚·B-TargetFolder‚ÉŠÜ‚Ü‚ê‚éƒpƒX‚ÍƒtƒBƒ‹ƒ^‘ÎÛŠO‚Å‚·B
 ƒfƒtƒHƒ‹ƒg‚Í .* ‚Å‘S‚Ä‚ª‘ÎÛ‚Æ‚È‚è‚Ü‚·B
 ‹Lq‚ÍƒVƒ“ƒOƒ‹ƒNƒI[ƒe[ƒVƒ‡ƒ“‚ÅŠ‡‚Á‚Ä‰º‚³‚¢B
