@@ -49,7 +49,7 @@ Execute backup software [arcserveUDP](https://www.arcserve.com/data-protection-s
 
 ### CheckFlag.ps1
 
-Check Flag File and if file dose not exist make new flag file.
+Check Flag File and if file exist(or dose not exist) , delete the flag file(or make a flag file)
 
 ### Wrapper.ps1
 
