@@ -1297,7 +1297,7 @@ Do
         $MoveToNewFolder = Join-Path -Path $MoveToFolder -ChildPath ($TargetFileParentFolder).Substring($TargetFolder.Length)
         IF ($Recurse) {
 
-            IF (-not(CheckContainer -CheckPath $MoveToNewFolder -ObjectName 'Moving the file to, Folder ')) {
+            IF (-not(CheckContainer -CheckPath $MoveToNewFolder -ObjectName 'Desitination folder of the file ')) {
 
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Create a new folder $($MoveToNewFolder)"
 
