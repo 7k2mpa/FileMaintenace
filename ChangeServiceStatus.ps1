@@ -46,7 +46,7 @@ If the service is stoped already, terminate as WARNING.
 .EXAMPLE
 ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Running -RetrySpanSec 5 -RetryTimes 5 -WarningAsNormal
 
-Start Windows serivice(Service Name:Spooler, Diskplay Name:Print Spooler)
+Start Windows serivice(Service Name:Spooler, Display Name:Print Spooler)
 If it dose not start immediately, retry 5times every 5seconds.
 
 Specified -WarningAsNormal option and, if the service is started already, terminate as NORMAL.
