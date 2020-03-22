@@ -46,7 +46,7 @@ If the service is stoped already, terminate as WARNING.
 .EXAMPLE
 ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Running -RetrySpanSec 5 -RetryTimes 5 -WarningAsNormal
 
-Start Windows serivice(Service Name:Spooler, Print Spooler)
+Start Windows serivice(Service Name:Spooler, Diskplay Name:Print Spooler)
 If it dose not start immediately, retry 5times every 5seconds.
 
 Specified -WarningAsNormal option and, if the service is started already, terminate as NORMAL.
@@ -60,7 +60,7 @@ Specified -WarningAsNormal option and, if the service is started already, termin
 
 
 .PARAMETER Service
-Specify Windows 'Service name'.  'Service name' is diffent 'Display name'.
+Specify Windows 'Service name'.  'Service name' is diffent from 'Display name'.
 Sample
 Serivce Name:Spooker
 Display Name:Print Spooler
@@ -108,7 +108,7 @@ Default is 5times.
 デフォルトは$TRUEでEvent Log出力します。
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $Falseと等価です。
+　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
 
 .PARAMETER ProviderName
 　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
@@ -121,13 +121,13 @@ Default is 5times.
 デフォルトは$TRUEでコンソール出力します。
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $Falseと等価です。
+　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$Falseでログファイル出力しません。
+　ログフィルへの出力を制御します。デフォルトは$FALSEでログファイル出力しません。
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $Falseと等価です。
+　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
 
 .PARAMETER LogPath
 　ログファイル出力パスを指定します。デフォルトは$NULLです。
@@ -223,7 +223,7 @@ Param(
 
 [boolean]$Log2Console = $TRUE,
 [Switch]$NoLog2Console,
-[boolean]$Log2File = $False,
+[boolean]$Log2File = $FALSE,
 [Switch]$NoLog2File,
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath ,
 [String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
@@ -256,7 +256,7 @@ Try{
     #CommonFunctions.ps1の配置先を変更した場合は、ここを変更。同一フォルダに配置前提
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
-    Catch [Exception]{
+    Catch [Exception] {
     Write-Output "Fail to load CommonFunctions.ps1 Please verfy existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
@@ -380,7 +380,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
         'Stopped' {
             IF ($WMIService.AcceptStop) {
                 $return = $WMIService.stopService()
-                }else{
+                } else {
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] will not accept a stop request. Wait for $($RetrySpanSec) seconds."
                 Start-Sleep $RetrySpanSec
                 Continue
@@ -411,7 +411,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
                 IF ($serviceStatus) {
                     Logging -EventID $SuccessEventID -EventType Success -EventMessage "Service [$($Service)] is [$($TargetStatus)]"
                     Finalize $NormalReturnCode
-                    }else{
+                    } else {
                     Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] is not [$($TargetStatus)] Retry."
                     }
                 }
