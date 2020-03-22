@@ -213,9 +213,10 @@ function TryAction {
         IF ($OverRideFlag) {
             $Script:OverRideCount++
             $Script:InLoopOverRideCount++
-            $Script:OverRideFlag = $FALSE            }
-            Return
+            $Script:OverRideFlag = $FALSE            
             }
+        Return
+        }
 
       
     Try {
@@ -450,7 +451,7 @@ Param(
 
     #パスがフォルダで末尾に\が存在した場合は削除する。末尾の\有無で結果は一緒なのだが、統一しないと文字列数が異なるためパス文字列切り出しが誤動作する。
 
-    IF ($CheckPath.Substring($CheckPath.Length -1 , 1) -eq '\') {
+    IF ($CheckPath.EndsWith('\')) {
     
             Logging -EventID $InfoEventID -EventType Information -EventMessage "Windows path format allows the end of path with a path separator '\' , due to processing limitation, remove it."
             $CheckPath = $CheckPath.Substring(0 , $CheckPath.Length -1)
