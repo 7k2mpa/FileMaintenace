@@ -1045,11 +1045,23 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "All paramete
 }
 
 
-#圧縮フラグまたはタイムスタンプ付加フラグがTrueの処理
+function ConvertTo-CompressOrAddTimeStampFileName {
 
-function CompressAndAddTimeStamp {
+<#
+.SYNOPSIS
+ConvertTo new path with extention .zip or adding time stamp
+
+.INPUT
+System.String. Path of the file
+
+.OUTPUT
+Strings Array
+[0]new path
+[1]ActionType string for display
+#>
 
 Param(
+[Array]$PreAction = $PreAction,
 [parameter(mandatory=$TRUE)][String]$TargetObject
 ) 
 
@@ -1065,19 +1077,19 @@ Param(
         Switch -Regex ($PreAction) {    
         
           '^7z$' {
-                $Script:ActionType = "7z"
+                $actionType = "7z"
                 $extString = '.7z'
                 Break                
                 }
                 
            '^7zZip$' {
-                $Script:ActionType = "7zZip"
+                $actionType = "7zZip"
                 $extString = '.zip'
                 Break
                 }
                     
              Default {
-                $Script:ActionType = ""
+                $actionType = ""
                 $extString = $CompressedExtString
                 }    
         }
@@ -1085,12 +1097,12 @@ Param(
         IF ($PreAction -contains 'AddTimeStamp') {
 
                 $archiveFile = Join-Path -Path $targetFileParentFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )+$extString )
-                $Script:ActionType += "CompressAndAddTimeStamp"
+                $actionType += "CompressAndAddTimeStamp"
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Create new file [$(Split-Path -Path $archiveFile -Leaf)] compressed and added time stamp."
 
                 } else {
                 $archiveFile = $TargetObject+$extString
-                $Script:ActionType += "Compress"
+                $actionType += "Compress"
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Create new file [$(Split-Path -Path $archiveFile -Leaf)] compressed." 
                 }          
  
@@ -1099,7 +1111,7 @@ Param(
 #タイムスタンプ付加のみTrueの時
 
                 $archiveFile = Join-Path -Path $targetFileParentFolder -ChildPath (AddTimeStampToFileName -TargetFileName (Split-Path -Path $TargetObject -Leaf )  -TimeStampFormat $TimeStampFormat )
-                $Script:ActionType = "AddTimeStamp"
+                $actionType = "AddTimeStamp"
                 Logging -EventID $InfoEventID -EventType Information -EventMessage "Create new file [$(Split-Path -Path $archiveFile -Leaf)] added time stamp."
                 }
 
@@ -1109,12 +1121,12 @@ Param(
     IF ($PreAction -contains 'MoveNewFile') {
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage ("Specified -PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"] option, thus place the new file in the folder $($MoveToNewFolder)")
-        Return ( Join-Path -Path $MoveToNewFolder -ChildPath (Split-Path -Path $archiveFile -Leaf) )
+
+        Return ( Join-Path -Path $MoveToNewFolder -ChildPath (Split-Path -Path $archiveFile -Leaf) ) , $actionType
 
         } else {
-        Return $archiveFile
+        Return $archiveFile , $actionType
         }
-
 }
 
 
@@ -1316,7 +1328,10 @@ Do
 
     IF (( $PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')) {
 
-        $archivePath = CompressAndAddTimeStamp -TargetObject $TargetObject
+        $return = ConvertTo-CompressOrAddTimeStampFileName -TargetObject $TargetObject
+
+        $archivePath = $return[0]
+        $ActionType =  $return[1]
 
         IF (CheckLeafNotExists $archivePath) {
 
