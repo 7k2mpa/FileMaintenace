@@ -576,6 +576,7 @@ Param(
 [Switch]$Continue,
 [Switch]$ContinueAsNormal,
 [Switch]$NoneTargetAsWarning,
+[Switch]$NoAction,
 
 [String]$CompressedExtString = '.zip',
 [String][ValidateNotNullOrEmpty()][ValidateScript({ Test-Path $_  -PathType container })]$7zFolder = 'C:\Program Files\7-Zip',
@@ -583,7 +584,6 @@ Param(
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss',
 
 #Switches planned to obsolute please use -PreAction start
-[Switch]$NoAction,
 [Switch]$Compress,
 [Switch]$AddTimeStamp,
 [Switch]$MoveNewFile,
@@ -668,6 +668,8 @@ function Test-LeafNotExists {
     チェック対象のファイル、フォルダが存在しない...$TRUE
 #>
 
+[OutputType([Boolean])]
+[CmdletBinding()]
 Param(
 [Switch]$ForceEndLoop = $ForceEndLoop ,
 [Switch]$OverRide = $OverRide ,
@@ -677,9 +679,13 @@ Param(
 [int]$WarningEventID = $WarningEventID ,
 [int]$ErrorEventID = $ErrorEventID ,
 
-[String][parameter(mandatory=$TRUE)][Alias("CheckLeaf")]$Path
+[String][parameter(mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckLeaf")]$Path
 )
 
+begin {
+}
+
+process {
 Logging -EventID $InfoEventID -EventType Information -EventMessage "Check existence of $($Path)"
 
 DO
@@ -724,15 +730,15 @@ DO
 
     Logging -EventID $ErrorEventID -EventType Error -EventMessage "Same name object exists already, thus force to terminate $($ShellName)"
             
-    IF ($ForceEndLoop) {
+    IF ((-not($ForceEndLoop)) -and (-not($MYINVOCATION.ExpectingInput))) {
 
+        Finalize $ErrorReturnCode
+
+        } else {
         $Script:ErrorFlag = $TRUE
         $Script:ForceFinalize = $TRUE
         $noExistFlag = $FALSE
-        Break
-
-        } else {
-        Finalize $ErrorReturnCode
+        Break 
         }
 }
 
@@ -745,6 +751,10 @@ While ($FALSE)
         }
 
 Return $noExistFlag
+}
+
+end {
+}
 
 }
 
@@ -798,12 +808,13 @@ System.String. Path of the folder to get objects
 Strings Array of Objects's path
 #>
 
+[OutputType([String])]
 [CmdletBinding()]
 Param(
 [Switch]$Recurse = $Recurse,
 [String]$Action = $Action,
 
-[String][parameter(mandatory=$TRUE)][Alias("TargetFolder")]$Path
+[String][parameter(mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFolder")]$Path
 )
 
 begin {
@@ -1076,6 +1087,8 @@ Strings Array
 [1]ActionType string for display
 #>
 
+[OutputType([Array])]
+[CmdletBinding()]
 Param(
 [Array]$PreAction = $PreAction ,
 [String]$MoveToFolder = $MoveToFolder ,
@@ -1084,8 +1097,13 @@ Param(
 [String]$CompressedExtString =  $CompressedExtString ,
 [String]$TimeStampFormat = $TimeStampFormat ,
 
-[String][parameter(mandatory=$TRUE)][Alias("TargetObject")]$Path
+[String][parameter(mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetObject")]$Path
 ) 
+
+begin {
+}
+
+process {
 
     IF (($PreAction -contains 'MoveNewFile') -and ($PreAction -contains 'Archive')) {        
         $desitinationFolder = $MoveToFolder
@@ -1170,6 +1188,12 @@ Param(
             }
 
 Return $archiveFilePath , $actionType
+
+}
+
+end {
+}
+
 }
 
 
