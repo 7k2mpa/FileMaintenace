@@ -672,25 +672,29 @@ Param(
 [Switch]$ForceEndLoop = $ForceEndLoop ,
 [Switch]$OverRide = $OverRide ,
 [Switch]$Continue = $Continue ,
+[Switch]$ContinueAsNormal = $ContinueAsNormal ,
+[int]$InfoEventID = $InfoEventID ,
+[int]$WarningEventID = $WarningEventID ,
+[int]$ErrorEventID = $ErrorEventID ,
 
-[parameter(mandatory=$TRUE)][String]$CheckLeaf
+[String][parameter(mandatory=$TRUE)][Alias("CheckLeaf")]$Path
 )
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Check existence of $($CheckLeaf)"
+Logging -EventID $InfoEventID -EventType Information -EventMessage "Check existence of $($Path)"
 
 DO
 {
-    IF (-not(Test-Path -LiteralPath $CheckLeaf)) {
+    IF (-not(Test-Path -LiteralPath $Path)) {
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "File $($CheckLeaf) dose not exist."
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "File $($Path) dose not exist."
         $noExistFlag = $TRUE
         Break
         }
 
 
-    IF (($OverRide) -and (Test-Path -LiteralPath $CheckLeaf -PathType Leaf)) {
+    IF (($OverRide) -and (Test-Path -LiteralPath $Path -PathType Leaf)) {
      
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Same name file $($CheckLeaf) exists already, but specified -OverRide[$OverRide] option, thus override the file."
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Same name file $($Path) exists already, but specified -OverRide[$OverRide] option, thus override the file."
         $Script:OverRideFlag = $TRUE
         $Script:WarningFlag = $TRUE
         $noExistFlag = $TRUE
@@ -698,12 +702,12 @@ DO
         }
 
 
-    IF (Test-Path -LiteralPath $CheckLeaf -PathType Leaf) {
+    IF (Test-Path -LiteralPath $Path -PathType Leaf) {
         
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Same name file $($CheckLeaf) exists already."
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Same name file $($Path) exists already."
         
         } else {
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Same name folder $($CheckLeaf) exists already."        
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Same name folder $($Path) exists already."        
         }
 
 
@@ -798,14 +802,15 @@ Strings Array of Objects's path
 Param(
 [Switch]$Recurse = $Recurse,
 [String]$Action = $Action,
-[String][parameter(mandatory=$TRUE)]$TargetFolder
+
+[String][parameter(mandatory=$TRUE)][Alias("TargetFolder")]$Path
 )
 
 begin {
 }
 
 process {
-    $candidateObjects = Get-ChildItem -LiteralPath $TargetFolder -Recurse:$Recurse -Include * 
+    $candidateObjects = Get-ChildItem -LiteralPath $Path -Recurse:$Recurse -Include * 
 
     $objects = @()
 
@@ -1072,8 +1077,14 @@ Strings Array
 #>
 
 Param(
-[Array]$PreAction = $PreAction,
-[parameter(mandatory=$TRUE)][String]$TargetObject
+[Array]$PreAction = $PreAction ,
+[String]$MoveToFolder = $MoveToFolder ,
+[String]$TargetFolder = $TargetFolder ,
+[String]$MoveToNewFolder = $MoveToNewFolder ,
+[String]$CompressedExtString =  $CompressedExtString ,
+[String]$TimeStampFormat = $TimeStampFormat ,
+
+[String][parameter(mandatory=$TRUE)][Alias("TargetObject")]$Path
 ) 
 
     IF (($PreAction -contains 'MoveNewFile') -and ($PreAction -contains 'Archive')) {        
@@ -1086,7 +1097,7 @@ Param(
                 $desitinationFolder = $MoveToNewFolder
 
                 } elseIF (-not($PreAction -contains 'MoveNewFile') ) {
-                    $desitinationFolder = Split-Path -Path $TargetObject -Parent
+                    $desitinationFolder = Split-Path -Path $Path -Parent
                     } 
 
 
@@ -1137,7 +1148,7 @@ Param(
 
     IF ($PreAction -contains 'AddTimeStamp') {
 
-        $archiveFilePath = Join-Path -Path $desitinationFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $TargetObject -Leaf) -TimeStampFormat $TimeStampFormat )+$extension )
+        $archiveFilePath = Join-Path -Path $desitinationFolder -ChildPath ((AddTimeStampToFileName -TargetFileName (Split-Path $Path -Leaf) -TimeStampFormat $TimeStampFormat )+$extension )
 
         IF ($PreAction -match '^(Compress|Archive)$') {
 
@@ -1148,7 +1159,7 @@ Param(
             }
 
         } else {        
-        $archiveFilePath = Join-Path -Path $desitinationFolder -ChildPath ((Split-Path $TargetObject -Leaf)+$extension )        
+        $archiveFilePath = Join-Path -Path $desitinationFolder -ChildPath ((Split-Path $Path -Leaf)+$extension )        
         }
 
         Logging -EventID $InfoEventID -EventType Information -EventMessage "Create a new file [$(Split-Path -Path $archiveFilePath -Leaf)] with action [$($actionType)]"
@@ -1229,7 +1240,7 @@ $Version = '20200324_1630'
 
 $TargetObjects = @()
 
-$TargetObjects = Get-Object -TargetFolder $TargetFolder
+$TargetObjects = Get-Object -Path $TargetFolder
 
     IF ($NULL -eq $TargetObjects) {
 
@@ -1254,12 +1265,12 @@ Write-Output $TargetObjects
 
 IF ($PreAction -contains 'Archive') {
 
-    [Array]$return = ConvertTo-PreActionFileName -TargetObject $ArchiveFileName
+    [Array]$return = ConvertTo-PreActionFileName -Path $ArchiveFileName
  
     $archivePath   = $return[0]
     $preActionType = $return[1]
 
-    IF (-not(Test-LeafNotExists $archivePath)) {
+    IF (-not(Test-LeafNotExists -Path $archivePath)) {
         
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "File/Folder exists in the path [$($archivePath)] already, thus terminate $($ShellName) with ERROR"
         Finalize $ErrorReturnCode        
@@ -1351,12 +1362,12 @@ Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "---
 
     IF (( $PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')) {
 
-         [Array]$return = ConvertTo-PreActionFileName -TargetObject $TargetObject
+         [Array]$return = ConvertTo-PreActionFileName -Path $TargetObject
 
         $archivePath   = $return[0]
         $preActionType = $return[1]
 
-        IF (Test-LeafNotExists $archivePath) {
+        IF (Test-LeafNotExists -Path $archivePath) {
 
             TryAction -ActionType $preActionType -ActionFrom $TargetObject -ActionTo $archivePath -ActionError $TargetObject
             }
@@ -1388,7 +1399,7 @@ Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "---
     '^(Move|Copy)$' {
             $targetFileMoveToPath = Join-Path -Path $MoveToNewFolder -ChildPath (Split-Path -Path $TargetObject -Leaf)
 
-            IF (Test-LeafNotExists $targetFileMoveToPath) {
+            IF (Test-LeafNotExists -Path $targetFileMoveToPath) {
 
                 TryAction -ActionType $Action -ActionFrom $TargetObject -ActionTo $targetFileMoveToPath -ActionError $TargetObject 
                 }
@@ -1453,7 +1464,7 @@ Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "---
 
             $newFilePath = ConvertToAbsolutePath -CheckPath $newFilePath -ObjectName 'Filename renamed'
 
-                    IF (Test-LeafNotExists $newFilePath) {
+                    IF (Test-LeafNotExists -Path $newFilePath) {
 
                         TryAction -ActionType Rename -ActionFrom $TargetObject -ActionTo $newFilePath -ActionError $TargetObject
     
