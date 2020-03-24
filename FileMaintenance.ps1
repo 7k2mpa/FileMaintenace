@@ -645,7 +645,10 @@ Try{
 
 ################# 共通部品、関数  #######################
 
-function CheckLeafNotExists {
+
+
+
+function Test-LeafNotExists {
 
 <#
 .SYNOPSIS
@@ -666,82 +669,79 @@ function CheckLeafNotExists {
 #>
 
 Param(
+[Switch]$ForceEndLoop = $ForceEndLoop ,
+[Switch]$OverRide = $OverRide ,
+[Switch]$Continue = $Continue ,
+
 [parameter(mandatory=$TRUE)][String]$CheckLeaf
 )
 
 Logging -EventID $InfoEventID -EventType Information -EventMessage "Check existence of $($CheckLeaf)"
 
-    #既にファイルがあるが、OverRide指定は無い。よって、異常終了 or Continue指定ありで継続
+DO
+{
+    IF (-not(Test-Path -LiteralPath $CheckLeaf)) {
 
-    IF ((Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -and (-not($OverRide))) {
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "File $($CheckLeaf) dose not exist."
+        $noExistFlag = $TRUE
+        Break
+        }
 
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "File $($CheckLeaf) exists already."
 
-        IF (-not($ContinueAsNormal)) {
-            $Script:WarningFlag = $TRUE
-            }    
-        IF (-not($Continue)) {
- 
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "File $($CheckLeaf) exists already, thus force to terminate $($ShellName)"
+    IF (($OverRide) -and (Test-Path -LiteralPath $CheckLeaf -PathType Leaf)) {
+     
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Same name file $($CheckLeaf) exists already, but specified -OverRide[$OverRide] option, thus override the file."
+        $Script:OverRideFlag = $TRUE
+        $Script:WarningFlag = $TRUE
+        $noExistFlag = $TRUE
+        Break
+        }
+
+
+    IF (Test-Path -LiteralPath $CheckLeaf -PathType Leaf) {
+        
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Same name file $($CheckLeaf) exists already."
+        
+        } else {
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Same name folder $($CheckLeaf) exists already."        
+        }
+
+
+    IF ($Continue) {
+
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Specified -Continue[$($Continue)] option, continue to process objects."
+    
+        $Script:WarningFlag = $TRUE
+        $Script:ContinueFlag = $TRUE
+        $noExistFlag = $FALSE
+        Break
+        }           
+
+
+    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Same name object exists already, thus force to terminate $($ShellName)"
             
-                IF ($ForceEndLoop) {
-                    $Script:ErrorFlag = $TRUE
-                    $Script:ForceFinalize = $TRUE
-                    Break
-                    } else {
-                    Finalize $ErrorReturnCode
-                    }
-            } else {
-            Logging -EventID $WarningEventID -EventType Warning -EventMessage "Specified -Continue[$($Continue)] option, continue to process objects."
-            $Script:ContinueFlag = $TRUE
+    IF ($ForceEndLoop) {
 
-            #既存ファイルがあるので$FALSEを返してファイル処理させない
-            Return $FALSE
-            }
+        $Script:ErrorFlag = $TRUE
+        $Script:ForceFinalize = $TRUE
+        $noExistFlag = $FALSE
+        Break
 
-      #既にファイルがあるが、OverRide指定がある。よって継続  
+        } else {
+        Finalize $ErrorReturnCode
+        }
+}
 
-     } elseIF ((Test-Path -LiteralPath $CheckLeaf -PathType Leaf) -and ($OverRide)) {
+While ($FALSE)
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "File $($CheckLeaf) exists already, but specified -OverRide[$OverRide] option,thus override the file."
-            $Script:OverRideFlag = $TRUE
+    IF (($ContinueAsNormal) -and ($WarningFlag)) {
 
-            #ここまで来ればファイルが存在しないは確定。同一名称のフォルダが存在する可能性は残っている
-            #同一名称のフォルダが存在するとOverRide出来ないので、Continue指定ありの場合は継続。指定なしで異常終了
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "Specified -ContinueAsNormal[$($ContinueAsNormal)] option, count warning event as NORMAL."
+        $Script:WarningFlag = $FALSE
+        }
 
-            } elseIF (Test-Path -LiteralPath $CheckLeaf -PathType Container) {
+Return $noExistFlag
 
-                Logging -EventID $WarningEventID -EventType Warning -EventMessage "Same name folder $($CheckLeaf) exists already."
-                $Script:WarningFlag = $TRUE
-
-                IF (-not($Continue)) {
-
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Same name folder $($CheckLeaf) exists already, thus force to terminate $($ShellName)"
-
-                    IF ($ForceEndLoop) {
-                        $Script:ErrorFlag = $TRUE
-                        $Script:ForceFinalize = $TRUE
-                        Break
-                        } else {
-                        Finalize $ErrorReturnCode
-                        }
-            
-                    } else {
-                    Logging -EventID $WarningEventID -EventType Warning -EventMessage "Specified -Continue[$($Continue)] option, thus continue to process objects."
-                    $Script:ContinueFlag = $TRUE
-
-                    #既存フォルダがあるので$FALSEを返してファイル処理させない
-                    Return $FALSE
-                    }
-
-            
-            #同一名称のファイル、フォルダ共に存在しない
-
-            } else {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "File $($CheckLeaf) dose not exist."            
-            }
-
-Return $TRUE
 }
 
 
@@ -1175,11 +1175,11 @@ Param(
 
 
         IF ($OverRide -and ($OverRideCount -gt 0)) {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Specified -OverRide[$($OverRide)] option, thus overrided old files with new files created in the same name in [$($OverRideCount)] times."
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Specified -OverRide[$($OverRide)] option, thus overrided old same name files with new files created in [$($OverRideCount)] times."
             }
 
         IF (($Continue) -and ($ContinueCount -gt 0)) {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Specified -Continue [$($Continue)] option, thus continued to process next objects in [$($ContinueCount)] times even though error occured with the same name file/folders existed already."
+            Logging -EventID $InfoEventID -EventType Information -EventMessage "Specified -Continue[$($Continue)] option, thus continued to process next objects in [$($ContinueCount)] times even though error occured with the same name file/folders existed already."
             }
     }
 
@@ -1190,13 +1190,14 @@ EndingProcess $ReturnCode
 
 #####################   ここから本体  ######################
 
-[Boolean]$ErrorFlag = $FALSE
-[Boolean]$WarningFlag = $FALSE
-[Boolean]$NormalFlag = $FALSE
-[Boolean]$OverRideFlag = $FALSE
-[Boolean]$ContinueFlag = $FALSE
-[Boolean]$ForceFinalize = $FALSE          ;#$TRUEでオブジェクト処理ループを強制終了。
-[Boolean]$ForceEndloop = $FALSE           ;#$FALSEではFinalize , $TRUEではループ内でBreak
+[Boolean]$ErrorFlag     = $FALSE
+[Boolean]$WarningFlag   = $FALSE
+[Boolean]$NormalFlag    = $FALSE
+[Boolean]$OverRideFlag  = $FALSE
+[Boolean]$ContinueFlag  = $FALSE
+
+[Boolean]$ForceEndloop  = $FALSE          ;#$FALSEではFinalize , $TRUEではループ内でBreak
+
 [Int][ValidateRange(0,2147483647)]$ErrorCount = 0
 [Int][ValidateRange(0,2147483647)]$WarningCount = 0
 [Int][ValidateRange(0,2147483647)]$NormalCount = 0
@@ -1204,9 +1205,10 @@ EndingProcess $ReturnCode
 [Int][ValidateRange(0,2147483647)]$ContinueCount = 0
 [Int][ValidateRange(0,2147483647)]$InLoopDeletedFilesCount = 0
 
+
 $DatumPath = $PSScriptRoot
 
-$Version = '20200305_1030'
+$Version = '20200324_1630'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
@@ -1252,12 +1254,12 @@ Write-Output $TargetObjects
 
 IF ($PreAction -contains 'Archive') {
 
-    $return = ConvertTo-PreActionFileName -TargetObject $ArchiveFileName
+    [Array]$return = ConvertTo-PreActionFileName -TargetObject $ArchiveFileName
  
     $archivePath   = $return[0]
     $preActionType = $return[1]
 
-    IF (-not(CheckLeafNotExists $archivePath)) {
+    IF (-not(Test-LeafNotExists $archivePath)) {
         
         Logging -EventID $ErrorEventID -EventType Error -EventMessage "File/Folder exists in the path [$($archivePath)] already, thus terminate $($ShellName) with ERROR"
         Finalize $ErrorReturnCode        
@@ -1289,17 +1291,20 @@ Do/Whileはループのため、処理途中でBreakすると、Whileへjumpする。
 #>
 Do
 {
-    [Boolean]$ErrorFlag = $FALSE
-    [Boolean]$WarningFlag = $FALSE
-    [Boolean]$NormalFlag = $FALSE
-    [Boolean]$OverRideFlag = $FALSE
-    [Boolean]$ContinueFlag = $FALSE
-    [Boolean]$ForceEndloop = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
-    [Int]$InLoopOverRideCount = 0    ;#$OverRideCountは処理全体のOverRide回数。$InLoopOverRideCountは1処理ループ内でのOverRide回数。1オブジェクトで複数回OverRideがあり得るため
+[Boolean]$ErrorFlag     = $FALSE
+[Boolean]$WarningFlag   = $FALSE
+[Boolean]$NormalFlag    = $FALSE
+[Boolean]$OverRideFlag  = $FALSE
+[Boolean]$ContinueFlag  = $FALSE
+[Boolean]$ForceFinalize = $FALSE          ;#$TRUEが戻ったらオブジェクト処理ループを強制終了
 
-    [String]$TargetFileParentFolder = Split-Path -Path $TargetObject -Parent
+[Boolean]$ForceEndloop  = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
 
-    Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- Start processing [$($FilterType)] $($TargetObject) ---"
+[Int]$InLoopOverRideCount = 0    ;#$OverRideCountは処理全体のOverRide回数。$InLoopOverRideCountは1処理ループ内でのOverRide回数。1オブジェクトで複数回OverRideがあり得るため
+
+[String]$TargetFileParentFolder = Split-Path -Path $TargetObject -Parent
+
+Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- Start processing [$($FilterType)] $($TargetObject) ---"
 
 
 #移動元のファイルパスから移動先のファイルパスを生成。
@@ -1316,7 +1321,7 @@ Do
         #C:\TargetFolder\A\B\C              :TargetFileParentFolder
         #C:\TargetFolder\A\B\C\target.txt   :TargetFile
         #D:\MoveToFolder                    :MoveToFolder
-        #D:\MoveToFolder\A\B\C              :MoveToNewFolder
+        #D:\MoveToFolder\A\B\C              :Test-LeafNotExists
 
         #D:\MoveToFolder\A\B\C\target.txt   :ファイルの移動先パス
 
@@ -1346,16 +1351,15 @@ Do
 
     IF (( $PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')) {
 
-        $return = ConvertTo-PreActionFileName -TargetObject $TargetObject
+         [Array]$return = ConvertTo-PreActionFileName -TargetObject $TargetObject
 
         $archivePath   = $return[0]
         $preActionType = $return[1]
 
-        IF (CheckLeafNotExists $archivePath) {
+        IF (Test-LeafNotExists $archivePath) {
 
             TryAction -ActionType $preActionType -ActionFrom $TargetObject -ActionTo $archivePath -ActionError $TargetObject
             }
-
         
     } elseIF ($PreAction -contains 'Archive') {
        
@@ -1384,10 +1388,10 @@ Do
     '^(Move|Copy)$' {
             $targetFileMoveToPath = Join-Path -Path $MoveToNewFolder -ChildPath (Split-Path -Path $TargetObject -Leaf)
 
-            IF (CheckLeafNotExists $targetFileMoveToPath) {
+            IF (Test-LeafNotExists $targetFileMoveToPath) {
 
-                TryAction -ActionType $Action -ActionFrom $TargetObject -ActionTo $targetFileMoveToPath -ActionError $TargetObject
-                }           
+                TryAction -ActionType $Action -ActionFrom $TargetObject -ActionTo $targetFileMoveToPath -ActionError $TargetObject 
+                }
             }
 
     #分岐4 空フォルダを判定して削除
@@ -1449,12 +1453,13 @@ Do
 
             $newFilePath = ConvertToAbsolutePath -CheckPath $newFilePath -ObjectName 'Filename renamed'
 
-                    IF (CheckLeafNotExists $newFilePath) {
+                    IF (Test-LeafNotExists $newFilePath) {
 
                         TryAction -ActionType Rename -ActionFrom $TargetObject -ActionTo $newFilePath -ActionError $TargetObject
+    
                         } else {
-                        Logging -EventID $InfoEventID -EventType Information -EventMessage  "A file [$($newFilePath)] already exists same as attempting rename, thus do not rename [$($TargetObject)]"
-                        }
+                            Logging -EventID $InfoEventID -EventType Information -EventMessage  "A file [$($newFilePath)] already exists same as attempting rename, thus do not rename [$($TargetObject)]" 
+                            }
             }
 
     #分岐3 NullClear
