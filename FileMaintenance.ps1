@@ -1321,7 +1321,7 @@ Logging -EventID $InfoLoopStartEventID -EventType Information -EventMessage "---
         #C:\TargetFolder\A\B\C              :TargetFileParentFolder
         #C:\TargetFolder\A\B\C\target.txt   :TargetFile
         #D:\MoveToFolder                    :MoveToFolder
-        #D:\MoveToFolder\A\B\C              :Test-LeafNotExists
+        #D:\MoveToFolder\A\B\C              :MoveToNewFolder
 
         #D:\MoveToFolder\A\B\C\target.txt   :ファイルの移動先パス
 
