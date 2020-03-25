@@ -329,7 +329,7 @@ Try{
 
 function Initialize {
 
-$SHELLNAME=Split-Path $PSCommandPath -Leaf
+$ShellName = Split-Path $PSCommandPath -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -344,30 +344,29 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
 #パラメータの確認
 
-    IF(-NOT($AllServers)){
+    IF (-NOT($AllServers)) {
 
-        CheckHostname -CheckHostName $Server -ObjectName 'バックアップ対象 -Server' > $NULL
+        Test-Hostname -CheckHostName $Server -ObjectName 'バックアップ対象 -Server' > $NULL
         }
 
-    CheckHostname -CheckHostName $UDPConsoleServerName -ObjectName 'arcserveUDP Console Server -UDPConsoleServerName' > $NULL
+    Test-Hostname -CheckHostName $UDPConsoleServerName -ObjectName 'arcserveUDP Console Server -UDPConsoleServerName' > $NULL
 
 #[String][ValidateSet("JobExecUserAndPasswordFile","FixedPasswordFile" , "PlanText")]$AuthorizationType = 'JobExecUserAndPasswordFile' ,
 
 
-    IF($AuthorizationType -match '^(FixedPasswordFile|PlainText)$' ){
+    IF ($AuthorizationType -match '^(FixedPasswordFile|PlainText)$' ) {
 
-        CheckDomainName -CheckDomainName $ExecUserDomain -ObjectName '実行ユーザが所属するドメイン -ExecUserDomain'  > $NULL
-    
-        CheckUserName -CheckUserName $ExecUser -ObjectName '実行ユーザ -ExecUser ' > $NULL
+        Test-DomainName -CheckDomainName $ExecUserDomain -ObjectName '実行ユーザが所属するドメイン -ExecUserDomain'  > $NULL    
+        Test-UserName -CheckUserName $ExecUser -ObjectName '実行ユーザ -ExecUser ' > $NULL
 
         }
 
 #UDPConsoleの存在を確認
 
-    IF(Test-Connection -ComputerName $UDPConsoleServerName -Quiet){
+    IF (Test-Connection -ComputerName $UDPConsoleServerName -Quiet) {
     
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "UDPコンソールサーバ[$($UDPConsoleServerName)]が応答しました。"
-        }else{
+        } else {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "UDPコンソールサーバ[$($UDPConsoleServerName)]が応答しません。 -UDPConsoleServerNameが正しく設定されているか確認して下さい。"
         Exit $ErrorReturnCode
         }
@@ -375,14 +374,14 @@ $SHELLNAME=Split-Path $PSCommandPath -Leaf
 
 #Password Fileの有無を確認
 
-    IF($AuthorizationType -match '^FixedPasswordFile$' ){
+    IF ($AuthorizationType -match '^FixedPasswordFile$' ) {
 
         $FixedPasswordFilePath  = ConvertTo-AbsolutePath -CheckPath $FixedPasswordFilePath -ObjectName '-FixedPasswordFilePath'
 
         Test-Leaf -CheckPath $FixedPasswordFilePath -ObjectName '-FixedPasswordFilePath' -IfNoExistFinalize > $NULL
         }
 
-    IF($AuthorizationType -match '^JobExecUserAndPasswordFile$' ){
+    IF ($AuthorizationType -match '^JobExecUserAndPasswordFile$' ) {
 
         $ExecUserPasswordFilePath  = ConvertTo-AbsolutePath -CheckPath $ExecUserPasswordFilePath -ObjectName '-ExecUserPasswordFilePath'
     
@@ -413,21 +412,6 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "arcserve U
 
 }
 
-function GetUserAndDomain{
-
-    $UserInfo = @()
-
-#ユーザ名はdomain\userの形式で出力されるので、バックスラッシュ\を区切り記号として、配列に代入
-#-Splitは正規表現なのでエスケープ記号はバックスラッシュ\　Powershellのエスケープであるバッククオート`ではない
-
-    $UserInfo = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name -split '\\'
-
-    $Script:DoDomain = $UserInfo[0]
-    $Script:DoUser = $UserInfo[1]
-
-}
-
-
 
 function Finalize {
 
@@ -437,7 +421,7 @@ Param(
 
     Pop-Location
 
-    IF(Test-Leaf -CheckPath $BackupFlagFilePath -ObjectName 'BackUp Flag'){
+    IF (Test-Leaf -CheckPath $BackupFlagFilePath -ObjectName 'BackUp Flag') {
         Invoke-Action -ActionType Delete -ActionFrom  $BackupFlagFilePath -ActionError "BackUp Flag [$($BackupFlagFilePath)]"
         }
 
@@ -459,8 +443,10 @@ $Version = '20200221_2145'
 
 . Initialize
 
-. GetUserAndDomain
+    [Array]$userInfo = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name -split '\\'
 
+    $DoDomain = $userInfo[0]
+    $DoUser   = $userInfo[1]
 
 #Create Invoke Command Strings
 
@@ -470,13 +456,13 @@ $Version = '20200221_2145'
 
 
 
-    IF($AllServers){
+    IF ($AllServers) {
 
        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "バックアップはプラン[$($Plan)]に含まれる全サーバが対象です。"
        $command +=  " -PlanName $Plan "
        $Server = 'All'
        
-       }else{
+       } else {
        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "バックアップはプラン[$($Plan)]に含まれるサーバ[$($Server)]が対象です。"
        $command += " -NodeName $Server "
 
@@ -486,16 +472,14 @@ $Version = '20200221_2145'
 
     Switch -Regex ($AuthorizationType){
 
-    '^JobExecUser$'
-        {
+    '^JobExecUser$' {
         #今のところ、この認証方式はarcserve UDPでは出来ない。実行ユーザが権限を持っていても(パスワードファイル|パスワード)を与える必要がある
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "認証方法は[$($AuthorizationType)]です。ジョブ実行中ユーザ名と認証情報で認証します。"
         }
 
-    '^JobExecUserAndPasswordFile$'
-        {
+    '^JobExecUserAndPasswordFile$' {
+    
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "認証方法は[$($AuthorizationType)]です。ジョブ実行中ユーザ名、予め用意した実行ユーザ名を含むパスワードファイルで認証します。"
-
 
         $ExtensionString = [System.IO.Path]::GetExtension((Split-Path -Path $ExecUserPasswordFilePath -Leaf))
         $FileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension((Split-Path -Path $ExecUserPasswordFilePath -Leaf))
@@ -509,27 +493,26 @@ $Version = '20200221_2145'
         $command += " -UDPConsoleUserName `'$DoUser`' -UDPConsoleDomainName `'$DoDomain`' -UDPConsolePasswordFile `'$ExecUserPasswordFilePath`' "
         }
 
-    '^FixedPasswordFile$'
-        {
+    '^FixedPasswordFile$' {
+
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "認証方法は[$($AuthorizationType)]です。指定したユーザ名、予め用意したパスワードファイルで認証します。"
         $Command += "-UDPConsoleDomainName `'$ExecUserDomain`' -UDPConsoleUserName `'$ExecUser`' -UDPConsolePasswordFile `'$FixedPasswordFilePath`' "
         }
 
-    '^PlainText$'
-        {
+    '^PlainText$' {
+
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "認証方法は[$($AuthorizationType)]です。指定したユーザ名、指定した平文パスワードで認証します。。"
         $Command += "-UDPConsoleDomainName `'$ExecUserDomain`' -UDPConsoleUserName `'$ExecUser`' -UDPConsolePassword `'$ExecUserPassword`' "
         }
 
-    Default
-        {
+    Default {
+
         Write-Log -EventID $InternalErrorEventID -EventType Error -EventMessage "内部エラー。-AuthorizationTypeの指定が正しくありません"
         Finalize $ErrorReturnCode
         }
     }
 
 #BackUp Flag Check and Create
-
 
      $ExtensionString = [System.IO.Path]::GetExtension((Split-Path -Path $BackupFlagFilePath -Leaf))
      $FileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension((Split-Path -Path $BackupFlagFilePath -Leaf))
@@ -540,7 +523,7 @@ $Version = '20200221_2145'
 
 
 
-    IF(Test-Leaf -CheckPath $BackupFlagFilePath -ObjectName 'バックアップ実行中フラグ'){
+    IF (Test-Leaf -CheckPath $BackupFlagFilePath -ObjectName 'バックアップ実行中フラグ') {
 
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Back Up実行中です。重複実行は出来ません"
             Finalize $ErrorReturnCode
@@ -554,7 +537,7 @@ $Version = '20200221_2145'
 
     Push-Location (Split-Path $UDPCLIPath -Parent)
 
-    Try{
+    Try {
         $Return = Invoke-Expression $command 2>$errorMessage -ErrorAction Stop 
         }
 
@@ -567,7 +550,7 @@ $Version = '20200221_2145'
         }
 
 
-        IF ($Return -ne 0){
+        IF ($Return -ne 0) {
                    
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "[$($Plan)]に含まれるサーバ[$($Server)]のバックアップ方式[$($BackUpJobType)]に失敗しました。"
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Error Message [$($ErrorMessage)]"

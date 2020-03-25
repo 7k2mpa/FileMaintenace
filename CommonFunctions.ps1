@@ -74,12 +74,12 @@ $Script:CommonFunctionsVersion = '20200221_2145'
 
 
 
-
-#ログ出力
-
-
 function Write-Log {
+<#
+.SYNOPSIS
+ Output Log to Windows Event Log , Console and File
 
+#>
 [CmdletBinding()]
 Param(
 [parameter(position=0 ,mandatory=$TRUE)][ValidateRange(1,65535)][int]$EventID ,
@@ -127,11 +127,12 @@ end {
 }
 
 
-#ReturnCode大小関係確認
-#$ErrorReturnCode = 0設定等を考慮して異常時はExit 1で抜ける
-
-function CheckReturnCode {
-
+function Test-ReturnCode {
+<#
+.SYNOPSIS
+ReturnCode大小関係確認
+$ErrorReturnCode = 0設定等を考慮して異常時はExit 1で抜ける
+#>
     IF (-not(($InternalErrorReturnCode -ge $WarningReturnCode) -and ($ErrorReturnCode -ge $WarningReturnCode) -and ($WarningReturnCode -ge $NormalReturnCode))) {
 
         Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID "The magnitude relation of ReturnCodes' parameters is not set correctly."
@@ -141,12 +142,12 @@ function CheckReturnCode {
 }
 
 
-
-#イベントソース未設定時の処理
-#この確認が終わるまではログ出力可能か確定しないのでコンソール出力を強制
-
-function CheckEventLogSource {
-
+function Test-EventLogSource {
+<#
+.SYNOPSIS
+イベントソース未設定時の処理
+この確認が終わるまではログ出力可能か確定しないのでコンソール出力を強制
+#>
     IF (-not($Log2EventLog)) {
         Return
         }
@@ -177,11 +178,12 @@ $ForceConsoleEventLog = $FALSE
 }
 
 
-#ログファイル出力先確認
-#この確認が終わるまではログ出力可能か確定しないのでEventLogとコンソール出力を強制
-
-function CheckLogFilePath {
-
+function Test-LogFilePath {
+<#
+.SYNOPSIS
+ログファイル出力先確認
+この確認が終わるまではログ出力可能か確定しないのでEventLogとコンソール出力を強制
+#>
     IF (-not($Log2File)) {
         Return
         }
@@ -195,10 +197,6 @@ $ForceConsoleEventLog = $TRUE
 $ForceConsoleEventLog = $FALSE
 
 }
-
-
-
-
 
 
 function Invoke-Action {
@@ -373,7 +371,7 @@ function Invoke-Action {
 }
 
 
-Function ConvertTo-AbsolutePath {
+function ConvertTo-AbsolutePath {
 
 <#
 .SYNOPSIS
@@ -496,48 +494,20 @@ Param(
 
 }
 
-
-
-
-
-#終了
-
-function  Invoke-PostFinalize {
+ 
+function ConvertTo-FileNameAddTimeStamp {
 
 Param(
-[parameter(mandatory=$TRUE)][int]$ReturnCode
+[String][parameter(mandatory=$TRUE)]$TimeStampFormat,
+[String][parameter(mandatory=$TRUE)]$TargetFileName
 )
 
-    IF (($ErrorCount -gt 0) -or ($ReturnCode -ge $ErrorReturnCode)) {
 
-        IF ($ErrorAsWarning) {
-            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred, specified -ErrorAsWarning[$($ErrorAsWarning)] option, thus the exit code is [$($WarningReturnCode)]"  
-            $returnCode = $WarningReturnCode
-           
-            } else {
-            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "An ERROR termination occurred, the exit code is [$($ErrorReturnCode)]"
-            $returnCode = $ErrorReturnCode
-            }
+    $formattedDate = (Get-Date).ToString($TimeStampFormat)
+    $extensionString = [System.IO.Path]::GetExtension($TargetFileName)
+    $fileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension($TargetFileName)
 
-        } elseIF (($WarningCount -gt 0) -or ($ReturnCode -ge $WarningReturnCode)) {
-
-            IF ($WarningAsNormal) {
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "A WARNING termination occurred, specified -WarningAsNormal[$($WarningAsNormal)] option, thus the exit code is [$($NormalReturnCode)]" 
-                $returnCode = $NormalReturnCode
-           
-                } else {
-                Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred, the exit code is [$($WarningReturnCode)]"
-                $returnCode = $WarningReturnCode
-                }
-        
-        } else {
-        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully. The exit code is [$($NormalReturnCode)]"
-        $returnCode = $NormalReturnCode               
-        }
-
-    Write-Log -EventID $EndEventID -EventType Information -EventMessage "Exit $($ShellName) Version $($Version)"
-
-Exit $returnCode
+    Return $fileNameWithOutExtentionString+$formattedDate+$extensionString
 
 }
 
@@ -589,13 +559,13 @@ Param(
 }
 
 
+function Test-ServiceStatus {
+<#
 #サービス状態確認
 #引数$Healthで状態(Running|Stopped)を指定してください。戻り値は指定状態で$TRUEまたは非指定状態$FALSE
 #サービス起動、停止しても状態推移には時間が掛かります。このfunctionは一定時間$Span、一定回数$UpTo、状態確認を繰り返します
 #起動が遅いサービスは$Spanを大きくしてください
-
-function Test-ServiceStatus {
-
+#>
 Param(
 [parameter(mandatory=$TRUE)][String]$ServiceName,
 [String][ValidateSet("Running", "Stopped")]$Health = 'Running',
@@ -773,7 +743,7 @@ Param(
 }
 
 
-function CheckExecUser {
+function Test-ExecUser {
 
     $Script:ScriptExecUser = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 
@@ -787,7 +757,6 @@ function CheckExecUser {
 }
 
 
-
 function Invoke-PreInitialize {
 
 $ERROR.clear()
@@ -796,17 +765,17 @@ $ForceConsoleEventLog = $FALSE
 
 #ReturnCode確認
 
-. CheckReturnCode
+. Test-ReturnCode
 
 
 #イベントソース未設定時の処理
 
-. CheckEventLogSource
+. Test-EventLogSource
 
 
 #ログファイル出力先確認
 
-. CheckLogFilePath
+. Test-LogFilePath
 
 
 
@@ -825,8 +794,48 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Loaded Com
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to validate parameters."
 
-. CheckExecUser
+. Test-ExecUser
 
+
+}
+
+
+function Invoke-PostFinalize {
+
+Param(
+[parameter(mandatory=$TRUE)][int]$ReturnCode
+)
+
+    IF (($ErrorCount -gt 0) -or ($ReturnCode -ge $ErrorReturnCode)) {
+
+        IF ($ErrorAsWarning) {
+            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred, specified -ErrorAsWarning[$($ErrorAsWarning)] option, thus the exit code is [$($WarningReturnCode)]"  
+            $returnCode = $WarningReturnCode
+           
+            } else {
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "An ERROR termination occurred, the exit code is [$($ErrorReturnCode)]"
+            $returnCode = $ErrorReturnCode
+            }
+
+        } elseIF (($WarningCount -gt 0) -or ($ReturnCode -ge $WarningReturnCode)) {
+
+            IF ($WarningAsNormal) {
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "A WARNING termination occurred, specified -WarningAsNormal[$($WarningAsNormal)] option, thus the exit code is [$($NormalReturnCode)]" 
+                $returnCode = $NormalReturnCode
+           
+                } else {
+                Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred, the exit code is [$($WarningReturnCode)]"
+                $returnCode = $WarningReturnCode
+                }
+        
+        } else {
+        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully. The exit code is [$($NormalReturnCode)]"
+        $returnCode = $NormalReturnCode               
+        }
+
+    Write-Log -EventID $EndEventID -EventType Information -EventMessage "Exit $($ShellName) Version $($Version)"
+
+Exit $returnCode
 
 }
 
@@ -909,8 +918,6 @@ Pop-Location
 }
 
 
-
-
 function Test-OracleBackUpMode {
 
 
@@ -972,27 +979,10 @@ function Test-OracleBackUpMode {
 }
 
 
-function ConvertTo-FileNameAddTimeStamp {
+function Test-UserName {
 
 Param(
-[String][parameter(mandatory=$TRUE)]$TimeStampFormat,
-[String][parameter(mandatory=$TRUE)]$TargetFileName
-)
-
-
-    $formattedDate = (Get-Date).ToString($TimeStampFormat)
-    $extensionString = [System.IO.Path]::GetExtension($TargetFileName)
-    $fileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension($TargetFileName)
-
-    Return $fileNameWithOutExtentionString+$formattedDate+$extensionString
-
-}
-
-
-function CheckUserName {
-
-Param(
-[parameter(mandatory=$TRUE)][String]$CheckUserName,
+[parameter(mandatory=$TRUE)][String]$CheckName,
 [String]$ObjectName 
 )
 
@@ -1011,7 +1001,8 @@ Param(
 
 }
 
-function CheckDomainName {
+
+function Test-DomainName {
 
 Param(
 [parameter(mandatory=$TRUE)][String]$CheckDomainName,
@@ -1034,7 +1025,7 @@ Param(
 }
 
 
-function CheckHostname {
+function Test-Hostname {
 
 Param(
 [parameter(mandatory=$TRUE)][String]$CheckHostName,
