@@ -292,24 +292,24 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #コマンドの有無を確認
 
 
-    $CommandPath = ConvertToAbsolutePath -CheckPath $CommandPath -ObjectName '-CommandPath'
+    $CommandPath = ConvertTo-AbsolutePath -CheckPath $CommandPath -ObjectName '-CommandPath'
 
-    CheckLeaf -CheckPath $CommandPath -ObjectName '-CommandPath' -IfNoExistFinalize > $NULL
+    Test-Leaf -CheckPath $CommandPath -ObjectName '-CommandPath' -IfNoExistFinalize > $NULL
 
 #コマンドファイルの有無を確認
     
 
-    $CommandFile = ConvertToAbsolutePath -CheckPath $CommandFile -ObjectName '-CommandFile'
+    $CommandFile = ConvertTo-AbsolutePath -CheckPath $CommandFile -ObjectName '-CommandFile'
 
-    CheckLeaf -CheckPath $CommandFile -ObjectName '-CommandFile' -IfNoExistFinalize > $NULL
+    Test-Leaf -CheckPath $CommandFile -ObjectName '-CommandFile' -IfNoExistFinalize > $NULL
 
 
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Starting to exec command [$($CommandPath)]です"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Starting to exec command [$($CommandPath)]です"
 
 }
 
@@ -344,9 +344,9 @@ $Version = '20200224_1640'
         }
                     catch [Exception]
                     {
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to load -CommandFile"
+                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to load -CommandFile"
                     $errorDetail = $Error[0] | Out-String
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
+                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
                     Finalize $ErrorReturnCode
                     }
 
@@ -355,25 +355,25 @@ $Version = '20200224_1640'
 
 For ( $i = 1 ; $i -le $UpTo ; $i++ ){
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute 1st line in [$($CommandFile)]"
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "Try times [$($i)/$($UpTo)]"
+    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execute 1st line in [$($CommandFile)]"
+    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Try times [$($i)/$($UpTo)]"
 
         Try {
         
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Execute command [$($CommandPath)] with arguments [$($line)]"
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execute command [$($CommandPath)] with arguments [$($line)]"
             Invoke-Expression "$CommandPath $Line" -ErrorAction Stop
 
             }
 
             catch [Exception]{
 
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute [$($CommandPath)]"
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute [$($CommandPath)]"
             $errorDetail = $Error[0] | Out-String
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
             Finalize $ErrorReturnCode
             }
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Result of execution [$($CommandFile)] is [$($LASTEXITCODE)]"
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Result of execution [$($CommandFile)] is [$($LASTEXITCODE)]"
                     
 
         #終了コードで分岐
@@ -382,11 +382,11 @@ For ( $i = 1 ; $i -le $UpTo ; $i++ ){
                         #条件1 異常終了
                         {$_ -ge $ErrorReturnCode} {
  
-                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred at line 1 in -CommandFile [$($CommandFile)]"
+                            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred at line 1 in -CommandFile [$($CommandFile)]"
        
                             IF ($Continue) {
-                                Logging -EventID $WarningEventID -EventType Warning -EventMessage "Will try again, because option -Continue[$($Continue)] is used." 
-                                Logging -EventID $WarningEventID -EventType Warning -EventMessage "Wait for [$($Span)] seconds."
+                                Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Will try again, because option -Continue[$($Continue)] is used." 
+                                Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Wait for [$($Span)] seconds."
                                 Start-Sleep -Seconds $Span
                                 Break     
      
@@ -400,8 +400,8 @@ For ( $i = 1 ; $i -le $UpTo ; $i++ ){
                         {$_ -ge $WarningReturnCode} {
                             
 
-                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred at line 1 in [$($CommandFile)] , will try again. " 
-                            Logging -EventID $WarningEventID -EventType Warning -EventMessage "Waint for [$($Span)] seconds."
+                            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred at line 1 in [$($CommandFile)] , will try again. " 
+                            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Waint for [$($Span)] seconds."
                             Start-Sleep -Seconds $Span                             
                             }
 
@@ -409,7 +409,7 @@ For ( $i = 1 ; $i -le $UpTo ; $i++ ){
                         #条件3 正常終了
                         Default {
 
-                            Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully in [$($i)] times try."                        
+                            Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully in [$($i)] times try."                        
                             Finalize $NormalReturnCode
                             }
         }
@@ -419,6 +419,6 @@ For ( $i = 1 ; $i -le $UpTo ; $i++ ){
 #対象群の処理ループ終端
 }
 
-Logging -EventID $WarningEventID -EventType Warning -EventMessage "Although with [$($UpTo)] times retry, did not complete successfully. Thus terminate as WARNING." 
+Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Although with [$($UpTo)] times retry, did not complete successfully. Thus terminate as WARNING." 
 
 Finalize $WarningReturnCode

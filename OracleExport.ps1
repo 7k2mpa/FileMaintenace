@@ -306,9 +306,9 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #指定フォルダの有無を確認
 
-   $OracleHomeBinPath = ConvertToAbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
+   $OracleHomeBinPath = ConvertTo-AbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
 
-   CheckContainer -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
+   Test-Container -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
 
 
         
@@ -317,12 +317,12 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
     $targetWindowsOracleService = "OracleService"+$OracleSID
 
-    IF (-not(CheckServiceStatus -ServiceName $targetWindowsOracleService -Health Running)) {
+    IF (-not(Test-ServiceStatus -ServiceName $targetWindowsOracleService -Health Running)) {
 
-        Logging -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
+        Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
         Finalize $ErrorReturnCode
         }else{
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is running."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is running."
         }
      
 
@@ -331,9 +331,9 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Start to export DB with Oracle data pump command."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to export DB with Oracle data pump command."
 
 }
 
@@ -361,8 +361,8 @@ $DatumPath = $PSScriptRoot
 
     IF ($AddTimeStamp) {
 
-        $DumpFile = AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $DumpFile
-        $LogFile  = AddTimeStampToFileName -TimeStampFormat $TimeStampFormat -TargetFileName $LogFile
+        $DumpFile = ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat -TargetFileName $DumpFile
+        $LogFile  = ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat -TargetFileName $LogFile
         }
 
 
@@ -382,11 +382,11 @@ $process = Start-Process .\EXPDP.exe -ArgumentList $execCommand -Wait -NoNewWind
 
 IF ($process.ExitCode -ne 0) {
 
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to export DB with Oracle data pump command."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to export DB with Oracle data pump command."
 	    Finalize $ErrorReturnCode
 
         }else{
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to export DB with Oracle data pump command."
+        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to export DB with Oracle data pump command."
         Finalize $NormalReturnCode
         }
                    

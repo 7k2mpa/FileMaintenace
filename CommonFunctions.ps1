@@ -77,7 +77,9 @@ $Script:CommonFunctionsVersion = '20200221_2145'
 
 #ログ出力
 
-function Logging {
+Set-Alias -Name Write-Log Write-Log
+
+function Write-Log {
 
 [CmdletBinding()]
 Param(
@@ -160,13 +162,13 @@ $ForceConsole = $TRUE
            
             New-EventLog -LogName $EventLogLogName -Source $ProviderName  -ErrorAction Stop
             $ForceConsoleEventLog = $TRUE    
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Regist new source event [$($ProviderName)] to [$($EventLogLogName)]"
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Regist new source event [$($ProviderName)] to [$($EventLogLogName)]"
             }
        
     }
     Catch [Exception] {
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to regist new source event because no source $($ProviderName) exists in event log, must have administrator privilage for registing new source. Start Powershell with administrator privilage and start the script."
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $Error[0]"
+    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to regist new source event because no source $($ProviderName) exists in event log, must have administrator privilage for registing new source. Start Powershell with administrator privilage and start the script."
+    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $Error[0]"
     Exit $ErrorReturnCode
     }
 
@@ -187,9 +189,9 @@ function CheckLogFilePath {
 
 $ForceConsoleEventLog = $TRUE    
 
-    $logPath = ConvertToAbsolutePath -CheckPath $LogPath -ObjectName '-LogPath'
+    $logPath = ConvertTo-AbsolutePath -CheckPath $LogPath -ObjectName '-LogPath'
 
-    CheckLogPath -CheckPath $logPath -ObjectName '-LogPath' > $NULL
+    Test-LogPath -CheckPath $logPath -ObjectName '-LogPath' > $NULL
     
 $ForceConsoleEventLog = $FALSE
 
@@ -200,7 +202,7 @@ $ForceConsoleEventLog = $FALSE
 
 
 
-function TryAction {
+function Invoke-Action {
     
     Param(
 
@@ -217,13 +219,13 @@ function TryAction {
 
     IF (-not($ActionType -match "^(Delete|NullClear|MakeNewFolder|Rename)$" ) -and ($NULL -eq $ActionTo)) {
 
-        Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error at Function TryAction  [$($ActionType)] requires [$($ActionTo)]"
+        Write-Log -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error at Function Invoke-Action  [$($ActionType)] requires [$($ActionTo)]"
         Finalize $InternalErrorReturnCode
         }
 
     IF ($NoAction -or ($WhatIfFlag -and ($ActionType -match "(Compress|Archive)") ))  {
     
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Specified -WhatIf[$($WhatIfFlag)] option, thus do not execute [$($ActionType)] [$($ActionError)]"
+        Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Specified -WhatIf[$($WhatIfFlag)] option, thus do not execute [$($ActionType)] [$($ActionError)]"
         $Script:NormalFlag = $TRUE
 
         IF ($OverRideFlag) {
@@ -319,7 +321,7 @@ function TryAction {
             }
                                            
         Default {
-            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error at Function TryAction. Switch ActionType exception has occurred. "
+            Write-Log -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error at Function Invoke-Action. Switch ActionType exception has occurred. "
             Finalize $InternalErrorReturnCode
             }
       }       
@@ -329,15 +331,15 @@ function TryAction {
     }   
     catch [Exception]{
        
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute [$($ActionType)] to [$($ActionError)]"
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute [$($ActionType)] to [$($ActionError)]"
         IF (-not($processErrorFlag)) {
             $errorDetail = $Error[0] | Out-String
             }
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
         $Script:ErrorFlag = $TRUE
 
         IF (($Continue) -and (-not($NoContinueOverRide))) {
-            Logging -EventID $WarningEventID -EventType Warning -EventMessage "Specified -Continue option, continue to process next objects."
+            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Specified -Continue option, continue to process next objects."
             $Script:WarningFlag = $TRUE
             $Script:ContinueFlag = $TRUE
             Return
@@ -356,7 +358,7 @@ function TryAction {
     }
 
    IF ($ActionType -match '^(Copy|AddTimeStamp|Rename|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$' ) {
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ActionTo) was created."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($ActionTo) was created."
         }
 
 
@@ -366,13 +368,13 @@ function TryAction {
         $Script:OverRideFlag = $FALSE
         }
            
-    Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to [$($ActionType)] to [$($ActionError)]"
+    Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to [$($ActionType)] to [$($ActionError)]"
     $Script:NormalFlag = $TRUE
 
 }
 
 
-Function ConvertToAbsolutePath {
+Function ConvertTo-AbsolutePath {
 
 <#
 .SYNOPSIS
@@ -382,7 +384,7 @@ Function ConvertToAbsolutePath {
  このfunctionは検査対象パスがNull , emptyの場合、異常終了します。確認が必要なパスのみを検査して下さい。
  * ?等のNTFSに使用できない文字がパスに含まれている場合は異常終了します
  []のPowershellでワイルドカードとして扱われる文字は、ワイルドカードとして扱いません。LiteralPathとしてそのまま処理します
- なおTryActionはワイルドカード[]を扱いません。LiteralPathとしてそのまま処理します
+ なおInvoke-Actionはワイルドカード[]を扱いません。LiteralPathとしてそのまま処理します
 
 .PARAMETER CheckPath
  相対パスまたは絶対パスを指定してください。
@@ -408,7 +410,7 @@ Param(
 
     IF ([String]::IsNullOrEmpty($CheckPath)) {
            
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
         Finalize $ErrorReturnCode
         }
 
@@ -417,10 +419,10 @@ Param(
     $CheckPath = $CheckPath.Replace('/','\')
 
     IF (Test-Path -LiteralPath $CheckPath -IsValid) {
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is valid path format."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is valid path format."
    
         } else {
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)] is invalid path format. The path may contain a drive letter not existed or characters that can not use by NTFS."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)] is invalid path format. The path may contain a drive letter not existed or characters that can not use by NTFS."
         Finalize $ErrorReturnCode
         }
 
@@ -430,23 +432,23 @@ Param(
 
         "^\.+\\.*" {
        
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is relative path format."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is relative path format."
 
             $convertedCheckPath = Join-Path -Path $DatumPath -ChildPath $CheckPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
          
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Convert to absolute path format [$($convertedCheckPath)] with joining the folder path [$($DatumPath)] the script is placed and the path [$($CheckPath)]"
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Convert to absolute path format [$($convertedCheckPath)] with joining the folder path [$($DatumPath)] the script is placed and the path [$($CheckPath)]"
 
             $CheckPath = $convertedCheckPath
             }
 
         "^[c-zC-Z]:\\.*" {
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is absolute path format."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is absolute path format."
             }
 
         Default {
       
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)] is neither absolute path format nor relative path format."
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)] is neither absolute path format nor relative path format."
             Finalize $ErrorReturnCode
             }
     }
@@ -455,13 +457,13 @@ Param(
 
     IF ($CheckPath -match '\\\\') {
  
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "NTFS allows multiple path separators such as '\\' , due to processing limitation, convert multiple path separators to a single."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "NTFS allows multiple path separators such as '\\' , due to processing limitation, convert multiple path separators to a single."
 
             For ( $i = 0 ; $i -lt $CheckPath.Length-1 ; $i++ ) {
                 $CheckPath = $CheckPath.Replace('\\','\')
                 }
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is created by converting multiple path separators to a single."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is created by converting multiple path separators to a single."
         }
 
 
@@ -469,7 +471,7 @@ Param(
 
     IF ($CheckPath.EndsWith('\')) {
     
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Windows path format allows the end of path with a path separator '\' , due to processing limitation, remove it."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Windows path format allows the end of path with a path separator '\' , due to processing limitation, remove it."
             $CheckPath = $CheckPath.Substring(0 , $CheckPath.Length -1)
             }
 
@@ -478,7 +480,7 @@ Param(
 
     IF ((Split-Path $CheckPath -noQualifier) -match '(\/|:|\?|`"|<|>|\||\*)') {
     
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName may contain characters that can not use by NTFS  such as BackSlash/ Colon: Question? DoubleQuote`" less or greater than<> astarisk* pipe| "
+                Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName may contain characters that can not use by NTFS  such as BackSlash/ Colon: Question? DoubleQuote`" less or greater than<> astarisk* pipe| "
                 Finalize $ErrorReturnCode
                 }
 
@@ -487,7 +489,7 @@ Param(
 
     IF ($CheckPath -match '\\(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])(\\|$|\..*$)') {
 
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName may contain the Windows reserved words such as (AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
+                Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName may contain the Windows reserved words such as (AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
                 Finalize $ErrorReturnCode
                 }        
 
@@ -510,38 +512,38 @@ Param(
     IF (($ErrorCount -gt 0) -or ($ReturnCode -ge $ErrorReturnCode)) {
 
         IF ($ErrorAsWarning) {
-            Logging -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred, specified -ErrorAsWarning[$($ErrorAsWarning)] option, thus the exit code is [$($WarningReturnCode)]"  
+            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred, specified -ErrorAsWarning[$($ErrorAsWarning)] option, thus the exit code is [$($WarningReturnCode)]"  
             $returnCode = $WarningReturnCode
            
             } else {
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "An ERROR termination occurred, the exit code is [$($ErrorReturnCode)]"
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "An ERROR termination occurred, the exit code is [$($ErrorReturnCode)]"
             $returnCode = $ErrorReturnCode
             }
 
         } elseIF (($WarningCount -gt 0) -or ($ReturnCode -ge $WarningReturnCode)) {
 
             IF ($WarningAsNormal) {
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "A WARNING termination occurred, specified -WarningAsNormal[$($WarningAsNormal)] option, thus the exit code is [$($NormalReturnCode)]" 
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "A WARNING termination occurred, specified -WarningAsNormal[$($WarningAsNormal)] option, thus the exit code is [$($NormalReturnCode)]" 
                 $returnCode = $NormalReturnCode
            
                 } else {
-                Logging -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred, the exit code is [$($WarningReturnCode)]"
+                Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred, the exit code is [$($WarningReturnCode)]"
                 $returnCode = $WarningReturnCode
                 }
         
         } else {
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully. The exit code is [$($NormalReturnCode)]"
+        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully. The exit code is [$($NormalReturnCode)]"
         $returnCode = $NormalReturnCode               
         }
 
-    Logging -EventID $EndEventID -EventType Information -EventMessage "Exit $($ShellName) Version $($Version)"
+    Write-Log -EventID $EndEventID -EventType Information -EventMessage "Exit $($ShellName) Version $($Version)"
 
 Exit $returnCode
 
 }
 
 
-function CheckServiceExist {
+function Test-ServiceExist {
 
 <#
 .SYNOPSIS
@@ -574,14 +576,14 @@ Param(
 
     IF ($service.Status -Match "^$") {
         IF (-not($NoMessage)) {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] dose not exist."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] dose not exist."
             }
             Return $FALSE
 
         } else {
 
         IF (-not($NoMessage)) {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists"
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists"
             }
         Return $TRUE
         }
@@ -593,7 +595,7 @@ Param(
 #サービス起動、停止しても状態推移には時間が掛かります。このfunctionは一定時間$Span、一定回数$UpTo、状態確認を繰り返します
 #起動が遅いサービスは$Spanを大きくしてください
 
-function CheckServiceStatus {
+function Test-ServiceStatus {
 
 Param(
 [parameter(mandatory=$TRUE)][String]$ServiceName,
@@ -605,7 +607,7 @@ Param(
     For ( $i = 0 ; $i -lt $UpTo; $i++ )
     {
         # サービス存在確認
-        IF (-not(CheckServiceExist $ServiceName -NoMessage)) {
+        IF (-not(Test-ServiceExist $ServiceName -NoMessage)) {
             Return $FALSE
             }
 
@@ -614,31 +616,31 @@ Param(
         $service = Get-Service | Where-Object {$_.Name -eq $ServiceName}
 
         IF ($service.Status -eq $Health) {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($service.Status)]"
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($service.Status)]"
             Return $TRUE     
             }
 
         IF (($Span -eq 0) -and ($UpTo -eq 1)) {
                 
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($service.Status)]"
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($service.Status)]"
                 Return $FALSE
                 }
 
         # 指定間隔(秒)待機
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)] , is not [$($Health)] Wait for $($Span)seconds."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)] , is not [$($Health)] Wait for $($Span)seconds."
         Start-sleep $Span
     }
 
     # サービスは指定状態へ遷移しなかった
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)] now. The specified number of seconds has elapsed but the service has not transitioned to status [$($Health)]"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists and status is [$($Service.Status)] now. The specified number of seconds has elapsed but the service has not transitioned to status [$($Health)]"
 Return $FALSE
 
 }
 
 
-function CheckNullOrEmpty {
+function Test-PathNullOrEmpty {
 
 Param(
 [String]$CheckPath,
@@ -656,7 +658,7 @@ Param(
 
         IF ($IfNullOrEmptyFinalize) {
            
-               Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
+               Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
                Finalize $ErrorReturnCode
                }
                
@@ -667,7 +669,7 @@ Param(
 }
 
 
-function CheckContainer {
+function Test-Container {
 
 Param(
 [String]$CheckPath,
@@ -679,14 +681,14 @@ Param(
 
     IF (Test-Path -LiteralPath $CheckPath -PathType Container) {
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] exists."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] exists."
             Return $TRUE
 
             } else {
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] dose not exist."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] dose not exist."
                 IF($IfNoExistFinalize){
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
+                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
                     Finalize $ErrorReturnCode
 
                     } else {
@@ -697,7 +699,7 @@ Param(
 }
 
 
-function CheckLeaf {
+function Test-Leaf {
 
 Param(
 [String]$CheckPath,
@@ -709,15 +711,15 @@ Param(
 
     IF (Test-Path -LiteralPath $CheckPath -PathType Leaf) {
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] exists."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] exists."
             Return $TRUE
 
             } else {
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] dose not exist."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] dose not exist."
             
             IF($IfNoExistFinalize){
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
+                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
                     Finalize $ErrorReturnCode
             
                     } else {
@@ -727,7 +729,7 @@ Param(
 }
 
 
-function CheckLogPath {
+function Test-LogPath {
 
 Param(
 
@@ -738,35 +740,35 @@ Param(
 )
     #ログ出力先ファイルの親フォルダが存在しなければ異常終了
 
-    Split-Path -Path $CheckPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName $ObjectName -IfNoExistFinalize > $NULL}
+    Split-Path -Path $CheckPath | ForEach-Object {Test-Container -CheckPath $_ -ObjectName $ObjectName -IfNoExistFinalize > $NULL}
 
     #ログ出力先（予定）ファイルと同一名称のフォルダが存在していれば異常終了
 
     IF (Test-Path -LiteralPath $CheckPath -PathType Container) {
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Same name folder $($CheckLeaf) exists already."        
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Same name folder $($Test-Leaf) exists already."        
         Finalize $ErrorReturnCode
         }
 
 
     IF (Test-Path -LiteralPath $CheckPath -PathType Leaf) {
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Check write permission of $($ObjectName) [$($CheckPath)]"
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Check write permission of $($ObjectName) [$($CheckPath)]"
         $logFormattedDate = (Get-Date).ToString($LogDateFormat)
         $logWrite = $logFormattedDate+" "+$ShellName+" Write Permission Check"
         
 
         Try {
             Write-Output $logWrite | Out-File -FilePath $CheckPath -Append -Encoding $LogFileEncode
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Successfully complete to write to $($ObjectName) [$($CheckPath)]"
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Successfully complete to write to $($ObjectName) [$($CheckPath)]"
             }
         Catch [Exception]{
-            Logging -EventType Error -EventID $ErrorEventID -EventMessage  "Failed to write to $($ObjectName) [$($CheckPath)]"
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution error message : $Error[0]"
+            Write-Log -EventType Error -EventID $ErrorEventID -EventMessage  "Failed to write to $($ObjectName) [$($CheckPath)]"
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution error message : $Error[0]"
             Finalize $ErrorReturnCode
             }
      
      } else {
-            TryAction -ActionType MakeNewFileWithValue -ActionFrom $CheckPath -ActionError $CheckPath -FileValue $FileValue
+            Invoke-Action -ActionType MakeNewFileWithValue -ActionFrom $CheckPath -ActionError $CheckPath -FileValue $FileValue
             }
 
 }
@@ -776,10 +778,10 @@ function CheckExecUser {
 
     $Script:ScriptExecUser = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "Executed in user [$($ScriptExecUser.Name)]"
+    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Executed in user [$($ScriptExecUser.Name)]"
 
     IF (-not($ScriptExecUser.Name -match $ExecutableUser)) {
-                Logging -EventType Error -EventID $ErrorEventID -EventMessage "Executed in an unauthorized user."
+                Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "Executed in an unauthorized user."
                 Finalize $ErrorReturnCode
                 }
 
@@ -818,11 +820,11 @@ IF ($NoLog2Console)  {[boolean]$Script:Log2Console  = $FALSE}
 IF ($NoLog2File)     {[boolean]$Script:Log2File     = $FALSE}
 
 
-Logging -EventID $StartEventID -EventType Information -EventMessage "Start $($ShellName) Version $($Version)"
+Write-Log -EventID $StartEventID -EventType Information -EventMessage "Start $($ShellName) Version $($Version)"
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Loaded CommonFunctions.ps1 Version $($CommonFunctionsVersion)"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Loaded CommonFunctions.ps1 Version $($CommonFunctionsVersion)"
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Start to validate parameters."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to validate parameters."
 
 . CheckExecUser
 
@@ -830,7 +832,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "Start to val
 }
 
 
-function ExecSQL {
+function Invoke-SQL {
 
 Param(
 [String]$SQLLogPath,
@@ -890,11 +892,11 @@ Pop-Location
 
     IF ($LASTEXITCODE -eq 0) {
 
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to execute SQL Command[$($SQLName)]"
+        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to execute SQL Command[$($SQLName)]"
         Return $TRUE
 
         } else {
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute SQL Command[$($SQLName)]"
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute SQL Command[$($SQLName)]"
    
             IF ($IfErrorFinalize) {
             Finalize $ErrorReturnCode
@@ -910,11 +912,11 @@ Pop-Location
 
 
 
-function CheckOracleBackUpMode {
+function Test-OracleBackUpMode {
 
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "Get the backup status of Oracle Database ,determine Oracle Database is running in which mode BackUp/Normal. A line [Active] is in BackUp Mode."
-  . ExecSQL -SQLCommand $DBCheckBackUpMode -SQLName "DBCheckBackUpMode" -SQLLogPath $SQLLogPath > $NULL
+    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Get the backup status of Oracle Database ,determine Oracle Database is running in which mode BackUp/Normal. A line [Active] is in BackUp Mode."
+  . Invoke-SQL -SQLCommand $DBCheckBackUpMode -SQLName "DBCheckBackUpMode" -SQLLogPath $SQLLogPath > $NULL
 
    
     #文字列配列に変換する
@@ -930,30 +932,30 @@ function CheckOracleBackUpMode {
 
             IF ($Line -match 'NOT ACTIVE') {
                 $normalModeCount ++
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "[$line] line[$i] Normal Mode"
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "[$line] line[$i] Normal Mode"
  
  
                 } elseIF ($Line -match 'ACTIVE') {
                 $backUpModeCount ++
-                Logging -EventID $InfoEventID -EventType Information -EventMessage "[$line] line[$i] BackUp Mode"
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "[$line] line[$i] BackUp Mode"
                 }
  
     $i ++
     }
 
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database is running in...."
+    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database is running in...."
 
     IF (($backUpModeCount -eq 0) -and ($normalModeCount -gt 0)) {
  
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Normal Mode"
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Normal Mode"
         $Script:NormalModeFlag = $TRUE
         $Script:BackUpModeFlag = $FALSE
         Return
 
     } elseIF (($backUpModeCount -gt 0) -and ($normalModeCount -eq 0)) {
    
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Back Up Mode"
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Back Up Mode"
         $Script:NormalModeFlag = $FALSE
         $Script:BackUpModeFlag = $TRUE
         Return
@@ -961,7 +963,7 @@ function CheckOracleBackUpMode {
 
     } else {
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "??? Mode ???"
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "??? Mode ???"
         $Script:NormalModeFlag = $FALSE
         $Script:BackUpModeFlag = $FALSE
         Return
@@ -971,7 +973,7 @@ function CheckOracleBackUpMode {
 }
 
 
-function AddTimeStampToFileName {
+function ConvertTo-FileNameAddTimeStamp {
 
 Param(
 [String][parameter(mandatory=$TRUE)]$TimeStampFormat,
@@ -998,12 +1000,12 @@ Param(
     Switch -Regex ($CheckUserName) {
 
     '^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z]$' {
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckUserName)] is valid user name."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckUserName)] is valid user name."
         Return $TRUE     
         }
 
     Default {
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) [$($CheckUserName)] is invalid user name."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) [$($CheckUserName)] is invalid user name."
         Finalize $ErroReturnCode
         }
     }
@@ -1020,12 +1022,12 @@ Param(
     Switch -Regex ($CheckDomainName) {
 
     '^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z]$' {
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckDomainName)] is valid domain name."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckDomainName)] is valid domain name."
         Return $TRUE     
         }
 
     Default {
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) [$($CheckDomainName)] is invalid domain name."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) [$($CheckDomainName)] is invalid domain name."
         Finalize $ErroReturnCode
         }
     }
@@ -1043,17 +1045,17 @@ Param(
     Switch -Regex ($CheckHostName) {
 
     '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$' {
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckHostName)] is valid IP Address."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckHostName)] is valid IP Address."
         Return $TRUE     
         }
 
     '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$' {
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckHostName)] is valid Hostname."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName) [$($CheckHostName)] is valid Hostname."
         Return $TRUE                
         }
 
     Default {
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) [$($CheckHostName)] is invalid Hostname."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) [$($CheckHostName)] is invalid Hostname."
         Finalize $ErroReturnCode
         }
     }

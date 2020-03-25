@@ -353,34 +353,34 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #OracleBINフォルダの指定、存在確認
 
-    $OracleHomeBinPath = ConvertToAbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
+    $OracleHomeBinPath = ConvertTo-AbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
 
-    CheckContainer -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
+    Test-Container -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
 
 #OracleRmanLogファイルの指定、存在、書き込み権限確認
 
-    $OracleRMANLogPath = ConvertToAbsolutePath -CheckPath $OracleRMANLogPath -ObjectName '-OracleRmanLogPath'
+    $OracleRMANLogPath = ConvertTo-AbsolutePath -CheckPath $OracleRMANLogPath -ObjectName '-OracleRmanLogPath'
 
-    CheckLogPath -CheckPath $OracleRMANLogPath -ObjectName '-OracleRMANLLogPath' > $NULL
+    Test-LogPath -CheckPath $OracleRMANLogPath -ObjectName '-OracleRMANLLogPath' > $NULL
 
 
 #実行するRMANファイルの存在確認
    
-    $ExecRmanPath = ConvertToAbsolutePath -CheckPath $ExecRmanPath -ObjectName '-ExecRmanPath'
+    $ExecRmanPath = ConvertTo-AbsolutePath -CheckPath $ExecRmanPath -ObjectName '-ExecRmanPath'
 
-    CheckLeaf -CheckPath $ExecRmanPath -ObjectName '-ExecRmanPath' -IfNoExistFinalize > $NULL
+    Test-Leaf -CheckPath $ExecRmanPath -ObjectName '-ExecRmanPath' -IfNoExistFinalize > $NULL
 
 
 #対象のOracleがサービス起動しているか確認
 
     $targetWindowsOracleService = "OracleService"+$OracleSID
 
-    IF (-not(CheckServiceStatus -ServiceName $targetWindowsOracleService -Health Running)) {
+    IF (-not(Test-ServiceStatus -ServiceName $targetWindowsOracleService -Health Running)) {
 
-        Logging -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
+        Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
         Finalize $ErrorReturnCode
         }else{
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is running."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is running."
         }
      
 
@@ -389,9 +389,9 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Start to delete Oracle archive logs older than $($Days)days."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to delete Oracle archive logs older than $($Days)days."
 
 }
 
@@ -432,14 +432,14 @@ $Version = '20200313_1415'
 
     IF ($LASTEXITCODE -ne 0) {
 
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to delete Oracle archive logs older than $($Days)days."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to delete Oracle archive logs older than $($Days)days."
 
 	    Finalize $ErrorReturnCode
         }
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Successfully completed to delete Oracle archive logs older than $($Days)days."
-Logging -EventID $InfoEventID -EventType Information -EventMessage "!!REMIND they were deleted in Oracle RMAN records and you need to delete log files in the file system with OS's delete command!!"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Successfully completed to delete Oracle archive logs older than $($Days)days."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "!!REMIND they were deleted in Oracle RMAN records and you need to delete log files in the file system with OS's delete command!!"
  
 
 Finalize $NormalReturnCode

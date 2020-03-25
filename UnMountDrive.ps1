@@ -221,27 +221,27 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
     IF ($driveLetters.Contains($MountedDrive)) {
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage  "Drive $($MountedDrive) exists already."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage  "Drive $($MountedDrive) exists already."
 
 
         [Object]$drive = Get-WMIObject Win32_LogicalDisk | Where-Object { $_.DeviceID -eq $MountedDrive }
         IF ($drive.DriveType -ne 4) {
-                    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Drive $($MountedDrive) is not network drive."
+                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Drive $($MountedDrive) is not network drive."
                     Finalize $ErrorReturnCode
                     }
 
     }else{
 
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Drive $($MountedDrive) dose not exists."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Drive $($MountedDrive) dose not exists."
         Finalize $ErrorReturnCode
         }
 
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Start to unmount drive ${MountedDrive}"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to unmount drive ${MountedDrive}"
 
 
 }
@@ -284,13 +284,13 @@ Try{
 
     catch [Exception] {
         $errorDetail = $ERROR[0] | Out-String
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to unmount drive $($MountedDrive)"
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to unmount drive $($MountedDrive)"
 	    Finalize $ErrorReturnCode
         }
 
 
 
 
-Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed to unmount drive ${MountedDrive} successfully."
+Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Completed to unmount drive ${MountedDrive} successfully."
 Finalize $NormalReturnCode     

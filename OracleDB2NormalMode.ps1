@@ -345,23 +345,23 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #OracleBINフォルダの指定、存在確認
 
-    $OracleHomeBinPath = ConvertToAbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
+    $OracleHomeBinPath = ConvertTo-AbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
 
-    CheckContainer -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
+    Test-Container -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
 
 
 #SQLLogファイルの指定、存在、書き込み権限確認
 
-    $SQLLogPath = ConvertToAbsolutePath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath'
+    $SQLLogPath = ConvertTo-AbsolutePath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath'
 
-    CheckLogPath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath' > $NULL
+    Test-LogPath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath' > $NULL
 
 
 #SQLコマンド群の指定、存在確認、Load
 
-    $SQLCommandsPath = ConvertToAbsolutePath -CheckPath $SQLCommandsPath -ObjectName '-SQLCommandPath'
+    $SQLCommandsPath = ConvertTo-AbsolutePath -CheckPath $SQLCommandsPath -ObjectName '-SQLCommandPath'
 
-    CheckLeaf -CheckPath $SQLCommandsPath -ObjectName '-SQLCommandsPath' -IfNoExistFinalize > $NULL
+    Test-Leaf -CheckPath $SQLCommandsPath -ObjectName '-SQLCommandsPath' -IfNoExistFinalize > $NULL
 
 
     Try {
@@ -370,18 +370,18 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
         }
 
         Catch [Exception] {
-        Logging -EventType Error -EventID $ErrorEventID -EventMessage  "Fail to load SQLs in -SQLCommandsPath"
+        Write-Log -EventType Error -EventID $ErrorEventID -EventMessage  "Fail to load SQLs in -SQLCommandsPath"
         Finalize $ErrorReturnCode
     }
 
-    Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to load SQLs Version $($SQLsVersion) in -SQLCommandsPath"
+    Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to load SQLs Version $($SQLsVersion) in -SQLCommandsPath"
 
 
 #Oracleサービス起動用のStartService.ps1の存在確認
 
-    $StartServicePath = ConvertToAbsolutePath -CheckPath $StartServicePath -ObjectName '-StartServicePath'
+    $StartServicePath = ConvertTo-AbsolutePath -CheckPath $StartServicePath -ObjectName '-StartServicePath'
 
-    CheckLeaf -CheckPath $StartServicePath -ObjectName '-StartServicePath' -IfNoExistFinalize > $NULL
+    Test-Leaf -CheckPath $StartServicePath -ObjectName '-StartServicePath' -IfNoExistFinalize > $NULL
 
 
 
@@ -389,30 +389,30 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
     $targetWindowsOracleService = "OracleService"+$OracleSID
 
-    IF (-not(CheckServiceExist -ServiceName $targetWindowsOracleService)) {
+    IF (-not(Test-ServiceExist -ServiceName $targetWindowsOracleService)) {
 
-        Logging -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] dose not exist."
+        Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] dose not exist."
         Finalize $ErrorReturnCode
         }
 
 #ControlFile出力先pathの存在確認
 
 
-    $controlfiledotctlPATH = ConvertToAbsolutePath -CheckPath $controlfiledotctlPATH -ObjectName '-controlfiledotctlPATH '
+    $controlfiledotctlPATH = ConvertTo-AbsolutePath -CheckPath $controlfiledotctlPATH -ObjectName '-controlfiledotctlPATH '
 
-    CheckContainer -CheckPath (Split-Path $ControlfiledotctlPATH -Parent) -ObjectName '-controlfiledotctlPATHのParent Folder ' -IfNoExistFinalize > $NULL
+    Test-Container -CheckPath (Split-Path $ControlfiledotctlPATH -Parent) -ObjectName '-controlfiledotctlPATHのParent Folder ' -IfNoExistFinalize > $NULL
 
-    $controlfiledotbkPATH = ConvertToAbsolutePath -CheckPath $controlfiledotbkPATH -ObjectName '-controlfiledotbkPATH '
+    $controlfiledotbkPATH = ConvertTo-AbsolutePath -CheckPath $controlfiledotbkPATH -ObjectName '-controlfiledotbkPATH '
 
-    CheckContainer -CheckPath (Split-Path $ControlfiledotbkPATH -Parent) -ObjectName '-controlfiledotbkPATHのParent Folder ' -IfNoExistFinalize > $NULL
+    Test-Container -CheckPath (Split-Path $ControlfiledotbkPATH -Parent) -ObjectName '-controlfiledotbkPATHのParent Folder ' -IfNoExistFinalize > $NULL
 
 
 
 #処理開始メッセージ出力
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "To start to switch Oracle Database to Normal Mode. (to end BackUp Mode)"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "To start to switch Oracle Database to Normal Mode. (to end BackUp Mode)"
 
 }
 
@@ -469,17 +469,17 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
         'インスタンスがあります' {
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Listener is running."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Listener is running."
             $needToStartListener = $FALSE
             }
 
         'リスナーがありません' {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Listener is stopped."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Listener is stopped."
             $needToStartListener = $TRUE
             }   
 
         Default {
-            Logging -EventID $WarningEventID -EventType Warning -EventMessage "Listener status is unknown."
+            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Listener status is unknown."
             $needToStartListener = $TRUE
             }
      
@@ -495,10 +495,10 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
  
 
         IF ($LASTEXITCODE -eq 0) {
-            Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfulley complete to start Listener."
+            Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfulley complete to start Listener."
             
             }else{
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to start Listener."
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to start Listener."
             Finalize $ErrorReturnCode
             }
 
@@ -508,27 +508,27 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 #Windowsサービス起動状態を確認、必要に応じて起動    
 
 
-    IF (CheckServiceStatus -ServiceName $targetWindowsOracleService -Health Running -Span 0 -UpTo 1) {
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is already running."
+    IF (Test-ServiceStatus -ServiceName $targetWindowsOracleService -Health Running -Span 0 -UpTo 1) {
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is already running."
         
         }else{
         $serviceCommand = "$StartServicePath -Service $TargetOracleService -RetrySpanSec $RetrySpanSec -RetryTimes $RetryTimes"
 
 
         Try {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Start Windows Serive [$($targetWindowsOracleService)] with StartService.ps1"
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start Windows Serive [$($targetWindowsOracleService)] with StartService.ps1"
             Invoke-Expression $serviceCommand        
             }
 
         catch [Exception] {
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to start script [$($StartServicePath)]"
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to start script [$($StartServicePath)]"
             $errorDetail = $ERROR[0] | Out-String
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
             Finalize $ErrorReturnCode
             }            
             
         IF ($LASTEXITCODE -ne 0) {
-                Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to start Windows service [$($targetWindowsOracleService)]"
+                Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to start Windows service [$($targetWindowsOracleService)]"
                 Finalize $ErrorReturnCode
                 }
         }
@@ -536,39 +536,39 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
 #DBインスタンス状態確認
 
-    $execSQLReturnCode =  . ExecSQL -SQLCommand $DBStatus -SQLName 'DB Status Check' -SQLLogPath $SQLLogPath
+    $execSQLReturnCode =  . Invoke-SQL -SQLCommand $DBStatus -SQLName 'DB Status Check' -SQLLogPath $SQLLogPath
 
     IF (($execSQLReturnCode) -OR ( $SQLLog -match 'ORA-01034')) {
 
-            Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to check Oracle Database Status."
+            Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to check Oracle Database Status."
                 
             }else{
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Failed to check Oracle Database Status."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Failed to check Oracle Database Status."
             }
 
 
         IF ($SQLLog -match 'OPEN') {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle instance [SID $($OracleSID)] is already OPEN."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle instance [SID $($OracleSID)] is already OPEN."
          
   
         }elseIF ($SQLLog -match '(STARTED|MOUNTED)') {
             
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Oracle instance [SID $($OracleSID)] is MOUNT or NOMOUNT. Shutdown and start up manually."
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Oracle instance [SID $($OracleSID)] is MOUNT or NOMOUNT. Shutdown and start up manually."
             Finalize $ErrorReturnCode
 
         }else{
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle instance [SID $($OracleSID)] is not OPEN."        
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Switch Oracle instance [SID $($OracleSID)] to OPEN."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle instance [SID $($OracleSID)] is not OPEN."        
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Switch Oracle instance [SID $($OracleSID)] to OPEN."
 
 
-            $execSQLReturnCode = . ExecSQL -SQLCommand $DBStart -SQLName 'Oracle DB Instance OPEN' -SQLLogPath $SQLLogPath
+            $execSQLReturnCode = . Invoke-SQL -SQLCommand $DBStart -SQLName 'Oracle DB Instance OPEN' -SQLLogPath $SQLLogPath
 
                 IF ($execSQLReturnCode) {
 
-                    Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to switch Oracle instance to OPEN."
+                    Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to switch Oracle instance to OPEN."
                 
                     }else{
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Failed to switch Oracle instance to OPEN."
+                    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Failed to switch Oracle instance to OPEN."
                     $ErrorCount ++
                     }
             }
@@ -578,43 +578,43 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
 #BackUp/Normal Modeどちらかを確認
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "Check Back Up Mode"
+    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Check Back Up Mode"
 
-. CheckOracleBackUpMode > $NULL
+. Test-OracleBackUpMode > $NULL
 
       IF ($LASTEXITCODE -ne 0) {
 
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Check Back Up Mode."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Check Back Up Mode."
 
 	    Finalize $ErrorReturnCode
         }else{ 
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Check Back Up Mode."
+        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Check Back Up Mode."
         }
 
 
 
  IF (-not($BackUpModeFlag) -and ($NormalModeFlag)) {
  
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database is running in Normal Mode(ending backup mode)"
+    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database is running in Normal Mode(ending backup mode)"
     }
 
  IF (-not( ($BackUpModeFlag) -xor ($NormalModeFlag) )) {
 
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Oracle Database is running in UNKNOWN mode."
+    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Oracle Database is running in UNKNOWN mode."
     $ErrorCount ++
  
     }elseIF (($BackUpModeFlag) -and (-not($NormalModeFlag))) {
  
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database is running in Backup Mode. Switch to Normal Mode(Ending Backup Mode)"
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database is running in Backup Mode. Switch to Normal Mode(Ending Backup Mode)"
 
-        $execSQLReturnCode = . ExecSQL -SQLCommand $DBBackUpModeOff -SQLName "Switch to Normal Mode" -SQLLogPath $SQLLogPath
+        $execSQLReturnCode = . Invoke-SQL -SQLCommand $DBBackUpModeOff -SQLName "Switch to Normal Mode" -SQLLogPath $SQLLogPath
 
         IF ($execSQLReturnCode) {
 
-            Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to switch to Normal Mode(Ending Backup Mode)"
+            Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to switch to Normal Mode(Ending Backup Mode)"
 
             }else{        
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to switch to Normal Mode(Ending Backup Mode)"
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to switch to Normal Mode(Ending Backup Mode)"
             $ErrorCount ++
             }
  }
@@ -627,28 +627,28 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
     $DBExportControlFile = $DBExportControlFile.Replace('&controlfiledotctlPATH' , $controlfiledotctlPATH)
     $DBExportControlFile = $DBExportControlFile.Replace('&controlfiledotbkPATH'  , $controlfiledotbkPATH)
 
-    $execSQLReturnCode = . ExecSQL -SQLCommand $DBExportControlFile -SQLName 'DBExportControlFile'  -SQLLogPath $SQLLogPath
+    $execSQLReturnCode = . Invoke-SQL -SQLCommand $DBExportControlFile -SQLName 'DBExportControlFile'  -SQLLogPath $SQLLogPath
 
     IF ($execSQLReturnCode) {
 
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to export Oracle Control Files."
+        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to export Oracle Control Files."
 
         }else{         
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Failed to export Oracle Control Files"
+        Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Failed to export Oracle Control Files"
         $WarningCount ++
         }
 
 
 #Redo Log 強制書き出し
 
-    $execSQLReturnCode = . ExecSQL -SQLCommand $ExportRedoLog  -SQLName 'ExportRedoLog'  -SQLLogPath $SQLLogPath 
+    $execSQLReturnCode = . Invoke-SQL -SQLCommand $ExportRedoLog  -SQLName 'ExportRedoLog'  -SQLLogPath $SQLLogPath 
 
     IF ($execSQLReturnCode) {
 
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to export Redo Log."
+        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to export Redo Log."
 	    
         }else{
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Failed to export Redo Log."
+        Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Failed to export Redo Log."
         $WarningCount ++
         }
 

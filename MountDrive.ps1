@@ -233,11 +233,11 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
     IF ($driveLetters.Contains($MountDrive)) {
 
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Drive $($MountDrive) exists already."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Drive $($MountDrive) exists already."
         Finalize $ErrorReturnCode
 
         }else{
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Drive $($MountDrive) dose not exists."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Drive $($MountDrive) dose not exists."
         }
 
 
@@ -247,10 +247,10 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
     IF (Test-Path -LiteralPath FileSystem::$TargetPath) {
         
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath $($TargetPath) exists."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath $($TargetPath) exists."
         
         }else{
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath $($TargetPath) dose not exists."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath $($TargetPath) dose not exists."
         Finalize $ErrorReturnCode
         }
 
@@ -258,9 +258,9 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Start to mount UNC Path $($TargetPath) as drive ${MountDrive}"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to mount UNC Path $($TargetPath) as drive ${MountDrive}"
 
 }
 
@@ -296,12 +296,12 @@ Try {
     catch [Exception]
     {
     $errorDetail = $ERROR[0] | Out-String
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
-    Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to mount drive $($MountDrive)"
+    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
+    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to mount drive $($MountDrive)"
 	Finalize $ErrorReturnCode
     }
 
  
 
-Logging -EventID $SuccessEventID -EventType Success -EventMessage "Completed to mount drive $($MountDrive) successfully."
+Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Completed to mount drive $($MountDrive) successfully."
 Finalize $NormalReturnCode

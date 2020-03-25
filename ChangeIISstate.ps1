@@ -222,25 +222,25 @@ $ShellName = Split-Path $PSCommandPath -Leaf
 
 #パラメータの確認
 
-    IF (-not(CheckServiceExist -ServiceName 'W3SVC')) {
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Web Service [W3SVC] dose not exist."
+    IF (-not(Test-ServiceExist -ServiceName 'W3SVC')) {
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Web Service [W3SVC] dose not exist."
         Finalize $ErrorReturnCode
         }
  
      IF ($TargetState -notmatch '^(Started|Stopped)$') {
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "-TargetState is invalid."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "-TargetState is invalid."
         Finalize $ErrorReturnCode   
         }
        
 
     IF (Get-Website | Where-Object{$_.Name -ne $Site}) {
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Site [$($Site)] dose not exist."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Site [$($Site)] dose not exist."
         Finalize $ErrorReturnCode
         }
 
 
     IF (Get-Website | Where-Object{$_.Name -eq $Site} | Where-Object {$_.State -eq $TargetState}) {
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Site [$($Site)] state is already [$($TargetState)]."
+        Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Site [$($Site)] state is already [$($TargetState)]."
         Finalize $WarningReturnCode
         }
         
@@ -250,9 +250,9 @@ $ShellName = Split-Path $PSCommandPath -Leaf
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Starting to change IIS Site [$($Site)] state."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Starting to change IIS Site [$($Site)] state."
 
 }
 
@@ -293,13 +293,13 @@ $Version = '20200207_1615'
         }
 
     Default {
-        Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetState is invalid. '
+        Write-Log -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetState is invalid. '
         Finalize $InternalErrorReturnCode    
         }
  }
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "With Powershell Cmdlet , Starting to change site [$($Site)] state from [$($OriginalState)] to [$($TargetState)]"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "With Powershell Cmdlet , Starting to change site [$($Site)] state from [$($OriginalState)] to [$($TargetState)]"
         
     Switch -Regex ($TargetState) {
  
@@ -312,7 +312,7 @@ Logging -EventID $InfoEventID -EventType Information -EventMessage "With Powersh
             }
 
         Default {
-            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetState is invalid. '
+            Write-Log -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetState is invalid. '
             Finalize $InternalErrorReturnCode
             }
     }
@@ -326,27 +326,27 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
         
                 $TargetState {
 
-                    Logging -EventID $SuccessEventID -EventType Success -EventMessage "Site[$($Site)] state was [$($SiteState)]."
+                    Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Site[$($Site)] state was [$($SiteState)]."
                     Finalize $NormalReturnCode
                     }
 
 
                 $OriginalState {
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] state is still [$($SiteState)]. "
+                    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] state is still [$($SiteState)]. "
                     }
 
               
                 DEFAULT {
-                    Logging -EventID $InfoEventID -EventType Information -EventMessage "Site [$($site)] state is [$($SiteState)]"
+                    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Site [$($site)] state is [$($SiteState)]"
                     } 
             }  
     
 
       #チェック回数の上限に達していない場合は、指定秒待機
 
-      Logging -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] exists and site state did not change to [$($TargetState)]. Wait for $($RetrySpanSec) seconds."
+      Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] exists and site state did not change to [$($TargetState)]. Wait for $($RetrySpanSec) seconds."
       Start-Sleep $RetrySpanSec
 }
 
-Logging -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , site [$($Site)] state did not change to [$($TargetState)]."
+Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , site [$($Site)] state did not change to [$($TargetState)]."
 Finalize $ErrorReturnCode

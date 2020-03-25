@@ -333,9 +333,9 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #OracleBINフォルダの指定、存在確認
 
-    $OracleHomeBinPath = ConvertToAbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-oracleHomeBinPath'
+    $OracleHomeBinPath = ConvertTo-AbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-oracleHomeBinPath'
 
-    CheckContainer -CheckPath $OracleHomeBinPath -ObjectName '-oracleHomeBinPath' -IfNoExistFinalize > $NULL
+    Test-Container -CheckPath $OracleHomeBinPath -ObjectName '-oracleHomeBinPath' -IfNoExistFinalize > $NULL
 
 
 #BackUpFlagフォルダの指定、存在確認
@@ -343,25 +343,25 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
     IF (-not($NoCheckBackUpFlag)) {
 
-        $BackUpFlagPath = ConvertToAbsolutePath -CheckPath $BackUpFlagPath -ObjectName  '-BackUpFlagPath'
+        $BackUpFlagPath = ConvertTo-AbsolutePath -CheckPath $BackUpFlagPath -ObjectName  '-BackUpFlagPath'
 
-        Split-Path $BackUpFlagPath | ForEach-Object {CheckContainer -CheckPath $_ -ObjectName 'Parent Folder of -BackUpFlagPath' -IfNoExistFinalize > $NULL}
+        Split-Path $BackUpFlagPath | ForEach-Object {Test-Container -CheckPath $_ -ObjectName 'Parent Folder of -BackUpFlagPath' -IfNoExistFinalize > $NULL}
 
         }
 
 
 #SQLLogファイルの指定、存在、書き込み権限確認
 
-    $SQLLogPath = ConvertToAbsolutePath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath'
+    $SQLLogPath = ConvertTo-AbsolutePath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath'
 
-    CheckLogPath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath' > $NULL
+    Test-LogPath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath' > $NULL
 
 
 #SQLコマンド群の指定、存在確認、Load
 
-    $SQLCommandsPath = ConvertToAbsolutePath -CheckPath $SQLCommandsPath -ObjectName '-SQLCommandPath'
+    $SQLCommandsPath = ConvertTo-AbsolutePath -CheckPath $SQLCommandsPath -ObjectName '-SQLCommandPath'
 
-    CheckLeaf -CheckPath $SQLCommandsPath -ObjectName '-SQLCommandsPath' -IfNoExistFinalize > $NULL
+    Test-Leaf -CheckPath $SQLCommandsPath -ObjectName '-SQLCommandsPath' -IfNoExistFinalize > $NULL
 
 
     Try {
@@ -370,31 +370,31 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
         }
 
         Catch [Exception] {
-        Logging -EventType Error -EventID $ErrorEventID -EventMessage  "Fail to load SQLs in -SQLCommandsPath"
+        Write-Log -EventType Error -EventID $ErrorEventID -EventMessage  "Fail to load SQLs in -SQLCommandsPath"
         Finalize $ErrorReturnCode
         }
 
-    Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to load SQLs Version $($SQLsVersion) in -SQLCommandsPath"
+    Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to load SQLs Version $($SQLsVersion) in -SQLCommandsPath"
 
 
 #Oracle起動確認
 
     $targetWindowsOracleService = "OracleService"+$OracleSID
 
-    IF (-not(CheckServiceStatus -ServiceName $targetWindowsOracleService -Health Running)) {
+    IF (-not(Test-ServiceStatus -ServiceName $targetWindowsOracleService -Health Running)) {
 
-        Logging -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
+        Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
         Finalize $ErrorReturnCode
         }else{
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is running."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is running."
         }
 
 
 #処理開始メッセージ出力
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "To start to switch Oracle Database to Back Up Mode."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "To start to switch Oracle Database to Back Up Mode."
 
 }
 
@@ -441,28 +441,28 @@ Push-Location $OracleHomeBinPath
 
     IF ($NoCheckBackUpFlag) {
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Specified -NoCheckBackUpFlag option,thus skip to check status with backup flag."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Specified -NoCheckBackUpFlag option,thus skip to check status with backup flag."
         
         
-        }elseIF (CheckLeaf -CheckPath $BackUpFlagPath -ObjectName 'Backup Flag') {
+        }elseIF (Test-Leaf -CheckPath $BackUpFlagPath -ObjectName 'Backup Flag') {
 
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Running Back Up now. Can not start duplicate execution."
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Running Back Up now. Can not start duplicate execution."
             Finalize $ErrorReturnCode
             }
     
 
 #セッション情報を出力
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "Export Session Info."
+    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Export Session Info."
 
-    $execSQLReturnCode =  . ExecSQL -SQLCommand $SessionCheck -SQLName "Check Sessions" -SQLLogPath $SQLLogPath
+    $execSQLReturnCode =  . Invoke-SQL -SQLCommand $SessionCheck -SQLName "Check Sessions" -SQLLogPath $SQLLogPath
  
     IF ($execSQLReturnCode) {
 
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Export Session Info."
+        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Export Session Info."
 
         }else{
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Export Session Info."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Export Session Info."
 	    Finalize $ErrorReturnCode
         
         }
@@ -470,16 +470,16 @@ Push-Location $OracleHomeBinPath
 
 #Redo Log強制書き出し
 
-  Logging -EventID $InfoEventID -EventType Information -EventMessage "Export Redo Log."
+  Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Export Redo Log."
 
-    $execSQLReturnCode = . ExecSQL -SQLCommand $ExportRedoLog -SQLName "Export Redo Log" -SQLLogPath $SQLLogPath
+    $execSQLReturnCode = . Invoke-SQL -SQLCommand $ExportRedoLog -SQLName "Export Redo Log" -SQLLogPath $SQLLogPath
 
     IF ($execSQLReturnCode) {
 
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Export Redo Log."
+        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Export Redo Log."
         
         }else{
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Export Redo Log."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Export Redo Log."
 	    Finalize $ErrorReturnCode
 
         }
@@ -490,17 +490,17 @@ Push-Location $OracleHomeBinPath
 
 #BackUp/Normal Modeどちらかを確認
 
-    Logging -EventID $InfoEventID -EventType Information -EventMessage "Check Database running status in which mode"
+    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Check Database running status in which mode"
 
-  . CheckOracleBackUpMode > $NULL
+  . Test-OracleBackUpMode > $NULL
 
       IF ($LASTEXITCODE -ne 0) {
 
-        Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Check Database running status ."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Check Database running status ."
 	    Finalize $ErrorReturnCode
         
         }else{
-        Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Check Database running status."
+        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Check Database running status."
         }
 
 
@@ -508,12 +508,12 @@ Push-Location $OracleHomeBinPath
 
     IF (($BackUpModeFlag) -and (-not($NormalModeFlag))) {
  
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Oracle Database running status is Backup Mode already."
+        Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Oracle Database running status is Backup Mode already."
         $WarningCount ++
  
         }elseIF (-not  (($BackUpModeFlag) -xor ($NormalModeFlag))) {
  
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Oracle Database running status is unknown."
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Oracle Database running status is unknown."
             Finalize $ErrorReturnCode
             }
 
@@ -521,26 +521,26 @@ Push-Location $OracleHomeBinPath
 
     IF (-not($BackUpModeFlag) -and ($NormalModeFlag)) {
  
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database running status is Normal Mode."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database running status is Normal Mode."
 
 
 #Back Up Modeへ切替
 
     IF ($NoChangeToBackUpMode) {
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Specified -NoChangeToBackUpMode option, thus do not switch to BackUpMode."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Specified -NoChangeToBackUpMode option, thus do not switch to BackUpMode."
 
         }else{
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Switch to Back Up Mode"
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Switch to Back Up Mode"
 
-        $execSQLReturnCode = . ExecSQL -SQLCommand $DBBackUpModeOn -SQLName "Switch to Back Up Mode" -SQLLogPath $SQLLogPath
+        $execSQLReturnCode = . Invoke-SQL -SQLCommand $DBBackUpModeOn -SQLName "Switch to Back Up Mode" -SQLLogPath $SQLLogPath
 
         IF ($execSQLReturnCode) {
 
-            Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to switch to Back Up Mode."
+            Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to switch to Back Up Mode."
             
             }else{
-            Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to switch to Back Up Mode."
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to switch to Back Up Mode."
 
 	        Finalize $ErrorReturnCode
             
@@ -564,17 +564,17 @@ Push-Location $OracleHomeBinPath
 
         'インスタンスがあります' {
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Listener is running."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Listener is running."
             $needToStopListener = $TRUE
             }
 
         'リスナーがありません' {
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Listener is stopped."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Listener is stopped."
             $needToStopListener = $FALSE
             }   
 
         Default {
-            Logging -EventID $WarningEventID -EventType Warning -EventMessage "Listener status is unknown."
+            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Listener status is unknown."
             $needToStopListener = $TRUE
             }     
      }
@@ -582,28 +582,28 @@ Push-Location $OracleHomeBinPath
 
     IF ($NoStopListener) {
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "Specified -NoStopListener option, thus do not stop Listener."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Specified -NoStopListener option, thus do not stop Listener."
 
         }else{
 
         IF ($needToStopListener) {
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Stop Listener"
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Stop Listener"
             $returnMessage = LSNRCTL.exe STOP 2>&1 
 
             Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
 
             IF ($LASTEXITCODE -ne 0) {
 
-                Logging -EventID $ErrorEventID -EventType Error -EventMessage "Failed to stop Listener."
+                Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to stop Listener."
                 Finalize $ErrorReturnCode
 
                 }else{
-                Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to stop Listener."
+                Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to stop Listener."
                 }
             
             }else{
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Listener is stopped already, process next step."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Listener is stopped already, process next step."
             }
     }
 

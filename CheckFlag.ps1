@@ -290,9 +290,9 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #フラグフォルダの有無を確認
 
 
-    $FlagFolder = ConvertToAbsolutePath -CheckPath $FlagFolder -ObjectName  '-FlagFolder'
+    $FlagFolder = ConvertTo-AbsolutePath -CheckPath $FlagFolder -ObjectName  '-FlagFolder'
 
-    CheckContainer -CheckPath $FlagFolder -ObjectName '-FlagFolder' -IfNoExistFinalize > $NULL
+    Test-Container -CheckPath $FlagFolder -ObjectName '-FlagFolder' -IfNoExistFinalize > $NULL
 
 
 #フラグファイル名のValidation
@@ -300,14 +300,14 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
     IF ($FlagFile -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
-        Logging -EventType Error -EventID $ErrorEventID -EventMessage "The path -FlagFile contains some characters that can not be used by NTFS"
+        Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "The path -FlagFile contains some characters that can not be used by NTFS"
         Finalize $ErrorReturnCode
         }
 
 #Check invalid combination -Status and -PostAction
 
     IF (($Status -eq 'Exist' -and $PostAction -eq 'Create') -or ($Status -eq 'NoExist' -and $PostAction -eq 'Delete')) {
-        Logging -EventType Error -EventID $ErrorEventID -EventMessage "Must not specify -Status [$($Status)] and -PostAction [$($PostAction)] in the same time."
+        Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "Must not specify -Status [$($Status)] and -PostAction [$($PostAction)] in the same time."
         Finalize $ErrorReturnCode    
     
         }
@@ -317,9 +317,9 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #処理開始メッセージ出力
 
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid"
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "Starting to check existence of the flag file [$($FlagFile)]"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Starting to check existence of the flag file [$($FlagFile)]"
 
 }
 
@@ -356,12 +356,12 @@ Switch -Regex ($Status) {
 
     '^NoExist$' {
 
-        IF ( -not(CheckLeaf -CheckPath $flagPath -ObjectName 'Flag file') -and -not(CheckContainer -CheckPath $flagPath -ObjectName 'Same Name folder')) {
+        IF ( -not(Test-Leaf -CheckPath $flagPath -ObjectName 'Flag file') -and -not(Test-Container -CheckPath $flagPath -ObjectName 'Same Name folder')) {
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exists and terminate as NORMAL." 
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exists and terminate as NORMAL." 
 
             } else {
-            Logging -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] exists already and terminate as WARNING."
+            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] exists already and terminate as WARNING."
             Finalize $WarningReturnCode    
             }
         }
@@ -369,19 +369,19 @@ Switch -Regex ($Status) {
 
     '^Exist$' {
     
-        IF (CheckLeaf -CheckPath $flagPath -ObjectName 'Flag file') {
+        IF (Test-Leaf -CheckPath $flagPath -ObjectName 'Flag file') {
 
-            Logging -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] exists and terminate as NORMAL."    
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] exists and terminate as NORMAL."    
 
             } else {
-            Logging -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] is deleted already and terminate as WARNING."
+            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] is deleted already and terminate as WARNING."
             Finalize $WarningReturnCode
             }        
         }
 
 
     Default {
-            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error. Switch Status exception has occurred. "
+            Write-Log -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error. Switch Status exception has occurred. "
             Finalize $InternalErrorReturnCode    
             }
 }
@@ -396,20 +396,20 @@ Switch -Regex ($PostAction) {
 
     'Create' {
     
-            TryAction -ActionType MakeNewFileWithValue -ActionFrom $flagPath -ActionError $flagPath -FileValue $flagValue
-            Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to create the flag file [$($flagPath)]"
+            Invoke-Action -ActionType MakeNewFileWithValue -ActionFrom $flagPath -ActionError $flagPath -FileValue $flagValue
+            Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to create the flag file [$($flagPath)]"
             }
 
 
     'Delete' {
     
-            TryAction -ActionType Delete -ActionFrom $flagPath -ActionError $flagPath
-            Logging -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to delete the flag file [$($flagPath)]"
+            Invoke-Action -ActionType Delete -ActionFrom $flagPath -ActionError $flagPath
+            Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to delete the flag file [$($flagPath)]"
             }
 
     Default {
 
-            Logging -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error. Switch PostAction exception has occurred. "
+            Write-Log -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error. Switch PostAction exception has occurred. "
             Finalize $InternalErrorReturnCode    
             }
 }
