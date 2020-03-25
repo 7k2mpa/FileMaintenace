@@ -264,7 +264,7 @@ Try{
 
 function Initialize {
 
-$ShellNane = Split-Path -Path $PSCommandPath -Leaf
+$ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
