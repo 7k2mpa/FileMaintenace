@@ -576,7 +576,6 @@ Param(
 [Switch]$Continue,
 [Switch]$ContinueAsNormal,
 [Switch]$NoneTargetAsWarning,
-[Switch]$NoAction,
 
 [String]$CompressedExtString = '.zip',
 [String][ValidateNotNullOrEmpty()][ValidateScript({ Test-Path $_  -PathType container })]$7zFolder = 'C:\Program Files\7-Zip',
@@ -589,6 +588,8 @@ Param(
 [Switch]$MoveNewFile,
 [Switch]$NullOriginalFile,
 #Switches planned to obsolute please use -PreAction end
+[Switch]$NoAction,
+#Switches planned to obsolute
 
 
 [Boolean]$Log2EventLog = $TRUE,
@@ -679,7 +680,7 @@ Param(
 [int]$WarningEventID = $WarningEventID ,
 [int]$ErrorEventID = $ErrorEventID ,
 
-[String][parameter(mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckLeaf")]$Path
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckLeaf")]$Path
 )
 
 begin {
@@ -814,7 +815,7 @@ Param(
 [Switch]$Recurse = $Recurse,
 [String]$Action = $Action,
 
-[String][parameter(mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFolder")]$Path
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFolder")]$Path
 )
 
 begin {
@@ -1097,7 +1098,7 @@ Param(
 [String]$CompressedExtString =  $CompressedExtString ,
 [String]$TimeStampFormat = $TimeStampFormat ,
 
-[String][parameter(mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetObject")]$Path
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetObject")]$Path
 ) 
 
 begin {
@@ -1231,8 +1232,6 @@ EndingProcess $ReturnCode
 [Boolean]$OverRideFlag  = $FALSE
 [Boolean]$ContinueFlag  = $FALSE
 
-[Boolean]$ForceEndloop  = $FALSE          ;#$FALSEではFinalize , $TRUEではループ内でBreak
-
 [Int][ValidateRange(0,2147483647)]$ErrorCount = 0
 [Int][ValidateRange(0,2147483647)]$WarningCount = 0
 [Int][ValidateRange(0,2147483647)]$NormalCount = 0
@@ -1240,10 +1239,12 @@ EndingProcess $ReturnCode
 [Int][ValidateRange(0,2147483647)]$ContinueCount = 0
 [Int][ValidateRange(0,2147483647)]$InLoopDeletedFilesCount = 0
 
+[String]$DatumPath = $PSScriptRoot
+[Boolean]$WhatIfFlag = (($PSBoundParameters['WhatIf']) -ne $NULL)
 
-$DatumPath = $PSScriptRoot
+[String]$Version = '20200324_1630'
 
-$Version = '20200324_1630'
+[Boolean]$ForceEndloop  = $FALSE          ;#$FALSEではFinalize , $TRUEではループ内でBreak
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
@@ -1253,7 +1254,6 @@ $Version = '20200324_1630'
 
 #対象のフォルダまたはファイルを探して配列に入れる
 
-
     IF ($Action -eq "DeleteEmptyFolders") {
 
         $FilterType = "Folder"
@@ -1262,13 +1262,13 @@ $Version = '20200324_1630'
         $FilterType = "File"
         }
 
-$TargetObjects = @()
+$targetObjects = @()
 
-$TargetObjects = Get-Object -Path $TargetFolder
+$targetObjects = Get-Object -Path $TargetFolder
 
-    IF ($NULL -eq $TargetObjects) {
+    IF ($NULL -eq $targetObjects) {
 
-        Logging -EventID $InfoEventID -EventType Information -EventMessage "In -TargetFolder [$($TargetFolder)] no [$($FilterType)] exists for processing."
+        Logging -EventID $InfoEventID -EventType Information -EventMessage "In -TargetFolder [$($targetFolder)] no [$($FilterType)] exists for processing."
 
         IF ($NoneTargetAsWarning) {
             Logging -EventID $WarningEventID -EventType Warning -EventMessage "Specified -NoneTargetAsWarning option, thus terminiate $($ShellName) with WARNING."
@@ -1279,11 +1279,11 @@ $TargetObjects = Get-Object -Path $TargetFolder
             }
     }
 
-Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($TargetObjects.Length)] [$($FilterType)(s)] exist for processing."
+Logging -EventID $InfoEventID -EventType Information -EventMessage "[$($targetObjects.Length)] [$($FilterType)(s)] exist for processing."
 
 Write-Output "[$($FilterType)(s)] are for processing..."
 
-Write-Output $TargetObjects
+Write-Output $targetObjects
     　
 #-PreAction Archiveは複数ファイルを1ファイルに圧縮する。よって、ループ前に圧縮先の1ファイルのフルパスを確定しておく
 
@@ -1305,7 +1305,7 @@ IF ($PreAction -contains 'Archive') {
 
 #対象フォルダorファイル群の処理ループ
 
-ForEach ($TargetObject in $TargetObjects)
+ForEach ($TargetObject in $targetObjects)
 {
 <#
 PowershellはGOTO文が存在せず処理分岐ができない。

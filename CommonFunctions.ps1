@@ -79,13 +79,28 @@ $Script:CommonFunctionsVersion = '20200221_2145'
 
 function Logging {
 
+[CmdletBinding()]
 Param(
-[parameter(mandatory=$TRUE)][ValidateRange(1,65535)][int]$EventID,
-[parameter(mandatory=$TRUE)][String][ValidateSet("Information", "Warning", "Error" ,"Success")]$EventType,
-[parameter(mandatory=$TRUE)][String]$EventMessage
+[parameter(position=0 ,mandatory=$TRUE)][ValidateRange(1,65535)][int]$EventID ,
+[parameter(position=1 ,mandatory=$TRUE)][String][ValidateSet("Information", "Warning", "Error" ,"Success")]$EventType ,
+[parameter(position=2 ,mandatory=$TRUE)][String]$EventMessage ,
+
+[Switch]$Log2EventLog = $Log2EventLog ,
+[Switch]$ForceConsoleEventLog = $ForceConsoleEventLog ,
+[Switch]$ForceConsole = $ForceConsole ,
+[String]$EventLogLogName = $EventLogLogName ,
+[String]$ProviderName = $ProviderName ,
+[String]$ShellName = $ShellName ,
+[Switch]$Log2Console = $Log2Console ,
+[Switch]$Log2File = $Log2File ,
+[String]$LogDateFormat = $LogDateFormat ,
+[String]$LogPath = $LogPath ,
+[String]$LogFileEncode = $LogFileEncode
 )
+begin {
+}
 
-
+process {
     IF (($Log2EventLog -or $ForceConsoleEventLog) -and -not($ForceConsole) ) {
 
         Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType $EventType -EventId $EventID -Message "[$($ShellName)] $($EventMessage)"
@@ -94,18 +109,20 @@ Param(
 
     IF ($Log2Console -or $ForceConsole -or $ForceConsoleEventLog) {
 
-        $ConsoleWrite = $EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
-        Write-Host $ConsoleWrite
+        $consoleWrite = $EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
+        Write-Host $consoleWrite
         }   
 
 
     IF ($Log2File -and -not($ForceConsole -or $ForceConsoleEventLog )) {
 
         $logFormattedDate = (Get-Date).ToString($LogDateFormat)
-        $logWrite = $LogFormattedDate+" "+$SHELLNAME+" "+$EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
+        $logWrite = $logFormattedDate+" "+$ShellName+" "+$EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
         Write-Output $logWrite | Out-File -FilePath $LogPath -Append -Encoding $LogFileEncode
         }   
-
+}
+end {
+}
 }
 
 
@@ -204,10 +221,9 @@ function TryAction {
         Finalize $InternalErrorReturnCode
         }
 
-
-    IF ($NoAction) {
+    IF ($NoAction -or ($WhatIfFlag -and ($ActionType -match "(Compress|Archive)") ))  {
     
-        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Specified -NoAction option, thus do not execute [$($ActionType)] to [ $($ActionError)]"
+        Logging -EventID $WarningEventID -EventType Warning -EventMessage "Specified -WhatIf[$($WhatIfFlag)] option, thus do not execute [$($ActionType)] [$($ActionError)]"
         $Script:NormalFlag = $TRUE
 
         IF ($OverRideFlag) {
