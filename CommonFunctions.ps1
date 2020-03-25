@@ -294,12 +294,12 @@ function Invoke-Action {
             Switch -Regex ($ActionType){
             
                 'Compress' {
-                    [String]$errorDetail = .\7z a $ActionTo $ActionFrom -t"$7zType" 2>&1
+                    [String]$errorDetail = .\7z.exe a $ActionTo $ActionFrom -t"$7zType" 2>&1
                     Break
                     }
 
                 'Archive' {
-                    [String]$errorDetail = .\7z u $ActionTo $ActionFrom -t"$7zType" 2>&1
+                    [String]$errorDetail = .\7z.exe u $ActionTo $ActionFrom -t"$7zType" 2>&1
                     Break
                     }
             
@@ -547,7 +547,7 @@ Param(
         IF (-not($NoMessage)) {
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] dose not exist."
             }
-            Return $FALSE
+        Return $FALSE
 
         } else {
 
@@ -886,10 +886,10 @@ Push-Location $OracleHomeBinPath
 
     IF ($PasswordAuthorization) {
 
-        $sqlLog = $SQLCommand | SQLPlus $ExecUser/$ExecUserPassword@OracleSerivce as sysdba
+        $sqlLog = $SQLCommand | SQLPlus.exe $ExecUser/$ExecUserPassword@OracleSerivce as sysdba
 
         } else {
-        $sqlLog = $SQLCommand | SQLPlus / as sysdba
+        $sqlLog = $SQLCommand | SQLPlus.exe / as sysdba
         }
 
 Write-Output $sqlLog | Out-File -FilePath $SQLLogPath -Append  -Encoding $LogFileEncode
