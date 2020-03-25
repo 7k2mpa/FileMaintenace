@@ -502,7 +502,7 @@ Param(
 
 #èIóπ
 
-function EndingProcess {
+function  Invoke-PostFinalize {
 
 Param(
 [parameter(mandatory=$TRUE)][int]$ReturnCode
@@ -788,7 +788,7 @@ function CheckExecUser {
 
 
 
-function PreInitialize {
+function Invoke-PreInitialize {
 
 $ERROR.clear()
 $ForceConsole = $FALSE

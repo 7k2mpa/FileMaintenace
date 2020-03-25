@@ -215,7 +215,7 @@ $ShellName = Split-Path $PSCommandPath -Leaf
 #実行ユーザ確認
 #プログラム起動メッセージ
 
-. PreInitialize
+. Invoke-PreInitialize
 
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
@@ -264,7 +264,7 @@ Param(
 )
 
 
-EndingProcess $ReturnCode
+ Invoke-PostFinalize $ReturnCode
 
 
 }
