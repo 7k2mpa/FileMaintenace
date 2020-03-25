@@ -543,11 +543,11 @@ Param(
 #[parameter(position=0, mandatory=$TRUE , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
  
 
-[Array][parameter(position=1)][ValidateNotNullOrEmpty()][ValidateSet("AddTimeStamp", "Compress", "MoveNewFile" , "none" , "Archive" , "7z" , "7zZip")]$PreAction = 'none',
+[Array][parameter(position=1)][ValidateNotNullOrEmpty()][ValidateSet("none" , "AddTimeStamp" , "Compress", "MoveNewFile" , "Archive" , "7z" , "7zZip")]$PreAction = 'none',
 
-[String][parameter(position=2)][ValidateNotNullOrEmpty()][ValidateSet("Move", "Copy", "Delete" , "none" , "DeleteEmptyFolders" , "NullClear" , "KeepFilesCount")]$Action = 'none',
+[String][parameter(position=2)][ValidateNotNullOrEmpty()][ValidateSet("none" , "Move", "Copy", "Delete" , "DeleteEmptyFolders" , "NullClear" , "KeepFilesCount")]$Action = 'none',
 
-[String][parameter(position=3)][ValidateNotNullOrEmpty()][ValidateSet("none"  , "NullClear" , "Rename")]$PostAction = 'none',
+[String][parameter(position=3)][ValidateNotNullOrEmpty()][ValidateSet("none" , "NullClear" , "Rename")]$PostAction = 'none',
 
 
 [String][parameter(position=4)]
@@ -560,13 +560,12 @@ Param(
 [Int][ValidateRange(0,730000)]$Days = 0,
 [Int64][ValidateRange(0,9223372036854775807)]$Size = 0,
 
-#[Regex]$RegularExpression = 'applog([0-9][0-9])([0-9][0-9])([0-9][0-9])',
-#[Regex]$RegularExpression = '\.txt$',
-[Regex]$RegularExpression = '.*',
-[Regex]$ParentRegularExpression = '.*',
+#[Regex][Alias("Regex")]$RegularExpression = '$(.*)\.txt$' , #RenameRegex Sample
 
-[Regex]$RenameToRegularExpression = '.loglog',
-#[Regex]$RenameToRegularExpression = 'applicationlog-20$1-$2-$3',
+[Regex][Alias("Regex")]$RegularExpression = '.*',
+[Regex][Alias("PathRegex")]$ParentRegularExpression = '.*',
+
+[Regex][Alias("RenameRegex")]$RenameToRegularExpression = '$1.log',
 
 [Boolean]$Recurse = $TRUE,
 [Switch]$NoRecurse,
@@ -589,7 +588,7 @@ Param(
 [Switch]$NullOriginalFile,
 #Switches planned to obsolute please use -PreAction end
 [Switch]$NoAction,
-#Switches planned to obsolute
+#Switches planned to obsolute end
 
 
 [Boolean]$Log2EventLog = $TRUE,
@@ -606,7 +605,7 @@ Param(
 #[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath = ..\Log\FileMaintenance.log ,
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath  ,
 [String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss',
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShiftJIS
 
 [Int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
 [Int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
@@ -1332,10 +1331,9 @@ Do
 [Boolean]$OverRideFlag  = $FALSE
 [Boolean]$ContinueFlag  = $FALSE
 [Boolean]$ForceFinalize = $FALSE          ;#$TRUEが戻ったらオブジェクト処理ループを強制終了
+[Int]$InLoopOverRideCount = 0    ;#$OverRideCountは処理全体のOverRide回数。$InLoopOverRideCountは1処理ループ内でのOverRide回数。1オブジェクトで複数回OverRideがあり得るため
 
 [Boolean]$ForceEndloop  = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
-
-[Int]$InLoopOverRideCount = 0    ;#$OverRideCountは処理全体のOverRide回数。$InLoopOverRideCountは1処理ループ内でのOverRide回数。1オブジェクトで複数回OverRideがあり得るため
 
 [String]$TargetFileParentFolder = Split-Path -Path $TargetObject -Parent
 
