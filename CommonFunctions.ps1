@@ -77,7 +77,6 @@ $Script:CommonFunctionsVersion = '20200221_2145'
 
 #ログ出力
 
-Set-Alias -Name Write-Log Write-Log
 
 function Write-Log {
 
@@ -745,7 +744,7 @@ Param(
     #ログ出力先（予定）ファイルと同一名称のフォルダが存在していれば異常終了
 
     IF (Test-Path -LiteralPath $CheckPath -PathType Container) {
-        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Same name folder $($Test-Leaf) exists already."        
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Same name folder $($CheckPath) exists already."        
         Finalize $ErrorReturnCode
         }
 
