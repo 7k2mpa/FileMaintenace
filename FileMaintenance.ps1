@@ -828,7 +828,6 @@ process {
             Object = $object
             Time   = $object.LastWriteTime
             Depth  = ($object.FullName.Split("\\")).Count
-            ParentFolder = ''
             }
         }
 
@@ -1327,8 +1326,6 @@ Do
 
 [Boolean]$ForceEndloop  = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
 
-$Target.ParentFolder = $Target.Object.FullName | Split-Path -Parent
-
 Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- Start processing [$($FilterType)] $($Target.Object.FullName) ---"
 
 
@@ -1354,7 +1351,7 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
         #String.Substringメソッドは文字列から、引数位置から最後までを取り出す
         #destinationFolderはNoRecurseでもMove|Copyで一律使用するので作成
 
-        $destinationFolder = $MoveToFolder | Join-Path -ChildPath ($Target.ParentFolder).Substring($TargetFolder.Length)
+        $destinationFolder = $MoveToFolder | Join-Path -ChildPath ($Target.Object.DirectoryName).Substring($TargetFolder.Length)
         IF ($Recurse) {
 
             IF (-not(Test-Container -CheckPath $destinationFolder -ObjectName 'Desitination folder of the file ')) {
@@ -1408,7 +1405,7 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
 
     #分岐3 移動 or 複製 　同一のファイルが（移動|複製先）に存在しないことを確認してから処理
     '^(Move|Copy)$' {
-            $destinationPath = $destinationFolder | Join-Path -ChildPath ($Target.Object.FullName | Split-Path -Leaf)
+            $destinationPath = $destinationFolder | Join-Path -ChildPath ($Target.Object.Name)
 
             IF (Test-LeafNotExists -Path $destinationPath) {
 
@@ -1471,9 +1468,9 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
 
     #分岐2 Rename Rename後の同一名称ファイルがに存在しないことを確認してから処理
     '^Rename$' {
-            $newFilePath = $Target.ParentFolder |
-                Join-Path -ChildPath (($Target.Object.FullName | Split-Path -Leaf) -replace "$RegularExpression" , "$RenameToRegularExpression") |
-                ConvertTo-AbsolutePath -ObjectName 'Filename renamed'
+            $newFilePath = $Target.Object.DirectoryName |
+                            Join-Path -ChildPath (($Target.Object.Name) -replace "$RegularExpression" , "$RenameToRegularExpression") |
+                            ConvertTo-AbsolutePath -ObjectName 'Filename renamed'
                             
             IF (Test-LeafNotExists -Path $newFilePath) {
 
