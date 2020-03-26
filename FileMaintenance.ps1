@@ -679,7 +679,7 @@ Param(
 [int]$WarningEventID = $WarningEventID ,
 [int]$ErrorEventID = $ErrorEventID ,
 
-[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("Test-Leaf")]$Path
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("Test-Leaf")]$Path
 )
 
 begin {
@@ -750,7 +750,7 @@ While ($FALSE)
         $Script:WarningFlag = $FALSE
         }
 
-Return $noExistFlag
+Write-Output $noExistFlag
 }
 
 end {
@@ -811,11 +811,13 @@ Param(
 [Switch]$Recurse = $Recurse,
 [String]$Action = $Action,
 
-[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFolder")]$Path ,
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFolder")]$Path ,
 [String][parameter(position=1 , mandatory=$TRUE )][ValidateSet("File" , "Folder")]$FilterType
 )
 
-
+begin {
+}
+process {
     $candidateObjects = Get-ChildItem -LiteralPath $Path -Recurse:$Recurse -Include * -File:($FilterType -eq 'File') -Directory:($FilterType -eq 'Folder')
 
     $objects = @()
@@ -847,7 +849,9 @@ Param(
             Write-output $objects
             }
     }
-
+}
+end {
+}
 
 }
 
@@ -1253,8 +1257,7 @@ Param(
          
 $targets = @()
 
-$targets = Get-Object -Path $TargetFolder -FilterType $FilterType
-
+$targets = $TargetFolder | Get-Object -FilterType $FilterType
 
     IF ($NULL -eq $targets) {
 
