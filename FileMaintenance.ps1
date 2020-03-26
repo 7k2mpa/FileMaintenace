@@ -815,10 +815,7 @@ Param(
 [String][parameter(position=1 , mandatory=$TRUE )][ValidateSet("File" , "Folder")]$FilterType
 )
 
-begin {
-}
 
-process {
     $candidateObjects = Get-ChildItem -LiteralPath $Path -Recurse:$Recurse -Include * -File:($FilterType -eq 'File') -Directory:($FilterType -eq 'Folder')
 
     $objects = @()
@@ -850,10 +847,7 @@ process {
             Write-output $objects
             }
     }
-}
 
-end {
-}
 
 }
 
@@ -1256,12 +1250,13 @@ Param(
         } else {
         $FilterType = "File"
         }
-
+         
 $targets = @()
 
 $targets = Get-Object -Path $TargetFolder -FilterType $FilterType
 
-    IF ($NULL -eq $targetObjects) {
+
+    IF ($NULL -eq $targets) {
 
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "In -TargetFolder [$($targetFolder)] no [$($FilterType)] exists for processing."
 
