@@ -766,7 +766,6 @@ filter ComplexFilter{
 　オブジェクトを複数条件でフィルタ、適合するものだけをOUTPUT
 
 .DESCRIPTION
-$FileTypeの指定に基づき、フォルダ、ファイルを抽出
 最終変更日時が$Daysより古い
 (ファイル|フォルダ)名が正規表現$RegularExpressionにマッチ
 ファイル容量が $Sizeより大きい
@@ -782,7 +781,6 @@ PSobject passed the filter
 
 #>
  
-    IF (($_.PSIsContainer -eq ($FilterType -eq 'Folder')) -or ( -not($_.PSIsContainer) -eq ($FilterType -eq 'File'))) {
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
     IF ($_.Name -match $RegularExpression) {
     IF ($_.Length -ge $Size) {
@@ -791,7 +789,6 @@ PSobject passed the filter
     }
     } 
     }                                                                              
-    }
 }
 
  
@@ -814,14 +811,15 @@ Param(
 [Switch]$Recurse = $Recurse,
 [String]$Action = $Action,
 
-[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFolder")]$Path
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFolder")]$Path ,
+[String][parameter(position=1 , mandatory=$TRUE )][ValidateSet("File" , "Folder")]$FilterType
 )
 
 begin {
 }
 
 process {
-    $candidateObjects = Get-ChildItem -LiteralPath $Path -Recurse:$Recurse -Include * 
+    $candidateObjects = Get-ChildItem -LiteralPath $Path -Recurse:$Recurse -Include * -File:($FilterType -eq 'File') -Directory:($FilterType -eq 'Folder')
 
     $objects = @()
 
@@ -1079,12 +1077,10 @@ ConvertTo new path with extention .zip or adding time stamp
 System.String. Path of the file
 
 .OUTPUT
-Strings Array
-[0]new path
-[1]ActionType string for display
+PSobject
 #>
 
-[OutputType([Array])]
+[OutputType([object])]
 [CmdletBinding()]
 Param(
 [Array]$PreAction = $PreAction ,
@@ -1094,13 +1090,18 @@ Param(
 [String]$CompressedExtString =  $CompressedExtString ,
 [String]$TimeStampFormat = $TimeStampFormat ,
 
-[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetObject")]$Path
+[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetObject")]$Path
 ) 
 
 begin {
 }
 
 process {
+
+    $archive = New-Object PSObject -Property @{
+    Path = ''
+    Type = ''
+    }
 
     IF (($PreAction -contains 'MoveNewFile') -and ($PreAction -contains 'Archive')) {        
         $desitinationFolder = $MoveToFolder
@@ -1115,7 +1116,6 @@ process {
                     $desitinationFolder = Split-Path -Path $Path -Parent
                     } 
 
-
     IF (($PreAction -match '^(Compress|Archive)$')) {
 
         #$PreActionは配列である。それをSwitch処理すると1要素づつループする。
@@ -1124,36 +1124,36 @@ process {
         Switch -Regex ($PreAction) {    
         
           '^7z$' {
-                $actionType = "7z"
+                $archive.Type = "7z"
                 $extension = '.7z'
                 Break                
                 }
                 
            '^7zZip$' {
-                $actionType = "7zZip"
+                $aarchive.Type = "7zZip"
                 $extension = '.zip'
                 Break
                 }
                     
              Default {
-                $actionType = ''
+                $archive.Type = ''
                 $extension = $CompressedExtString
                 }    
         }
     } else {
-    $actionType = '' 
+    $archive.Type = '' 
     $extension = ''
     }
  
     Switch -Regex ($PreAction) {    
         
           '^Compress$' {
-                $actionType += "Compress"
+                $archive.Type += "Compress"
                 Break                
                 }
                 
            '^Archive$' {
-                $actionType += "Archive"
+                $archive.Type += "Archive"
                 Break
                 }
                     
@@ -1163,29 +1163,28 @@ process {
 
     IF ($PreAction -contains 'AddTimeStamp') {
 
-        $archiveFilePath = Join-Path -Path $desitinationFolder -ChildPath ((ConvertTo-FileNameAddTimeStamp -TargetFileName (Split-Path $Path -Leaf) -TimeStampFormat $TimeStampFormat )+$extension )
+        $archive.Path = $desitinationFolder | Join-Path -ChildPath (($Path | Split-Path -Leaf | ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat) + $extension)
 
         IF ($PreAction -match '^(Compress|Archive)$') {
 
-            $actionType += "AndAddTimeStamp"
+            $archive.Type += "AndAddTimeStamp"
            
             } else {
-            $actionType += "AddTimeStamp"        
+            $archive.Type += "AddTimeStamp"        
             }
 
         } else {        
-        $archiveFilePath = Join-Path -Path $desitinationFolder -ChildPath ((Split-Path $Path -Leaf)+$extension )        
+        $archive.Path = $desitinationFolder | Join-Path -ChildPath ((Split-Path $Path -Leaf)+$extension )        
         }
 
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Create a new file [$(Split-Path -Path $archiveFilePath -Leaf)] with action [$($actionType)]"
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Create a new file [$(Split-Path -Path $archive.Path -Leaf)] with action [$($archive.Type)]"
 
     IF ($PreAction -contains 'MoveNewFile') {
 
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage ("Specified -PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"] option, thus place the new file in the folder [$($desitinationFolder)]")
             }
 
-Return $archiveFilePath , $actionType
-
+    Write-Output $archive
 }
 
 end {
@@ -1194,7 +1193,7 @@ end {
 }
 
 
-function Finalize{
+function Finalize {
 
 Param(
 [parameter(mandatory=$TRUE)][Int]$ReturnCode
@@ -1260,7 +1259,7 @@ Param(
 
 $targetObjects = @()
 
-$targetObjects = Get-Object -Path $TargetFolder
+$targetObjects = Get-Object -Path $TargetFolder -FilterType $FilterType
 
     IF ($NULL -eq $targetObjects) {
 
@@ -1285,17 +1284,13 @@ Write-Output $targetObjects
 
 IF ($PreAction -contains 'Archive') {
 
-    [Array]$return = ConvertTo-PreActionFileName -Path $ArchiveFileName
+   $archive = ConvertTo-PreActionFileName -Path $ArchiveFileName
  
-    $archivePath   = $return[0]
-    $preActionType = $return[1]
-
-    IF (-not(Test-LeafNotExists -Path $archivePath)) {
+    IF (-not(Test-LeafNotExists -Path $archive.Path)) {
         
-        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "File/Folder exists in the path [$($archivePath)] already, thus terminate $($ShellName) with ERROR"
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "File/Folder exists in the path [$($archive.Path)] already, thus terminate $($ShellName) with ERROR"
         Finalize $ErrorReturnCode        
         }
-
 }
 
 
@@ -1359,7 +1354,7 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
         #String.Substringメソッドは文字列から、引数位置から最後までを取り出す
         #MoveToNewFolderはNoRecurseでもMove|Copyで一律使用するので作成
 
-        $MoveToNewFolder = Join-Path -Path $MoveToFolder -ChildPath ($TargetFileParentFolder).Substring($TargetFolder.Length)
+        $MoveToNewFolder = $MoveToFolder | Join-Path -ChildPath ($TargetFileParentFolder).Substring($TargetFolder.Length)
         IF ($Recurse) {
 
             IF (-not(Test-Container -CheckPath $MoveToNewFolder -ObjectName 'Desitination folder of the file ')) {
@@ -1381,19 +1376,16 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
 
     IF (( $PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')) {
 
-         [Array]$return = ConvertTo-PreActionFileName -Path $TargetObject
+        $archive = ConvertTo-PreActionFileName -Path $TargetObject
 
-        $archivePath   = $return[0]
-        $preActionType = $return[1]
+        IF (Test-LeafNotExists -Path $archive.Path) {
 
-        IF (Test-LeafNotExists -Path $archivePath) {
-
-            Invoke-Action -ActionType $preActionType -ActionFrom $TargetObject -ActionTo $archivePath -ActionError $TargetObject
+            Invoke-Action -ActionType $archive.Type -ActionFrom $TargetObject -ActionTo $archive.Path -ActionError $TargetObject
             }
         
     } elseIF ($PreAction -contains 'Archive') {
        
-        Invoke-Action -ActionType $preActionType -ActionFrom $TargetObject -ActionTo $archivePath -ActionError $TargetObject
+        Invoke-Action -ActionType $archive.Type -ActionFrom $TargetObject -ActionTo $archive.Path -ActionError $TargetObject
         }
 
 

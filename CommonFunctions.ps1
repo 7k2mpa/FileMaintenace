@@ -497,17 +497,27 @@ Param(
  
 function ConvertTo-FileNameAddTimeStamp {
 
+[OutputType([String])]
+[CmdletBinding()]
+
 Param(
-[String][parameter(mandatory=$TRUE)]$TimeStampFormat,
-[String][parameter(mandatory=$TRUE)]$TargetFileName
+[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFileName")]$Name ,
+[String][parameter(position=1 , mandatory=$TRUE)]$TimeStampFormat 
 )
 
-
+begin {
     $formattedDate = (Get-Date).ToString($TimeStampFormat)
-    $extensionString = [System.IO.Path]::GetExtension($TargetFileName)
-    $fileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension($TargetFileName)
+}
 
-    Return $fileNameWithOutExtentionString+$formattedDate+$extensionString
+process {
+    $extensionString = [System.IO.Path]::GetExtension($Name)
+    $fileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension($Name)
+
+    $fileNameWithOutExtentionString + $formattedDate + $extensionString
+}
+
+end {
+}
 
 }
 
@@ -974,7 +984,7 @@ function Test-OracleBackUpMode {
         $dbStatus.BackUp = $FALSE
     }
 
-Return $dbStatus
+    Write-Output $dbStatus
 
 }
 
