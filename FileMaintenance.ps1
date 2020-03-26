@@ -1277,7 +1277,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "[$($target
 Write-Output "[$($FilterType)(s)] are for processing..."
 
 Write-Output $targets.Object.Fullname
-    　
+  　
 #-PreAction Archiveは複数ファイルを1ファイルに圧縮する。よって、ループ前に圧縮先の1ファイルのフルパスを確定しておく
 
 IF ($PreAction -contains 'Archive') {
