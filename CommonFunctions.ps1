@@ -398,14 +398,18 @@ function ConvertTo-AbsolutePath {
 
 #>
 
-
+[OutputType([String])]
+[CmdletBinding()]
 Param(
-[String]$CheckPath,
-[parameter(mandatory=$TRUE)][String]$ObjectName
+[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath")]$Path ,
+[String][parameter(position=1 , mandatory=$TRUE)]$ObjectName
 )
 
+begin {
+}
 
-    IF ([String]::IsNullOrEmpty($CheckPath)) {
+Process {
+    IF ([String]::IsNullOrEmpty($Path)) {
            
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
         Finalize $ErrorReturnCode
@@ -413,69 +417,69 @@ Param(
 
     #Windowsではパス区切に/も使用できる。しかしながら、処理を簡単にするため\に統一する
 
-    $CheckPath = $CheckPath.Replace('/','\')
+    $Path = $Path.Replace('/','\')
 
-    IF (Test-Path -LiteralPath $CheckPath -IsValid) {
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is valid path format."
+    IF (Test-Path -LiteralPath $Path -IsValid) {
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($Path)] is valid path format."
    
         } else {
-        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)] is invalid path format. The path may contain a drive letter not existed or characters that can not use by NTFS."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($Path)] is invalid path format. The path may contain a drive letter not existed or characters that can not use by NTFS."
         Finalize $ErrorReturnCode
         }
 
 
 
-    Switch -Regex ($CheckPath) {
+    Switch -Regex ($Path) {
 
         "^\.+\\.*" {
        
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is relative path format."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($Path)] is relative path format."
 
-            $convertedCheckPath = Join-Path -Path $DatumPath -ChildPath $CheckPath | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
+            $convertedPath = $DatumPath | Join-Path -ChildPath $Path | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
          
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Convert to absolute path format [$($convertedCheckPath)] with joining the folder path [$($DatumPath)] the script is placed and the path [$($CheckPath)]"
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Convert to absolute path format [$($convertedPath)] with joining the folder path [$($DatumPath)] the script is placed and the path [$($Path)]"
 
-            $CheckPath = $convertedCheckPath
+            $Path = $convertedPath
             }
 
         "^[c-zC-Z]:\\.*" {
 
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is absolute path format."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($Path)] is absolute path format."
             }
 
         Default {
       
-            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($CheckPath)] is neither absolute path format nor relative path format."
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($Path)] is neither absolute path format nor relative path format."
             Finalize $ErrorReturnCode
             }
     }
 
     #パス末尾に\\が連続すると処理が複雑になるので、使わせない
 
-    IF ($CheckPath -match '\\\\') {
+    IF ($Path -match '\\\\') {
  
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "NTFS allows multiple path separators such as '\\' , due to processing limitation, convert multiple path separators to a single."
 
-            For ( $i = 0 ; $i -lt $CheckPath.Length-1 ; $i++ ) {
-                $CheckPath = $CheckPath.Replace('\\','\')
+            For ( $i = 0 ; $i -lt $Path.Length-1 ; $i++ ) {
+                $Path = $Path.Replace('\\','\')
                 }
 
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($CheckPath)] is created by converting multiple path separators to a single."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($Path)] is created by converting multiple path separators to a single."
         }
 
 
     #パスがフォルダで末尾に\が存在した場合は削除する。末尾の\有無で結果は一緒なのだが、統一しないと文字列数が異なるためパス文字列切り出しが誤動作する。
 
-    IF ($CheckPath.EndsWith('\')) {
+    IF ($Path.EndsWith('\')) {
     
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Windows path format allows the end of path with a path separator '\' , due to processing limitation, remove it."
-            $CheckPath = $CheckPath.Substring(0 , $CheckPath.Length -1)
+            $Path = $Path.Substring(0 , $Path.Length -1)
             }
 
 
     #TEST-Path -isvalidはコロン:の含まれているPathを正しく判定しないので個別に判定
 
-    IF ((Split-Path $CheckPath -noQualifier) -match '(\/|:|\?|`"|<|>|\||\*)') {
+    IF (($Path | Split-Path -noQualifier) -match '(\/|:|\?|`"|<|>|\||\*)') {
     
                 Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName may contain characters that can not use by NTFS  such as BackSlash/ Colon: Question? DoubleQuote`" less or greater than<> astarisk* pipe| "
                 Finalize $ErrorReturnCode
@@ -484,13 +488,17 @@ Param(
 
     #Windows予約語がパスに含まれているか判定
 
-    IF ($CheckPath -match '\\(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])(\\|$|\..*$)') {
+    IF ($Path -match '\\(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])(\\|$|\..*$)') {
 
                 Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName may contain the Windows reserved words such as (AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
                 Finalize $ErrorReturnCode
                 }        
 
-    Return $CheckPath
+    Write-Output $Path
+}
+end {
+}
+
 
 }
 
