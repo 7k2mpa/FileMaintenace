@@ -485,14 +485,11 @@ Push-Location $OracleHomeBinPath
         }
 
 
-
-
-
 #BackUp/Normal Modeどちらかを確認
 
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Check Database running status in which mode"
 
-  . Test-OracleBackUpMode > $NULL
+    $status = Test-OracleBackUpMode
 
       IF ($LASTEXITCODE -ne 0) {
 
@@ -506,12 +503,12 @@ Push-Location $OracleHomeBinPath
 
 
 
-    IF (($BackUpModeFlag) -and (-not($NormalModeFlag))) {
+    IF (($status.BackUp) -and (-not($status.Normal))) {
  
         Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Oracle Database running status is Backup Mode already."
         $WarningCount ++
  
-        }elseIF (-not  (($BackUpModeFlag) -xor ($NormalModeFlag))) {
+        }elseIF (-not  (($status.BackUp) -xor ($status.Normal))) {
  
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Oracle Database running status is unknown."
             Finalize $ErrorReturnCode
@@ -519,9 +516,11 @@ Push-Location $OracleHomeBinPath
 
 
 
-    IF (-not($BackUpModeFlag) -and ($NormalModeFlag)) {
+    IF (-not($status.BackUp) -and ($status.Normal)) {
  
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database running status is Normal Mode."
+        }
+
 
 
 #Back Up Modeへ切替
@@ -548,7 +547,6 @@ Push-Location $OracleHomeBinPath
 
     }
 
-}
 
 
 #Listner停止

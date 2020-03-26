@@ -580,7 +580,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Check Back Up Mode"
 
-. Test-OracleBackUpMode > $NULL
+    $status = Test-OracleBackUpMode
 
       IF ($LASTEXITCODE -ne 0) {
 
@@ -593,17 +593,17 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
 
 
- IF (-not($BackUpModeFlag) -and ($NormalModeFlag)) {
+ IF (-not($status.BackUp) -and ($status.Normal)) {
  
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database is running in Normal Mode(ending backup mode)"
     }
 
- IF (-not( ($BackUpModeFlag) -xor ($NormalModeFlag) )) {
+ IF (-not( ($status.BackUp) -xor ($status.Normal) )) {
 
     Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Oracle Database is running in UNKNOWN mode."
     $ErrorCount ++
  
-    }elseIF (($BackUpModeFlag) -and (-not($NormalModeFlag))) {
+    }elseIF (($status.BackUp) -and (-not($status.Normal))) {
  
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database is running in Backup Mode. Switch to Normal Mode(Ending Backup Mode)"
 

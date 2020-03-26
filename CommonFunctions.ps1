@@ -917,8 +917,69 @@ Pop-Location
 
 }
 
-
 function Test-OracleBackUpMode {
+
+
+    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Get the backup status of Oracle Database ,determine Oracle Database is running in which mode BackUp/Normal. A line [Active] is in BackUp Mode."
+  . Invoke-SQL -SQLCommand $DBCheckBackUpMode -SQLName "DBCheckBackUpMode" -SQLLogPath $SQLLogPath > $NULL
+
+   
+    #•¶Žš—ñ”z—ñ‚É•ÏŠ·‚·‚é
+    $SQLLog = $SQLLog -replace "`r","" |  ForEach-Object {$_ -split "`n"}
+
+    $normalModeCount = 0
+    $backUpModeCount = 0
+
+    $dbStatus = New-Object PSObject -Property @{
+    Normal = $FALSE
+    BackUp = $FALSE
+    }
+
+    $i = 1
+
+    foreach ($line in $SQLLog) {
+
+            IF ($Line -match 'NOT ACTIVE') {
+                $normalModeCount ++
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "[$line] line[$i] Normal Mode"
+ 
+ 
+                } elseIF ($Line -match 'ACTIVE') {
+                $backUpModeCount ++
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "[$line] line[$i] BackUp Mode"
+                }
+ 
+    $i ++
+    }
+
+
+    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database is running in...."
+
+    IF (($backUpModeCount -eq 0) -and ($normalModeCount -gt 0)) {
+ 
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Normal Mode"
+        $dbStatus.Normal = $TRUE
+        $dbStatus.BackUp = $FALSE
+
+    } elseIF (($backUpModeCount -gt 0) -and ($normalModeCount -eq 0)) {
+   
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Back Up Mode"
+        $dbStatus.Normal = $FALSE
+        $dbStatus.BackUp = $TRUE
+
+    } else {
+
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "??? Mode ???"
+        $dbStatus.Normal = $FALSE
+        $dbStatus.BackUp = $FALSE
+    }
+
+Return $dbStatus
+
+}
+
+
+function Test-OLDOracleBackUpMode {
 
 
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Get the backup status of Oracle Database ,determine Oracle Database is running in which mode BackUp/Normal. A line [Active] is in BackUp Mode."
