@@ -309,7 +309,7 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Starting to change Service [$($Service)] status."
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Starting to switch Service [$($Service)] status."
 
 }
 
@@ -373,7 +373,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
           Finalize $ErrorReturnCode
           }
 
-    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "With WMIService.(start|stop)Service , starting to change Service [$($Service)] status from [$($originalStatus)] to [$($TargetStatus)]"
+    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "With WMIService.(start|stop)Service , starting to switch Service [$($Service)] status from [$($originalStatus)] to [$($TargetStatus)]"
 
     Switch -Regex ($TargetStatus) {
  
@@ -438,9 +438,9 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
 
       #チェック回数の上限に達していない場合は、指定秒待機
 
-      Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Serivce [$($Service)] exists and service status dose not change to [$($TargetStatus)] Wait for $($RetrySpanSec) seconds."
+      Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Serivce [$($Service)] exists and service status dose not switch to [$($TargetStatus)] Wait for $($RetrySpanSec) seconds."
       Start-Sleep $RetrySpanSec
 }
 
-Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , service [$($Service)] status is not change to [$($TargetStatus)]"
+Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , service [$($Service)] status is not switch to [$($TargetStatus)]"
 Finalize $ErrorReturnCode

@@ -283,14 +283,14 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #コマンドの有無を確認
 
 
-    $CommandPath = ConvertTo-AbsolutePath -CheckPath $CommandPath -ObjectName ' -CommandPath'
+    $CommandPath = $CommandPath | ConvertTo-AbsolutePath -ObjectName ' -CommandPath'
 
     Test-Leaf -CheckPath $CommandPath -ObjectName '-CommandPath' -IfNoExistFinalize > $NULL
 
 #コマンドファイルの有無を確認
     
 
-    $CommandFile = ConvertTo-AbsolutePath -CheckPath $CommandFile -ObjectName '-CommandFile'
+    $CommandFile = $CommandFile | ConvertTo-AbsolutePath -ObjectName '-CommandFile'
 
     Test-Leaf -CheckPath $CommandFile -ObjectName '-CommandFile' -IfNoExistFinalize > $NULL
 

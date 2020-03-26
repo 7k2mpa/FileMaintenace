@@ -203,7 +203,7 @@ Param(
 
 
 [String][parameter(position=1 , mandatory=$true)][ValidateNotNullOrEmpty()][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
-[String][parameter(position=2 , mandatory=$true)][ValidateNotNullOrEmpty()][ValidateSet("Exist","NoExist")]$Status = 'NoExist',
+[String][parameter(position=2)][ValidateNotNullOrEmpty()][ValidateSet("Exist","NoExist")]$Status = 'NoExist',
 [String][parameter(position=3)][ValidateNotNullOrEmpty()][ValidateSet("Create","Delete")]$PostAction,
 
 #Planned to obsolute
@@ -290,7 +290,7 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #フラグフォルダの有無を確認
 
 
-    $FlagFolder = ConvertTo-AbsolutePath -CheckPath $FlagFolder -ObjectName  '-FlagFolder'
+    $FlagFolder = $FlagFolder | ConvertTo-AbsolutePath -ObjectName  '-FlagFolder'
 
     Test-Container -CheckPath $FlagFolder -ObjectName '-FlagFolder' -IfNoExistFinalize > $NULL
 
