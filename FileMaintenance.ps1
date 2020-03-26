@@ -1437,7 +1437,7 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
     #•ªŠò6 KeepFilesCount
     '^KeepFilesCount$' {
             IF (($targets.Length - $InLoopDeletedFilesCount) -gt $KeepFiles) {
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage  "In the folder more than [$($KeepFiles)] files exist, thus delete the oldest [$($Target.Object.fullname)]"
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage  "In the folder more than [$($KeepFiles)] files exist, thus delete the oldest [$($Target.Object)]"
                 Invoke-Action -ActionType Delete -ActionFrom $Target.Object -ActionError $Target.Object
 
                 #$Invoke-Action‚ªˆÙíI—¹&-Continue $TRUE‚¾‚Æ$ContinueFlag $TRUE‚É‚È‚é‚Ì‚ÅA‚»‚Ìê‡‚ÍŒã‘±ˆ—‚Í‚µ‚È‚¢‚ÅŸ‚ÌObjectˆ—‚Éi‚Ş
