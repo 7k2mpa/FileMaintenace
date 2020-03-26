@@ -828,6 +828,7 @@ process {
             Object = $object
             Time   = $object.LastWriteTime
             Depth  = ($object.FullName.Split("\\")).Count
+            ParentFolder = ''
             }
         }
 
@@ -1313,6 +1314,7 @@ Do/Whileはループのため、処理途中でBreakすると、Whileへjumpする。
 3.処理終了メッセージ出力しない。Finalizeへ進む（処理打ち切り）
  Finalize $ErrorReturnCode
 #>
+
 Do
 {
 [Boolean]$ErrorFlag     = $FALSE
@@ -1325,9 +1327,9 @@ Do
 
 [Boolean]$ForceEndloop  = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
 
-[String]$TargetFileParentFolder = $Target.Object | Split-Path -Parent
+[String]$TargetFileParentFolder = $Target.Object.FullName | Split-Path -Parent
 
-Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- Start processing [$($FilterType)] $($Target.Object) ---"
+Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "--- Start processing [$($FilterType)] $($Target.Object.FullName) ---"
 
 
 #移動元のファイルパスから移動先のファイルパスを生成。
@@ -1374,16 +1376,16 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
 
     IF (( $PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')) {
 
-        $archive = $Target.Object | ConvertTo-PreActionFileName
+        $archive = $Target.Object.FullName | ConvertTo-PreActionFileName
 
         IF (Test-LeafNotExists -Path $archive.Path) {
 
-            Invoke-Action -ActionType $archive.Type -ActionFrom $Target.Object -ActionTo $archive.Path -ActionError $Target.Object
+            Invoke-Action -ActionType $archive.Type -ActionFrom $Target.Object.FullName -ActionTo $archive.Path -ActionError $Target.Object.FullName
             }
         
     } elseIF ($PreAction -contains 'Archive') {
        
-        Invoke-Action -ActionType $archive.Type -ActionFrom $Target.Object -ActionTo $archive.Path -ActionError $Target.Object
+        Invoke-Action -ActionType $archive.Type -ActionFrom $Target.Object.FullName -ActionTo $archive.Path -ActionError $Target.Object.FullName
         }
 
 
@@ -1395,50 +1397,50 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
     '^none$' {
             IF ( ($PostAction -eq 'none') -and ($PreAction -contains 'none') ) {
 
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Specified -Action [$($Action)] option, thus do not process $($Target.Object)"
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Specified -Action [$($Action)] option, thus do not process $($Target.Object.FullName)"
                 }
             }
 
     #分岐2 削除
     '^Delete$' {
-            Invoke-Action -ActionType Delete -ActionFrom $Target.Object -ActionError $Target.Object
+            Invoke-Action -ActionType Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
             } 
 
     #分岐3 移動 or 複製 　同一のファイルが（移動|複製先）に存在しないことを確認してから処理
     '^(Move|Copy)$' {
-            $targetFileMoveToPath = $MoveToNewFolder | Join-Path -ChildPath ($Target.Object | Split-Path -Leaf)
+            $targetFileMoveToPath = $MoveToNewFolder | Join-Path -ChildPath ($Target.Object.FullName | Split-Path -Leaf)
 
             IF (Test-LeafNotExists -Path $targetFileMoveToPath) {
 
-                Invoke-Action -ActionType $Action -ActionFrom $Target.Object -ActionTo $targetFileMoveToPath -ActionError $Target.Object 
+                Invoke-Action -ActionType $Action -ActionFrom $Target.Object.FullName -ActionTo $targetFileMoveToPath -ActionError $Target.Object.FullName 
                 }
             }
 
     #分岐4 空フォルダを判定して削除
     '^DeleteEmptyFolders$' {
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage  "Check the folder $($Target.Object) is empty."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage  "Check the folder $($Target.Object.FullName) is empty."
 
             IF ($Target.Object.GetFileSystemInfos().Count -eq 0) {
 
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage  "The folder $($Target.Object) is empty."
-                Invoke-Action -ActionType Delete -ActionFrom $Target.Object -ActionError $Target.Object
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage  "The folder $($Target.Object.FullName) is empty."
+                Invoke-Action -ActionType Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
 
                 } else {
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "The folder $($Target.Object) is not empty." 
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "The folder $($Target.Object.FullName) is not empty." 
                 }
             }
 
 
     #分岐5 NullClear
     '^NullClear$' {
-            Invoke-Action -ActionType NullClear -ActionFrom $Target.Object -ActionError $Target.Object          
+            Invoke-Action -ActionType NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
             }
 
     #分岐6 KeepFilesCount
     '^KeepFilesCount$' {
             IF (($targets.Length - $InLoopDeletedFilesCount) -gt $KeepFiles) {
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage  "In the folder more than [$($KeepFiles)] files exist, thus delete the oldest [$($Target.Object)]"
-                Invoke-Action -ActionType Delete -ActionFrom $Target.Object -ActionError $Target.Object
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage  "In the folder more than [$($KeepFiles)] files exist, thus delete the oldest [$($Target.Object.FullName)]"
+                Invoke-Action -ActionType Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
 
                 #$Invoke-Actionが異常終了&-Continue $TRUEだと$ContinueFlag $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
                 IF ($ContinueFlag) {
@@ -1447,7 +1449,7 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
                 $InLoopDeletedFilesCount++
             
             } else {
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage  "Tn the foler less [$($KeepFiles)] files exist, thus do not delete [$($Target.Object)]"
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage  "Tn the foler less [$($KeepFiles)] files exist, thus do not delete [$($Target.Object.FullName)]"
                 }
             }
 
@@ -1469,20 +1471,20 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
 
     #分岐2 Rename Rename後の同一名称ファイルがに存在しないことを確認してから処理
     '^Rename$' {
-            $newFilePath = $TargetFileParentFolder | Join-Path -ChildPath (($Target.Object | Split-Path -Leaf) -replace "$RegularExpression" , "$RenameToRegularExpression") | ConvertTo-AbsolutePath -ObjectName 'Filename renamed'
+            $newFilePath = $TargetFileParentFolder | Join-Path -ChildPath (($Target.Object.FullName | Split-Path -Leaf) -replace "$RegularExpression" , "$RenameToRegularExpression") | ConvertTo-AbsolutePath -ObjectName 'Filename renamed'
                             
                     IF (Test-LeafNotExists -Path $newFilePath) {
 
-                        Invoke-Action -ActionType Rename -ActionFrom $Target.Object -ActionTo $newFilePath -ActionError $Target.Object
+                        Invoke-Action -ActionType Rename -ActionFrom $Target.Object.FullName -ActionTo $newFilePath -ActionError $Target.Object.FullName
     
                         } else {
-                            Write-Log -EventID $InfoEventID -EventType Information -EventMessage  "A file [$($newFilePath)] already exists same as attempting rename, thus do not rename [$($Target.Object.fullname)]" 
+                            Write-Log -EventID $InfoEventID -EventType Information -EventMessage  "A file [$($newFilePath)] already exists same as attempting rename, thus do not rename [$($Target.Object.FullName.fullname)]" 
                             }
             }
 
     #分岐3 NullClear
     '^NullClear$' {
-            Invoke-Action -ActionType NullClear -ActionFrom $Target.Object -ActionError $Target.Object          
+            Invoke-Action -ActionType NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
             }
 
 
@@ -1514,7 +1516,7 @@ While($FALSE)
         $ContinueCount++
         }
          
-    Write-Log -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- End processing [$($FilterType)] $($Target.Object)  Results  Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)] ---"
+    Write-Log -EventID $InfoLoopEndEventID -EventType Information -EventMessage "--- End processing [$($FilterType)] $($Target.Object.FullName)  Results  Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)] ---"
 
     IF ($ForceFinalize) {    
         Finalize $ErrorReturnCode
