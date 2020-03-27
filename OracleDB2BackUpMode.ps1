@@ -236,8 +236,7 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[String]$OracleSID = $Env:ORACLE_SID ,
-[String]$OracleService ,
+[String][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,
 
 [String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
 
@@ -314,7 +313,7 @@ Try {
 
 function Initialize {
 
-$ShellName = Split-Path -Path $PSCommandPath -Leaf
+$ShellName = $PSCommandPath | Split-Path -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -326,19 +325,14 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
-#For Backward compatibility
-
-    IF ( (-not($OracleSID)) -and ($OracleService))  {
-            $OracleSID = $OracleSerivce
-            } 
 
 #パラメータの確認
 
 #OracleBINフォルダの指定、存在確認
 
-    $OracleHomeBinPath = $OracleHomeBinPath | ConvertTo-AbsolutePath -ObjectName  '-oracleHomeBinPath'
+    $OracleHomeBinPath = $OracleHomeBinPath | ConvertTo-AbsolutePath -Name  '-oracleHomeBinPath'
 
-    Test-Container -CheckPath $OracleHomeBinPath -ObjectName '-oracleHomeBinPath' -IfNoExistFinalize > $NULL
+    $OracleHomeBinPath | Test-Container -Name '-oracleHomeBinPath' -IfNoExistFinalize > $NULL
 
 
 #BackUpFlagフォルダの指定、存在確認
@@ -348,23 +342,22 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
         $BackUpFlagPath = $BackUpFlagPath | ConvertTo-AbsolutePath -ObjectName  '-BackUpFlagPath'
 
-        $BackUpFlagPath | Split-Path | ForEach-Object {Test-Container -CheckPath $_ -ObjectName 'Parent Folder of -BackUpFlagPath' -IfNoExistFinalize > $NULL}
-
+        $BackUpFlagPath | Split-Path -Parent | Test-Container -Name 'Parent Folder of -BackUpFlagPath' -IfNoExistFinalize > $NULL
         }
 
 
 #SQLLogファイルの指定、存在、書き込み権限確認
 
-    $SQLLogPath = ConvertTo-AbsolutePath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath'
+    $SQLLogPath = $SQLLogPath | ConvertTo-AbsolutePath -ObjectName '-SQLLogPath'
 
-    Test-LogPath -CheckPath $SQLLogPath -ObjectName '-SQLLogPath' > $NULL
+    $SQLLogPath | Test-LogPath -Name '-SQLLogPath' > $NULL
 
 
 #SQLコマンド群の指定、存在確認、Load
 
-    $SQLCommandsPath = ConvertTo-AbsolutePath -CheckPath $SQLCommandsPath -ObjectName '-SQLCommandPath'
+    $SQLCommandsPath = $SQLCommandsPath | ConvertTo-AbsolutePath -ObjectName '-SQLCommandPath'
 
-    Test-Leaf -CheckPath $SQLCommandsPath -ObjectName '-SQLCommandsPath' -IfNoExistFinalize > $NULL
+    $SQLCommandsPath | Test-Leaf -Name '-SQLCommandsPath' -IfNoExistFinalize > $NULL
 
 
     Try {
@@ -388,6 +381,7 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
         Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
         Finalize $ErrorReturnCode
+
         }else{
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is running."
         }
@@ -439,8 +433,8 @@ $Version = '20200207_1615'
 
 Push-Location $OracleHomeBinPath
 
-
-#バックアップ実行中かを確認
+ 
+#planed to obsolute バックアップ実行中かを確認
 
     IF ($NoCheckBackUpFlag) {
 
@@ -452,6 +446,7 @@ Push-Location $OracleHomeBinPath
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Running Back Up now. Can not start duplicate execution."
             Finalize $ErrorReturnCode
             }
+#planed to obsolute バックアップ実行中かを確認
     
 
 #セッション情報を出力
