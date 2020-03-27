@@ -679,7 +679,7 @@ Param(
 [int]$WarningEventID = $WarningEventID ,
 [int]$ErrorEventID = $ErrorEventID ,
 
-[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("Test-Leaf")]$Path
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath")]$Path
 )
 
 begin {
@@ -837,16 +837,16 @@ process {
  
         #KeepFilesCount配列に入れたパス一式を古い順に整列
         '^KeepFilesCount$' {
-            Write-output $objects | Sort-Object -Property Time
+            Write-Output $objects | Sort-Object -Property Time
             }
 
         #DeleteEmptyFolders配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
         '^DeleteEmptyFolders$' {
-            Write-output $objects | Sort-Object -Property Depth -Descending  
+            Write-Output $objects | Sort-Object -Property Depth -Descending  
             }
 
         Default{
-            Write-output $objects
+            Write-Output $objects
             }
     }
 }
@@ -858,7 +858,7 @@ end {
 
 function Initialize {
 
-$ShellName = Split-Path -Path $PSCommandPath -Leaf
+$ShellName = $PSCommandPath | Split-Path -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -888,21 +888,21 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 #指定フォルダの有無を確認
 #Test-Container functionは$TRUE,$FALSEが戻値なので$NULLへ捨てる。捨てないとコンソール出力される
 
-    $TargetFolder = $TargetFolder | ConvertTo-AbsolutePath -ObjectName '-TargetFolder'
+    $TargetFolder = $TargetFolder | ConvertTo-AbsolutePath -Name '-TargetFolder'
 
-    Test-Container -CheckPath $TargetFolder -ObjectName '-TargetFolder' -IfNoExistFinalize > $NULL
+    $TargetFolder | Test-Container -Name '-TargetFolder' -IfNoExistFinalize > $NULL
 
 
 #移動先フォルダの要不要と有無を確認
 
     IF ( ($Action -match "^(Move|Copy)$") -or ($PreAction -contains 'MoveNewFile') ) {    
 
-        $MoveToFolder = $MoveToFolder | ConvertTo-AbsolutePath -ObjectName '-MoveToFolder'
+        $MoveToFolder = $MoveToFolder | ConvertTo-AbsolutePath -Name '-MoveToFolder'
 
-        Test-Container -CheckPath $MoveToFolder -ObjectName '-MoveToFolder' -IfNoExistFinalize > $NULL
+        $MoveToFolder | Test-Container -Name '-MoveToFolder' -IfNoExistFinalize > $NULL
  
        
-    } elseIF (-not (Test-PathNullOrEmpty -CheckPath $MoveToFolder)) {
+    } elseIF (-not ($MoveToFolder | Test-PathNullOrEmpty)) {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Specified -Action [$($Action)] option, must not specifiy -MoveToFolder option."
         Finalize $ErrorReturnCode
         }
@@ -911,7 +911,7 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 #ArchiveFileNameの要不要と有無、Validation
 
     IF ($PreAction -contains 'Archive') {
-        Test-PathNullOrEmpty -CheckPath $ArchiveFileName -ObjectName '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL
+        $ArchiveFileName | Test-PathNullOrEmpty -Name '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL
         
         IF ($ArchiveFileName -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
@@ -925,9 +925,9 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 
     IF ( $PreAction -match "^(7z|7zZip)$") {    
 
-        $7zFolder = $7zFolder | ConvertTo-AbsolutePath -ObjectName '-7zFolder'
+        $7zFolder = $7zFolder | ConvertTo-AbsolutePath -Name '-7zFolder'
 
-        Test-Container -CheckPath $7zFolder -ObjectName '-7zFolder' -IfNoExistFinalize > $NULL
+        $7zFolder | Test-Container -Name '-7zFolder' -IfNoExistFinalize > $NULL
         }
 
 #組み合わせが不正な指定を確認
@@ -1065,7 +1065,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parame
 }
 
 
-function ConvertTo-PreActionFileName {
+function ConvertTo-PreActionPath {
 
 <#
 .SYNOPSIS
@@ -1082,38 +1082,20 @@ PSobject
 [CmdletBinding()]
 Param(
 [Array]$PreAction = $PreAction ,
-[String]$MoveToFolder = $MoveToFolder ,
-[String]$TargetFolder = $TargetFolder ,
-[String]$MoveToNewFolder = $MoveToNewFolder ,
 [String]$CompressedExtString =  $CompressedExtString ,
 [String]$TimeStampFormat = $TimeStampFormat ,
 
-[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetObject")]$Path
+[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetObject")]$Path , 
+[String][parameter(position=1 , mandatory=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("destinationFolder")]$DestinationPath
 ) 
 
 begin {
-}
-
-process {
-
     $archive = New-Object PSObject -Property @{
-    Path = ''
-    Type = ''
-    }
-
-    IF (($PreAction -contains 'MoveNewFile') -and ($PreAction -contains 'Archive')) {        
-        $desitinationFolder = $MoveToFolder
-
-        } elseIF (-not($PreAction -contains 'MoveNewFile') -and ($PreAction -contains 'Archive')) {
-            $desitinationFolder = $TargetFolder
-
-            } elseIF (($PreAction -contains 'MoveNewFile') ) {
-                $desitinationFolder = $MoveToNewFolder
-
-                } elseIF (-not($PreAction -contains 'MoveNewFile') ) {
-                    $desitinationFolder = $Path | Split-Path -Parent
-                    } 
-
+        Path = ''
+        Type = ''
+        }
+}
+process {
     IF (($PreAction -match '^(Compress|Archive)$')) {
 
         #$PreActionは配列である。それをSwitch処理すると1要素づつループする。
@@ -1161,7 +1143,7 @@ process {
 
     IF ($PreAction -contains 'AddTimeStamp') {
 
-        $archive.Path = $desitinationFolder | Join-Path -ChildPath (($Path | Split-Path -Leaf | ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat) + $extension)
+        $archive.Path = $DestinationPath | Join-Path -ChildPath (($Path | Split-Path -Leaf | ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat) + $extension)
 
         IF ($PreAction -match '^(Compress|Archive)$') {
 
@@ -1172,22 +1154,20 @@ process {
             }
 
         } else {        
-        $archive.Path = $desitinationFolder | Join-Path -ChildPath (($Path | Split-Path -Leaf) + $extension )        
+        $archive.Path = $DestinationPath | Join-Path -ChildPath (($Path | Split-Path -Leaf) + $extension )        
         }
 
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Create a new file [$($archive.Path | Split-Path -Leaf)] with action [$($archive.Type)]"
 
     IF ($PreAction -contains 'MoveNewFile') {
 
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage ("Specified -PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"] option, thus place the new file in the folder [$($desitinationFolder)]")
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage ("Specified -PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"] option, thus place the new file in the folder [$($DestinationPath)]")
             }
 
     Write-Output $archive
 }
-
 end {
 }
-
 }
 
 
@@ -1254,7 +1234,7 @@ Param(
         } else {
         $FilterType = "File"
         }
-         
+
 $targets = @()
 
 $targets = $TargetFolder | Get-Object -FilterType $FilterType
@@ -1282,9 +1262,17 @@ Write-Output $targets.Object.Fullname
 
 IF ($PreAction -contains 'Archive') {
 
-    $archive = $ArchiveFileName | ConvertTo-PreActionFileName
+    IF (($PreAction -contains 'MoveNewFile')) {        
+
+        $destination = $MoveToFolder
+
+        } else {
+        $destination = $TargetFolder
+        }
+
+    $archive = $ArchiveFileName | ConvertTo-PreActionPath -DestinationPath $destination
  
-    IF (-not(Test-LeafNotExists -Path $archive.Path)) {
+    IF (-not($archive.Path | Test-LeafNotExists)) {
         
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "File/Folder exists in the path [$($archive.Path)] already, thus terminate $($ShellName) with ERROR"
         Finalize $ErrorReturnCode        
@@ -1354,7 +1342,7 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
         $destinationFolder = $MoveToFolder | Join-Path -ChildPath ($Target.Object.DirectoryName).Substring($TargetFolder.Length)
         IF ($Recurse) {
 
-            IF (-not(Test-Container -CheckPath $destinationFolder -ObjectName 'Desitination folder of the file ')) {
+            IF (-not($destinationFolder | Test-Container -Name 'Desitination folder of the file ')) {
 
                 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Create a new folder $($destinationFolder)"
 
@@ -1368,14 +1356,21 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
         }
     }
 
-
 #Pre Action
 
     IF (( $PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')) {
 
-        $archive = $Target.Object.FullName | ConvertTo-PreActionFileName
+        IF (($PreAction -contains 'MoveNewFile')) {        
 
-        IF (Test-LeafNotExists -Path $archive.Path) {
+            $destination = $destinationFolder
+
+            } else {
+            $destination = $Target.Object.FullName | Split-Path -Parent
+            }
+
+        $archive = $Target.Object.FullName | ConvertTo-PreActionPath -DestinationPath $destination
+
+        IF ($archive.Path | Test-LeafNotExists) {
 
             Invoke-Action -ActionType $archive.Type -ActionFrom $Target.Object.FullName -ActionTo $archive.Path -ActionError $Target.Object.FullName
             }
@@ -1407,7 +1402,7 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
     '^(Move|Copy)$' {
             $destinationPath = $destinationFolder | Join-Path -ChildPath ($Target.Object.Name)
 
-            IF (Test-LeafNotExists -Path $destinationPath) {
+            IF ($destinationPath | Test-LeafNotExists) {
 
                 Invoke-Action -ActionType $Action -ActionFrom $Target.Object.FullName -ActionTo $destinationPath -ActionError $Target.Object.FullName 
                 }
@@ -1470,9 +1465,9 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
     '^Rename$' {
             $newFilePath = $Target.Object.DirectoryName |
                             Join-Path -ChildPath (($Target.Object.Name) -replace "$RegularExpression" , "$RenameToRegularExpression") |
-                            ConvertTo-AbsolutePath -ObjectName 'Filename renamed'
+                            ConvertTo-AbsolutePath -Name 'Filename renamed'
                             
-            IF (Test-LeafNotExists -Path $newFilePath) {
+            IF ($newFilePath | Test-LeafNotExists) {
 
                 Invoke-Action -ActionType Rename -ActionFrom $Target.Object.FullName -ActionTo $newFilePath -ActionError $Target.Object.FullName
     

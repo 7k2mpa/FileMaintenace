@@ -307,9 +307,9 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #Check invalid combination -Status and -PostAction
 
     IF (($Status -eq 'Exist' -and $PostAction -eq 'Create') -or ($Status -eq 'NoExist' -and $PostAction -eq 'Delete')) {
+
         Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "Must not specify -Status [$($Status)] and -PostAction [$($PostAction)] in the same time."
-        Finalize $ErrorReturnCode    
-    
+        Finalize $ErrorReturnCode        
         }
 
 
@@ -348,7 +348,7 @@ $Version = '20200207_1615'
 . Initialize
 
 [String]$flagValue = $ShellName +" "+ (Get-Date).ToString($LogDateFormat)
-[String]$flagPath = Join-Path -Path $FlagFolder -ChildPath $FlagFile
+[String]$flagPath = $FlagFolder | Join-Path -ChildPath $FlagFile
 
 
 Switch -Regex ($Status) {

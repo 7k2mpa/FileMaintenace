@@ -402,7 +402,7 @@ function ConvertTo-AbsolutePath {
 [CmdletBinding()]
 Param(
 [String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath")]$Path ,
-[String][parameter(position=1 , mandatory=$TRUE)]$ObjectName
+[String][parameter(position=1)][Alias("ObjectName")]$Name
 )
 
 begin {
@@ -411,7 +411,7 @@ begin {
 Process {
     IF ([String]::IsNullOrEmpty($Path)) {
            
-        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($Name) is required."
         Finalize $ErrorReturnCode
         }
 
@@ -420,10 +420,10 @@ Process {
     $Path = $Path.Replace('/','\')
 
     IF (Test-Path -LiteralPath $Path -IsValid) {
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($Path)] is valid path format."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$Name[$($Path)] is valid path format."
    
         } else {
-        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($Path)] is invalid path format. The path may contain a drive letter not existed or characters that can not use by NTFS."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$Name[$($Path)] is invalid path format. The path may contain a drive letter not existed or characters that can not use by NTFS."
         Finalize $ErrorReturnCode
         }
 
@@ -433,7 +433,7 @@ Process {
 
         "^\.+\\.*" {
        
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($Path)] is relative path format."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$Name[$($Path)] is relative path format."
 
             $convertedPath = $DatumPath | Join-Path -ChildPath $Path | ForEach-Object {[System.IO.Path]::GetFullPath($_)}
          
@@ -444,12 +444,12 @@ Process {
 
         "^[c-zC-Z]:\\.*" {
 
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($Path)] is absolute path format."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$Name[$($Path)] is absolute path format."
             }
 
         Default {
       
-            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$ObjectName[$($Path)] is neither absolute path format nor relative path format."
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$Name[$($Path)] is neither absolute path format nor relative path format."
             Finalize $ErrorReturnCode
             }
     }
@@ -464,7 +464,7 @@ Process {
                 $Path = $Path.Replace('\\','\')
                 }
 
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$ObjectName[$($Path)] is created by converting multiple path separators to a single."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$Name[$($Path)] is created by converting multiple path separators to a single."
         }
 
 
@@ -481,7 +481,7 @@ Process {
 
     IF (($Path | Split-Path -noQualifier) -match '(\/|:|\?|`"|<|>|\||\*)') {
     
-                Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName may contain characters that can not use by NTFS  such as BackSlash/ Colon: Question? DoubleQuote`" less or greater than<> astarisk* pipe| "
+                Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "$Name may contain characters that can not use by NTFS  such as BackSlash/ Colon: Question? DoubleQuote`" less or greater than<> astarisk* pipe| "
                 Finalize $ErrorReturnCode
                 }
 
@@ -490,7 +490,7 @@ Process {
 
     IF ($Path -match '\\(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])(\\|$|\..*$)') {
 
-                Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "$ObjectName may contain the Windows reserved words such as (AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
+                Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "$Name may contain the Windows reserved words such as (AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
                 Finalize $ErrorReturnCode
                 }        
 
@@ -629,135 +629,153 @@ Return $FALSE
 
 function Test-PathNullOrEmpty {
 
+[OutputType([Boolean])]
+[CmdletBinding()]
 Param(
-[String]$CheckPath,
-[String]$ObjectName,
+[String][parameter(position=0 , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath")]$Path ,
+[String][parameter(position=1)][Alias("ObjectName")]$Name ,
 
 [Switch]$IfNullOrEmptyFinalize,
 [Switch]$NoMessage
 
 )
 
+    IF ([String]::IsNullOrEmpty($Path)) {
 
-    IF (-not([String]::IsNullOrEmpty($CheckPath))) {
-        Return $FALSE
-        } else {
+        Write-Output $TRUE
 
         IF ($IfNullOrEmptyFinalize) {
            
-               Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
+               Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($Name) is required."
                Finalize $ErrorReturnCode
-               }
-               
+               }                
         }
 
-    Return $TRUE
-       
+    Write-Output $FALSE    
 }
 
 
 function Test-Container {
 
+[OutputType([Boolean])]
+[CmdletBinding()]
 Param(
-[String]$CheckPath,
-[String]$ObjectName,
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath")]$Path,
+[String][parameter(position=1)][Alias("ObjectName")]$Name,
 
 [Switch]$IfNoExistFinalize
-
 )
+begin {
+}
+process {
 
-    IF (Test-Path -LiteralPath $CheckPath -PathType Container) {
+    IF (Test-Path -LiteralPath $Path -PathType Container) {
 
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] exists."
-            Return $TRUE
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($Name)[$($Path)] exists."
+            Write-Output $TRUE
 
             } else {
 
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] dose not exist."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($Name)[$($Path)] dose not exist."
                 IF($IfNoExistFinalize){
-                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
+                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($Name) is required."
                     Finalize $ErrorReturnCode
 
                     } else {
-                    Return $FALSE
+                    Write-Output $FALSE
                     }
     }
-
+}
+end {
+}
 }
 
 
 function Test-Leaf {
 
+[OutputType([Boolean])]
+[CmdletBinding()]
 Param(
-[String]$CheckPath,
-[String]$ObjectName,
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath")]$Path,
+[String][parameter(position=1)][Alias("ObjectName")]$Name,
 
 [Switch]$IfNoExistFinalize
-
 )
+begin {
+}
+process {
 
-    IF (Test-Path -LiteralPath $CheckPath -PathType Leaf) {
+    IF (Test-Path -LiteralPath $Path -PathType Leaf) {
 
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] exists."
-            Return $TRUE
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($Name)[$($Path)] exists."
+            Write-Output $TRUE
 
             } else {
 
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($ObjectName)[$($CheckPath)] dose not exist."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($Name)[$($Path)] dose not exist."
             
             IF($IfNoExistFinalize){
-                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($ObjectName) is required."
+                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($Name) is required."
                     Finalize $ErrorReturnCode
             
                     } else {
-                    Return $FALSE
+                    Write-Output $FALSE
                     }
     }
+}
+end {
+}
 }
 
 
 function Test-LogPath {
-
+[OutputType([boolean])]
+[CmdletBinding()]
 Param(
 
-[String]$CheckPath,
-[String]$ObjectName ,
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath")]$Path,
+[String][parameter(position=1)][Alias("ObjectName")]$Name,
 [String]$FileValue = $NULL
 
 )
+begin {
+}
+process {
     #ログ出力先ファイルの親フォルダが存在しなければ異常終了
 
-    Split-Path -Path $CheckPath | ForEach-Object {Test-Container -CheckPath $_ -ObjectName $ObjectName -IfNoExistFinalize > $NULL}
+    $Path | Split-Path -Parent | Test-Container -ObjectName $Name -IfNoExistFinalize > $NULL
 
     #ログ出力先（予定）ファイルと同一名称のフォルダが存在していれば異常終了
 
-    IF (Test-Path -LiteralPath $CheckPath -PathType Container) {
-        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Same name folder $($CheckPath) exists already."        
+    IF (Test-Path -LiteralPath $Path -PathType Container) {
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Same name folder $($Path) exists already."        
         Finalize $ErrorReturnCode
         }
 
 
-    IF (Test-Path -LiteralPath $CheckPath -PathType Leaf) {
+    IF (Test-Path -LiteralPath $Path -PathType Leaf) {
 
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Check write permission of $($ObjectName) [$($CheckPath)]"
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Check write permission of $($Name) [$($Path)]"
         $logFormattedDate = (Get-Date).ToString($LogDateFormat)
         $logWrite = $logFormattedDate+" "+$ShellName+" Write Permission Check"
         
 
         Try {
-            Write-Output $logWrite | Out-File -FilePath $CheckPath -Append -Encoding $LogFileEncode
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Successfully complete to write to $($ObjectName) [$($CheckPath)]"
+            Write-Output $logWrite | Out-File -FilePath $Path -Append -Encoding $LogFileEncode
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Successfully complete to write to $($Name) [$($Path)]"
             }
         Catch [Exception]{
-            Write-Log -EventType Error -EventID $ErrorEventID -EventMessage  "Failed to write to $($ObjectName) [$($CheckPath)]"
+            Write-Log -EventType Error -EventID $ErrorEventID -EventMessage  "Failed to write to $($Name) [$($Path)]"
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution error message : $Error[0]"
             Finalize $ErrorReturnCode
             }
      
      } else {
-            Invoke-Action -ActionType MakeNewFileWithValue -ActionFrom $CheckPath -ActionError $CheckPath -FileValue $FileValue
+            Invoke-Action -ActionType MakeNewFileWithValue -ActionFrom $Path -ActionError $Path -FileValue $FileValue
             }
-
+}
+end {
+}
 }
 
 
@@ -993,67 +1011,6 @@ function Test-OracleBackUpMode {
     }
 
     Write-Output $dbStatus
-
-}
-
-
-function Test-OLDOracleBackUpMode {
-
-
-    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Get the backup status of Oracle Database ,determine Oracle Database is running in which mode BackUp/Normal. A line [Active] is in BackUp Mode."
-  . Invoke-SQL -SQLCommand $DBCheckBackUpMode -SQLName "DBCheckBackUpMode" -SQLLogPath $SQLLogPath > $NULL
-
-   
-    #文字列配列に変換する
-    $SQLLog = $SQLLog -replace "`r","" |  ForEach-Object {$_ -split "`n"}
-
-    $normalModeCount = 0
-    $backUpModeCount = 0
-
-
-    $i = 1
-
-    foreach ($line in $SQLLog) {
-
-            IF ($Line -match 'NOT ACTIVE') {
-                $normalModeCount ++
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "[$line] line[$i] Normal Mode"
- 
- 
-                } elseIF ($Line -match 'ACTIVE') {
-                $backUpModeCount ++
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "[$line] line[$i] BackUp Mode"
-                }
- 
-    $i ++
-    }
-
-
-    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database is running in...."
-
-    IF (($backUpModeCount -eq 0) -and ($normalModeCount -gt 0)) {
- 
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Normal Mode"
-        $Script:NormalModeFlag = $TRUE
-        $Script:BackUpModeFlag = $FALSE
-        Return
-
-    } elseIF (($backUpModeCount -gt 0) -and ($normalModeCount -eq 0)) {
-   
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Back Up Mode"
-        $Script:NormalModeFlag = $FALSE
-        $Script:BackUpModeFlag = $TRUE
-        Return
-
-
-    } else {
-
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "??? Mode ???"
-        $Script:NormalModeFlag = $FALSE
-        $Script:BackUpModeFlag = $FALSE
-        Return
-    }
-
 
 }
 

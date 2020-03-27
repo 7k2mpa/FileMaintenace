@@ -244,7 +244,7 @@ Param(
 [String]$SQLLogPath = '.\SC_Logs\SQL.log',
 [String]$BackUpFlagPath = '.\Lock\BkUpDB.flg',
 
-[Switch]$NoCheckBackUpFlag = $TRUE ,
+
 
 [String]$SQLCommandsPath = '.\SQL\SQLs.ps1',
 
@@ -260,6 +260,9 @@ Param(
 
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
 
+#Planed to obsolute
+[Switch]$NoCheckBackUpFlag = $TRUE ,
+#Planed to obsolute
 
 
 [boolean]$Log2EventLog = $TRUE,
@@ -333,7 +336,7 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #OracleBINフォルダの指定、存在確認
 
-    $OracleHomeBinPath = ConvertTo-AbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-oracleHomeBinPath'
+    $OracleHomeBinPath = $OracleHomeBinPath | ConvertTo-AbsolutePath -ObjectName  '-oracleHomeBinPath'
 
     Test-Container -CheckPath $OracleHomeBinPath -ObjectName '-oracleHomeBinPath' -IfNoExistFinalize > $NULL
 
@@ -343,9 +346,9 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
     IF (-not($NoCheckBackUpFlag)) {
 
-        $BackUpFlagPath = ConvertTo-AbsolutePath -CheckPath $BackUpFlagPath -ObjectName  '-BackUpFlagPath'
+        $BackUpFlagPath = $BackUpFlagPath | ConvertTo-AbsolutePath -ObjectName  '-BackUpFlagPath'
 
-        Split-Path $BackUpFlagPath | ForEach-Object {Test-Container -CheckPath $_ -ObjectName 'Parent Folder of -BackUpFlagPath' -IfNoExistFinalize > $NULL}
+        $BackUpFlagPath | Split-Path | ForEach-Object {Test-Container -CheckPath $_ -ObjectName 'Parent Folder of -BackUpFlagPath' -IfNoExistFinalize > $NULL}
 
         }
 
