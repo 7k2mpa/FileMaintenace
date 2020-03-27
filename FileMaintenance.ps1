@@ -605,7 +605,7 @@ Param(
 #[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath = ..\Log\FileMaintenance.log ,
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath  ,
 [String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss',
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShiftJIS
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default ShiftJIS
 
 [Int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
 [Int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
@@ -784,7 +784,7 @@ PSobject passed the filter
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
     IF ($_.Name -match $RegularExpression) {
     IF ($_.Length -ge $Size) {
-    IF (($_.FullName).Substring($TargetFolder.Length , ($_.FullName | Split-Path -Parent).Length - $TargetFolder.Length +1) -match $ParentRegularExpression)
+    IF (($_.FullName).Substring($TargetFolder.Length , ($_.DirectoryName).Length - $TargetFolder.Length +1) -match $ParentRegularExpression)
         {$_}
     }
     } 
@@ -902,10 +902,10 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
         Test-Container -CheckPath $MoveToFolder -ObjectName '-MoveToFolder' -IfNoExistFinalize > $NULL
  
        
-     } elseIF (-not (Test-PathNullOrEmpty -CheckPath $MoveToFolder)) {
-                Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Specified -Action [$($Action)] option, must not specifiy -MoveToFolder option."
-                Finalize $ErrorReturnCode
-                }
+    } elseIF (-not (Test-PathNullOrEmpty -CheckPath $MoveToFolder)) {
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Specified -Action [$($Action)] option, must not specifiy -MoveToFolder option."
+        Finalize $ErrorReturnCode
+        }
 
 
 #ArchiveFileNameの要不要と有無、Validation
@@ -1282,7 +1282,7 @@ Write-Output $targets.Object.Fullname
 
 IF ($PreAction -contains 'Archive') {
 
-   $archive = $ArchiveFileName | ConvertTo-PreActionFileName
+    $archive = $ArchiveFileName | ConvertTo-PreActionFileName
  
     IF (-not(Test-LeafNotExists -Path $archive.Path)) {
         
@@ -1466,7 +1466,7 @@ Write-Log -EventID $InfoLoopStartEventID -EventType Information -EventMessage "-
     '^none$' {            
             }
 
-    #分岐2 Rename Rename後の同一名称ファイルがに存在しないことを確認してから処理
+    #分岐2 Rename Rename後の同一名称ファイルが存在しないことを確認してから処理
     '^Rename$' {
             $newFilePath = $Target.Object.DirectoryName |
                             Join-Path -ChildPath (($Target.Object.Name) -replace "$RegularExpression" , "$RenameToRegularExpression") |
