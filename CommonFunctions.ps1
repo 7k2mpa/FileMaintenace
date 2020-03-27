@@ -190,9 +190,9 @@ function Test-LogFilePath {
 
 $ForceConsoleEventLog = $TRUE    
 
-    $logPath = ConvertTo-AbsolutePath -CheckPath $LogPath -ObjectName '-LogPath'
+    $LogPath | ConvertTo-AbsolutePath -Name '-LogPath' | Test-LogPath -ObjectName '-LogPath' > $NULL
 
-    Test-LogPath -CheckPath $logPath -ObjectName '-LogPath' > $NULL
+#    Test-LogPath -CheckPath $logPath -ObjectName '-LogPath' > $NULL
     
 $ForceConsoleEventLog = $FALSE
 
@@ -401,8 +401,8 @@ function ConvertTo-AbsolutePath {
 [OutputType([String])]
 [CmdletBinding()]
 Param(
-[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath")]$Path ,
-[String][parameter(position=1)][Alias("ObjectName")]$Name
+[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path ,
+[String][parameter(position=1 , ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name
 )
 
 begin {
@@ -521,7 +521,7 @@ process {
     $extensionString = [System.IO.Path]::GetExtension($Name)
     $fileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension($Name)
 
-    $fileNameWithOutExtentionString + $formattedDate + $extensionString
+    Write-Output $fileNameWithOutExtentionString + $formattedDate + $extensionString
 }
 
 end {
@@ -552,27 +552,28 @@ function Test-ServiceExist {
 
 
 Param(
-[parameter(mandatory=$TRUE)][String]$ServiceName,
+[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][Alias("Name")]$ServiceName ,
+#[parameter(mandatory=$TRUE)][String]$ServiceName,
 [Switch]$NoMessage
 )
 
 
 # サービス状態取得
 
-    $service = Get-Service | Where-Object {$_.Name -eq $serviceName}
+    $service = Get-Service | Where-Object {$_.Name -eq $ServiceName}
 
     IF ($service.Status -Match "^$") {
         IF (-not($NoMessage)) {
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] dose not exist."
             }
-        Return $FALSE
+        Write-Output $FALSE
 
         } else {
 
         IF (-not($NoMessage)) {
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($ServiceName)] exists"
             }
-        Return $TRUE
+        Write-Output $TRUE
         }
 }
 
@@ -585,8 +586,8 @@ function Test-ServiceStatus {
 #起動が遅いサービスは$Spanを大きくしてください
 #>
 Param(
-[parameter(mandatory=$TRUE)][String]$ServiceName,
-[String][ValidateSet("Running", "Stopped")]$Health = 'Running',
+[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][Alias("Name")]$ServiceName ,
+[String][parameter(position=1 ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][ValidateSet("Running", "Stopped")][Alias("Status")]$Health = 'Running',
 [int][ValidateRange(0,2147483647)]$Span = 3,
 [int][ValidateRange(0,2147483647)]$UpTo = 10
 )
@@ -594,7 +595,7 @@ Param(
     For ( $i = 0 ; $i -lt $UpTo; $i++ )
     {
         # サービス存在確認
-        IF (-not(Test-ServiceExist $ServiceName -NoMessage)) {
+        IF (-not($ServiceName | Test-ServiceExist -NoMessage)) {
             Return $FALSE
             }
 
@@ -632,8 +633,8 @@ function Test-PathNullOrEmpty {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
-[String][parameter(position=0 , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath")]$Path ,
-[String][parameter(position=1)][Alias("ObjectName")]$Name ,
+[String][parameter(position=0 , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path ,
+[String][parameter(position=1 , ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
 
 [Switch]$IfNullOrEmptyFinalize,
 [Switch]$NoMessage
@@ -660,8 +661,8 @@ function Test-Container {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
-[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath")]$Path,
-[String][parameter(position=1)][Alias("ObjectName")]$Name,
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path,
+[String][parameter(position=1 , ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
 
 [Switch]$IfNoExistFinalize
 )
@@ -675,15 +676,15 @@ process {
             Write-Output $TRUE
 
             } else {
-
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($Name)[$($Path)] dose not exist."
-                IF($IfNoExistFinalize){
-                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($Name) is required."
-                    Finalize $ErrorReturnCode
+            
+            IF($IfNoExistFinalize){
+                Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($Name) is required."
+                Finalize $ErrorReturnCode
 
-                    } else {
-                    Write-Output $FALSE
-                    }
+                } else {
+                Write-Output $FALSE
+                }
     }
 }
 end {
@@ -696,8 +697,8 @@ function Test-Leaf {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
-[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath")]$Path,
-[String][parameter(position=1)][Alias("ObjectName")]$Name,
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path,
+[String][parameter(position=1 , ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
 
 [Switch]$IfNoExistFinalize
 )
@@ -715,12 +716,12 @@ process {
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "$($Name)[$($Path)] dose not exist."
             
             IF($IfNoExistFinalize){
-                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($Name) is required."
-                    Finalize $ErrorReturnCode
+                Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "$($Name) is required."
+                Finalize $ErrorReturnCode
             
-                    } else {
-                    Write-Output $FALSE
-                    }
+                } else {
+                Write-Output $FALSE
+                }
     }
 }
 end {
@@ -733,8 +734,8 @@ function Test-LogPath {
 [CmdletBinding()]
 Param(
 
-[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath")]$Path,
-[String][parameter(position=1)][Alias("ObjectName")]$Name,
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path,
+[String][parameter(position=1 , ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
 [String]$FileValue = $NULL
 
 )
@@ -934,23 +935,20 @@ Write-Output $sqlLog | Out-File -FilePath $SQLLogPath -Append  -Encoding $LogFil
 Pop-Location
 
 
-    IF ($LASTEXITCODE -eq 0) {
+    IF ($LASTEXITCODE -ne 0) {
 
-        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to execute SQL Command[$($SQLName)]"
-        Return $TRUE
-
-        } else {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute SQL Command[$($SQLName)]"
    
             IF ($IfErrorFinalize) {
             Finalize $ErrorReturnCode
             }
    
-        Return $FALSE
-    }
+        Write-Output $FALSE
 
-
-
+        } else {
+        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to execute SQL Command[$($SQLName)]"
+        Write-Output $TRUE
+        }
 }
 
 function Test-OracleBackUpMode {

@@ -207,7 +207,7 @@ Try{
 
 function Initialize {
 
-$ShellName = Split-Path $PSCommandPath -Leaf
+$ShellName = $PSCommandPath | Split-Path -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -222,7 +222,7 @@ $ShellName = Split-Path $PSCommandPath -Leaf
 
 #パラメータの確認
 
-    IF (-not(Test-ServiceExist -ServiceName 'W3SVC')) {
+    IF (-not('W3SVC' | Test-ServiceExist)) {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Web Service [W3SVC] dose not exist."
         Finalize $ErrorReturnCode
         }
@@ -320,9 +320,9 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "With Power
 
 For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
 
-      $SiteState = Get-Website | Where-Object{$_.Name -eq $Site} | ForEach-Object{$_.State}
+      $siteState = Get-Website | Where-Object{$_.Name -eq $Site} | ForEach-Object{$_.State}
 
-           Switch ($SiteState) {
+           Switch ($siteState) {
         
                 $TargetState {
 

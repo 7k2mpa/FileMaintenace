@@ -679,7 +679,7 @@ Param(
 [int]$WarningEventID = $WarningEventID ,
 [int]$ErrorEventID = $ErrorEventID ,
 
-[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath")]$Path
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path
 )
 
 begin {
@@ -805,13 +805,13 @@ System.String. Path of the folder to get objects
 Strings Array of Objects's path
 #>
 
-[OutputType([String])]
+[OutputType([PSObject])]
 [CmdletBinding()]
 Param(
 [Switch]$Recurse = $Recurse,
 [String]$Action = $Action,
 
-[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFolder")]$Path ,
+[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFolder" , "FullName")]$Path ,
 [String][parameter(position=1 , mandatory=$TRUE )][ValidateSet("File" , "Folder")]$FilterType
 )
 
@@ -1078,14 +1078,14 @@ System.String. Path of the file
 PSobject
 #>
 
-[OutputType([object])]
+[OutputType([PSobject])]
 [CmdletBinding()]
 Param(
 [Array]$PreAction = $PreAction ,
 [String]$CompressedExtString =  $CompressedExtString ,
 [String]$TimeStampFormat = $TimeStampFormat ,
 
-[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetObject")]$Path , 
+[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetObject" , "FullName")]$Path , 
 [String][parameter(position=1 , mandatory=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("destinationFolder")]$DestinationPath
 ) 
 

@@ -256,9 +256,7 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[String]$OracleSID = $Env:ORACLE_SID ,
-[String]$OracleService ,
-#[parameter(mandatory=$true)][String]$OracleService,
+[String][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,
 
 [String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
 
@@ -329,7 +327,7 @@ Try {
 
 function Initialize {
 
-$ShellName = Split-Path -Path $PSCommandPath -Leaf
+$ShellName = $PSCommandPath | Split-Path -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -342,40 +340,33 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
 
-#For Backward compatibility
-
-    IF ( (-not($OracleSID)) -and ($OracleService))  {
-            $OracleSID = $OracleSerivce
-            } 
-
-
 #パラメータの確認
 
 #OracleBINフォルダの指定、存在確認
 
-    $OracleHomeBinPath = ConvertTo-AbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
+    $OracleHomeBinPath = $OracleHomeBinPath | ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath'
 
-    Test-Container -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
+    $OracleHomeBinPath | Test-Container -Name '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
 
 #OracleRmanLogファイルの指定、存在、書き込み権限確認
 
-    $OracleRMANLogPath = ConvertTo-AbsolutePath -CheckPath $OracleRMANLogPath -ObjectName '-OracleRmanLogPath'
+    $OracleRMANLogPath = $OracleRMANLogPath | ConvertTo-AbsolutePath -Name '-OracleRmanLogPath'
 
-    Test-LogPath -CheckPath $OracleRMANLogPath -ObjectName '-OracleRMANLLogPath' > $NULL
+    $OracleRMANLogPath | Test-LogPath -Name '-OracleRMANLLogPath' > $NULL
 
 
 #実行するRMANファイルの存在確認
    
-    $ExecRmanPath = ConvertTo-AbsolutePath -CheckPath $ExecRmanPath -ObjectName '-ExecRmanPath'
+    $ExecRmanPath = $ExecRmanPath  | ConvertTo-AbsolutePath -Name '-ExecRmanPath'
 
-    Test-Leaf -CheckPath $ExecRmanPath -ObjectName '-ExecRmanPath' -IfNoExistFinalize > $NULL
+    $ExecRmanPath | Test-Leaf -Name '-ExecRmanPath' -IfNoExistFinalize > $NULL
 
 
 #対象のOracleがサービス起動しているか確認
 
     $targetWindowsOracleService = "OracleService"+$OracleSID
 
-    IF (-not(Test-ServiceStatus -ServiceName $targetWindowsOracleService -Health Running)) {
+    IF (-not($targetWindowsOracleService | Test-ServiceStatus -Status Running)) {
 
         Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
         Finalize $ErrorReturnCode

@@ -202,12 +202,14 @@ https://github.com/7k2mpa/FileMaintenace
 
 #>
 
-
+[CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
 Param(
 
-[String][parameter(position=0, mandatory=$true , HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help StartService.ps1')]$Service  ,
 
-[String][parameter(position=1 , mandatory=$true)][ValidateSet("Running", "Stopped")]$TargetStatus , 
+[String][parameter(position=0, mandatory=$true ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE, HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help StartService.ps1')]
+[Alias("Name")]$Service ,
+
+[String][parameter(position=1 , mandatory=$true ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][ValidateSet("Running", "Stopped")][Alias("Status")]$TargetStatus , 
 #[String][parameter(position=1)][ValidateSet("Running", "Stopped")]$TargetStatus = 'Running', 
 #[String][parameter(position=1)][ValidateSet("Running", "Stopped")]$TargetStatus = 'Stopped', 
 
@@ -268,7 +270,7 @@ Try{
 
 function Initialize {
 
-$ShellName = Split-Path -Path $PSCommandPath -Leaf
+$ShellName = $PSCommandPath | Split-Path -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -284,7 +286,7 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #パラメータの確認
 
 
-    IF (-not(Test-ServiceExist -ServiceName $Service -NoMessage)) {
+    IF (-not($Service | Test-ServiceExist -NoMessage)) {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Service [$($Service)] dose not exist."
         Finalize $ErrorReturnCode
         }
@@ -296,7 +298,7 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
         }
 
 
-    IF (Test-ServiceStatus -ServiceName $Service -Health $TargetStatus -Span 0 -UpTo 1 ) {
+    IF ($Service | Test-ServiceStatus -Status $TargetStatus -Span 0 -UpTo 1 ) {
         Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Service [$($Service)] status is already [$($TargetStatus)]"
         Finalize $WarningReturnCode
         }
@@ -406,7 +408,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
      Switch ($return.returnvalue) {
         
             0 {
-                $serviceStatus = Test-ServiceStatus -ServiceName $Service -Health $TargetStatus -Span $RetrySpanSec -UpTo $RetryTimes
+                $serviceStatus = $Service | Test-ServiceStatus -Status $TargetStatus -Span $RetrySpanSec -UpTo $RetryTimes
 
                 IF ($serviceStatus) {
                     Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Service [$($Service)] is [$($TargetStatus)]"

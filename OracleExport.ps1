@@ -210,8 +210,7 @@ Param(
 [String]$ExecUser = 'foo',
 [String]$ExecUserPassword = 'hogehoge',
 
-[String]$OracleSID = $Env:ORACLE_SID ,
-[String]$OracleService ,
+[String][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,
 
 #[parameter(mandatory=$TRUE)][String]$Schema  ,
 [String]$Schema = 'MCFRAME' ,
@@ -283,7 +282,7 @@ Try {
 
 function Initialize {
 
-$ShellName = Split-Path -Path $PSCommandPath -Leaf
+$ShellName = $PSCommandPath | Split-Path -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -295,29 +294,21 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
-#For Backward compatibility
-
-    IF ( (-not($OracleSID)) -and ($OracleService))  {
-            $OracleSID = $OracleSerivce
-            } 
-
 
 #パラメータの確認
 
 #指定フォルダの有無を確認
 
-   $OracleHomeBinPath = ConvertTo-AbsolutePath -CheckPath $OracleHomeBinPath -ObjectName  '-OracleHomeBinPath'
+    $OracleHomeBinPath = $OracleHomeBinPath | ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath'
 
-   Test-Container -CheckPath $OracleHomeBinPath -ObjectName '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
-
-
-        
+    $OracleHomeBinPath | Test-Container -Name '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
+    
 
 #対象のOracleがサービス起動しているか確認
 
     $targetWindowsOracleService = "OracleService"+$OracleSID
 
-    IF (-not(Test-ServiceStatus -ServiceName $targetWindowsOracleService -Health Running)) {
+    IF (-not($targetWindowsOracleService | Test-ServiceStatus -Status Running)) {
 
         Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
         Finalize $ErrorReturnCode
@@ -361,8 +352,8 @@ $DatumPath = $PSScriptRoot
 
     IF ($AddTimeStamp) {
 
-        $DumpFile = ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat -TargetFileName $DumpFile
-        $LogFile  = ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat -TargetFileName $LogFile
+        $DumpFile = $DumpFile | ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat
+        $LogFile  = $LogFile  | ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat 
         }
 
 
