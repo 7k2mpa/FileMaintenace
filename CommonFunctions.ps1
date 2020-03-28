@@ -104,7 +104,7 @@ begin {
 process {
     IF (($Log2EventLog -or $ForceConsoleEventLog) -and -not($ForceConsole) ) {
 
-        Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType $EventType -Id $EventID -Message "[$($ShellName)] $($EventMessage)"
+        Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType $EventType -EventId $EventID -Message "[$($ShellName)] $($EventMessage)"
         }
 
 
@@ -135,7 +135,7 @@ $ErrorReturnCode = 0Ý’è“™‚ðl—¶‚µ‚ÄˆÙíŽž‚ÍExit 1‚Å”²‚¯‚é
 #>
     IF (-not(($InternalErrorReturnCode -ge $WarningReturnCode) -and ($ErrorReturnCode -ge $WarningReturnCode) -and ($WarningReturnCode -ge $NormalReturnCode))) {
 
-        Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -Id $ErrorEventID "The magnitude relation of ReturnCodes' parameters is not set correctly."
+        Write-EventLog -LogName $EventLogLogName -Source $ProviderName -EntryType Error -EventId $ErrorEventID "The magnitude relation of ReturnCodes' parameters is not set correctly."
         Write-Output "The magnitude relation of ReturnCodes is not set correctly."
         Exit 1
         }
@@ -162,13 +162,13 @@ $ForceConsole = $TRUE
            
             New-EventLog -LogName $EventLogLogName -Source $ProviderName  -ErrorAction Stop
             $ForceConsoleEventLog = $TRUE    
-            Write-Log -Id $InfoEventID -Type Information -Message "Regist new source event [$($ProviderName)] to [$($EventLogLogName)]"
+            Write-Log -EventId $InfoEventID -Type Information -Message "Regist new source event [$($ProviderName)] to [$($EventLogLogName)]"
             }
        
     }
     Catch [Exception] {
-    Write-Log -Id $ErrorEventID -Type Error -Message "Failed to regist new source event because no source $($ProviderName) exists in event log, must have administrator privilage for registing new source. Start Powershell with administrator privilage and start the script."
-    Write-Log -Id $ErrorEventID -Type Error -Message "Execution Error Message : $Error[0]"
+    Write-Log -EventId $ErrorEventID -Type Error -Message "Failed to regist new source event because no source $($ProviderName) exists in event log, must have administrator privilage for registing new source. Start Powershell with administrator privilage and start the script."
+    Write-Log -EventId $ErrorEventID -Type Error -Message "Execution Error Message : $Error[0]"
     Exit $ErrorReturnCode
     }
 
