@@ -82,9 +82,9 @@ function Write-Log {
 #>
 [CmdletBinding()]
 Param(
-[parameter(position=0 ,mandatory=$TRUE)][ValidateRange(1,65535)][int]$EventID ,
-[parameter(position=1 ,mandatory=$TRUE)][String][ValidateSet("Information", "Warning", "Error" ,"Success")]$EventType ,
-[parameter(position=2 ,mandatory=$TRUE)][String]$EventMessage ,
+[parameter(position = 0, mandatory)][ValidateRange(1,65535)][int][Alias("ID")]$EventID ,
+[parameter(position = 1, mandatory)][String][ValidateSet("Information", "Warning", "Error" ,"Success")][Alias("Type")]$EventType ,
+[parameter(position = 2, mandatory)][String][Alias("Message")]$EventMessage ,
 
 [Switch]$Log2EventLog = $Log2EventLog ,
 [Switch]$ForceConsoleEventLog = $ForceConsoleEventLog ,
