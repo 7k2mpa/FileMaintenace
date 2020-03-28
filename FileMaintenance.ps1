@@ -196,7 +196,7 @@ Specify methods to process files.
 -PreAction option accept multiple arguments.
 Separate arguments with comma,
 
-None:Do nothing, and is default. If you want test the action, specify -WhatIf option.
+None:Do nothing, and is default. If you want to test the action, specify -WhatIf option.
 Compress:Create compressed files from the original files.
 AddTimeStamp:Create new files with file name added time stamp.
 Archive:Create an archive file from files. Specify archive file name with -ArchiveFileName option.
@@ -220,7 +220,7 @@ MoveNewFile:-PreActionの新規生成ファイルを-TargetFolderと同一ではなく、-MoveToFo
 
 Specify method to process files.
 
-None:Do nothing, and is default. If you want test the action, specify -WhatIf option.
+None:Do nothing, and is default. If you want to test the action, specify -WhatIf option.
 Move:Move the files to -MoveNewFolder path.
 Delete:Delete the files.
 Copy:Copy the files and place to -MoveNewFolder path.
@@ -242,7 +242,7 @@ NullClear:ファイルの内容削除 NullClearします。
 
 Specify method to process files.
 
-None:Do nothing, and is default. If you want test the action, specify -WhatIf option.
+None:Do nothing, and is default. If you want to test the action, specify -WhatIf option.
 Rename:Rename the files with -RenameToRegularExpression
 NullClear:Clear the files with null.
 
@@ -323,6 +323,9 @@ Specify regular expression to match processing path of files.
 PowerShellの仕様上、大文字小文字の区別はしない筈ですが、実際には区別されるので注意して下さい。
 
 .PARAMETER RenameToRegularExpression
+
+Specify regular expression for rename rule.
+
 -PostAction Renameを指定した場合のファイル名正規表現置換規則を指定します。
 -RegularExpressionに対する置換パターンを指定します。
 https://docs.microsoft.com/ja-jp/dotnet/standard/base-types/substitutions-in-regular-expressions
@@ -352,7 +355,7 @@ Specify if you want to override old same name files moved or copied.
 .PARAMETER Continue
 Specify if you want to skip old files do not want to override.
 If has skip to process, terminate as WARNING.
-[terminate as ERROR before override] is default. 
+[terminate as ERROR and do not skipp] is default. 
 
 　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
 スキップすると警告終了します。
@@ -361,7 +364,7 @@ If has skip to process, terminate as WARNING.
 .PARAMETER ContinueAsNormal
 Specify if you want to skip old files do not want to override.
 If has skip to process, terminate as NORMAL.
-[terminate as ERROR before override] is default. 
+[terminate as ERROR and do not skipp] is default. 
 
 　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
 -Continueと異なりスキップしても正常終了します。ファイルの差分コピー等で利用してください。
@@ -391,6 +394,9 @@ Specify if you want to terminate as WARNING with no files existed in the folder.
 デフォルトは[_yyyyMMdd_HHmmss]です。
 
 .PARAMETER KeepFiles
+Specify how many newer files in the folder to keep with -Action KeepFileCount option.
+[1] is default.
+
 -Action KeepFilesCount指定時の世代数を指定します。
 デフォルトは1です。
 
@@ -543,8 +549,7 @@ Param(
 [ValidateNotNullOrEmpty()][ValidateScript({ Test-Path $_  -PathType container })]
 [ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName")]$TargetFolder ,
 
-#[parameter(position=0, mandatory=$TRUE , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String]$TargetFolder,  #Validation debug用に用意してあります。通常は使わない
-#[parameter(position=0, mandatory=$TRUE , HelpMessage = '処理対象のフォルダを指定(ex. D:\Logs) 全てのHelpはGet-Help FileMaintenance.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$TargetFolder ,
+#[String]$TargetFolder,  #for Validation debug
  
 
 [Array][parameter(position = 1)][ValidateNotNullOrEmpty()]
@@ -667,13 +672,13 @@ function Test-LeafNotExists {
 
 .OUTPUT
 　Boolean
-    チェック対象のファイルが存在するが、-OverRideを指定...$TRUE　（この指定は-Continueに優先する）なおInvoke-Actionは既にファイルが存在する場合は強制上書き
-    チェック対象のファイルが存在するが、-Continueを指定...$FALSE
-    チェック対象のファイルが存在する...$ErrorReturnCode でFinalizeへ進む、またはBreak
-    チェック対象の同一名称のフォルダが存在するが、-OverRideを指定...上書きが出来ないので$ErrorReturnCode でFinalizeへ進む、またはBreak
-    チェック対象と同一名称のフォルダが存在するが、-Continueを指定...$FALSE
-    チェック対象と同一名称のフォルダが存在する...$ErrorReturnCode でFinalizeへ進む、またはBreak
-    チェック対象のファイル、フォルダが存在しない...$TRUE
+1    チェック対象のファイルが存在するが、-OverRideを指定...$TRUE, $OverRideFlag = $TRUE（この指定は-Continueに優先する）なおInvoke-Actionは既にファイルが存在する場合は強制上書き
+2    チェック対象のファイルが存在するが、-Continueを指定...$FALSE, $ContinueFlag = $TRUE 
+3    チェック対象のファイルが存在する...$ErrorReturnCode でFinalize, $FroceEndLoop=$TRUE ならば$FALSE, $ForceFinalize=$TRUE
+4    チェック対象の同一名称のフォルダが存在するが、-OverRideを指定...上書きが出来ないので$ErrorReturnCode でFinalize, $FroceEndLoop=$TRUE ならば$FALSE, $ForceFinalize=$TRUE
+5    チェック対象と同一名称のフォルダが存在するが、-Continueを指定...$FALSE
+6    チェック対象と同一名称のフォルダが存在する...$ErrorReturnCode でFinalize, $FroceEndLoop=$TRUE ならば$FALSE, $ForceFinalize=$TRUE
+7    チェック対象のファイル、フォルダが存在しない...$TRUE
 #>
 
 [OutputType([Boolean])]
@@ -699,6 +704,7 @@ Write-Log -ID $InfoEventID -Type Information -Message "Check existence of $($Pat
 
 DO
 {
+    #Case 7
     IF (-not(Test-Path -LiteralPath $Path)) {
 
         Write-Log -ID $InfoEventID -Type Information -Message "File $($Path) dose not exist."
@@ -706,7 +712,7 @@ DO
         Break
         }
 
-
+    #Case 1
     IF (($OverRide) -and (Test-Path -LiteralPath $Path -PathType Leaf)) {
      
         Write-Log -ID $WarningEventID -Type Warning -Message ("Same name file $($Path) exists already, " +
@@ -726,7 +732,7 @@ DO
         Write-Log -ID $WarningEventID -Type Warning -Message "Same name folder $($Path) exists already."        
         }
 
-
+    #Case 2,5
     IF ($Continue) {
 
         Write-Log -ID $WarningEventID -Type Warning -Message "Specified -Continue[$($Continue)] option, continue to process objects."
@@ -737,7 +743,7 @@ DO
         Break
         }           
 
-
+    #Case 3,4,6
     Write-Log -ID $ErrorEventID -Type Error -Message "Same name object exists already, thus force to terminate $($ShellName)"
             
     IF ((-not($ForceEndLoop)) -and (-not($MYINVOCATION.ExpectingInput))) {
