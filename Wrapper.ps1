@@ -264,7 +264,7 @@ Try{
 
 function Initialize {
 
-$ShellName = Split-Path -Path $PSCommandPath -Leaf
+$ShellName = $PSCommandPath | Split-Path -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -285,14 +285,14 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
     $CommandPath = $CommandPath | ConvertTo-AbsolutePath -ObjectName ' -CommandPath'
 
-    Test-Leaf -CheckPath $CommandPath -ObjectName '-CommandPath' -IfNoExistFinalize > $NULL
+    $CommandPath | Test-Leaf -Name '-CommandPath' -IfNoExistFinalize > $NULL
 
 #コマンドファイルの有無を確認
     
 
     $CommandFile = $CommandFile | ConvertTo-AbsolutePath -ObjectName '-CommandFile'
 
-    Test-Leaf -CheckPath $CommandFile -ObjectName '-CommandFile' -IfNoExistFinalize > $NULL
+    $CommandFile | Test-Leaf -Name '-CommandFile' -IfNoExistFinalize > $NULL
 
 
 #処理開始メッセージ出力

@@ -265,7 +265,7 @@ Try{
 
 function Initialize {
 
-$ShellName = Split-Path -Path $PSCommandPath -Leaf
+$ShellName = $PSCommandPath | Split-Path -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -279,7 +279,7 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #For Backward compatibility
 
-    IF ($CreateFlag)  {
+    IF ($CreateFlag) {
             $PostAction = 'Create'
             } 
 
@@ -292,7 +292,7 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
     $FlagFolder = $FlagFolder | ConvertTo-AbsolutePath -ObjectName  '-FlagFolder'
 
-    Test-Container -CheckPath $FlagFolder -ObjectName '-FlagFolder' -IfNoExistFinalize > $NULL
+    $FlagFolder | Test-Container -Name '-FlagFolder' -IfNoExistFinalize > $NULL
 
 
 #フラグファイル名のValidation
@@ -356,7 +356,7 @@ Switch -Regex ($Status) {
 
     '^NoExist$' {
 
-        IF ( -not(Test-Leaf -CheckPath $flagPath -ObjectName 'Flag file') -and -not(Test-Container -CheckPath $flagPath -ObjectName 'Same Name folder')) {
+        IF ( -not($flagPath | Test-Leaf -Name 'Flag file') -and -not($flagPath | Test-Container -Name 'Same Name folder')) {
 
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exists and terminate as NORMAL." 
 
@@ -369,7 +369,7 @@ Switch -Regex ($Status) {
 
     '^Exist$' {
     
-        IF (Test-Leaf -CheckPath $flagPath -ObjectName 'Flag file') {
+        IF ($flagPath | Test-Leaf -Name 'Flag file') {
 
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] exists and terminate as NORMAL."    
 

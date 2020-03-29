@@ -503,7 +503,7 @@ function ConvertTo-FileNameAddTimeStamp {
 [CmdletBinding()]
 
 Param(
-[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFileName")]$Name ,
+[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$TRUE, ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFileName")]$Name ,
 [String][parameter(position=1 , mandatory=$TRUE)]$TimeStampFormat 
 )
 
@@ -512,10 +512,10 @@ begin {
 }
 
 process {
-    $extensionString = [System.IO.Path]::GetExtension($Name)
-    $fileNameWithOutExtentionString = [System.IO.Path]::GetFileNameWithoutExtension($Name)
+    $extension                = [System.IO.Path]::GetExtension($Name)
+    $fileNameWithOutExtention = [System.IO.Path]::GetFileNameWithoutExtension($Name)
 
-    Write-Output $fileNameWithOutExtentionString + $formattedDate + $extensionString
+    Write-Output ($fileNameWithOutExtention + $formattedDate + $extension)
 }
 
 end {
@@ -666,19 +666,19 @@ process {
 
     IF (Test-Path -LiteralPath $Path -PathType Container) {
 
-            Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] exists."
-            Write-Output $TRUE
+        Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] exists."
+        Write-Output $TRUE
+
+        } else {
+        Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] dose not exist."
+            
+        IF($IfNoExistFinalize){
+            Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
+            Finalize $ErrorReturnCode
 
             } else {
-            Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] dose not exist."
-            
-            IF($IfNoExistFinalize){
-                Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
-                Finalize $ErrorReturnCode
-
-                } else {
-                Write-Output $FALSE
-                }
+            Write-Output $FALSE
+            }
     }
 }
 end {
@@ -702,20 +702,20 @@ process {
 
     IF (Test-Path -LiteralPath $Path -PathType Leaf) {
 
-            Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] exists."
-            Write-Output $TRUE
+        Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] exists."
+        Write-Output $TRUE
 
+        } else {
+
+        Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] dose not exist."
+            
+        IF($IfNoExistFinalize){
+            Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
+            Finalize $ErrorReturnCode
+            
             } else {
-
-            Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] dose not exist."
-            
-            IF($IfNoExistFinalize){
-                Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
-                Finalize $ErrorReturnCode
-            
-                } else {
-                Write-Output $FALSE
-                }
+            Write-Output $FALSE
+            }
     }
 }
 end {

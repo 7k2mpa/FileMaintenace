@@ -2,6 +2,11 @@
 
 <#
 .SYNOPSIS
+This script execute the program specified with arguments in the specified config file.
+Untill Ending with Normal, execute specified times every specified seconds.  
+
+CommonFunctions.ps1 is requied.
+
 指定したプログラムを設定ファイルに書かれたパラメータを読み込んで実行します。
 正常終了に遷移するまで、指定秒数間隔で指定回数実行します。
 
@@ -12,6 +17,18 @@
 <Common Parameters>はサポートしていません
 
 .DESCRIPTION
+
+This script execute the program specified with arguments in the specified config file.
+Untill Ending with Normal, execute specified times every specified seconds.  
+
+If the program exit with Normal return code, this script exit with Normal return code.
+
+If the program exit with Warning return code, this script execute specified times every specified seconds.  
+And if the program exit wirt Warning return code after exections, this script exit with Warning return code.
+
+If the program exit with Error return code, this script exit with Error return code.
+
+
 指定したプログラムを設定ファイルに書かれたパラメータを読み込んで実行します。
 正常終了に遷移するまで、指定秒数間隔で指定回数実行します。
 指定したプログラムが正常終了した場合、本プログラムは正常終了します。
@@ -273,7 +290,7 @@ Try{
 
 function Initialize {
 
-$ShellName = Split-Path -Path $PSCommandPath -Leaf
+$ShellName = $PSCommandPath | Split-Path -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -294,14 +311,14 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
     $CommandPath = $CommandPath | ConvertTo-AbsolutePath -ObjectName '-CommandPath'
 
-    Test-Leaf -CheckPath $CommandPath -ObjectName '-CommandPath' -IfNoExistFinalize > $NULL
+    $CommandPath | Test-Leaf -Name '-CommandPath' -IfNoExistFinalize > $NULL
 
 #コマンドファイルの有無を確認
     
 
     $CommandFile = $CommandFile | ConvertTo-AbsolutePath -ObjectName '-CommandFile'
 
-    Test-Leaf -CheckPath $CommandFile -ObjectName '-CommandFile' -IfNoExistFinalize > $NULL
+    $CommandFile | Test-Leaf -Name '-CommandFile' -IfNoExistFinalize > $NULL
 
 
 #処理開始メッセージ出力
@@ -340,7 +357,7 @@ $Version = '20200224_1640'
 
     Try {
 
-        $line = @(Get-Content $CommandFile -Encoding $CommandFileEncode -TotalCount 1  -ErrorAction Stop)
+        $line = @(Get-Content -Path $CommandFile -Encoding $CommandFileEncode -TotalCount 1  -ErrorAction Stop)
         }
                     catch [Exception]
                     {
