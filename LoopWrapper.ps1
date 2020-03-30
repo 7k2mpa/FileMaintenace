@@ -28,6 +28,20 @@ And if the program exit wirt Warning return code after exections, this script ex
 
 If the program exit with Error return code, this script exit with Error return code.
 
+The configuration file can be set arbitrarily.
+1st line of the configuration file is used to execute the program.
+
+Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
+
+
+Sample Configuration file.
+
+Save blow to LoopWrapperCommand.txt
+Execute this script with argument -CommandPath .\CheckFlag.ps1 -CommandFile .\LoopWrapperCommand.txt
+---
+-CheckFolder .\Lock -CheckFile BkupDB.flg
+---
+
 
 指定したプログラムを設定ファイルに書かれたパラメータを読み込んで実行します。
 正常終了に遷移するまで、指定秒数間隔で指定回数実行します。
@@ -58,6 +72,20 @@ If the program exit with Error return code, this script exit with Error return c
 .EXAMPLE
 
 LoopWrapper.ps1 -CommandPath .\CheckFlag.ps1 -CommandFile .\Command.txt
+
+Execute CheckFlag.ps1 in the same folder with arugument 1st line of Command.txt
+
+If CheckFlag.ps1 end as Normal, this program exits as Normal.
+
+CheckFlag.ps1 test a flag file and if a flag file dose not exist, CheckFlag.ps1 ends as Normal,
+if a flag file exists, CheckFlag.ps1 end as Error.
+
+With this configuration, untill this script execute CheckFlag.ps1 specified times.
+After specified times, this script end as Warning.
+
+If CheckFlag.ps1 ends as Error, this script ends as Error.
+
+
 　このプログラムと同一フォルダに存在するCheckFlag.ps1を起動します。
 起動する際に渡すパラメータは設定ファイルComman.txtの1行目です。
 
@@ -75,6 +103,19 @@ CheckFlag.ps1が異常終了すると、本プログラムは異常終了します。
 .EXAMPLE
 
 LoopWrapper.ps1 -CommandPath .\CheckFlag.ps1 -CommandFile .\Command.txt -Span 60 -UpTo 120
+
+Execute CheckFlag.ps1 in the same folder with arugument 1st line of Command.txt
+
+If CheckFlag.ps1 end as Normal, this program exits as Normal.
+
+CheckFlag.ps1 test a flag file and if a flag file dose not exist, CheckFlag.ps1 ends as Normal,
+if a flag file exists, CheckFlag.ps1 end as Error.
+
+With this configuration, untill this script execute CheckFlag.ps1 120 times every 60 seconds.
+After specified times, this script end as Warning.
+
+If CheckFlag.ps1 ends as Error, this script ends as Error.
+
 　このプログラムと同一フォルダに存在するCheckFlag.ps1を起動します。
 起動する際に渡すパラメータは設定ファイルComman.txtの1行目です。
 
@@ -94,31 +135,57 @@ CheckFlag.ps1が異常終了すると、本プログラムは異常終了します。
 
 
 .PARAMETER CommandPath
+
+Specify the path of script to execute.
+Specification is required.
+Wild cards are not accepted.
 　起動するプログラムパスを指定します。
 指定は必須です。
 相対、絶対パスで指定可能です。
 ワイルドカード*は使用できません。
 
 .PARAMETER CommandFile
+
+Specify the path of command file with arguments.
+Specification is required.
+Wild cards are not accepted.
+
 　起動するプログラムに渡すコマンドファイルを指定します。
 指定は必須です。
 相対、絶対パスで指定可能です。
 ワイルドカード*は使用できません。
 
 .PARAMETER CommandFileEncode
+
+Specify encode chracter code in the command file.
+[Default(ShitJIS)] is default.
+
 　コマンドファイルの文字コードを指定します。
 デフォルトは[Default]でShif-Jisです。
 
 
 .PARAMETER Span
+
+Specify how log waiting for retry the script execution in seconds.
+[10 secnods] is default
+
+
 再実行時の間隔を秒数で指定します。
 デフォルトは10秒です。
 
 .PARAMETER UpTo
+
+Specify how many times to execute the script.
+[1000times] is default.
+
 再実行の試行回数を指定します。
 デフォルトは1000回です。
 
 .PARAMETER Continue
+
+If you want to execute script again with argument 1st line in the command file ending the script as error.
+[This script ends as Error] is default.
+
 起動したプログラムが異常終了してもループ処理を継続します。
 
 
@@ -349,7 +416,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200224_1640'
+$Version = '20200330_1000'
 
 #初期設定、パラメータ確認、起動メッセージ出力
 

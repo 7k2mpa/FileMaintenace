@@ -950,7 +950,8 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 
 
     IF (($TargetFolder -eq $MoveToFolder) -and (($Action -match "move|copy") -or  ($PreAction -contains 'MoveNewFile'))) {
-        Write-Log -Type Error -ID $ErrorEventID -Message "Specified -(Pre)Action option for Move or Copy files, -TargetFolder and -MoveToFolder must not be same."
+        Write-Log -Type Error -ID $ErrorEventID -Message ("Specified -(Pre)Action option for Move or Copy files, " +
+            "-TargetFolder and -MoveToFolder must not be same.")
 		Finalize $ErrorReturnCode
         }
 
@@ -991,7 +992,8 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
    IF ($Action -eq "DeleteEmptyFolders") {
         IF ( ($PreAction -match '^(Compress|Archive|AddTimeStamp)$') -or ($PostAction -ne 'none' )) {
     
-                Write-Log -Type Error -ID $ErrorEventID -Message "Specified -Action [$Action] , must not specify -PreAction or -PostAction options for modify files."
+                Write-Log -Type Error -ID $ErrorEventID -Message ("Specified -Action [$Action] , " +
+                    "must not specify -PreAction or -PostAction options for modify files.")
 				Finalize $ErrorReturnCode
 
         } elseIF ($Size -ne 0) {
@@ -1076,7 +1078,8 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
         }
 
     IF ($OverRide) {
-        Write-Log -ID $InfoEventID -Type Information -Message "Specified -OverRide[$($OverRide)] option, thus if files exist with the same name, will override them."
+        Write-Log -ID $InfoEventID -Type Information -Message ("Specified -OverRide[$($OverRide)] option, " +
+            "thus if files exist with the same name, will override them.")
         }
 
     IF ($ContinueAsNormal) {
@@ -1245,7 +1248,7 @@ Param(
 [String]$DatumPath = $PSScriptRoot
 [Boolean]$WhatIfFlag = (($PSBoundParameters['WhatIf']) -ne $NULL)
 
-[String]$Version = '20200324_1630'
+$Version = '20200330_1000'
 
 [Boolean]$ForceEndloop  = $FALSE          ;#$FALSEÇ≈ÇÕFinalize , $TRUEÇ≈ÇÕÉãÅ[Évì‡Ç≈Break
 

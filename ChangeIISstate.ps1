@@ -274,7 +274,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200207_1615'
+$Version = '20200330_1000'
 
 
 #初期設定、パラメータ確認、起動メッセージ出力

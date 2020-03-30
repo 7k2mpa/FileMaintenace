@@ -79,23 +79,42 @@ If ERROR termination occur in the line, do not terminate Wrapper.ps1 and execute
 
 
 .PARAMETER CommandPath
+
+Specify the path of script to execute.
+Specification is required.
+Wild cards are not accepted.
+
 　起動するプログラムパスを指定します。
 指定は必須です。
 相対、絶対パスで指定可能です。
 ワイルドカード*は使用できません。
 
 .PARAMETER CommandFile
+
+Specify the path of command file with arguments.
+Specification is required.
+Wild cards are not accepted.
+
+
 　起動するプログラムに渡すコマンドファイルを指定します。
 指定は必須です。
 相対、絶対パスで指定可能です。
 ワイルドカード*は使用できません。
 
 .PARAMETER CommandFileEncode
+
+Specify encode chracter code in the command file.
+[Default(ShitJIS)] is default.
+
 　コマンドファイルの文字コードを指定します。
 デフォルトは[Default]でShif-Jisです。
 
 
 .PARAMETER Continue
+
+If you want to execute script with argument next line in the command file ending the script as error.
+[This script ends as Error] is default.
+
 　起動したプログラムが異常終了しても、コマンドファイルの次行を継続処理します。
 デフォルトではそのまま異常終了します。
 
@@ -336,7 +355,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200224_1640'
+$Version = '20200330_1000'
 
 #初期設定、パラメータ確認、起動メッセージ出力
 

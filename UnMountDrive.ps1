@@ -198,7 +198,7 @@ Try{
 
 function Initialize {
 
-$ShellName = Split-Path -Path $PSCommandPath -Leaf
+$ShellName = $PSCommandPath | Split-Path -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -263,7 +263,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200207_1615'
+$Version = '20200330_1000'
 
 $psDrive = $MountedDrive -replace ":" 
 
