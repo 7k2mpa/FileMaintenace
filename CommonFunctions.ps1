@@ -255,7 +255,7 @@ process {
             }
 
         '^(Compress|CompressAndAddTimeStamp)$' {
-            $ActionTo = $ActionTo -replace "\[" , "````["
+#           $ActionTo = $ActionTo -replace "\[" , "````["
             Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Force > $NULL  -ErrorAction Stop
             }                  
                                        
@@ -268,7 +268,7 @@ process {
             }
 
         '^(Archive|ArchiveAndAddTimeStamp)$' {
-            $ActionTo = $ActionTo -replace "\[" , "````["
+#           $ActionTo = $ActionTo -replace "\[" , "````["
             Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Update > $NULL  -ErrorAction Stop
             }                  
 

@@ -1139,7 +1139,7 @@ process {
                 }
                 
            '^7zZip$' {
-                $aarchive.Type = "7zZip"
+                $archive.Type = "7zZip"
                 $extension = '.zip'
                 Break
                 }
@@ -1400,7 +1400,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
             $destination = $destinationFolder
 
             } else {
-            $destination = $Target.Object.FullName | Split-Path -Parent
+            $destination = $Target.Object.DirectoryName
             }
 
         $archive = $Target.Object.FullName | ConvertTo-PreActionPath -DestinationPath $destination
