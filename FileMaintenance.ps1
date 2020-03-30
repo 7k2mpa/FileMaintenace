@@ -800,7 +800,7 @@ PSobject passed the filter
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
     IF ($_.Name -match $RegularExpression) {
     IF ($_.Length -ge $Size) {
-    IF (($_.FullName).Substring($TargetFolder.Length , ($_.DirectoryName).Length - $TargetFolder.Length +1) -match $ParentRegularExpression)
+    IF (($_.FullName).Substring($TargetFolder.Length , (Split-Path -Path $_.FullName -Parent).Length - $TargetFolder.Length +1) -match $ParentRegularExpression)
         {$_}
     }
     } 
@@ -818,7 +818,7 @@ function Get-Object {
 System.String. Path of the folder to get objects
 
 .OUTPUT
-Strings Array of Objects's path
+PSObject
 #>
 
 [OutputType([PSObject])]
@@ -1107,7 +1107,7 @@ System.String. Path of the file
 PSobject
 #>
 
-[OutputType([PSobject])]
+[OutputType([PSObject])]
 [CmdletBinding()]
 Param(
 [Array]$PreAction = $PreAction ,
