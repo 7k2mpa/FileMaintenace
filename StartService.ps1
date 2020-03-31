@@ -202,12 +202,14 @@ https://github.com/7k2mpa/FileMaintenace
 
 #>
 
-
+[CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
 Param(
 
-[String][parameter(position=0, mandatory=$true , HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help StartService.ps1')]$Service  ,
 
-#[String][parameter(position=1 , mandatory=$true)][ValidateSet("Running", "Stopped")]$TargetStatus , 
+[String][parameter(position=0, mandatory=$true ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE, HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help StartService.ps1')]
+[Alias("Name")]$Service ,
+
+#[String][parameter(position=1 , mandatory=$true ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][ValidateSet("Running", "Stopped")][Alias("Status")]$TargetStatus , 
 [String][parameter(position=1)][ValidateSet("Running", "Stopped")]$TargetStatus = 'Running', 
 #[String][parameter(position=1)][ValidateSet("Running", "Stopped")]$TargetStatus = 'Stopped', 
 
@@ -268,7 +270,7 @@ Try{
 
 function Initialize {
 
-$ShellName = Split-Path -Path $PSCommandPath -Leaf
+$ShellName = $PSCommandPath | Split-Path -Leaf
 
 #イベントソース未設定時の処理
 #ログファイル出力先確認
@@ -284,20 +286,20 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #パラメータの確認
 
 
-    IF (-not(Test-ServiceExist -ServiceName $Service -NoMessage)) {
-        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Service [$($Service)] dose not exist."
+    IF (-not($Service | Test-ServiceExist -NoMessage)) {
+        Write-Log -Id $ErrorEventID -Type Error -Message "Service [$($Service)] dose not exist."
         Finalize $ErrorReturnCode
         }
 
 
      IF ($TargetStatus -notmatch '(Running|Stopped)') {
-        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "-TargetStatus is invalid."
+        Write-Log -Id $ErrorEventID -Type Error -Message "-TargetStatus is invalid."
         Finalize $ErrorReturnCode   
         }
 
 
-    IF (Test-ServiceStatus -ServiceName $Service -Health $TargetStatus -Span 0 -UpTo 1 ) {
-        Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Service [$($Service)] status is already [$($TargetStatus)]"
+    IF ($Service | Test-ServiceStatus -Status $TargetStatus -Span 0 -UpTo 1 ) {
+        Write-Log -Id $WarningEventID -Type Warning -Message "Service [$($Service)] status is already [$($TargetStatus)]"
         Finalize $WarningReturnCode
         }
         
@@ -307,9 +309,9 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #処理開始メッセージ出力
 
 
-Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
+Write-Log -Id $InfoEventID -Type Information -Message "All parameters are valid."
 
-Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Starting to change Service [$($Service)] status."
+Write-Log -Id $InfoEventID -Type Information -Message "Starting to switch Service [$($Service)] status."
 
 }
 
@@ -331,7 +333,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200207_1615'
+$Version = '20200330_1000'
 
 [String]$computer = "localhost" 
 [String]$class = "win32_service" 
@@ -353,7 +355,7 @@ $Version = '20200207_1615'
         }
 
     Default {
-        Write-Log -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetStatus is invalid.'
+        Write-Log -Id $InternalErrorEventID -Type Error -Message 'Internal Error. $TargetStatus is invalid.'
         Finalize $InternalErrorReturnCode
         } 
  }
@@ -369,19 +371,20 @@ $Version = '20200207_1615'
 For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
 
       # サービス存在確認
-      IF (-not(Test-ServiceExist $Service)) {
+      IF (-not($Service | Test-ServiceExist)) {
           Finalize $ErrorReturnCode
           }
 
-    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "With WMIService.(start|stop)Service , starting to change Service [$($Service)] status from [$($originalStatus)] to [$($TargetStatus)]"
+    Write-Log -Id $InfoEventID -Type Information -Message "With WMIService.(start|stop)Service , starting to switch Service [$($Service)] status from [$($originalStatus)] to [$($TargetStatus)]"
 
     Switch -Regex ($TargetStatus) {
  
         'Stopped' {
             IF ($WMIService.AcceptStop) {
                 $return = $WMIService.stopService()
+
                 } else {
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] will not accept a stop request. Wait for $($RetrySpanSec) seconds."
+                Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] will not accept a stop request. Wait for $($RetrySpanSec) seconds."
                 Start-Sleep $RetrySpanSec
                 Continue
                 }
@@ -396,7 +399,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
             }
 
         Default {
-            Write-Log -EventID $InternalErrorEventID -EventType Error -EventMessage 'Internal Error. $TargetStatus is invalid. '
+            Write-Log -Id $InternalErrorEventID -Type Error -Message 'Internal Error. $TargetStatus is invalid. '
             Finalize $InternalErrorReturnCode    
             }
     }
@@ -406,41 +409,42 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
      Switch ($return.returnvalue) {
         
             0 {
-                $serviceStatus = Test-ServiceStatus -ServiceName $Service -Health $TargetStatus -Span $RetrySpanSec -UpTo $RetryTimes
+                $serviceStatus = $Service | Test-ServiceStatus -Status $TargetStatus -Span $RetrySpanSec -UpTo $RetryTimes
 
                 IF ($serviceStatus) {
-                    Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Service [$($Service)] is [$($TargetStatus)]"
+                    Write-Log -Id $SuccessEventID -Type Success -Message "Service [$($Service)] is [$($TargetStatus)]"
                     Finalize $NormalReturnCode
+                
                     } else {
-                    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] is not [$($TargetStatus)] Retry."
+                    Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] is not [$($TargetStatus)] Retry."
                     }
                 }
 
 
             2 {
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] reports access denied."
+                Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] reports access denied."
                 }
 
             5 { 
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] can not accept control at this time."
+                Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] can not accept control at this time."
                 } 
             
             10 {
-                Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Service [$($Service)] is already [$($TargetStatus)]"
+                Write-Log -Id $WarningEventID -Type Warning -Message "Service [$($Service)] is already [$($TargetStatus)]"
                 Finalize $WarningErrorCode
                 }
               
             DEFAULT {
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Service [$($Service)] reports ERROR $($Return.returnValue)"
+                Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] reports ERROR $($Return.returnValue)"
                 } 
       }  
     
 
       #チェック回数の上限に達していない場合は、指定秒待機
 
-      Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Serivce [$($Service)] exists and service status dose not change to [$($TargetStatus)] Wait for $($RetrySpanSec) seconds."
+      Write-Log -Id $InfoEventID -Type Information -Message "Serivce [$($Service)] exists and service status dose not switch to [$($TargetStatus)] Wait for $($RetrySpanSec) seconds."
       Start-Sleep $RetrySpanSec
 }
 
-Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , service [$($Service)] status is not change to [$($TargetStatus)]"
+Write-Log -Id $ErrorEventID -Type Error -Message "Although waiting predeterminated times , service [$($Service)] status is not switch to [$($TargetStatus)]"
 Finalize $ErrorReturnCode
