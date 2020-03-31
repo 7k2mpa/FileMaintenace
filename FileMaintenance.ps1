@@ -1248,7 +1248,7 @@ Param(
 [String]$DatumPath = $PSScriptRoot
 [Boolean]$WhatIfFlag = (($PSBoundParameters['WhatIf']) -ne $NULL)
 
-$Version = '20200330_1000'
+$Version = '20200331_1000'
 
 [Boolean]$ForceEndloop  = $FALSE          ;#$FALSEÇ≈ÇÕFinalize , $TRUEÇ≈ÇÕÉãÅ[Évì‡Ç≈Break
 
@@ -1286,7 +1286,7 @@ $targets = $TargetFolder | Get-Object -FilterType $FilterType
             }
     }
 
-Write-Log -ID $InfoEventID -Type Information -Message "[$($targets.Length)] [$($FilterType)(s)] exist for processing."
+Write-Log -ID $InfoEventID -Type Information -Message ("["+@($targets).Length+"] [$($FilterType)(s)] exist for processing.")
 
 Write-Output "[$($FilterType)(s)] are for processing..."
 
@@ -1466,9 +1466,9 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
     #ï™äÚ6 KeepFilesCount
     '^KeepFilesCount$' {
-            IF (($targets.Length - $InLoopDeletedFilesCount) -gt $KeepFiles) {
+            IF ((@($targets).Length - $InLoopDeletedFilesCount) -gt $KeepFiles) {
 
-                Write-Log -ID $InfoEventID -Type Information -Message  ("In the folder more than [$($KeepFiles)] files exist, " +
+                Write-Log -ID $InfoEventID -Type Information -Message  ("More than [$($KeepFiles)] files exist in the folder, " +
                     "thus delete the oldest [$($Target.Object.FullName)]")
 
                 Invoke-Action -ActionType Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
@@ -1480,7 +1480,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
                 $InLoopDeletedFilesCount++
             
                 } else {
-                Write-Log -ID $InfoEventID -Type Information -Message  ("Tn the foler less [$($KeepFiles)] files exist, " +
+                Write-Log -ID $InfoEventID -Type Information -Message  ("Less [$($KeepFiles)] files exist in the folder, " +
                     "thus do not delete [$($Target.Object.FullName)]")
                 }
             }
@@ -1513,7 +1513,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
     
                 } else {
                 Write-Log -ID $InfoEventID -Type Information -Message  ("A file [$($newFilePath)] already exists same as attempting rename, " +
-                    "thus do not rename [$($Target.Object.FullName.fullname)]")
+                    "thus do not rename [$($Target.Object.FullName)]")
                 }
             }
 
