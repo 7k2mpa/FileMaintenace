@@ -1,0 +1,96 @@
+#これはWrapper.ps1でFileMaintenance.ps1を起動する時のコマンドテキスト例です。
+
+#コマンドテキストはUTF,SJISお好みの文字コードで記述できます。
+#デフォルトはSJISです。
+# .\Wrapper.ps1 -CommandFileEncode UTF8
+#の様に明示的に指定して下さい。
+
+#コマンドファイルの書式
+#このファイルで大体わかるかと思います。
+#空白行はスキップしてくれます。行頭を#で始めるとコメント扱いになります。
+
+
+#-TargetFolder , -MoveToFolderの指定方法
+
+#スペースが含まれている場合は引用符で括って下さい。
+
+-TargetFolder '.\TEST\C C\'
+
+
+#こんな命名は無いと思いますが引用符'が含まれている場合は二重引用符で括って下さい。
+
+-TargetFolder ".\TEST\D' 'D\"
+
+#なお、二重引用符"はNTFSで使用出来ません
+
+
+#ブラケット[]を含む場合は、そのまま記述して下さい。Powershellワイルドカードとして認識はされません。バッククオート`でのエスケープは不要です
+
+-TargetFolder .\TEST\[LOG]
+
+#NTFSに使用できない文字（ワイルドカード*,?を含む）を指定すると異常終了判定します。
+#複数のフォルダを指定するには、-ParentRegularExpressionを使用してください。
+
+-TargetFolder .\TEST*
+
+
+#相対パスと絶対パス
+
+#Wrapper.ps1 , FileMaintenace.ps1は絶対パスと相対パス表記とをサポートします。
+#相対パス表記はカレントディレクトを基準にしません。プログラムが配置されたディレクトを基準にします。
+#相対パス表記はドット.で始まる表記にして下さい。
+#
+# D:\TEST\infra\Shell\Wrapper.ps1
+# D:\TEST\infra\Shell\FileMaintenance.ps1
+# D:\TEST\infra\Log1
+# D:\TEST\infra\Shell\Log2
+
+-TargetFolder ..\Log1
+-TargetFolder .\Log2
+
+
+
+#正規表現 -RegularExpression  -ParentRegularExpressionの指定方法
+
+#対象ファイル、フォルダ名に[]を含む場合は、正規表現のバックスラッシュ\エスケープが必要です。
+#例えば、以下はLog[1].txt , Log[2].txt ... Log[5].txtが処理対象になります。
+
+-TargetFolder D:\TEST -RegularExpression '^Log\[[1-5]\]\.txt$'
+
+
+# D:\TEST\Log[0].txt
+# D:\TEST\Log[1].txt
+# D:\TEST\Log[2].txt
+#      :
+#      :
+# D:\TEST\Log[5].txt
+# D:\TEST\Log[6].txt
+
+
+#Powershellワイルドカード文字を正規表現経由で入力させても、ワイルドカード処理しません。
+#以下の例ではLog[*].txtをそのまま対象フォルダのファイル群へマッチさせます。アスタリスク*はPowershellワイルドカードとしては機能しません。
+#検索対象のファイルシステムがNTFSであればアスタリスク*を含むファイル名は存在しえないので、結果として何もマッチしません。
+
+-TargetFolder D:\TEST -RegularExpression '^Log\[\*\]\.txt$'
+
+# D:\TEST\Log[0].txt
+# D:\TEST\Log[1].txt
+# D:\TEST\Log[2].txt
+#      :
+#      :
+# D:\TEST\Log[5].txt
+# D:\TEST\Log[6].txt
+
+
+#-ParentRegularExpressionはパス文字のみを正規表現でマッチさせます。
+#以下の例ではD:\TESTフォルダ以下のパスに\OLD\を含むもののみがマッチします。ファイル名はマッチ対象外です。
+#これは本番、検証でフォルダ名が微妙に異なる環境でコマンドファイルを統一するのに便利です。
+#一方、大量のファイルを処理することになるので、十分にテストしてください。
+
+-TargetFolder D:\TEST -ParentRegularExpression '\\OLD\\'
+
+
+# D:\TEST\APP\Current\log.log
+# D:\TEST\APP\OLD\log.log
+# D:\TEST\BATCH\Current\log.log
+# D:\TEST\BATCH\OLD\log.log
