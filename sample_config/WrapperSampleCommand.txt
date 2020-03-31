@@ -2,7 +2,8 @@
 
 #You can specify character code of command text in UTF or ShiftJIS or other code.
 #ShiftJIS is default
-#If you want to specify, with -CommandFileEncode option.
+#If you want to specify, specify with -CommandFileEncode option.
+
 # .\Wrapper.ps1 -CommandFileEncode UTF8
 
 #Command file format.
@@ -12,26 +13,32 @@
 
 #How to specify -TargetFolder , -MoveToFolder
 
-#If path includes space, quote with single quote'
+#If the path includes space, quote with single quote'
 
 -TargetFolder '.\TEST\C C\'
 
 
-#If path include quote' characters, quote with double quote"
+#If the path includes quote' characters, quote with double quote"
 
 -TargetFolder ".\TEST\D' 'D\"
 
 #F.Y.I. double quote" is not allowed in NTFS path name.
 
 
-#If path include bracket[], write path literally. Bracket[] are not treated as wild cards.
-#It is not necessary to quote with quote'
+#If the path includes bracket[], specify the path literally. Bracket[] dose not work as wild cards.
+#It is not necessary to escape with backquote`
+
+Do not use
+
+-TargetFolder .\TESET\`[LOG`]
+
+Do
 
 -TargetFolder .\TEST\[LOG]
 
 #If specify path with characters not allowed in NTFS(include wild card * ?),
 #terminate with Error.
-#If you want to specify the path like wild card, specify -ParentRegularExpression
+#If you want to specify the path with wild cards, specify -ParentRegularExpression
 
 #Do not use
 -TargetFolder .\TEST\Log*\
@@ -55,9 +62,9 @@
 # D:\TEST\infra\Shell\Log2
 
 
-#How to specify -RegularExpression  -ParentRegularExpression
+#How to specify -RegularExpression and -ParentRegularExpression
 
-#If file/folder name include bracket[] in the path, bracket[] needs to be escaped with backslash\
+#If file/folder name includes bracket[] in the path, bracket[] needs to be escaped with backslash\
 #Log[1].txt , Log[2].txt ... Log[5].txt are matched in the sample.
 
 -TargetFolder D:\TEST -RegularExpression '^Log\[[1-5]\]\.txt$'
@@ -72,8 +79,8 @@
 # D:\TEST\Log[6].txt
 
 
-#If you specify arugument with wild card and regular expression, wild cards do not work.
-#"Log[*].txt" will be matched to the files in the folder, but wild card* dose not work and work literally.
+#If you specify arugument with wild cards and regular expression, wild cards do not work.
+#"Log[*].txt" will be matched to the files in the folder, but asterisk* dose not work as wild card and work literally.
 #NTFS do not allow file name including asterisk*, thus nothing is matched.
 
 -TargetFolder D:\TEST -RegularExpression '^Log\[\*\]\.txt$'
