@@ -1252,7 +1252,7 @@ $Version = '20200331_1000'
 
 [Boolean]$ForceEndloop  = $FALSE          ;#$FALSEではFinalize , $TRUEではループ内でBreak
 
-
+#$VerbosePreference = 'Continue'
 #初期設定、パラメータ確認、起動メッセージ出力
 
 . Initialize
@@ -1288,9 +1288,11 @@ $targets = $TargetFolder | Get-Object -FilterType $FilterType
 
 Write-Log -ID $InfoEventID -Type Information -Message ("["+@($targets).Length+"] [$($FilterType)(s)] exist for processing.")
 
-Write-Output "[$($FilterType)(s)] are for processing..."
+Write-Debug   ("["+@($targets).Length+"][$($FilterType)(s)] are for processing...")
 
-Write-Output $targets.Object.Fullname
+Write-Debug   ("`r`n" + ($targets.Object.fullname | Out-String))
+
+Write-Verbose ("["+@($targets).Length+"][$($FilterType)(s)] are for processing..." + "`r`n" + ($targets.Object.fullname | Out-String))
 
 #-PreAction Archiveは複数ファイルを1ファイルに圧縮する。よって、ループ前に圧縮先の1ファイルのフルパスを確定しておく
 
