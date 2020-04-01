@@ -382,7 +382,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
         Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
         Finalize $ErrorReturnCode
 
-        }else{
+        } else {
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is running."
         }
 
@@ -441,7 +441,7 @@ Push-Location $OracleHomeBinPath
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Specified -NoCheckBackUpFlag option,thus skip to check status with backup flag."
         
         
-        }elseIF (Test-Leaf -CheckPath $BackUpFlagPath -ObjectName 'Backup Flag') {
+        } elseIF (Test-Leaf -CheckPath $BackUpFlagPath -ObjectName 'Backup Flag') {
 
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Running Back Up now. Can not start duplicate execution."
             Finalize $ErrorReturnCode
@@ -459,7 +459,7 @@ Push-Location $OracleHomeBinPath
 
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Export Session Info."
 
-        }else{
+        } else {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Export Session Info."
 	    Finalize $ErrorReturnCode
         
@@ -476,7 +476,7 @@ Push-Location $OracleHomeBinPath
 
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Export Redo Log."
         
-        }else{
+        } else {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Export Redo Log."
 	    Finalize $ErrorReturnCode
 
@@ -494,7 +494,7 @@ Push-Location $OracleHomeBinPath
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Check Database running status ."
 	    Finalize $ErrorReturnCode
         
-        }else{
+        } else {
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Check Database running status."
         }
 
@@ -506,7 +506,7 @@ Push-Location $OracleHomeBinPath
         Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Oracle Database running status is Backup Mode already."
         $WarningCount ++
  
-        }elseIF (-not  (($status.BackUp) -xor ($status.Normal))) {
+        } elseIF (-not(($status.BackUp) -xor ($status.Normal))) {
  
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Oracle Database running status is unknown."
             Finalize $ErrorReturnCode
@@ -527,7 +527,7 @@ Push-Location $OracleHomeBinPath
 
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Specified -NoChangeToBackUpMode option, thus do not switch to BackUpMode."
 
-        }else{
+        } else {
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Switch to Back Up Mode"
 
         $execSQLReturnCode = . Invoke-SQL -SQLCommand $DBBackUpModeOn -SQLName "Switch to Back Up Mode" -SQLLogPath $SQLLogPath
@@ -536,7 +536,7 @@ Push-Location $OracleHomeBinPath
 
             Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to switch to Back Up Mode."
             
-            }else{
+            } else {
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to switch to Back Up Mode."
 
 	        Finalize $ErrorReturnCode
@@ -580,7 +580,7 @@ Push-Location $OracleHomeBinPath
 
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Specified -NoStopListener option, thus do not stop Listener."
 
-        }else{
+        } else {
 
         IF ($needToStopListener) {
 
@@ -594,11 +594,11 @@ Push-Location $OracleHomeBinPath
                 Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to stop Listener."
                 Finalize $ErrorReturnCode
 
-                }else{
+                } else {
                 Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to stop Listener."
                 }
             
-            }else{
+            } else {
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Listener is stopped already, process next step."
             }
     }

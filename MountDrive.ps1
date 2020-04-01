@@ -54,7 +54,7 @@ Specification is required.
 デフォルトは$TRUEでEvent Log出力します。
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $Falseと等価です。
+　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
 
 .PARAMETER ProviderName
 　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
@@ -67,13 +67,13 @@ Specification is required.
 デフォルトは$TRUEでコンソール出力します。
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $Falseと等価です。
+　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$Falseでログファイル出力しません。
+　ログフィルへの出力を制御します。デフォルトは$FALSEでログファイル出力しません。
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $Falseと等価です。
+　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
 
 .PARAMETER LogPath
 　ログファイル出力パスを指定します。デフォルトは$NULLです。
@@ -150,8 +150,8 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[parameter(position=0, mandatory=$true , HelpMessage = 'Specify UNC Path to mount (ex. \\FileServer\Share) or Get-Help MountDrive.ps1')][String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,    
-[parameter(position=1, mandatory=$true , HelpMessage = 'Specify Drive Letter (ex. F:)  or Get-Help MountDrive.ps1')][String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive,
+[parameter(position = 0, mandatory, HelpMessage = 'Specify UNC Path to mount (ex. \\FileServer\Share) or Get-Help MountDrive.ps1')][String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,    
+[parameter(position = 1, mandatory, HelpMessage = 'Specify Drive Letter (ex. F:)  or Get-Help MountDrive.ps1')][String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive,
 
 #[parameter(position=0, mandatory=$true , HelpMessage = 'UNC Pathを指定(ex. \\FileServer\Share) 全てのHelpはGet-Help MountDrive.ps1')][String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,                                                                          
 #[parameter(position=1, mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help MountDrive.ps1')][String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive,
@@ -167,7 +167,7 @@ Param(
 
 [boolean]$Log2Console = $TRUE,
 [Switch]$NoLog2Console,
-[boolean]$Log2File = $False,
+[boolean]$Log2File = $FALSE,
 [Switch]$NoLog2File,
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath ,
 [String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
@@ -236,7 +236,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Drive $($MountDrive) exists already."
         Finalize $ErrorReturnCode
 
-        }else{
+        } else {
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Drive $($MountDrive) dose not exists."
         }
 
@@ -249,7 +249,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
         
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath $($TargetPath) exists."
         
-        }else{
+        } else {
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath $($TargetPath) dose not exists."
         Finalize $ErrorReturnCode
         }
@@ -290,7 +290,7 @@ $psDrive = $MountDrive -replace ":"
 
 Try {
 
-    New-PSDrive -Persist -Name $psDrive -PSProvider FileSystem -Root $TargetPath -Scope Global -ErrorAction Stop > $Null
+    New-PSDrive -Persist -Name $psDrive -PSProvider FileSystem -Root $TargetPath -Scope Global -ErrorAction Stop > $NULL
     }
 
     catch [Exception]

@@ -48,7 +48,7 @@ Specification is required.
 デフォルトは$TRUEでEvent Log出力します。
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $Falseと等価です。
+　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
 
 .PARAMETER ProviderName
 　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
@@ -61,13 +61,13 @@ Specification is required.
 デフォルトは$TRUEでコンソール出力します。
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $Falseと等価です。
+　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$Falseでログファイル出力しません。
+　ログフィルへの出力を制御します。デフォルトは$FALSEでログファイル出力しません。
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $Falseと等価です。
+　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
 
 .PARAMETER LogPath
 　ログファイル出力パスを指定します。デフォルトは$NULLです。
@@ -142,7 +142,7 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[parameter(position=0, mandatory=$true , HelpMessage = 'Specify Drive Letter (ex. F:) or Get-Help UnMountDrive.ps1')][String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
+[parameter(position = 0, mandatory, HelpMessage = 'Specify Drive Letter (ex. F:) or Get-Help UnMountDrive.ps1')][String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
 #[parameter(position=0, mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help UnMountDrive.ps1')][String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
 #[String][ValidatePattern('^[d-z]:$')]$MountedDrive="F:",
 
@@ -154,7 +154,7 @@ Param(
 
 [boolean]$Log2Console = $TRUE,
 [Switch]$NoLog2Console,
-[boolean]$Log2File = $False,
+[boolean]$Log2File = $FALSE,
 [Switch]$NoLog2File,
 [String][ValidatePattern('^(\.+\\|[C-Z]:\\).*')]$LogPath ,
 [String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
@@ -230,7 +230,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
                     Finalize $ErrorReturnCode
                     }
 
-    }else{
+    } else {
 
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Drive $($MountedDrive) dose not exists."
         Finalize $ErrorReturnCode
@@ -276,7 +276,7 @@ Try{
 
     Remove-SmbMapping -LocalPath $MountedDrive -Force -UpdateProfile  -ErrorAction Continue
 
-    If ( (Get-PSDrive -Name $psDrive) 2>$Null ) {
+    If ( (Get-PSDrive -Name $psDrive) 2>$NULL ) {
         Remove-PSDrive -Name $psDrive -Force  -ErrorAction Stop
         }
 

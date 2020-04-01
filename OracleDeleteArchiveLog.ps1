@@ -370,7 +370,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
         Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
         Finalize $ErrorReturnCode
-        }else{
+        } else {
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is running."
         }
      
@@ -415,7 +415,7 @@ $Version = '20200313_1415'
         $rmanLog = RMAN.exe target $ExecUser/$ExecUserPassword@$OracleSID CMDFILE "$ExecRMANPath" $Days
         Write-Output $rmanLog | Out-File -FilePath $OracleRMANLogPath -Append  -Encoding $LogFileEncode
  
-        }else{
+        } else {
         $rmanLog = RMAN.exe target / CMDFILE "$ExecRMANPath" $Days
         Write-Output $rmanLog | Out-File -FilePath $OracleRMANLogPath -Append  -Encoding $LogFileEncode
         }

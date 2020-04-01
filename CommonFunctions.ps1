@@ -148,33 +148,29 @@ function Test-EventLogSource {
 イベントソース未設定時の処理
 この確認が終わるまではログ出力可能か確定しないのでコンソール出力を強制
 #>
-    IF (-not($Log2EventLog)) {
-        Return
+    IF ($Log2EventLog) {
+
+        $ForceConsole = $TRUE
+
+        Try {
+            IF (-not([System.Diagnostics.Eventlog]::SourceExists($ProviderName) ) ) {
+            #新規イベントソースを設定
+           
+                New-EventLog -LogName $EventLogLogName -Source $ProviderName  -ErrorAction Stop
+                $ForceConsoleEventLog = $TRUE    
+                Write-Log -EventId $InfoEventID -Type Information -Message "Regist new source event [$($ProviderName)] to [$($EventLogLogName)]"
+                }
+        }
+        Catch [Exception] {
+        Write-Log -EventId $ErrorEventID -Type Error -Message ("Failed to regist new source event because no source $($ProviderName) exists in event log, " +
+            "must have administrator privilage for registing new source. Start Powershell with administrator privilage and start the script.")
+        Write-Log -EventId $ErrorEventID -Type Error -Message "Execution Error Message : $Error[0]"
+        Exit $ErrorReturnCode
         }
 
-
-$ForceConsole = $TRUE
-
-    Try {
-
-        IF (-not([System.Diagnostics.Eventlog]::SourceExists($ProviderName) ) ) {
-        #新規イベントソースを設定
-           
-            New-EventLog -LogName $EventLogLogName -Source $ProviderName  -ErrorAction Stop
-            $ForceConsoleEventLog = $TRUE    
-            Write-Log -EventId $InfoEventID -Type Information -Message "Regist new source event [$($ProviderName)] to [$($EventLogLogName)]"
-            }
-       
+        $ForceConsole = $FALSE
+        $ForceConsoleEventLog = $FALSE
     }
-    Catch [Exception] {
-    Write-Log -EventId $ErrorEventID -Type Error -Message "Failed to regist new source event because no source $($ProviderName) exists in event log, must have administrator privilage for registing new source. Start Powershell with administrator privilage and start the script."
-    Write-Log -EventId $ErrorEventID -Type Error -Message "Execution Error Message : $Error[0]"
-    Exit $ErrorReturnCode
-    }
-
-$ForceConsole = $FALSE
-$ForceConsoleEventLog = $FALSE
-
 }
 
 
@@ -184,18 +180,14 @@ function Test-LogFilePath {
 ログファイル出力先確認
 この確認が終わるまではログ出力可能か確定しないのでEventLogとコンソール出力を強制
 #>
-    IF (-not($Log2File)) {
-        Return
-        }
+    IF ($Log2File) {
 
-$ForceConsoleEventLog = $TRUE    
+        $ForceConsoleEventLog = $TRUE    
 
-    $LogPath | ConvertTo-AbsolutePath -Name '-LogPath' | Test-LogPath -ObjectName '-LogPath' > $NULL
-
-#    Test-LogPath -CheckPath $logPath -ObjectName '-LogPath' > $NULL
+        $LogPath | ConvertTo-AbsolutePath -Name '-LogPath' | Test-LogPath -ObjectName '-LogPath' > $NULL
     
-$ForceConsoleEventLog = $FALSE
-
+        $ForceConsoleEventLog = $FALSE
+        }
 }
 
 
@@ -543,14 +535,16 @@ function Test-ServiceExist {
 
 #>
 
-
+[OutputType([Boolean])]
+[CmdletBinding()]
 Param(
 [String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][Alias("Name")]$ServiceName ,
 #[parameter(mandatory=$TRUE)][String]$ServiceName,
 [Switch]$NoMessage
 )
-
-
+begin {
+}
+process {
 # サービス状態取得
 
     $service = Get-Service | Where-Object {$_.Name -eq $ServiceName}
@@ -569,6 +563,9 @@ Param(
         Write-Output $TRUE
         }
 }
+end {
+}
+}
 
 
 function Test-ServiceStatus {
@@ -578,6 +575,8 @@ function Test-ServiceStatus {
 #サービス起動、停止しても状態推移には時間が掛かります。このfunctionは一定時間$Span、一定回数$UpTo、状態確認を繰り返します
 #起動が遅いサービスは$Spanを大きくしてください
 #>
+[OutputType([Boolean])]
+[CmdletBinding()]
 Param(
 [String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][Alias("Name")]$ServiceName ,
 [String][parameter(position=1 ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][ValidateSet("Running", "Stopped")][Alias("Status")]$Health = 'Running',
@@ -633,6 +632,9 @@ Param(
 [Switch]$NoMessage
 
 )
+begin {
+}
+process {
 
     IF ([String]::IsNullOrEmpty($Path)) {
 
@@ -647,6 +649,9 @@ Param(
         } else {
         Write-Output $FALSE 
         }
+}
+end {
+}
 }
 
 
@@ -734,6 +739,7 @@ Param(
 
 )
 begin {
+    $logFormattedDate = (Get-Date).ToString($LogDateFormat)
 }
 process {
     #ログ出力先ファイルの親フォルダが存在しなければ異常終了
@@ -751,12 +757,11 @@ process {
     IF (Test-Path -LiteralPath $Path -PathType Leaf) {
 
         Write-Log -Id $InfoEventID -Type Information -Message "Check write permission of $($Name) [$($Path)]"
-        $logFormattedDate = (Get-Date).ToString($LogDateFormat)
         $logWrite = $logFormattedDate+" "+$ShellName+" Write Permission Check"
         
 
         Try {
-            Write-Output $logWrite | Out-File -FilePath $Path -Append -Encoding $LogFileEncode
+            Write-Output $logWrite | Out-File -FilePath $Path -Append -Encoding $LogFileEncode -ErrorAction Stop
             Write-Log -Id $InfoEventID -Type Information -Message "Successfully complete to write to $($Name) [$($Path)]"
             }
         Catch [Exception]{
@@ -872,23 +877,21 @@ Exit $returnCode
 
 
 function Invoke-SQL {
-
+[OutputType([boolean])]
+[CmdletBinding()]
 Param(
 [String]$SQLLogPath,
 [parameter(mandatory=$TRUE)][String]$SQLName,
 [parameter(mandatory=$TRUE)][String]$SQLCommand,
 
 [Switch]$IfErrorFinalize
-
 )
-
+begin {
     $scriptExecUser = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name
 
     $logFormattedDate = (Get-Date).ToString($LogDateFormat)
 
     $sqlLog = $NULL
-
-
 
 #Powershellではヒアドキュメントの改行はLFとして処理される
 #しかしながら、他のOracleからの出力はLF&CRのため、Windowsメモ帳で開くと改行コードが混在して正しく処理されない
@@ -909,7 +912,8 @@ SQL Exec User: $ExecUser`r
 Password Authrization [$PasswordAuthorization]`r
 `r
 "@
-
+}
+process {
 
 Write-Output $logWrite | Out-File -FilePath $SQLLogPath -Append  -Encoding $LogFileEncode
 
@@ -943,6 +947,9 @@ Pop-Location
         Write-Log -Id $SuccessEventID -Type Success -Message "Successfully completed to execute SQL Command[$($SQLName)]"
         Write-Output $TRUE
         }
+}
+end {
+}
 }
 
 function Test-OracleBackUpMode {
@@ -1018,7 +1025,7 @@ Param(
 
     '^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z]$' {
         Write-Log -Id $InfoEventID -Type Information -Message "$($ObjectName) [$($CheckUserName)] is valid user name."
-        Return $TRUE     
+        Write-Output $TRUE     
         }
 
     Default {
@@ -1041,7 +1048,7 @@ Param(
 
     '^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z]$' {
         Write-Log -Id $InfoEventID -Type Information -Message "$($ObjectName) [$($CheckDomainName)] is valid domain name."
-        Return $TRUE     
+        Write-Output $TRUE     
         }
 
     Default {
@@ -1064,12 +1071,12 @@ Param(
 
     '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$' {
         Write-Log -Id $InfoEventID -Type Information -Message "$($ObjectName) [$($CheckHostName)] is valid IP Address."
-        Return $TRUE     
+        Write-Output $TRUE     
         }
 
     '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$' {
         Write-Log -Id $InfoEventID -Type Information -Message "$($ObjectName) [$($CheckHostName)] is valid Hostname."
-        Return $TRUE                
+        Write-Output $TRUE                
         }
 
     Default {
