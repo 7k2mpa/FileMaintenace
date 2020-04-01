@@ -100,7 +100,6 @@ Param(
 )
 begin {
 }
-
 process {
     IF (($Log2EventLog -or $ForceConsoleEventLog) -and -not($ForceConsole) ) {
 
@@ -198,7 +197,7 @@ Param(
 [String][parameter(position = 0 ,mandatory)]
 [ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|MakeNew(FileWithValue|Folder)|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$")]$ActionType,
 
-[String][parameter(position = 1 , mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)]
+[String][parameter(position = 1 ,mandatory ,ValueFromPipeline=$TRUE, ValueFromPipelineByPropertyName=$TRUE)]
 [Alias("Path" , "FullName")]$ActionFrom ,
 
 [String]$ActionTo,
@@ -387,8 +386,8 @@ function ConvertTo-AbsolutePath {
 [OutputType([String])]
 [CmdletBinding()]
 Param(
-[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path ,
-[String][parameter(position=1 , ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name
+[String][parameter(position = 0, mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path ,
+[String][parameter(position = 1, ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name
 )
 
 begin {
@@ -495,8 +494,8 @@ function ConvertTo-FileNameAddTimeStamp {
 [CmdletBinding()]
 
 Param(
-[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$TRUE, ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFileName")]$Name ,
-[String][parameter(position=1 , mandatory=$TRUE)]$TimeStampFormat 
+[String][parameter(position = 0, mandatory, ValueFromPipeline=$TRUE, ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFileName")]$Name ,
+[String][parameter(position = 1, mandatory)]$TimeStampFormat 
 )
 
 begin {
@@ -538,7 +537,7 @@ function Test-ServiceExist {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
-[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][Alias("Name")]$ServiceName ,
+[String][parameter(position = 0, mandatory, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][Alias("Name")]$ServiceName ,
 #[parameter(mandatory=$TRUE)][String]$ServiceName,
 [Switch]$NoMessage
 )
@@ -558,7 +557,7 @@ process {
         } else {
 
         IF (-not($NoMessage)) {
-            Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists"
+            Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists."
             }
         Write-Output $TRUE
         }
@@ -578,8 +577,8 @@ function Test-ServiceStatus {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
-[String][parameter(position=0 , mandatory=$TRUE ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][Alias("Name")]$ServiceName ,
-[String][parameter(position=1 ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][ValidateSet("Running", "Stopped")][Alias("Status")]$Health = 'Running',
+[String][parameter(position = 0, mandatory, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][Alias("Name")]$ServiceName ,
+[String][parameter(position = 1, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][ValidateSet("Running", "Stopped")][Alias("Status")]$Health = 'Running',
 [int][ValidateRange(0,2147483647)]$Span = 3,
 [int][ValidateRange(0,2147483647)]$UpTo = 10
 )
@@ -625,8 +624,8 @@ function Test-PathNullOrEmpty {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
-[String][parameter(position=0 , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path ,
-[String][parameter(position=1 , ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
+[String][parameter(position = 0, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path ,
+[String][parameter(position = 1, ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
 
 [Switch]$IfNullOrEmptyFinalize,
 [Switch]$NoMessage
@@ -660,8 +659,8 @@ function Test-Container {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
-[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path,
-[String][parameter(position=1 , ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
+[String][parameter(position = 0, mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path,
+[String][parameter(position = 1, ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
 
 [Switch]$IfNoExistFinalize
 )
@@ -696,8 +695,8 @@ function Test-Leaf {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
-[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path,
-[String][parameter(position=1 , ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
+[String][parameter(position = 0, mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path,
+[String][parameter(position = 1, ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
 
 [Switch]$IfNoExistFinalize
 )
@@ -733,8 +732,8 @@ function Test-LogPath {
 [CmdletBinding()]
 Param(
 
-[String][parameter(position=0 , mandatory=$TRUE , ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path,
-[String][parameter(position=1 , ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
+[String][parameter(position = 0, mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path,
+[String][parameter(position = 1, ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
 [String]$FileValue = $NULL
 
 )
@@ -839,7 +838,7 @@ Write-Log -Id $InfoEventID -Type Information -Message "Start to validate paramet
 function Invoke-PostFinalize {
 
 Param(
-[parameter(mandatory=$TRUE)][int]$ReturnCode
+[parameter(mandatory)][int]$ReturnCode
 )
 
     IF (($ErrorCount -gt 0) -or ($ReturnCode -ge $ErrorReturnCode)) {
@@ -881,8 +880,8 @@ function Invoke-SQL {
 [CmdletBinding()]
 Param(
 [String]$SQLLogPath,
-[parameter(mandatory=$TRUE)][String]$SQLName,
-[parameter(mandatory=$TRUE)][String]$SQLCommand,
+[parameter(mandatory)][String]$SQLName,
+[parameter(mandatory)][String]$SQLCommand,
 
 [Switch]$IfErrorFinalize
 )
@@ -1017,7 +1016,7 @@ function Test-OracleBackUpMode {
 function Test-UserName {
 
 Param(
-[parameter(mandatory=$TRUE)][String]$CheckName,
+[parameter(mandatory)][String]$CheckName,
 [String]$ObjectName 
 )
 
@@ -1040,7 +1039,7 @@ Param(
 function Test-DomainName {
 
 Param(
-[parameter(mandatory=$TRUE)][String]$CheckDomainName,
+[parameter(mandatory)][String]$CheckDomainName,
 [String]$ObjectName 
 )
 
@@ -1063,7 +1062,7 @@ Param(
 function Test-Hostname {
 
 Param(
-[parameter(mandatory=$TRUE)][String]$CheckHostName,
+[parameter(mandatory)][String]$CheckHostName,
 [String]$ObjectName 
 )
 
