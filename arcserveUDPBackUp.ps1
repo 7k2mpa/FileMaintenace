@@ -2,13 +2,35 @@
 
 <#
 .SYNOPSIS
+This script start arcserve UDP backup job with arcserve UDP CLI.
+CommonFunctions.ps1 is required.
+
 arcserveUDP ver.6ˆÈ~‚ÅÀ‘•‚³‚ê‚½CLIŒo—R‚ÅƒoƒbƒNƒAƒbƒvƒWƒ‡ƒu‚ğ‹N“®‚·‚éƒvƒƒOƒ‰ƒ€‚Å‚·B
 Às‚É‚ÍCommonFunctions.ps1‚ª•K—v‚Å‚·B
-ƒZƒbƒg‚ÅŠJ”­‚µ‚Ä‚¢‚éFileMaintenance.ps1‚Æ•¹—p‚·‚é‚Æ•¡”‚Ìˆ—‚ğˆêŠ‡Às‚Å‚«‚Ü‚·B
 
 <Common Parameters>‚ÍƒTƒ|[ƒg‚µ‚Ä‚¢‚Ü‚¹‚ñ
 
 .DESCRIPTION
+This script start arcserve UDP backup job with arcserve UDP CLI.
+CommonFunctions.ps1 is required.
+Can specify full or incremental backup.
+Can specify authorization style plain password or password file.
+If you want to specify password authorization, execution user must be same with user of password file.
+It is a future of Windows.
+
+If you specify -ExecUser arcserve and start script with another user, can not authorization with password file of 'arcserve' user.
+
+This script support the location of arcserve backup console server both in the same host or in the other.
+
+Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually.  
+
+Path sample
+
+D:\script\infra\arcserveUDPBackUp.ps1
+D:\script\infra\Log\backup.flg
+D:\script\infra\UDP.psw
+
+
 arcserveUDP CLIŒo—R‚ÅƒoƒbƒNƒAƒbƒvƒWƒ‡ƒu‚ğ‹N“®‚·‚éƒvƒƒOƒ‰ƒ€‚Å‚·B
 ƒoƒbƒNƒAƒbƒv‚Íƒtƒ‹ƒoƒbƒNƒAƒbƒvA·•ªƒoƒbƒNƒAƒbƒv‚ğ‘I‘ğ‚Å‚«‚Ü‚·B
 ”FØ‚ÍƒpƒXƒ[ƒh•½•¶AƒpƒXƒ[ƒhƒtƒ@ƒCƒ‹A—¼•û‚ğƒTƒ|[ƒg‚µ‚Ä‚¢‚Ü‚·B
@@ -37,17 +59,32 @@ D:\script\infra\UDP.psw
 .EXAMPLE
 
 arcserveUDPBackUp.ps1 -Plan SSDB -Server SVDB01 -BackUpJobType Incr
+
+Start incremental backup targeting server [SVDB] in the plan [SSDB] 
+
 arcserveUDP‚ÌƒoƒbƒNƒAƒbƒvƒvƒ‰ƒ“[SSDB]‚ÉŠÜ‚Ü‚ê‚éAƒT[ƒo[SVDB01]‚ğ·•ªƒoƒbƒNƒAƒbƒv‹N“®‚µ‚Ü‚·B
 
 .EXAMPLE
 
 arcserveUDPBackUp.ps1 -Plan SSDB -AllServers -BackUpJobType Full -UDPConsoleServerName BKUPSV01.corp.local
+
+Start full backup targeting all servers in the plan [SSDB]
+and specify arcserve UDP console BKUPSV01.corp.local 
+
 arcserveUDP‚ÌƒoƒbƒNƒAƒbƒvƒvƒ‰ƒ“[SSDB]‚ÉŠÜ‚Ü‚ê‚éA‘S‚Ä‚ÌƒT[ƒo‚ğƒtƒ‹ƒoƒbƒNƒAƒbƒv‹N“®‚µ‚Ü‚·B
 arcserveUDP‚ÌƒRƒ“ƒ\[ƒ‹ƒT[ƒo‚ÍBKUPSV01.corp.local‚ğw’è‚µ‚Ü‚·B
 
 .EXAMPLE
 
+
+
 arcserveUDPBackUp.ps1 -Plan SSDB -Server SVDB02 -BackUpJobType Incr -AuthorizationType PlainText -ExecUser = 'arcserve' -ExecUserDomain = 'INTRA' -ExecUserPassword = 'hogehoge'
+
+Start incremental backup targeting server[SVDB02] in the plan [SSDB] 
+with plain password.
+Specify execution backup domain user [INTRA\arcserve] password [hogehoge]
+You can specify other user from running the script, but you shoud not use plain pssword for security reason.
+
 arcserveUDP‚ÌƒoƒbƒNƒAƒbƒvƒvƒ‰ƒ“[SSDB]‚ÉŠÜ‚Ü‚ê‚éAƒT[ƒo[SVDB02]‚ğ·•ªƒoƒbƒNƒAƒbƒv‹N“®‚µ‚Ü‚·B
 ”FØ•û®‚Í•½•¶ƒpƒXƒ[ƒh‚Æ‚µ‚Ü‚·B
 ƒoƒbƒNƒAƒbƒvƒRƒ“ƒ\[ƒ‹ƒT[ƒo‚ÌŠÇ—ƒ†[ƒU‚ÍƒhƒƒCƒ“ƒ†[ƒUINTRA\arcserveAƒpƒXƒ[ƒh‚Íhogehoge‚ğw’è‚µ‚Ü‚·B
@@ -57,6 +94,14 @@ arcserveUDP‚ÌƒoƒbƒNƒAƒbƒvƒvƒ‰ƒ“[SSDB]‚ÉŠÜ‚Ü‚ê‚éAƒT[ƒo[SVDB02]‚ğ·•ªƒoƒbƒNƒAƒbƒ
 .EXAMPLE
 
 arcserveUDPBackUp.ps1 -Plan SSDB -AllServers -BackUpJobType Full -AuthorizationType JobExecUserAndPasswordFile -ExecUserPasswordFilePath '.\UDP.psw'
+
+Start full backup targeting all servers in the plan [SSDB] 
+Autorization style is execution user of the script and password file.
+You need to make password file in the same user of executing the script.
+Password file name is set with the user name automatically.
+'_[username]' is added to the filename to load.
+If you specify '.\UDP.psw' and execution user is 'Domain\arcserve' , this script load the password file '.\UDP_arcserve.psw'
+
 arcserveUDP‚ÌƒoƒbƒNƒAƒbƒvƒvƒ‰ƒ“[SSDB]‚ÉŠÜ‚Ü‚ê‚éA‘S‚Ä‚ÌƒT[ƒo‚ğƒtƒ‹ƒoƒbƒNƒAƒbƒv‹N“®‚µ‚Ü‚·B
 ”FØ•û®‚ÍƒWƒ‡ƒuÀsƒ†[ƒU‚ÆƒpƒXƒ[ƒhƒtƒ@ƒCƒ‹‚Æ‚µ‚Ü‚·BƒWƒ‡ƒuÀsƒ†[ƒU‚ÅƒoƒbƒNƒAƒbƒvƒRƒ“ƒ\[ƒ‹ƒT[ƒo‚ÉƒƒOƒIƒ“‚µ‚Ü‚·B
 ‚±‚Ì‚ÌƒpƒXƒ[ƒh‚Í—\‚ßƒWƒ‡ƒuÀsƒ†[ƒU‚ÌƒpƒXƒ[ƒhƒtƒ@ƒCƒ‹‚ğì¬‚µ‚Ä‚¨‚­•K—v‚ª‚ ‚è‚Ü‚·B
@@ -65,20 +110,34 @@ arcserveUDP‚ÌƒoƒbƒNƒAƒbƒvƒvƒ‰ƒ“[SSDB]‚ÉŠÜ‚Ü‚ê‚éA‘S‚Ä‚ÌƒT[ƒo‚ğƒtƒ‹ƒoƒbƒNƒAƒbƒv‹
 
 
 .PARAMETER Plan
+Specify the plan in arcserve UDP.
+Specification is required.
+Wild card dose not be accepted.
+
 arcserveUDP‚É“o˜^‚µ‚Ä‚ ‚éƒvƒ‰ƒ“–¼‚ğw’è‚µ‚Ü‚·B
 w’è‚Í•K{‚Å‚·B
 
 ƒƒCƒ‹ƒhƒJ[ƒh*‚Íg—p‚Å‚«‚Ü‚¹‚ñB
 
 .PARAMETER Server
+Specify one server name in the -Plan option.
+Can not specify a server name not in the plan.
+Wild card dose not be accepted.
+
 arcserveUDP‚É“o˜^‚µ‚Ä‚ ‚éƒvƒ‰ƒ“‚ÉŠÜ‚Ü‚ê‚éƒT[ƒo–¼‚ğ1‘ä•ªw’è‚µ‚Ü‚·B
 ƒvƒ‰ƒ“‚ÉŠÜ‚Ü‚ê‚È‚¢ƒT[ƒo‚Íw’è‚Å‚«‚Ü‚¹‚ñB
 ƒƒCƒ‹ƒhƒJ[ƒh*‚Íg—p‚Å‚«‚Ü‚¹‚ñB
 
 .PARAMETER AllServers
+If you want specify all servers in the plan.
+
 arcserveUDP‚É“o˜^‚µ‚Ä‚ ‚éƒvƒ‰ƒ“‚ÉŠÜ‚Ü‚ê‚éƒT[ƒo‘S‚Ä‚ğƒoƒbƒNƒAƒbƒv‘ÎÛ‚É‚µ‚Ü‚·B
 
 .PARAMETER BackUpJobType
+Specify back up type.
+Full:Full BackUp
+Incr:Incremental BackUp
+
 ‘ÎÛ‚ÌƒoƒbƒNƒAƒbƒv•û®‚ğ‚µ‚Ä‚¢‚Ü‚·B
 
 Full:ƒtƒ‹ƒoƒbƒNƒAƒbƒv
@@ -88,27 +147,51 @@ Incr:‘•ªƒoƒbƒNƒAƒbƒv
 
 
 .PARAMETER BackupFlagFilePath
+Specify lock file path of back up status.
+This script generete and save flag file with plan name and server name added.
+If specify -AllServers option, file name be with 'All'
+
 ƒoƒbƒNƒAƒbƒv’†‚ğ¦‚·ƒoƒbƒNƒAƒbƒvƒtƒ@ƒCƒ‹‚Ì•Û‘¶æƒpƒX‚ğw’è‚µ‚Ü‚·B
 ƒtƒ@ƒCƒ‹–¼.Šg’£q‚Åw’è‚µ‚Ü‚·‚ªAƒtƒ@ƒCƒ‹–¼‚É©“®“I‚É_Plan–¼_ƒoƒbƒNƒAƒbƒv‘ÎÛƒT[ƒo–¼‚ğ•t‰Á‚µ‚½ƒtƒ@ƒCƒ‹–¼‚Å•Û‘¶‚µ‚Ü‚·B
 AllServers‚ğw’è‚µ‚½ê‡AƒoƒbƒNƒAƒbƒvƒT[ƒo–¼‚ÍAll‚Æ‚È‚è‚Ü‚·B
 
 
 .PARAMETER PROTOCOL
+
+Specify protocol to logon to arcserve UDP console server.
+http or https are allowed.
+[http] is default.
+
 arcserveUDPƒRƒ“ƒ\[ƒ‹ƒT[ƒo‚ÉƒƒOƒIƒ“‚·‚é‚ÌƒvƒƒgƒRƒ‹‚ğw’è‚µ‚Ü‚·B
 http / https‚ğw’è‚µ‚Ä‚­‚¾‚³‚¢B
 ƒfƒtƒHƒ‹ƒg‚Íhttp‚Å‚·B
 
 .PARAMETER UDPConsolePort
+
+Specify port number to logon to arcserve UDP console server.
+[8015] is default.
+
 arcserveUDPƒRƒ“ƒ\[ƒ‹ƒT[ƒo‚ÉƒƒOƒIƒ“‚·‚é‚Ì’ÊMƒ|[ƒg”Ô†‚ğw’è‚µ‚Ü‚·B
 ƒfƒtƒHƒ‹ƒg‚Í8015‚Å‚·B
 
 
 .PARAMETER UDPCLIPath
+
+Specify arcserve UDP CLI folder path.
+Relative or absolute path format is allowed.
+
 arcserveUDP CLI‚ª”z’u‚³‚ê‚½ƒpƒX‚ğw’è‚µ‚Ü‚·B
 ‘Š‘ÎAâ‘ÎƒpƒX‚Åw’è‰Â”\‚Å‚·B
 
 
 .PARAMETER AuthorizationType
+
+Specify authorization type to logon to the arcserve UDP console server.
+
+JobExecUserAndPasswordFile:script execution user / password file(user name is added to the file name )
+FixedPasswordFile:fixed user / password file
+PlanText:fixed user / plain password string
+
 arcserveUDPƒRƒ“ƒ\[ƒ‹ƒT[ƒo‚ÉƒƒOƒIƒ“‚·‚é”FØ•û®‚ğw’è‚µ‚Ü‚·B
 
 JobExecUserAndPasswordFile:–{ƒvƒƒOƒ‰ƒ€‚ğÀs‚µ‚Ä‚¢‚éƒ†[ƒU / –{ƒvƒƒOƒ‰ƒ€‚ğÀs‚µ‚Ä‚¢‚éƒ†[ƒU–¼‚ğŠÜ‚ŞƒpƒXƒ[ƒhƒtƒ@ƒCƒ‹
@@ -116,6 +199,12 @@ FixedPasswordFile:w’è‚µ‚½ƒ†[ƒU / w’è‚µ‚½ƒpƒXƒ[ƒhƒtƒ@ƒCƒ‹
 PlanText:w’è‚µ‚½ƒ†[ƒU / •½•¶ƒpƒXƒ[ƒh
 
 .PARAMETER ExecUser
+
+Specify OS user to logon to the arcserve UDP console in authorization type PlainText or FixedPasswordFile.
+If domain user runs the script, you specify user name without domain name.
+
+Sample:FooDOMAIN\BarUSER , specify -ExecUser BarUSER
+
 ”FØ•û®‚ğPlainText , FixedPasswordFile‚Æ‚µ‚½‚ÌarcserveUDPƒRƒ“ƒ\[ƒ‹ƒT[ƒoƒƒOƒIƒ“‚ÌOSƒ†[ƒU–¼‚ğw’è‚µ‚Ü‚·B
 ƒhƒƒCƒ“ƒ†[ƒU‚Ìê‡AƒhƒƒCƒ“•”•ª‚ğœ‹‚µ‚½‚à‚Ì‚ğw’è‚µ‚Ä‚­‚¾‚³‚¢B
 
@@ -123,6 +212,12 @@ PlanText:w’è‚µ‚½ƒ†[ƒU / •½•¶ƒpƒXƒ[ƒh
 
 
 .PARAMETER ExecUserDomain
+
+Specify OS user's domain to logon to the arcserve UDP console in authorization type PlainText or FixedPasswordFile.
+
+Sample:FooDOMAIN\BarUSER , specify -ExecDomain FooDOMAIN
+
+
 ”FØ•û®‚ğPlainText , FixedPasswordFile‚Æ‚µ‚½‚ÌarcserveUDPƒRƒ“ƒ\[ƒ‹ƒT[ƒoƒƒOƒIƒ“OSƒ†[ƒU‚ÌƒhƒƒCƒ“–¼‚ğw’è‚µ‚Ü‚·B
 
 —á:FooDOMAIN\BarUSER‚Å‚ ‚ê‚ÎAFooDOMAIN
@@ -132,11 +227,21 @@ PlanText:w’è‚µ‚½ƒ†[ƒU / •½•¶ƒpƒXƒ[ƒh
 
 
 .PARAMETER FixedPasswordFilePath
+Specify password file path in authorization style [FixedPasswordFile] to logon to the arcserve UDP console.
+
 ”FØ•û®‚ğFixedPasswordFile‚Æ‚µ‚½‚ÌarcserveUDPƒRƒ“ƒ\[ƒ‹ƒT[ƒoƒƒOƒIƒ“OSƒ†[ƒU‚ÌƒpƒXƒ[ƒhƒtƒ@ƒCƒ‹‚ğw’è‚µ‚Ü‚·B
 
 
 
 .PARAMETER ExecUserPasswordFilePath
+
+Specify password file path in authorization style [JobExecUserAndPasswordFile] to logon to the arcserve UDP console.
+
+Sample:'.\UDP.psw' , script running user FooDOMAIN\BarUSER
+password file '.UDP_BarUSER.psw' will be loaded automatically.
+
+_ and script running user name is inserted to the path specificated.
+
 ”FØ•û®‚ğJobExecUserAndPasswordFile‚Æ‚µ‚½‚ÌarcserveUDPƒRƒ“ƒ\[ƒ‹ƒT[ƒoƒƒOƒIƒ“OSƒ†[ƒU‚ÌƒpƒXƒ[ƒhƒtƒ@ƒCƒ‹ƒpƒX‚ğw’è‚µ‚Ü‚·B
 
 —á:'.\UDP.psw' , –{ƒvƒƒOƒ‰ƒ€‚ğÀs‚µ‚Ä‚¢‚éƒ†[ƒU‚ªFooDOMAIN\BarUSER
@@ -145,6 +250,9 @@ PlanText:w’è‚µ‚½ƒ†[ƒU / •½•¶ƒpƒXƒ[ƒh
 
 
 .PARAMETER UDPConsoleServerName
+
+Specify arcserve UDP console server's host name or IP address.
+
 arcserveUDPƒRƒ“ƒ\[ƒ‹ƒT[ƒo‚ÌƒzƒXƒg–¼AIPƒAƒhƒŒƒX‚ğw’è‚µ‚Ü‚·B
 
 
