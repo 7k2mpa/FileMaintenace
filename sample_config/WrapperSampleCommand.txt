@@ -36,7 +36,7 @@ Do
 
 -TargetFolder .\TEST\[LOG]
 
-#If specify path with characters not allowed in NTFS(include wild card * ?),
+#If specify path with characters are not allowed in NTFS(include wild card * ?),
 #terminate with Error.
 #If you want to specify the path with wild cards, specify -ParentRegularExpression
 
@@ -50,8 +50,8 @@ Do
 #relative and absolute path format
 
 #Wrapper.ps1 and FileMaintenace.ps1 accept relative and absolute path format.
-#Relative path format dose not base current path, base on the path script placed.
-#Relative path start with dot.
+#Relative path format dose not base on current path, base on the path script placed.
+#Specify a relative path starting with dot.
 
 -TargetFolder ..\Log1
 -TargetFolder .\Log2
