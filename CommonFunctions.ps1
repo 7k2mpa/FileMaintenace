@@ -194,10 +194,10 @@ function Invoke-Action {
 
 [CmdletBinding()]    
 Param(
-[String][parameter(position = 0 ,mandatory)]
+[String][parameter(position = 0, mandatory)]
 [ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|MakeNew(FileWithValue|Folder)|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$")]$ActionType,
 
-[String][parameter(position = 1 ,mandatory ,ValueFromPipeline=$TRUE, ValueFromPipelineByPropertyName=$TRUE)]
+[String][parameter(position = 1, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 [Alias("Path" , "FullName")]$ActionFrom ,
 
 [String]$ActionTo,
@@ -386,8 +386,8 @@ function ConvertTo-AbsolutePath {
 [OutputType([String])]
 [CmdletBinding()]
 Param(
-[String][parameter(position = 0, mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path ,
-[String][parameter(position = 1, ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path ,
+[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name
 )
 
 begin {
@@ -494,7 +494,7 @@ function ConvertTo-FileNameAddTimeStamp {
 [CmdletBinding()]
 
 Param(
-[String][parameter(position = 0, mandatory, ValueFromPipeline=$TRUE, ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFileName")]$Name ,
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("TargetFileName")]$Name ,
 [String][parameter(position = 1, mandatory)]$TimeStampFormat 
 )
 
@@ -537,8 +537,7 @@ function Test-ServiceExist {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
-[String][parameter(position = 0, mandatory, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][Alias("Name")]$ServiceName ,
-#[parameter(mandatory=$TRUE)][String]$ServiceName,
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("Name")]$ServiceName ,
 [Switch]$NoMessage
 )
 begin {
@@ -577,8 +576,8 @@ function Test-ServiceStatus {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
-[String][parameter(position = 0, mandatory, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][Alias("Name")]$ServiceName ,
-[String][parameter(position = 1, ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][ValidateSet("Running", "Stopped")][Alias("Status")]$Health = 'Running',
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("Name")]$ServiceName ,
+[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][ValidateSet("Running", "Stopped")][Alias("Status")]$Health = 'Running',
 [int][ValidateRange(0,2147483647)]$Span = 3,
 [int][ValidateRange(0,2147483647)]$UpTo = 10
 )
@@ -624,8 +623,8 @@ function Test-PathNullOrEmpty {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
-[String][parameter(position = 0, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path ,
-[String][parameter(position = 1, ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
+[String][parameter(position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path ,
+[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name,
 
 [Switch]$IfNullOrEmptyFinalize,
 [Switch]$NoMessage
@@ -659,8 +658,8 @@ function Test-Container {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
-[String][parameter(position = 0, mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path,
-[String][parameter(position = 1, ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path,
+[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name,
 
 [Switch]$IfNoExistFinalize
 )
@@ -695,8 +694,8 @@ function Test-Leaf {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
-[String][parameter(position = 0, mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path,
-[String][parameter(position = 1, ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path,
+[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name,
 
 [Switch]$IfNoExistFinalize
 )
@@ -732,8 +731,8 @@ function Test-LogPath {
 [CmdletBinding()]
 Param(
 
-[String][parameter(position = 0, mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("CheckPath" , "FullName")]$Path,
-[String][parameter(position = 1, ValueFromPipeline=$TRUE ,ValueFromPipelineByPropertyName=$TRUE)][Alias("ObjectName")]$Name,
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path,
+[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name,
 [String]$FileValue = $NULL
 
 )

@@ -272,6 +272,8 @@ If the path contains bracket[] , specify path literally and do not escape.
 .PARAMETER ArchiveFileName
 
 Specify the file name of the archive file with -PreAction Archive option.
+Specify it without extension.
+Extension strings will be added automatically with archive method.
 
 -PreAction Archive指定時のアーカイブファイル名を指定します。
 
@@ -295,7 +297,7 @@ Specify how many days older than today to process files.
 
 Specify size of files to process.
 0 byte is default, and process all files.
-postfix KB,MB,GB is accepted.
+Units of KB,MB,GB are accepted.
 
 　処理対象のファイルを容量でフィルタします。
 デフォルトは0KBで全てのファイルが対象となります。
@@ -325,6 +327,8 @@ PowerShellの仕様上、大文字小文字の区別はしない筈ですが、実際には区別されるので注
 .PARAMETER RenameToRegularExpression
 
 Specify regular expression for rename rule.
+
+https://docs.microsoft.com/ja-jp/dotnet/standard/base-types/substitutions-in-regular-expressions
 
 -PostAction Renameを指定した場合のファイル名正規表現置換規則を指定します。
 -RegularExpressionに対する置換パターンを指定します。
@@ -386,10 +390,18 @@ Specify if you want to terminate as WARNING with no files existed in the folder.
 
 
 .PARAMETER CompressedExtString
+Specify file extention strings in specifing -PreAction Compress option.
+[.zip] is default.
+
 　-PreAction Compress指定時のファイル拡張子を指定できます。
 デフォルトは[.zip]です。
 
 .PARAMETER TimeStampFormat
+Specify time stamp format in specifing -PreAction AddTimeStamp option
+[_yyyyMMdd_HHmmss] is default.
+It is deffernt from time stamp format of script log.
+
+
 　-PreAction AddTimeStamp指定時の書式を指定できます。
 デフォルトは[_yyyyMMdd_HHmmss]です。
 
@@ -541,7 +553,7 @@ https://github.com/7k2mpa/FileMaintenace
 
 #>
 
-[CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
+[CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="High")]
 Param(
 
 [String]
@@ -553,13 +565,13 @@ Param(
  
 
 [Array][parameter(position = 1)][ValidateNotNullOrEmpty()]
-[ValidateSet("none" , "AddTimeStamp" , "Compress", "MoveNewFile" , "Archive" , "7z" , "7zZip")]$PreAction = 'none',
+[ValidateSet("none" , "AddTimeStamp" , "Compress", "MoveNewFile" , "Archive" , "7z" , "7zZip")]$PreAction = 'none' ,
 
 [String][parameter(position = 2)][ValidateNotNullOrEmpty()]
-[ValidateSet("none" , "Move", "Copy", "Delete" , "DeleteEmptyFolders" , "NullClear" , "KeepFilesCount")]$Action = 'none',
+[ValidateSet("none" , "Move", "Copy", "Delete" , "DeleteEmptyFolders" , "NullClear" , "KeepFilesCount")]$Action = 'none' ,
 
 [String][parameter(position = 3)][ValidateNotNullOrEmpty()]
-[ValidateSet("none" , "NullClear" , "Rename")]$PostAction = 'none',
+[ValidateSet("none" , "NullClear" , "Rename")]$PostAction = 'none' ,
 
 
 [String][parameter(position = 4)]
@@ -569,30 +581,29 @@ Param(
 
 [String][ValidateNotNullOrEmpty()][ValidatePattern('^(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$ArchiveFileName = "archive" ,
 
-[Int][ValidateRange(0,2147483647)]$KeepFiles = 1,
-[Int][ValidateRange(0,730000)]$Days = 0,
-[Int64][ValidateRange(0,9223372036854775807)]$Size = 0,
+[Int][ValidateRange(0,2147483647)]$KeepFiles = 1 ,
+[Int][ValidateRange(0,730000)]$Days = 0 ,
+[Int64][ValidateRange(0,9223372036854775807)]$Size = 0 ,
 
 #[Regex][Alias("Regex")]$RegularExpression = '$(.*)\.txt$' , #RenameRegex Sample
 
-[Regex][Alias("Regex")]$RegularExpression = '.*',
-[Regex][Alias("PathRegex")]$ParentRegularExpression = '.*',
+[Regex][Alias("Regex")]$RegularExpression = '.*' ,
+[Regex][Alias("PathRegex")]$ParentRegularExpression = '.*' ,
+[Regex][Alias("RenameRegex")]$RenameToRegularExpression = '$1.log' ,
 
-[Regex][Alias("RenameRegex")]$RenameToRegularExpression = '$1.log',
-
-[Boolean]$Recurse = $TRUE,
-[Switch]$NoRecurse,
+[Boolean]$Recurse = $TRUE ,
+[Switch]$NoRecurse ,
 
 
-[Switch]$OverRide,
-[Switch]$Continue,
-[Switch]$ContinueAsNormal,
-[Switch]$NoneTargetAsWarning,
+[Switch]$OverRide ,
+[Switch]$Continue ,
+[Switch]$ContinueAsNormal ,
+[Switch]$NoneTargetAsWarning ,
 
 [String]$CompressedExtString = '.zip',
-[String][ValidateNotNullOrEmpty()][ValidateScript({ Test-Path $_  -PathType container })]$7zFolder = 'C:\Program Files\7-Zip',
+[String][ValidateNotNullOrEmpty()][ValidateScript({ Test-Path $_  -PathType container })]$7zFolder = 'C:\Program Files\7-Zip' ,
 
-[String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss',
+[String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss' ,
 
 #Switches planned to obsolute please use -PreAction start
 [Switch]$Compress,
@@ -692,7 +703,7 @@ Param(
 [int]$WarningEventID = $WarningEventID ,
 [int]$ErrorEventID = $ErrorEventID ,
 
-[String][parameter(position = 0 , mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)]
+[String][parameter(position = 0 , mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 [Alias("CheckPath" , "FullName")]$Path
 )
 
@@ -827,7 +838,7 @@ Param(
 [Switch]$Recurse = $Recurse,
 [String]$Action = $Action,
 
-[String][parameter(position = 0 , mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetFolder" , "FullName")]$Path ,
+[String][parameter(position = 0 , mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("TargetFolder" , "FullName")]$Path ,
 [String][parameter(position = 1 , mandatory)][ValidateSet("File" , "Folder")]$FilterType
 )
 
@@ -939,7 +950,7 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 
 #7zフォルダの要不要と有無を確認
 
-    IF ( $PreAction -match "^(7z|7zZip)$") {    
+    IF ($PreAction -match "^(7z|7zZip)$") {    
 
         $7zFolder = $7zFolder | ConvertTo-AbsolutePath -Name '-7zFolder'
 
