@@ -196,15 +196,12 @@ https://github.com/7k2mpa/FileMaintenace
 [CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
 Param(
 
-#[String][parameter(position=0,ValueFromPipeline,)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$FlagFolder = '.\',
-
 [String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify the folder of a flag file placed.(ex. D:\Logs)or Get-Help CheckFlag.ps1')]
 [ValidateNotNullOrEmpty()][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')][ValidateScript({ Test-Path $_  -PathType container })][Alias("Path","LiteralPath")]$FlagFolder ,
 
-
-[String][parameter(position= 1, mandatory)][ValidateNotNullOrEmpty()][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
-[String][parameter(position= 2)][ValidateNotNullOrEmpty()][ValidateSet("Exist","NoExist")]$Status = 'NoExist' ,
-[String][parameter(position= 3)][ValidateNotNullOrEmpty()][ValidateSet("Create","Delete")]$PostAction ,
+[String][parameter(position = 1, mandatory)][ValidateNotNullOrEmpty()][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
+[String][parameter(position = 2)][ValidateNotNullOrEmpty()][ValidateSet("Exist","NoExist")]$Status = 'NoExist' ,
+[String][parameter(position = 3)][ValidateNotNullOrEmpty()][ValidateSet("Create","Delete")]$PostAction ,
 
 #Planned to obsolute
 [Switch]$CreateFlag ,
