@@ -1125,8 +1125,8 @@ Param(
 [String]$CompressedExtString =  $CompressedExtString ,
 [String]$TimeStampFormat = $TimeStampFormat ,
 
-[String][parameter(position = 0 ,mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetObject" , "FullName")]$Path , 
-[String][parameter(position = 1 ,mandatory, ValueFromPipelineByPropertyName=$TRUE)][Alias("destinationFolder")]$DestinationPath
+[String][parameter(position = 0 ,mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("TargetObject" , "FullName")]$Path , 
+[String][parameter(position = 1 ,mandatory, ValueFromPipelineByPropertyName)][Alias("destinationFolder")]$DestinationPath
 ) 
 
 begin {
@@ -1216,7 +1216,7 @@ end {
 function Finalize {
 
 Param(
-[parameter(mandatory=$TRUE)][Int]$ReturnCode
+[parameter(mandatory)][Int]$ReturnCode
 )
     $ForceFinalize = $FALSE
  
