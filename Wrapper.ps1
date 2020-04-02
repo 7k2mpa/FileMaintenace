@@ -319,7 +319,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execute Command path is [$($CommandPath)]"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to execute command [$($CommandPath)] with arguments [$($CommandFile)]"
 
 }
 
@@ -329,7 +329,7 @@ Param(
 [parameter(mandatory=$true)][int]$ReturnCode
 )
 
-    IF (-NOT(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))) {
+    IF (-not(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))) {
 
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execution Results NORMAL[$($NormalCount)], WARNING[$($WarningCount)], ERROR[$($ErrorCount)]"
 

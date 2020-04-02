@@ -393,7 +393,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Starting to exec command [$($CommandPath)]‚Å‚·"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to execute command [$($CommandPath)] with arguments [$($CommandFile)]"
 
 }
 
@@ -423,16 +423,16 @@ $Version = '20200330_1000'
 . Initialize
 
     Try {
-
         $line = @(Get-Content -Path $CommandFile -Encoding $CommandFileEncode -TotalCount 1  -ErrorAction Stop)
         }
-                    catch [Exception]
-                    {
-                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to load -CommandFile"
-                    $errorDetail = $Error[0] | Out-String
-                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
-                    Finalize $ErrorReturnCode
-                    }
+
+        catch [Exception] {
+
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to load -CommandFile"
+        $errorDetail = $Error[0] | Out-String
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
+        Finalize $ErrorReturnCode
+        }
 
 
 
@@ -449,7 +449,7 @@ For ( $i = 1 ; $i -le $UpTo ; $i++ ){
 
             }
 
-            catch [Exception]{
+            catch [Exception] {
 
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute [$($CommandPath)]"
             $errorDetail = $Error[0] | Out-String
@@ -474,7 +474,7 @@ For ( $i = 1 ; $i -le $UpTo ; $i++ ){
                                 Start-Sleep -Seconds $Span
                                 Break     
      
-                                }else{
+                                } else {
                                 Finalize $ErrorReturnCode
                                 }
                             }

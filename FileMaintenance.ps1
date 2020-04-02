@@ -74,7 +74,7 @@ https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows
 
 .EXAMPLE
 
-FileMaintenace.ps1 -TargetFolder C:\TEST -noLog2Console
+FileMaintenace.ps1 -TargetFolder C:\TEST -noLog2Console -verbose
 
 Find files in C:\TEST and child folders recuresively.
 Verbose logs are not output at console.
@@ -775,7 +775,7 @@ end {
 }
 
 
-filter ComplexFilter{
+filter ComplexFilter {
 
 <#
 .SYNOPSIS
@@ -1114,8 +1114,8 @@ Param(
 [String]$CompressedExtString =  $CompressedExtString ,
 [String]$TimeStampFormat = $TimeStampFormat ,
 
-[String][parameter(position = 0 , mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetObject" , "FullName")]$Path , 
-[String][parameter(position = 1 , mandatory, ValueFromPipelineByPropertyName=$TRUE)][Alias("destinationFolder")]$DestinationPath
+[String][parameter(position = 0 ,mandatory, ValueFromPipeline=$TRUE , ValueFromPipelineByPropertyName=$TRUE)][Alias("TargetObject" , "FullName")]$Path , 
+[String][parameter(position = 1 ,mandatory, ValueFromPipelineByPropertyName=$TRUE)][Alias("destinationFolder")]$DestinationPath
 ) 
 
 begin {
@@ -1298,7 +1298,7 @@ Write-Verbose ("["+@($targets).Length+"][$($FilterType)(s)] are for processing..
 
 IF ($PreAction -contains 'Archive') {
 
-    IF (($PreAction -contains 'MoveNewFile')) {        
+    IF ($PreAction -contains 'MoveNewFile') {        
 
         $destination = $MoveToFolder
 
@@ -1397,7 +1397,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
     IF (( $PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')) {
 
-        IF (($PreAction -contains 'MoveNewFile')) {        
+        IF ($PreAction -contains 'MoveNewFile') {        
 
             $destination = $destinationFolder
 
