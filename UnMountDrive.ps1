@@ -142,7 +142,9 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[parameter(position = 0, mandatory, HelpMessage = 'Specify Drive Letter (ex. F:) or Get-Help UnMountDrive.ps1')][String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
+[parameter(position = 0, mandatory, HelpMessage = 'Specify Drive Letter (ex. F:) or Get-Help UnMountDrive.ps1')]
+[String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
+
 #[parameter(position=0, mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help UnMountDrive.ps1')][String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
 #[String][ValidatePattern('^[d-z]:$')]$MountedDrive="F:",
 
@@ -249,7 +251,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to u
 function Finalize {
 
 Param(
-[parameter(mandatory=$true)][int]$ReturnCode
+[parameter(mandatory)][int]$ReturnCode
 )
 
 
@@ -289,8 +291,6 @@ Try{
 	    Finalize $ErrorReturnCode
         }
 
-
-
-
 Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Completed to unmount drive ${MountedDrive} successfully."
+
 Finalize $NormalReturnCode     

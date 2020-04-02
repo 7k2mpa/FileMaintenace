@@ -198,13 +198,13 @@ Param(
 
 #[String][parameter(position=0,ValueFromPipeline,)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$FlagFolder = '.\',
 
-[String][parameter(position=0 , mandatory=$true ,ValueFromPipeline, HelpMessage = 'Specify the folder of a flag file placed.(ex. D:\Logs)or Get-Help CheckFlag.ps1')]
-[ValidateNotNullOrEmpty()][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')][ValidateScript({ Test-Path $_  -PathType container })][Alias("Path","LiteralPath")]$FlagFolder,
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify the folder of a flag file placed.(ex. D:\Logs)or Get-Help CheckFlag.ps1')]
+[ValidateNotNullOrEmpty()][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')][ValidateScript({ Test-Path $_  -PathType container })][Alias("Path","LiteralPath")]$FlagFolder ,
 
 
-[String][parameter(position=1 , mandatory=$true)][ValidateNotNullOrEmpty()][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
-[String][parameter(position=2)][ValidateNotNullOrEmpty()][ValidateSet("Exist","NoExist")]$Status = 'NoExist',
-[String][parameter(position=3)][ValidateNotNullOrEmpty()][ValidateSet("Create","Delete")]$PostAction,
+[String][parameter(position= 1, mandatory)][ValidateNotNullOrEmpty()][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
+[String][parameter(position= 2)][ValidateNotNullOrEmpty()][ValidateSet("Exist","NoExist")]$Status = 'NoExist' ,
+[String][parameter(position= 3)][ValidateNotNullOrEmpty()][ValidateSet("Create","Delete")]$PostAction ,
 
 #Planned to obsolute
 [Switch]$CreateFlag ,
@@ -327,7 +327,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Starting t
 function Finalize {
 
 Param(
-[parameter(mandatory=$true)][int]$ReturnCode
+[parameter(mandatory)][int]$ReturnCode
 )
 
  Invoke-PostFinalize $ReturnCode
@@ -356,7 +356,7 @@ Switch -Regex ($Status) {
 
     '^NoExist$' {
 
-        IF ( -not($flagPath | Test-Leaf -Name 'Flag file') -and -not($flagPath | Test-Container -Name 'Same Name folder')) {
+        IF (-not($flagPath | Test-Leaf -Name 'Flag file') -and -not($flagPath | Test-Container -Name 'Same Name folder')) {
 
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exists and terminate as NORMAL." 
 

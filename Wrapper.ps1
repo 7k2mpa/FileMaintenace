@@ -221,13 +221,15 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[parameter(position=0, mandatory=$true , HelpMessage = '起動対象のpowershellプログラムを指定(ex. .\FileMaintenance.ps1) 全てのHelpはGet-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*\.ps1$')]$CommandPath ,
-[parameter(position=1, mandatory=$true , HelpMessage = 'powershellプログラムに指定するコマンドファイルを指定(ex. .\Command.txt) 全てのHelpはGet-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommandFile,
+[parameter(position = 0, mandatory, HelpMessage = '起動対象のpowershellプログラムを指定(ex. .\FileMaintenance.ps1) 全てのHelpはGet-Help Wrapper.ps1')]
+[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*\.ps1$')]$CommandPath ,
 
+[parameter(position = 1, mandatory, HelpMessage = 'powershellプログラムに指定するコマンドファイルを指定(ex. .\Command.txt) 全てのHelpはGet-Help Wrapper.ps1')]
+[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommandFile ,
 
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$CommandFileEncode = 'Default', #Default指定はShift-Jis
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$CommandFileEncode = 'Default' , #Default指定はShift-Jis
 
-[Switch]$Continue,
+[Switch]$Continue ,
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
@@ -326,7 +328,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to e
 function Finalize {
 
 Param(
-[parameter(mandatory=$true)][int]$ReturnCode
+[parameter(mandatory)][int]$ReturnCode
 )
 
     IF (-not(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))) {
@@ -349,9 +351,9 @@ Param(
 
 #####################   ここから本体  ######################
 
-[int][ValidateRange(0,2147483647)]$NormalCount = 0
+[int][ValidateRange(0,2147483647)]$NormalCount  = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
-[int][ValidateRange(0,2147483647)]$ErrorCount = 0
+[int][ValidateRange(0,2147483647)]$ErrorCount   = 0
 
 $DatumPath = $PSScriptRoot
 

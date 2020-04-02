@@ -206,16 +206,19 @@ https://github.com/7k2mpa/FileMaintenace
 Param(
 
 
-[String][parameter(position=0, mandatory=$true ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE, HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help StartService.ps1')]
-[Alias("Name")]$Service ,
+[parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help StartService.ps1')]
+[String][Alias("Name")]$Service ,
 
-[String][parameter(position=1 , mandatory=$true ,ValueFromPipeline=$true, ValueFromPipelineByPropertyName=$TRUE)][ValidateSet("Running", "Stopped")][Alias("Status")]$TargetStatus , 
+[parameter(position = 1, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+[String][ValidateSet("Running", "Stopped")][Alias("Status")]$TargetStatus , 
+
+
 #[String][parameter(position=1)][ValidateSet("Running", "Stopped")]$TargetStatus = 'Running', 
 #[String][parameter(position=1)][ValidateSet("Running", "Stopped")]$TargetStatus = 'Stopped', 
 
 
-[int][parameter(position=2)][ValidateRange(1,65535)]$RetrySpanSec = 3,
-[int][parameter(position=3)][ValidateRange(1,65535)]$RetryTimes = 5,
+[int][parameter(position=2)][ValidateRange(1,65535)]$RetrySpanSec = 3 ,
+[int][parameter(position=3)][ValidateRange(1,65535)]$RetryTimes = 5 ,
 
 
 [boolean]$Log2EventLog = $TRUE,
@@ -319,7 +322,7 @@ Write-Log -Id $InfoEventID -Type Information -Message "Starting to switch Servic
 function Finalize {
 
 Param(
-[parameter(mandatory=$true)][int]$ReturnCode
+[parameter(mandatory)][int]$ReturnCode
 )
 
 
@@ -375,7 +378,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
           Finalize $ErrorReturnCode
           }
 
-    Write-Log -Id $InfoEventID -Type Information -Message "With WMIService.(start|stop)Service , starting to switch Service [$($Service)] status from [$($originalStatus)] to [$($TargetStatus)]"
+    Write-Log -Id $InfoEventID -Type Information -Message "With WMIService.(start|stop)Service, starting to switch Service [$($Service)] status from [$($originalStatus)] to [$($TargetStatus)]"
 
     Switch -Regex ($TargetStatus) {
  
@@ -447,4 +450,5 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
 }
 
 Write-Log -Id $ErrorEventID -Type Error -Message "Although waiting predeterminated times , service [$($Service)] status is not switch to [$($TargetStatus)]"
+
 Finalize $ErrorReturnCode

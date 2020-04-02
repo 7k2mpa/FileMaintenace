@@ -148,11 +148,11 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[String][parameter(position=0, mandatory=$true , HelpMessage = 'Enter IIS site name. To view all help , Get-Help ChangeIISstate.ps1')]$Site ,
+[String][parameter(position = 0, mandatory, HelpMessage = 'Enter IIS site name. To view all help , Get-Help ChangeIISstate.ps1')]$Site ,
 
-[String][parameter(position=1)][ValidateNotNullOrEmpty()][ValidateSet("Started", "Stopped")]$TargetState = 'Stopped' , 
-[int][parameter(position=2)][ValidateRange(1,65535)]$RetrySpanSec = 3,
-[int][parameter(position=3)][ValidateRange(1,65535)]$RetryTimes = 5,
+[String][parameter(position = 1)][ValidateNotNullOrEmpty()][ValidateSet("Started", "Stopped")]$TargetState = 'Stopped' , 
+[int][parameter(position = 2)][ValidateRange(1,65535)]$RetrySpanSec = 3 ,
+[int][parameter(position = 3)][ValidateRange(1,65535)]$RetryTimes = 5 ,
 
 
 [boolean]$Log2EventLog = $TRUE,
@@ -260,7 +260,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Starting t
 function Finalize {
 
 Param(
-[parameter(mandatory=$true)][int]$ReturnCode
+[parameter(mandatory)][int]$ReturnCode
 )
 
 
@@ -349,4 +349,5 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
 }
 
 Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , site [$($Site)] state did not change to [$($TargetState)]."
+
 Finalize $ErrorReturnCode

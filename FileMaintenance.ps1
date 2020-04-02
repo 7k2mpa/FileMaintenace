@@ -703,7 +703,7 @@ Param(
 [int]$WarningEventID = $WarningEventID ,
 [int]$ErrorEventID = $ErrorEventID ,
 
-[String][parameter(position = 0 , mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 [Alias("CheckPath" , "FullName")]$Path
 )
 
@@ -838,8 +838,8 @@ Param(
 [Switch]$Recurse = $Recurse,
 [String]$Action = $Action,
 
-[String][parameter(position = 0 , mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("TargetFolder" , "FullName")]$Path ,
-[String][parameter(position = 1 , mandatory)][ValidateSet("File" , "Folder")]$FilterType
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("TargetFolder" , "FullName")]$Path ,
+[String][parameter(position = 1, mandatory)][ValidateSet("File" , "Folder")]$FilterType
 )
 
 begin {
@@ -1249,9 +1249,9 @@ Param(
 [Boolean]$OverRideFlag  = $FALSE
 [Boolean]$ContinueFlag  = $FALSE
 
-[Int][ValidateRange(0,2147483647)]$ErrorCount = 0
-[Int][ValidateRange(0,2147483647)]$WarningCount = 0
-[Int][ValidateRange(0,2147483647)]$NormalCount = 0
+[Int][ValidateRange(0,2147483647)]$ErrorCount    = 0
+[Int][ValidateRange(0,2147483647)]$WarningCount  = 0
+[Int][ValidateRange(0,2147483647)]$NormalCount   = 0
 [Int][ValidateRange(0,2147483647)]$OverRideCount = 0
 [Int][ValidateRange(0,2147483647)]$ContinueCount = 0
 [Int][ValidateRange(0,2147483647)]$InLoopDeletedFilesCount = 0

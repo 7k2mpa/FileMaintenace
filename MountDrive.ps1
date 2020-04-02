@@ -150,11 +150,11 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[parameter(position = 0, mandatory, HelpMessage = 'Specify UNC Path to mount (ex. \\FileServer\Share) or Get-Help MountDrive.ps1')][String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,    
-[parameter(position = 1, mandatory, HelpMessage = 'Specify Drive Letter (ex. F:)  or Get-Help MountDrive.ps1')][String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive,
+[parameter(position = 0, mandatory, HelpMessage = 'Specify UNC Path to mount (ex. \\FileServer\Share) or Get-Help MountDrive.ps1')]
+[String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,    
 
-#[parameter(position=0, mandatory=$true , HelpMessage = 'UNC Pathを指定(ex. \\FileServer\Share) 全てのHelpはGet-Help MountDrive.ps1')][String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,                                                                          
-#[parameter(position=1, mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help MountDrive.ps1')][String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive,
+[parameter(position = 1, mandatory, HelpMessage = 'Specify Drive Letter (ex. F:)  or Get-Help MountDrive.ps1')]
+[String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive,
 
 #[String][validatePattern("^\\\\\w+\\\w+")]$TargetPath="\\hogehost\hogehoge",                                                                          
 #[String][ValidatePattern("^[d-z]:$")]$MountDrive= 'F:',
@@ -267,7 +267,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to m
 function Finalize {
 
 Param(
-[parameter(mandatory=$true)][int]$ReturnCode
+[parameter(mandatory)][int]$ReturnCode
 )
 
 

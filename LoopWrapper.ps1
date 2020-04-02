@@ -291,16 +291,18 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[parameter(position=0, mandatory=$true , HelpMessage = '起動対象のpowershellプログラムを指定(ex. .\FileMaintenance.ps1) 全てのHelpはGet-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*\.ps1$')]$CommandPath ,
-[parameter(position=1, mandatory=$true , HelpMessage = 'powershellプログラムに指定するコマンドファイルを指定(ex. .\Command.txt) 全てのHelpはGet-Help Wrapper.ps1')][String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommandFile,
+[parameter(position = 0, mandatory, HelpMessage = '起動対象のpowershellプログラムを指定(ex. .\FileMaintenance.ps1) 全てのHelpはGet-Help Wrapper.ps1')]
+[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*\.ps1$')]$CommandPath ,
 
+[parameter(position = 1, mandatory, HelpMessage = 'powershellプログラムに指定するコマンドファイルを指定(ex. .\Command.txt) 全てのHelpはGet-Help Wrapper.ps1')]
+[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommandFile ,
 
-[parameter(position=2)][ValidateRange(1,65535)][int]$Span = 10,
-[parameter(position=3)][ValidateRange(1,65535)][int]$UpTo = 1000,
+[parameter(position = 2)][ValidateRange(1,65535)][int]$Span = 10 ,
+[parameter(position = 3)][ValidateRange(1,65535)][int]$UpTo = 1000 ,
 
-[Switch]$Continue,
+[Switch]$Continue ,
 
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$CommandFileEncode = 'Default', #Default指定はShift-Jis
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$CommandFileEncode = 'Default' , #Default指定はShift-Jis
 
 
 [boolean]$Log2EventLog = $TRUE,
@@ -400,7 +402,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to e
 function Finalize {
 
 Param(
-[parameter(mandatory=$true)][int]$ReturnCode
+[parameter(mandatory)][int]$ReturnCode
 )
 
 
@@ -437,7 +439,7 @@ $Version = '20200330_1000'
 
 
 
-For ( $i = 1 ; $i -le $UpTo ; $i++ ){
+For ( $i = 1 ; $i -le $UpTo ; $i++ ) {
 
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execute 1st line in [$($CommandFile)]"
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Try times [$($i)/$($UpTo)]"
