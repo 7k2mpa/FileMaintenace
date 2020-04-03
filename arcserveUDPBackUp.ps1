@@ -452,7 +452,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 #パラメータの確認
 
-    IF (-NOT($AllServers)) {
+    IF (-not($AllServers)) {
 
         Test-Hostname -CheckHostName $Server -ObjectName 'BackUp target -Server' > $NULL
         }
@@ -474,6 +474,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
     IF (Test-Connection -ComputerName $UDPConsoleServerName -Quiet) {
     
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "UDP Console Server [$($UDPConsoleServerName)] responsed."
+
         } else {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "UDP Console Server [$($UDPConsoleServerName)] did not response. Check -UDPConsoleServerName"
         Exit $ErrorReturnCode
@@ -654,14 +655,14 @@ $Version = '20200221_2145'
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute arcserveUDP CLI [$($UDPCLIPath)]"
             $errorDetail = $ERROR[0] | Out-String
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
-            Finalize $errorReturnCode
+            Finalize $ErrorReturnCode
         }
 
 
         IF ($Return -ne 0) {
                    
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Falied to start backup Server [$($Server)] in the Plan [$($Plan)] Method [$($BackUpJobType)]"
-            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Error Message [$($ErrorMessage)]"
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Error Message [$($drrorMessage)]"
             Finalize $ErrorReturnCode         
             }
 

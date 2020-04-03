@@ -254,7 +254,7 @@ Param(
 
 [String]$SQLLogPath = '.\SC_Logs\SQL.log',
 
-[String][String]$SQLCommandsPath = '.\SQL\SQLs.ps1',
+[String]$SQLCommandsPath = '.\SQL\SQLs.ps1',
 
 [String]$ExecUser = 'hogehoge',
 [String]$ExecUserPassword = 'hogehoge',
@@ -272,7 +272,7 @@ Param(
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
 
 [String]$controlfiledotctlPATH = '.\SC_Logs\file_bk.ctl' ,
-[String]$controlfiledotbkPATH = '.\SC_Logs\controlfile.bk',
+[String]$controlfiledotbkPATH  = '.\SC_Logs\controlfile.bk',
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
@@ -427,12 +427,11 @@ Pop-Location
 
 [boolean]$ErrorFlag = $FALSE
 [boolean]$WarningFlag = $FALSE
-[boolean]$ContinueFlag = $FALSE
+
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
-[int][ValidateRange(0,2147483647)]$OverRideCount = 0
-[int][ValidateRange(0,2147483647)]$ContinueCount = 0
+
 
 [Boolean]$NeedToStartListener = $TRUE
 [String]$ListenerStatus = $NULL
