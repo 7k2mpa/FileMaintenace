@@ -779,6 +779,11 @@ end {
 
 function Test-ExecUser {
 
+Param(
+[Regex]$ExecutableUser = $ExecutableUser
+)
+
+
     $Script:ScriptExecUser = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 
     Write-Log -Id $InfoEventID -Type Information -Message "Executed in user [$($ScriptExecUser.Name)]"
@@ -873,23 +878,28 @@ Exit $returnCode
 
 }
 
-
 function Invoke-SQL {
-[OutputType([boolean])]
+[OutputType([PSObject])]
 [CmdletBinding()]
 Param(
-[String]$SQLLogPath,
-[parameter(mandatory)][String]$SQLName,
-[parameter(mandatory)][String]$SQLCommand,
 
-[Switch]$IfErrorFinalize
+[parameter(position = 0, mandatory)][String]$SQLCommand ,
+[parameter(position = 1, mandatory)][String]$SQLName ,
+[parameter(position = 2)][String]$SQLLogPath = $SQLLogPath ,
+
+[Switch]$IfErrorFinalize ,
+
+
+[Boolean]$PasswordAuthorization = $PasswordAuthorization ,
+[String]$ShellName = $ShellName ,
+[String]$LogFileEncode = $LogFileEncode ,
+[String]$LogDateFormat = $LogDateFormat , 
+[String]$ExecUser = $ExecUser ,
+[String]$ExecUserPassword = $ExecUserPassword
 )
 begin {
     $scriptExecUser = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name
-
     $logFormattedDate = (Get-Date).ToString($LogDateFormat)
-
-    $sqlLog = $NULL
 
 #Powershellではヒアドキュメントの改行はLFとして処理される
 #しかしながら、他のOracleからの出力はLF&CRのため、Windowsメモ帳で開くと改行コードが混在して正しく処理されない
@@ -904,12 +914,18 @@ DATE: $logFormattedDate`r
 SHELL: $ShellName`r
 SQL: $SQLName`r
 `r
-OS User: $ScriptExecUser`r
+OS User: $scriptExecUser`r
 `r
 SQL Exec User: $ExecUser`r
 Password Authrization [$PasswordAuthorization]`r
 `r
 "@
+
+    $invokeResult = New-Object PSObject -Property @{
+    Status = $NULL
+    Log = $NULL
+    }
+
 }
 process {
 
@@ -919,17 +935,15 @@ Push-Location $OracleHomeBinPath
 
     IF ($PasswordAuthorization) {
 
-        $sqlLog = $SQLCommand | SQLPlus.exe $ExecUser/$ExecUserPassword@OracleSerivce as sysdba
+        $invokeResult.Log = $SQLCommand | SQLPlus.exe $ExecUser/$ExecUserPassword@OracleSerivce as sysdba
 
         } else {
-        $sqlLog = $SQLCommand | SQLPlus.exe / as sysdba
+        $invokeResult.log = $SQLCommand | SQLPlus.exe / as sysdba
         }
-
-Write-Output $sqlLog | Out-File -FilePath $SQLLogPath -Append  -Encoding $LogFileEncode
-
 
 Pop-Location
 
+Write-Output $invokeResult.log | Out-File -FilePath $SQLLogPath -Append  -Encoding $LogFileEncode
 
     IF ($LASTEXITCODE -ne 0) {
 
@@ -939,26 +953,29 @@ Pop-Location
             Finalize $ErrorReturnCode
             }
    
-        Write-Output $FALSE
+        $invokeResult.Status = $FALSE
 
         } else {
         Write-Log -Id $SuccessEventID -Type Success -Message "Successfully completed to execute SQL Command[$($SQLName)]"
-        Write-Output $TRUE
+        $invokeResult.Status = $TRUE
         }
+Write-Output $invokeResult
 }
 end {
 }
 }
 
+
 function Test-OracleBackUpMode {
 
 
     Write-Log -Id $InfoEventID -Type Information -Message "Get the backup status of Oracle Database ,determine Oracle Database is running in which mode BackUp/Normal. A line [Active] is in BackUp Mode."
-  . Invoke-SQL -SQLCommand $DBCheckBackUpMode -SQLName "DBCheckBackUpMode" -SQLLogPath $SQLLogPath > $NULL
+    
+    $invokeResult = Invoke-SQL -SQLCommand $DBCheckBackUpMode -SQLName "DBCheckBackUpMode" -SQLLogPath $SQLLogPath
 
    
     #文字列配列に変換する
-    $SQLLog = $SQLLog -replace "`r","" |  ForEach-Object {$_ -split "`n"}
+    $sqlLog = $invokeResult.Log -replace "`r","" |  ForEach-Object {$_ -split "`n"}
 
     $normalModeCount = 0
     $backUpModeCount = 0
@@ -970,7 +987,7 @@ function Test-OracleBackUpMode {
 
     $i = 1
 
-    foreach ($line in $SQLLog) {
+    foreach ($line in $sqlLog) {
 
             IF ($Line -match 'NOT ACTIVE') {
                 $normalModeCount ++

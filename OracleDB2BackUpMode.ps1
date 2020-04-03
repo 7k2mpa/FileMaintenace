@@ -453,9 +453,9 @@ Push-Location $OracleHomeBinPath
 
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Export Session Info."
 
-    $execSQLReturnCode =  . Invoke-SQL -SQLCommand $SessionCheck -SQLName "Check Sessions" -SQLLogPath $SQLLogPath
+    $invokeResult = Invoke-SQL -SQLCommand $SessionCheck -SQLName "Check Sessions" -SQLLogPath $SQLLogPath
  
-    IF ($execSQLReturnCode) {
+    IF ($invokeResult.Status) {
 
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Export Session Info."
 
@@ -470,9 +470,9 @@ Push-Location $OracleHomeBinPath
 
   Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Export Redo Log."
 
-    $execSQLReturnCode = . Invoke-SQL -SQLCommand $ExportRedoLog -SQLName "Export Redo Log" -SQLLogPath $SQLLogPath
+    $invokeResult = Invoke-SQL -SQLCommand $ExportRedoLog -SQLName "Export Redo Log" -SQLLogPath $SQLLogPath
 
-    IF ($execSQLReturnCode) {
+    IF ($invokeResult.Status) {
 
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Export Redo Log."
         
@@ -530,9 +530,9 @@ Push-Location $OracleHomeBinPath
         } else {
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Switch to Back Up Mode"
 
-        $execSQLReturnCode = . Invoke-SQL -SQLCommand $DBBackUpModeOn -SQLName "Switch to Back Up Mode" -SQLLogPath $SQLLogPath
+        $invokeResult = Invoke-SQL -SQLCommand $DBBackUpModeOn -SQLName "Switch to Back Up Mode" -SQLLogPath $SQLLogPath
 
-        IF ($execSQLReturnCode) {
+        IF ($invokeResult.Status) {
 
             Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to switch to Back Up Mode."
             

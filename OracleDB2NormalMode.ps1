@@ -530,9 +530,9 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
 #DBインスタンス状態確認
 
-    $execSQLReturnCode =  . Invoke-SQL -SQLCommand $DBStatus -SQLName 'DB Status Check' -SQLLogPath $SQLLogPath
+    $invokeResult = Invoke-SQL -SQLCommand $DBStatus -SQLName 'DB Status Check' -SQLLogPath $SQLLogPath
 
-    IF (($execSQLReturnCode) -OR ( $SQLLog -match 'ORA-01034')) {
+    IF (($invokeResult.Status) -OR ($invokeResult.log -match 'ORA-01034')) {
 
             Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to check Oracle Database Status."
                 
@@ -541,11 +541,11 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
             }
 
 
-        IF ($SQLLog -match 'OPEN') {
+        IF ($invokeResult.log -match 'OPEN') {
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle instance [SID $($OracleSID)] is already OPEN."
          
   
-        }elseIF ($SQLLog -match '(STARTED|MOUNTED)') {
+        }elseIF ($invokeResult.log -match '(STARTED|MOUNTED)') {
             
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Oracle instance [SID $($OracleSID)] is MOUNT or NOMOUNT. Shutdown and start up manually."
             Finalize $ErrorReturnCode
@@ -555,9 +555,9 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Switch Oracle instance [SID $($OracleSID)] to OPEN."
 
 
-            $execSQLReturnCode = . Invoke-SQL -SQLCommand $DBStart -SQLName 'Oracle DB Instance OPEN' -SQLLogPath $SQLLogPath
+            $invokeResult = Invoke-SQL -SQLCommand $DBStart -SQLName 'Oracle DB Instance OPEN' -SQLLogPath $SQLLogPath
 
-                IF ($execSQLReturnCode) {
+                IF ($invokeResult.Status) {
 
                     Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to switch Oracle instance to OPEN."
                 
@@ -601,9 +601,9 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
  
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle Database is running in Backup Mode. Switch to Normal Mode(Ending Backup Mode)"
 
-        $execSQLReturnCode = . Invoke-SQL -SQLCommand $DBBackUpModeOff -SQLName "Switch to Normal Mode" -SQLLogPath $SQLLogPath
+        $invokeResult = Invoke-SQL -SQLCommand $DBBackUpModeOff -SQLName "Switch to Normal Mode" -SQLLogPath $SQLLogPath
 
-        IF ($execSQLReturnCode) {
+        IF ($invokeResult.Status) {
 
             Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to switch to Normal Mode(Ending Backup Mode)"
 
@@ -621,9 +621,9 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
     $DBExportControlFile = $DBExportControlFile.Replace('&controlfiledotctlPATH' , $controlfiledotctlPATH)
     $DBExportControlFile = $DBExportControlFile.Replace('&controlfiledotbkPATH'  , $controlfiledotbkPATH)
 
-    $execSQLReturnCode = . Invoke-SQL -SQLCommand $DBExportControlFile -SQLName 'DBExportControlFile'  -SQLLogPath $SQLLogPath
+    $invokeResult = Invoke-SQL -SQLCommand $DBExportControlFile -SQLName 'DBExportControlFile'  -SQLLogPath $SQLLogPath
 
-    IF ($execSQLReturnCode) {
+    IF ($invokeResult.Status) {
 
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to export Oracle Control Files."
 
@@ -635,9 +635,9 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
 #Redo Log 強制書き出し
 
-    $execSQLReturnCode = . Invoke-SQL -SQLCommand $ExportRedoLog  -SQLName 'ExportRedoLog'  -SQLLogPath $SQLLogPath 
+    $invokeResult = Invoke-SQL -SQLCommand $ExportRedoLog  -SQLName 'ExportRedoLog'  -SQLLogPath $SQLLogPath 
 
-    IF ($execSQLReturnCode) {
+    IF ($invokeResult.Status) {
 
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to export Redo Log."
 	    
