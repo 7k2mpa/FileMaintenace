@@ -662,7 +662,7 @@ $Version = '20200221_2145'
         IF ($Return -ne 0) {
                    
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Falied to start backup Server [$($Server)] in the Plan [$($Plan)] Method [$($BackUpJobType)]"
-            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Error Message [$($drrorMessage)]"
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Error Message [$($errorMessage)]"
             Finalize $ErrorReturnCode         
             }
 
