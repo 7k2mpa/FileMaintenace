@@ -674,13 +674,11 @@ process {
 
         } else {
         Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] dose not exist."
+        Write-Output $FALSE
             
         IF($IfNoExistFinalize){
             Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
             Finalize $ErrorReturnCode
-
-            } else {
-            Write-Output $FALSE
             }
     }
 }
@@ -711,13 +709,11 @@ process {
         } else {
 
         Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] dose not exist."
+        Write-Output $FALSE
             
         IF($IfNoExistFinalize){
             Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
             Finalize $ErrorReturnCode
-            
-            } else {
-            Write-Output $FALSE
             }
     }
 }
@@ -878,6 +874,7 @@ Exit $returnCode
 
 }
 
+
 function Invoke-SQL {
 [OutputType([PSObject])]
 [CmdletBinding()]
@@ -968,7 +965,16 @@ end {
 
 function Test-OracleBackUpMode {
 
+[OutputType([PSObject])]
+[CmdletBinding()]
+ Param(
+ [String]$DBCheckBackUpMode = $DBCheckBackUpMode ,
+ [String]$SQLLogPath = $SQLLogPath
+ )
 
+ begin {
+ }
+ process {
     Write-Log -Id $InfoEventID -Type Information -Message "Get the backup status of Oracle Database ,determine Oracle Database is running in which mode BackUp/Normal. A line [Active] is in BackUp Mode."
     
     $invokeResult = Invoke-SQL -SQLCommand $DBCheckBackUpMode -SQLName "DBCheckBackUpMode" -SQLLogPath $SQLLogPath
@@ -1025,17 +1031,26 @@ function Test-OracleBackUpMode {
     }
 
     Write-Output $dbStatus
-
+}
+end {
+}
 }
 
 
 function Test-UserName {
 
-Param(
-[parameter(mandatory)][String]$CheckName,
-[String]$ObjectName 
-)
+[OutputType([Boolean])]
+[CmdletBinding()]
 
+Param(
+[parameter(position = 0,  mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][String][Alias("Name")]$CheckName,
+[parameter(position = 1)][String]$ObjectName ,
+
+[Switch]$IfInvalidFinalize
+)
+begin  {
+}
+process {
     Switch -Regex ($CheckUserName) {
 
     '^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z]$' {
@@ -1045,20 +1060,34 @@ Param(
 
     Default {
         Write-Log -Id $ErrorEventID -Type Error -Message "$($ObjectName) [$($CheckUserName)] is invalid user name."
-        Finalize $ErroReturnCode
+        Write-Output $FALSE
+
+        IF($IfInvalidFinalize){
+
+            Finalize $ErrorReturnCode
+            }
         }
     }
-
+}
+end {
+}
 }
 
 
 function Test-DomainName {
 
-Param(
-[parameter(mandatory)][String]$CheckDomainName,
-[String]$ObjectName 
-)
+[OutputType([Boolean])]
+[CmdletBinding()]
 
+Param(
+[parameter(position = 0,  mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][String][Alias("Name")]$CheckDomainName,
+[parameter(position = 1)][String]$ObjectName ,
+
+[Switch]$IfInvalidFinalize
+)
+begin  {
+}
+process {
     Switch -Regex ($CheckDomainName) {
 
     '^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z]$' {
@@ -1068,20 +1097,34 @@ Param(
 
     Default {
         Write-Log -Id $ErrorEventID -Type Error -Message "$($ObjectName) [$($CheckDomainName)] is invalid domain name."
-        Finalize $ErroReturnCode
+        Write-Output $FALSE
+
+        IF($IfInvalidFinalize){
+
+            Finalize $ErrorReturnCode
+            }
         }
     }
-
+}
+end {
+}
 }
 
 
 function Test-Hostname {
 
-Param(
-[parameter(mandatory)][String]$CheckHostName,
-[String]$ObjectName 
-)
+[OutputType([Boolean])]
+[CmdletBinding()]
 
+Param(
+[parameter(position = 0,  mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][String][Alias("Name")]$CheckHostName,
+[parameter(position = 1)][String]$ObjectName ,
+
+[Switch]$IfInValidFinalize
+)
+begin  {
+}
+process {
     Switch -Regex ($CheckHostName) {
 
     '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$' {
@@ -1096,10 +1139,17 @@ Param(
 
     Default {
         Write-Log -Id $ErrorEventID -Type Error -Message "$($ObjectName) [$($CheckHostName)] is invalid Hostname."
-        Finalize $ErroReturnCode
+        Write-Output $FALSE
+
+        IF($IfInvalidFinalize){
+
+            Finalize $ErrorReturnCode
+            }
         }
     }
-
+}
+end {
+}
 #ValidIpAddressRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
 
 #ValidHostnameRegex = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$";

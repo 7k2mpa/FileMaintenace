@@ -454,18 +454,18 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
     IF (-not($AllServers)) {
 
-        Test-Hostname -CheckHostName $Server -ObjectName 'BackUp target -Server' > $NULL
+        $Server | Test-Hostname -ObjectName 'BackUp target -Server' -IfInvalidFinalize > $NULL
         }
 
-    Test-Hostname -CheckHostName $UDPConsoleServerName -ObjectName 'arcserveUDP Console Server -UDPConsoleServerName' > $NULL
+    $UDPConsoleServerName | Test-Hostname -ObjectName 'arcserveUDP Console Server -UDPConsoleServerName' -IfInvalidFinalize > $NULL
 
 #[String][ValidateSet("JobExecUserAndPasswordFile","FixedPasswordFile" , "PlanText")]$AuthorizationType = 'JobExecUserAndPasswordFile' ,
 
 
     IF ($AuthorizationType -match '^(FixedPasswordFile|PlainText)$' ) {
 
-        Test-DomainName -CheckDomainName $ExecUserDomain -ObjectName 'The domain of execution user -ExecUserDomain'  > $NULL    
-        Test-UserName -CheckUserName $ExecUser -ObjectName 'Execution user -ExecUser ' > $NULL
+        $ExecUserDomain | Test-DomainName -ObjectName 'The domain of execution user -ExecUserDomain' -IfInvalidFinalize > $NULL    
+        $ExecUser | Test-UserName -ObjectName 'Execution user -ExecUser ' -IfInvalidFinalize > $NULL
 
         }
 
@@ -477,7 +477,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
         } else {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "UDP Console Server [$($UDPConsoleServerName)] did not response. Check -UDPConsoleServerName"
-        Exit $ErrorReturnCode
+        Finalize $ErrorReturnCode
         }
 
 
@@ -508,7 +508,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
     $UDPCLIPath = $UDPCLIPath | ConvertTo-AbsolutePath -Name 'arcserveUDP CLI -UDPCLIPath'
 
-    $UDPCLIPath  | Test-Leaf -Name 'arcserveUDP CLI -UDPCLIPath' -IfNoExistFinalize > $NULL
+    $UDPCLIPath | Test-Leaf -Name 'arcserveUDP CLI -UDPCLIPath' -IfNoExistFinalize > $NULL
 
 
 
