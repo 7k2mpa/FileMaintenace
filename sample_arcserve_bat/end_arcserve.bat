@@ -8,7 +8,7 @@ cd /D %SC_DIR%
 
 set P_NAME=FileMaintenance.ps1
 
-powershell -Noninteractive -Command ".\FileMaintenance.ps1 -TargetFolder .\Lock -Action Delete ; exit $LASTEXITCODE"
+powershell -Noninteractive -Command ".\%P_NAME% -TargetFolder .\Lock -Action Delete ; exit $LASTEXITCODE"
 
 	IF %errorlevel%==8 (
 		call %SC_DIR%MSGPRINT.bat "%P_NAME% terminated as Error. Error LevelÅÅ%errorlevel%" ERROR 100

@@ -9,7 +9,7 @@ cd /D %SC_DIR%
 
 set P_NAME=CheckFlag.ps1
 
-powershell -Noninteractive -Command ".\CheckFlag.ps1 -FlagFolder .\Lock -FlagFile BkupDB.flg ; exit $LASTEXITCODE"
+powershell -Noninteractive -Command ".\%P_NAME% -FlagFolder .\Lock -FlagFile BkupDB.flg  -Status NoExist ; exit $LASTEXITCODE"
 
 	IF not %errorlevel%==0 (
 		call %SC_DIR%MSGPRINT.bat "%P_NAME% terminated as Error. Erro LevelÅÅ%errorlevel%" ERROR 100
@@ -20,7 +20,7 @@ powershell -Noninteractive -Command ".\CheckFlag.ps1 -FlagFolder .\Lock -FlagFil
 set P_NAME=OracleDB2BackUpMode.ps1
 
 
-powershell -Noninteractive -Command ".\OracleDB2BackUpMode.ps1 -NoChangeToBackUpMode ; exit $LASTEXITCODE"
+powershell -Noninteractive -Command ".\%P_NAME% -NoChangeToBackUpMode ; exit $LASTEXITCODE"
 
 	IF %errorlevel%==8 (
 		call %SC_DIR%MSGPRINT.bat "%P_NAME% terminated as Error. Erro LevelÅÅ%errorlevel%" ERROR 100
@@ -30,7 +30,7 @@ powershell -Noninteractive -Command ".\OracleDB2BackUpMode.ps1 -NoChangeToBackUp
 
 set P_NAME=CheckFlag.ps1
 
-powershell -Noninteractive -Command ".\CheckFlag.ps1 -FlagFolder .\Lock -FlagFile BkupDB.flg -CreateFlag ; exit $LASTEXITCODE"
+powershell -Noninteractive -Command ".\%P_NAME% -FlagFolder .\Lock -FlagFile BkupDB.flg -Status NoExist -PostAction Create ; exit $LASTEXITCODE"
 
 	IF not %errorlevel%==0 (
 		call %SC_DIR%MSGPRINT.bat "%P_NAME% terminated as Error. Erro LevelÅÅ%errorlevel%" ERROR 100
