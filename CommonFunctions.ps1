@@ -458,7 +458,7 @@ Process {
     IF ($Path.EndsWith('\')) {
     
             Write-Log -Id $InfoEventID -Type Information -Message "Windows path format allows the end of path with a path separator '\' , due to processing limitation, remove it."
-            $Path = $Path.Substring(0 , $Path.Length -1)
+            $Path = $Path.Substring(0, $Path.Length -1)
             }
 
 
@@ -600,14 +600,14 @@ Param(
 
         IF (($Span -eq 0) -and ($UpTo -eq 1)) {
                 
-                Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists and status is [$($service.Status)]"
-                Return $FALSE
-                }
+            Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists and status is [$($service.Status)]"
+            Return $FALSE
+            }
 
         # 指定間隔(秒)待機
 
         Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists and status is [$($Service.Status)] , is not [$($Health)] Wait for $($Span)seconds."
-        Start-sleep $Span
+        Start-Sleep $Span
     }
 
     # サービスは指定状態へ遷移しなかった
@@ -640,9 +640,9 @@ process {
 
         IF ($IfNullOrEmptyFinalize) {
            
-               Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
-               Finalize $ErrorReturnCode
-               }                
+           Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
+           Finalize $ErrorReturnCode
+           }                
 
         } else {
         Write-Output $FALSE 
@@ -779,16 +779,14 @@ Param(
 [Regex]$ExecutableUser = $ExecutableUser
 )
 
-
     $Script:ScriptExecUser = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 
     Write-Log -Id $InfoEventID -Type Information -Message "Executed in user [$($ScriptExecUser.Name)]"
 
     IF (-not($ScriptExecUser.Name -match $ExecutableUser)) {
-                Write-Log -Type Error -Id $ErrorEventID -Message "Executed in an unauthorized user."
-                Finalize $ErrorReturnCode
-                }
-
+        Write-Log -Type Error -Id $ErrorEventID -Message "Executed in an unauthorized user."
+        Finalize $ErrorReturnCode
+        }
 }
 
 
@@ -995,15 +993,15 @@ function Test-OracleBackUpMode {
 
     foreach ($line in $sqlLog) {
 
-            IF ($Line -match 'NOT ACTIVE') {
-                $normalModeCount ++
-                Write-Log -Id $InfoEventID -Type Information -Message "[$line] line[$i] Normal Mode"
+        IF ($line -match 'NOT ACTIVE') {
+            $normalModeCount ++
+            Write-Log -Id $InfoEventID -Type Information -Message "[$line] line[$i] Normal Mode"
  
  
-                } elseIF ($Line -match 'ACTIVE') {
-                $backUpModeCount ++
-                Write-Log -Id $InfoEventID -Type Information -Message "[$line] line[$i] BackUp Mode"
-                }
+            } elseIF ($line -match 'ACTIVE') {
+            $backUpModeCount ++
+            Write-Log -Id $InfoEventID -Type Information -Message "[$line] line[$i] BackUp Mode"
+            }
  
     $i ++
     }
@@ -1053,20 +1051,20 @@ begin  {
 process {
     Switch -Regex ($CheckUserName) {
 
-    '^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z]$' {
-        Write-Log -Id $InfoEventID -Type Information -Message "$($ObjectName) [$($CheckUserName)] is valid user name."
-        Write-Output $TRUE     
-        }
-
-    Default {
-        Write-Log -Id $ErrorEventID -Type Error -Message "$($ObjectName) [$($CheckUserName)] is invalid user name."
-        Write-Output $FALSE
-
-        IF($IfInvalidFinalize){
-
-            Finalize $ErrorReturnCode
+        '^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z]$' {
+            Write-Log -Id $InfoEventID -Type Information -Message "$($ObjectName) [$($CheckUserName)] is valid user name."
+            Write-Output $TRUE     
             }
-        }
+
+        Default {
+            Write-Log -Id $ErrorEventID -Type Error -Message "$($ObjectName) [$($CheckUserName)] is invalid user name."
+            Write-Output $FALSE
+
+            IF($IfInvalidFinalize){
+
+                Finalize $ErrorReturnCode
+                }
+            }
     }
 }
 end {
@@ -1090,20 +1088,20 @@ begin  {
 process {
     Switch -Regex ($CheckDomainName) {
 
-    '^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z]$' {
-        Write-Log -Id $InfoEventID -Type Information -Message "$($ObjectName) [$($CheckDomainName)] is valid domain name."
-        Write-Output $TRUE     
-        }
-
-    Default {
-        Write-Log -Id $ErrorEventID -Type Error -Message "$($ObjectName) [$($CheckDomainName)] is invalid domain name."
-        Write-Output $FALSE
-
-        IF($IfInvalidFinalize){
-
-            Finalize $ErrorReturnCode
+        '^[a-zA-Z][a-zA-Z0-9-]{1,61}[a-zA-Z]$' {
+            Write-Log -Id $InfoEventID -Type Information -Message "$($ObjectName) [$($CheckDomainName)] is valid domain name."
+            Write-Output $TRUE     
             }
-        }
+
+        Default {
+            Write-Log -Id $ErrorEventID -Type Error -Message "$($ObjectName) [$($CheckDomainName)] is invalid domain name."
+            Write-Output $FALSE
+
+            IF($IfInvalidFinalize){
+
+                Finalize $ErrorReturnCode
+                }
+            }
     }
 }
 end {
@@ -1127,25 +1125,25 @@ begin  {
 process {
     Switch -Regex ($CheckHostName) {
 
-    '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$' {
-        Write-Log -Id $InfoEventID -Type Information -Message "$($ObjectName) [$($CheckHostName)] is valid IP Address."
-        Write-Output $TRUE     
-        }
-
-    '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$' {
-        Write-Log -Id $InfoEventID -Type Information -Message "$($ObjectName) [$($CheckHostName)] is valid Hostname."
-        Write-Output $TRUE                
-        }
-
-    Default {
-        Write-Log -Id $ErrorEventID -Type Error -Message "$($ObjectName) [$($CheckHostName)] is invalid Hostname."
-        Write-Output $FALSE
-
-        IF($IfInvalidFinalize){
-
-            Finalize $ErrorReturnCode
+        '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$' {
+            Write-Log -Id $InfoEventID -Type Information -Message "$($ObjectName) [$($CheckHostName)] is valid IP Address."
+            Write-Output $TRUE     
             }
-        }
+
+        '^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$' {
+            Write-Log -Id $InfoEventID -Type Information -Message "$($ObjectName) [$($CheckHostName)] is valid Hostname."
+            Write-Output $TRUE                
+            }
+
+        Default {
+            Write-Log -Id $ErrorEventID -Type Error -Message "$($ObjectName) [$($CheckHostName)] is invalid Hostname."
+            Write-Output $FALSE
+
+            IF($IfInvalidFinalize){
+
+                Finalize $ErrorReturnCode
+                }
+            }
     }
 }
 end {
