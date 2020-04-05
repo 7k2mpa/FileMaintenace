@@ -1,4 +1,4 @@
-ï»¿#Requires -Version 3.0
+#Requires -Version 3.0
 
 
 <#
@@ -36,92 +36,92 @@ Specify IIS site state 'Started' or 'Stopped'
 
 
 .PARAMETER RetrySpanSec
-ã€€ã‚µãƒ¼ãƒ“ã‚¹åœæ­¢å†ç¢ºèªã®é–“éš”ç§’æ•°ã‚’æŒ‡å®šã—ã¾ã™ã€‚
-ã‚µãƒ¼ãƒ“ã‚¹ã«ã‚ˆã£ã¦ã¯æ•°ç§’å¿…è¦ãªã‚‚ã®ã‚‚ã‚ã‚‹ã®ã§é©åˆ‡ãªç§’æ•°ã«è¨­å®šã—ã¦ä¸‹ã•ã„ã€‚
-ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯3ç§’ã§ã™ã€‚
+@ƒT[ƒrƒX’âŽ~ÄŠm”F‚ÌŠÔŠu•b”‚ðŽw’è‚µ‚Ü‚·B
+ƒT[ƒrƒX‚É‚æ‚Á‚Ä‚Í”•b•K—v‚È‚à‚Ì‚à‚ ‚é‚Ì‚Å“KØ‚È•b”‚ÉÝ’è‚µ‚Ä‰º‚³‚¢B
+ƒfƒtƒHƒ‹ƒg‚Í3•b‚Å‚·B
 
 .PARAMETER RetryTimes
-ã€€ã‚µãƒ¼ãƒ“ã‚¹åœæ­¢å†ç¢ºèªã®å›žæ•°ã‚’æŒ‡å®šã—ã¾ã™ã€‚
-ã‚µãƒ¼ãƒ“ã‚¹ã«ã‚ˆã£ã¦ã¯æ•°ç§’å¿…è¦ãªã‚‚ã®ã‚‚ã‚ã‚‹ã®ã§é©åˆ‡ãªå›žæ•°ã«è¨­å®šã—ã¦ä¸‹ã•ã„ã€‚
-ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯5å›žã§ã™ã€‚
+@ƒT[ƒrƒX’âŽ~ÄŠm”F‚Ì‰ñ”‚ðŽw’è‚µ‚Ü‚·B
+ƒT[ƒrƒX‚É‚æ‚Á‚Ä‚Í”•b•K—v‚È‚à‚Ì‚à‚ ‚é‚Ì‚Å“KØ‚È‰ñ”‚ÉÝ’è‚µ‚Ä‰º‚³‚¢B
+ƒfƒtƒHƒ‹ƒg‚Í5‰ñ‚Å‚·B
 
 
 
 
 
 .PARAMETER Log2EventLog
-ã€€Windows Event Logã¸ã®å‡ºåŠ›ã‚’åˆ¶å¾¡ã—ã¾ã™ã€‚
-ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯$TRUEã§Event Logå‡ºåŠ›ã—ã¾ã™ã€‚
+@Windows Event Log‚Ö‚Ìo—Í‚ð§Œä‚µ‚Ü‚·B
+ƒfƒtƒHƒ‹ƒg‚Í$TRUE‚ÅEvent Logo—Í‚µ‚Ü‚·B
 
 .PARAMETER NoLog2EventLog
-ã€€Event Logå‡ºåŠ›ã‚’æŠ‘æ­¢ã—ã¾ã™ã€‚-Log2EventLog $Falseã¨ç­‰ä¾¡ã§ã™ã€‚
+@Event Logo—Í‚ð—}Ž~‚µ‚Ü‚·B-Log2EventLog $False‚Æ“™‰¿‚Å‚·B
 
 .PARAMETER ProviderName
-ã€€Windows Event Logå‡ºåŠ›ã®ãƒ—ãƒ­ãƒã‚¤ãƒ€åã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯[Infra]ã§ã™ã€‚
+@Windows Event Logo—Í‚ÌƒvƒƒoƒCƒ_–¼‚ðŽw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í[Infra]‚Å‚·B
 
 .PARAMETER EventLogLogName
-ã€€Windows Event Logå‡ºåŠ›ã®ãƒ­ã‚°åã‚’ã—ã¦ã„ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯[Application]ã§ã™ã€‚
+@Windows Event Logo—Í‚ÌƒƒO–¼‚ð‚µ‚Ä‚¢‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í[Application]‚Å‚·B
 
 .PARAMETER Log2Console 
-ã€€ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ã¸ã®ãƒ­ã‚°å‡ºåŠ›ã‚’åˆ¶å¾¡ã—ã¾ã™ã€‚
-ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯$TRUEã§ã‚³ãƒ³ã‚½ãƒ¼ãƒ«å‡ºåŠ›ã—ã¾ã™ã€‚
+@ƒRƒ“ƒ\[ƒ‹‚Ö‚ÌƒƒOo—Í‚ð§Œä‚µ‚Ü‚·B
+ƒfƒtƒHƒ‹ƒg‚Í$TRUE‚ÅƒRƒ“ƒ\[ƒ‹o—Í‚µ‚Ü‚·B
 
 .PARAMETER NoLog2Console
-ã€€ã‚³ãƒ³ã‚½ãƒ¼ãƒ«ãƒ­ã‚°å‡ºåŠ›ã‚’æŠ‘æ­¢ã—ã¾ã™ã€‚-Log2Console $Falseã¨ç­‰ä¾¡ã§ã™ã€‚
+@ƒRƒ“ƒ\[ƒ‹ƒƒOo—Í‚ð—}Ž~‚µ‚Ü‚·B-Log2Console $False‚Æ“™‰¿‚Å‚·B
 
 .PARAMETER Log2File
-ã€€ãƒ­ã‚°ãƒ•ã‚£ãƒ«ã¸ã®å‡ºåŠ›ã‚’åˆ¶å¾¡ã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯$Falseã§ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›ã—ã¾ã›ã‚“ã€‚
+@ƒƒOƒtƒBƒ‹‚Ö‚Ìo—Í‚ð§Œä‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í$False‚ÅƒƒOƒtƒ@ƒCƒ‹o—Í‚µ‚Ü‚¹‚ñB
 
 .PARAMETER NoLog2File
-ã€€ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›ã‚’æŠ‘æ­¢ã—ã¾ã™ã€‚-Log2File $Falseã¨ç­‰ä¾¡ã§ã™ã€‚
+@ƒƒOƒtƒ@ƒCƒ‹o—Í‚ð—}Ž~‚µ‚Ü‚·B-Log2File $False‚Æ“™‰¿‚Å‚·B
 
 .PARAMETER LogPath
-ã€€ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›ãƒ‘ã‚¹ã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯$NULLã§ã™ã€‚
-ç›¸å¯¾ã€çµ¶å¯¾ãƒ‘ã‚¹ã§æŒ‡å®šå¯èƒ½ã§ã™ã€‚
-ãƒ•ã‚¡ã‚¤ãƒ«ãŒå­˜åœ¨ã—ãªã„å ´åˆã¯æ–°è¦ä½œæˆã—ã¾ã™ã€‚
-ãƒ•ã‚¡ã‚¤ãƒ«ãŒæ—¢å­˜ã®å ´åˆã¯è¿½è¨˜ã—ã¾ã™ã€‚
+@ƒƒOƒtƒ@ƒCƒ‹o—ÍƒpƒX‚ðŽw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í$NULL‚Å‚·B
+‘Š‘ÎAâ‘ÎƒpƒX‚ÅŽw’è‰Â”\‚Å‚·B
+ƒtƒ@ƒCƒ‹‚ª‘¶Ý‚µ‚È‚¢ê‡‚ÍV‹Kì¬‚µ‚Ü‚·B
+ƒtƒ@ƒCƒ‹‚ªŠù‘¶‚Ìê‡‚Í’Ç‹L‚µ‚Ü‚·B
 
 .PARAMETER LogDateFormat
-ã€€ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›ã«å«ã¾ã‚Œã‚‹æ—¥æ™‚è¡¨ç¤ºãƒ•ã‚©ãƒ¼ãƒžãƒƒãƒˆã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯[yyyy-MM-dd-HH:mm:ss]å½¢å¼ã§ã™ã€‚
+@ƒƒOƒtƒ@ƒCƒ‹o—Í‚ÉŠÜ‚Ü‚ê‚é“úŽž•\Ž¦ƒtƒH[ƒ}ƒbƒg‚ðŽw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í[yyyy-MM-dd-HH:mm:ss]Œ`Ž®‚Å‚·B
 
 .PARAMETER NormalReturnCode
-ã€€æ­£å¸¸çµ‚äº†æ™‚ã®ãƒªã‚¿ãƒ¼ãƒ³ã‚³ãƒ¼ãƒ‰ã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯0ã§ã™ã€‚æ­£å¸¸çµ‚äº†=<è­¦å‘Šçµ‚äº†=<ï¼ˆå†…éƒ¨ï¼‰ç•°å¸¸çµ‚äº†ã¨ã—ã¦ä¸‹ã•ã„ã€‚
+@³íI—¹Žž‚ÌƒŠƒ^[ƒ“ƒR[ƒh‚ðŽw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í0‚Å‚·B³íI—¹=<ŒxI—¹=<i“à•”jˆÙíI—¹‚Æ‚µ‚Ä‰º‚³‚¢B
 
 .PARAMETER WarningReturnCode
-ã€€è­¦å‘Šçµ‚äº†æ™‚ã®ãƒªã‚¿ãƒ¼ãƒ³ã‚³ãƒ¼ãƒ‰ã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯1ã§ã™ã€‚æ­£å¸¸çµ‚äº†=<è­¦å‘Šçµ‚äº†=<ï¼ˆå†…éƒ¨ï¼‰ç•°å¸¸çµ‚äº†ã¨ã—ã¦ä¸‹ã•ã„ã€‚
+@ŒxI—¹Žž‚ÌƒŠƒ^[ƒ“ƒR[ƒh‚ðŽw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í1‚Å‚·B³íI—¹=<ŒxI—¹=<i“à•”jˆÙíI—¹‚Æ‚µ‚Ä‰º‚³‚¢B
 
 .PARAMETER ErrorReturnCode
-ã€€ç•°å¸¸çµ‚äº†æ™‚ã®ãƒªã‚¿ãƒ¼ãƒ³ã‚³ãƒ¼ãƒ‰ã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯8ã§ã™ã€‚æ­£å¸¸çµ‚äº†=<è­¦å‘Šçµ‚äº†=<ï¼ˆå†…éƒ¨ï¼‰ç•°å¸¸çµ‚äº†ã¨ã—ã¦ä¸‹ã•ã„ã€‚
+@ˆÙíI—¹Žž‚ÌƒŠƒ^[ƒ“ƒR[ƒh‚ðŽw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í8‚Å‚·B³íI—¹=<ŒxI—¹=<i“à•”jˆÙíI—¹‚Æ‚µ‚Ä‰º‚³‚¢B
 
 .PARAMETER InternalErrorReturnCode
-ã€€ãƒ—ãƒ­ã‚°ãƒ©ãƒ å†…éƒ¨ç•°å¸¸çµ‚äº†æ™‚ã®ãƒªã‚¿ãƒ¼ãƒ³ã‚³ãƒ¼ãƒ‰ã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯16ã§ã™ã€‚æ­£å¸¸çµ‚äº†=<è­¦å‘Šçµ‚äº†=<ï¼ˆå†…éƒ¨ï¼‰ç•°å¸¸çµ‚äº†ã¨ã—ã¦ä¸‹ã•ã„ã€‚
+@ƒvƒƒOƒ‰ƒ€“à•”ˆÙíI—¹Žž‚ÌƒŠƒ^[ƒ“ƒR[ƒh‚ðŽw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í16‚Å‚·B³íI—¹=<ŒxI—¹=<i“à•”jˆÙíI—¹‚Æ‚µ‚Ä‰º‚³‚¢B
 
 .PARAMETER InfoEventID
-ã€€Event Logå‡ºåŠ›ã§Informationã«å¯¾ã™ã‚‹Event IDã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯1ã§ã™ã€‚
+@Event Logo—Í‚ÅInformation‚É‘Î‚·‚éEvent ID‚ðŽw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í1‚Å‚·B
 
 .PARAMETER WarningEventID
-ã€€Event Logå‡ºåŠ›ã§Warningã«å¯¾ã™ã‚‹Event IDã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯10ã§ã™ã€‚
+@Event Logo—Í‚ÅWarning‚É‘Î‚·‚éEvent ID‚ðŽw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í10‚Å‚·B
 
 .PARAMETER SuccessErrorEventID
-ã€€Event Logå‡ºåŠ›ã§Successã«å¯¾ã™ã‚‹Event IDã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯73ã§ã™ã€‚
+@Event Logo—Í‚ÅSuccess‚É‘Î‚·‚éEvent ID‚ðŽw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í73‚Å‚·B
 
 .PARAMETER InternalErrorEventID
-ã€€Event Logå‡ºåŠ›ã§Internal Errorã«å¯¾ã™ã‚‹Event IDã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯99ã§ã™ã€‚
+@Event Logo—Í‚ÅInternal Error‚É‘Î‚·‚éEvent ID‚ðŽw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í99‚Å‚·B
 
 .PARAMETER ErrorEventID
-ã€€Event Logå‡ºåŠ›ã§Errorã«å¯¾ã™ã‚‹Event IDã‚’æŒ‡å®šã—ã¾ã™ã€‚ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯100ã§ã™ã€‚
+@Event Logo—Í‚ÅError‚É‘Î‚·‚éEvent ID‚ðŽw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í100‚Å‚·B
 
 .PARAMETER ErrorAsWarning
-ã€€ç•°å¸¸çµ‚äº†ã—ã¦ã‚‚è­¦å‘Šçµ‚äº†ã®ReturnCodeã‚’è¿”ã—ã¾ã™ã€‚
+@ˆÙíI—¹‚µ‚Ä‚àŒxI—¹‚ÌReturnCode‚ð•Ô‚µ‚Ü‚·B
 
 .PARAMETER WarningAsNormal
-ã€€è­¦å‘Šçµ‚äº†ã—ã¦ã‚‚æ­£å¸¸çµ‚äº†ã®ReturnCodeã‚’è¿”ã—ã¾ã™ã€‚
+@ŒxI—¹‚µ‚Ä‚à³íI—¹‚ÌReturnCode‚ð•Ô‚µ‚Ü‚·B
 
 .PARAMETER ExecutableUser
-ã€€ã“ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã‚’å®Ÿè¡Œå¯èƒ½ãªãƒ¦ãƒ¼ã‚¶ã‚’æ­£è¦è¡¨ç¾ã§æŒ‡å®šã—ã¾ã™ã€‚
-ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯[.*]ã§å…¨ã¦ã®ãƒ¦ãƒ¼ã‚¶ãŒå®Ÿè¡Œå¯èƒ½ã§ã™ã€‚ã€€
-è¨˜è¿°ã¯ã‚·ãƒ³ã‚°ãƒ«ã‚¯ã‚ªãƒ¼ãƒ†ãƒ¼ã‚·ãƒ§ãƒ³ã§æ‹¬ã£ã¦ä¸‹ã•ã„ã€‚
-æ­£è¦è¡¨ç¾ã®ãŸã‚ã€ãƒ‰ãƒ¡ã‚¤ãƒ³ã®ãƒãƒƒã‚¯ã‚¹ãƒ©ãƒƒã‚·ãƒ¥ã¯[domain\\.*]ã®æ§˜ã«ãƒãƒƒã‚¯ã‚¹ãƒ©ãƒƒã‚·ãƒ¥ã§ã‚¨ã‚¹ã‚±ãƒ¼ãƒ—ã—ã¦ä¸‹ã•ã„ã€‚ã€€
+@‚±‚ÌƒvƒƒOƒ‰ƒ€‚ðŽÀs‰Â”\‚Èƒ†[ƒU‚ð³‹K•\Œ»‚ÅŽw’è‚µ‚Ü‚·B
+ƒfƒtƒHƒ‹ƒg‚Í[.*]‚Å‘S‚Ä‚Ìƒ†[ƒU‚ªŽÀs‰Â”\‚Å‚·B@
+‹Lq‚ÍƒVƒ“ƒOƒ‹ƒNƒI[ƒe[ƒVƒ‡ƒ“‚ÅŠ‡‚Á‚Ä‰º‚³‚¢B
+³‹K•\Œ»‚Ì‚½‚ßAƒhƒƒCƒ“‚ÌƒoƒbƒNƒXƒ‰ƒbƒVƒ…‚Í[domain\\.*]‚Ì—l‚ÉƒoƒbƒNƒXƒ‰ƒbƒVƒ…‚ÅƒGƒXƒP[ƒv‚µ‚Ä‰º‚³‚¢B@
 
 .NOTES
 
@@ -166,7 +166,7 @@ Param(
 [Switch]$NoLog2File,
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath ,
 [String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #DefaultæŒ‡å®šã¯Shift-Jis
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #DefaultŽw’è‚ÍShift-Jis
 
 [int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
 [int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
@@ -192,7 +192,7 @@ Param(
 
 Try{
 
-    #CommonFunctions.ps1ã®é…ç½®å…ˆã‚’å¤‰æ›´ã—ãŸå ´åˆã¯ã€ã“ã“ã‚’å¤‰æ›´ã€‚åŒä¸€ãƒ•ã‚©ãƒ«ãƒ€ã«é…ç½®å‰æ
+    #CommonFunctions.ps1‚Ì”z’uæ‚ð•ÏX‚µ‚½ê‡‚ÍA‚±‚±‚ð•ÏXB“¯ˆêƒtƒHƒ‹ƒ_‚É”z’u‘O’ñ
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
@@ -201,26 +201,26 @@ Try{
     }
 
 
-################ è¨­å®šãŒå¿…è¦ãªã®ã¯ã“ã“ã¾ã§ ##################
+################ Ý’è‚ª•K—v‚È‚Ì‚Í‚±‚±‚Ü‚Å ##################
 
-################# å…±é€šéƒ¨å“ã€é–¢æ•°  #######################
+################# ‹¤’Ê•”•iAŠÖ”  #######################
 
 function Initialize {
 
 $ShellName = $PSCommandPath | Split-Path -Leaf
 
-#ã‚¤ãƒ™ãƒ³ãƒˆã‚½ãƒ¼ã‚¹æœªè¨­å®šæ™‚ã®å‡¦ç†
-#ãƒ­ã‚°ãƒ•ã‚¡ã‚¤ãƒ«å‡ºåŠ›å…ˆç¢ºèª
-#ReturnCodeç¢ºèª
-#å®Ÿè¡Œãƒ¦ãƒ¼ã‚¶ç¢ºèª
-#ãƒ—ãƒ­ã‚°ãƒ©ãƒ èµ·å‹•ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸
+#ƒCƒxƒ“ƒgƒ\[ƒX–¢Ý’èŽž‚Ìˆ—
+#ƒƒOƒtƒ@ƒCƒ‹o—ÍæŠm”F
+#ReturnCodeŠm”F
+#ŽÀsƒ†[ƒUŠm”F
+#ƒvƒƒOƒ‰ƒ€‹N“®ƒƒbƒZ[ƒW
 
 . Invoke-PreInitialize
 
-#ã“ã“ã¾ã§å®Œäº†ã™ã‚Œã°æ¥­å‹™çš„ãªãƒ­ã‚¸ãƒƒã‚¯ã®ã¿ã‚’ç¢ºèªã™ã‚Œã°è‰¯ã„
+#‚±‚±‚Ü‚ÅŠ®—¹‚·‚ê‚Î‹Æ–±“I‚ÈƒƒWƒbƒN‚Ì‚Ý‚ðŠm”F‚·‚ê‚Î—Ç‚¢
 
 
-#ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã®ç¢ºèª
+#ƒpƒ‰ƒ[ƒ^‚ÌŠm”F
 
     IF (-not('W3SVC' | Test-ServiceExist)) {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Web Service [W3SVC] dose not exist."
@@ -247,7 +247,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 
 
-#å‡¦ç†é–‹å§‹ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡ºåŠ›
+#ˆ—ŠJŽnƒƒbƒZ[ƒWo—Í
 
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
@@ -270,14 +270,14 @@ Param(
 }
 
 
-#####################   ã“ã“ã‹ã‚‰æœ¬ä½“  ######################
+#####################   ‚±‚±‚©‚ç–{‘Ì  ######################
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200330_1000'
+$Version = "2.0.0-beta.7"
 
 
-#åˆæœŸè¨­å®šã€ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ç¢ºèªã€èµ·å‹•ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸å‡ºåŠ›
+#‰ŠúÝ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
 
 . Initialize
 
@@ -342,7 +342,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
             }  
     
 
-      #ãƒã‚§ãƒƒã‚¯å›žæ•°ã®ä¸Šé™ã«é”ã—ã¦ã„ãªã„å ´åˆã¯ã€æŒ‡å®šç§’å¾…æ©Ÿ
+      #ƒ`ƒFƒbƒN‰ñ”‚ÌãŒÀ‚É’B‚µ‚Ä‚¢‚È‚¢ê‡‚ÍAŽw’è•b‘Ò‹@
 
       Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] exists and site state did not change to [$($TargetState)]. Wait for $($RetrySpanSec) seconds."
       Start-Sleep $RetrySpanSec

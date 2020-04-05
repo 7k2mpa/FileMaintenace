@@ -1,4 +1,4 @@
-﻿#Requires -Version 3.0
+#Requires -Version 3.0
 
 <#
 .SYNOPSIS
@@ -7,20 +7,20 @@ CommonFunctions.ps1 is required.
 You can unmount multiple network drives with Wrapper.ps1
 <Common Parameters> is not supported.
 
-マウント済ネットワークドライブをアンマウントするプログラムです。
-実行にはCommonFunctions.ps1が必要です。
-セットで開発しているWrapper.ps1と併用すると複数のドライブを処理できます。
+�}�E���g�σl�b�g���[�N�h���C�u���A���}�E���g����v���O�����ł��B
+���s�ɂ�CommonFunctions.ps1���K�v�ł��B
+�Z�b�g�ŊJ�����Ă���Wrapper.ps1�ƕ��p����ƕ����̃h���C�u�������ł��܂��B
 
-<Common Parameters>はサポートしていません
+<Common Parameters>�̓T�|�[�g���Ă��܂���
 
 .DESCRIPTION
 
 This script unmount Network drive.
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
-マウント済ネットワークドライブをアンマウントするプログラムです。
+�}�E���g�σl�b�g���[�N�h���C�u���A���}�E���g����v���O�����ł��B
 
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
+���O�o�͐��[Windows EventLog][�R���\�[��][���O�t�@�C��]���I���\�ł��B���ꂼ��o�́A�}�~���w��ł��܂��B
 
 
 .EXAMPLE
@@ -28,7 +28,7 @@ UnMountDrive.ps1 -MountedDrive F:
 
 UnMount SMB share mapped as Drive F:
 
-マウント済ネットワークドライブのF:をアンマウントします。
+�}�E���g�σl�b�g���[�N�h���C�u��F:���A���}�E���g���܂��B
 
 
 
@@ -37,85 +37,85 @@ UnMount SMB share mapped as Drive F:
 Specify drive letter mapped.
 Specification is required.
 
-アンマウント対象のマウント済ドライブのF:を指定します。
-指定必須です。
+�A���}�E���g�Ώۂ̃}�E���g�σh���C�u��F:���w�肵�܂��B
+�w��K�{�ł��B
 
 
 
 
 .PARAMETER Log2EventLog
-　Windows Event Logへの出力を制御します。
-デフォルトは$TRUEでEvent Log出力します。
+�@Windows Event Log�ւ̏o�͂𐧌䂵�܂��B
+�f�t�H���g��$TRUE��Event Log�o�͂��܂��B
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
+�@Event Log�o�͂�}�~���܂��B-Log2EventLog $FALSE�Ɠ����ł��B
 
 .PARAMETER ProviderName
-　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
+�@Windows Event Log�o�͂̃v���o�C�_�����w�肵�܂��B�f�t�H���g��[Infra]�ł��B
 
 .PARAMETER EventLogLogName
-　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
+�@Windows Event Log�o�͂̃��O�������Ă��܂��B�f�t�H���g��[Application]�ł��B
 
 .PARAMETER Log2Console 
-　コンソールへのログ出力を制御します。
-デフォルトは$TRUEでコンソール出力します。
+�@�R���\�[���ւ̃��O�o�͂𐧌䂵�܂��B
+�f�t�H���g��$TRUE�ŃR���\�[���o�͂��܂��B
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
+�@�R���\�[�����O�o�͂�}�~���܂��B-Log2Console $FALSE�Ɠ����ł��B
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$FALSEでログファイル出力しません。
+�@���O�t�B���ւ̏o�͂𐧌䂵�܂��B�f�t�H���g��$FALSE�Ń��O�t�@�C���o�͂��܂���B
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
+�@���O�t�@�C���o�͂�}�~���܂��B-Log2File $FALSE�Ɠ����ł��B
 
 .PARAMETER LogPath
-　ログファイル出力パスを指定します。デフォルトは$NULLです。
-相対、絶対パスで指定可能です。
-ファイルが存在しない場合は新規作成します。
-ファイルが既存の場合は追記します。
+�@���O�t�@�C���o�̓p�X���w�肵�܂��B�f�t�H���g��$NULL�ł��B
+���΁A��΃p�X�Ŏw��\�ł��B
+�t�@�C�������݂��Ȃ��ꍇ�͐V�K�쐬���܂��B
+�t�@�C���������̏ꍇ�͒ǋL���܂��B
 
 .PARAMETER LogDateFormat
-　ログファイル出力に含まれる日時表示フォーマットを指定します。デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
+�@���O�t�@�C���o�͂Ɋ܂܂������\���t�H�[�}�b�g���w�肵�܂��B�f�t�H���g��[yyyy-MM-dd-HH:mm:ss]�`���ł��B
 
 .PARAMETER NormalReturnCode
-　正常終了時のリターンコードを指定します。デフォルトは0です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@����I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��0�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER WarningReturnCode
-　警告終了時のリターンコードを指定します。デフォルトは1です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�x���I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��1�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER ErrorReturnCode
-　異常終了時のリターンコードを指定します。デフォルトは8です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�ُ�I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��8�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER InternalErrorReturnCode
-　プログラム内部異常終了時のリターンコードを指定します。デフォルトは16です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�v���O���������ُ�I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��16�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER InfoEventID
-　Event Log出力でInformationに対するEvent IDを指定します。デフォルトは1です。
+�@Event Log�o�͂�Information�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��1�ł��B
 
 .PARAMETER WarningEventID
-　Event Log出力でWarningに対するEvent IDを指定します。デフォルトは10です。
+�@Event Log�o�͂�Warning�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��10�ł��B
 
 .PARAMETER SuccessErrorEventID
-　Event Log出力でSuccessに対するEvent IDを指定します。デフォルトは73です。
+�@Event Log�o�͂�Success�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��73�ł��B
 
 .PARAMETER InternalErrorEventID
-　Event Log出力でInternal Errorに対するEvent IDを指定します。デフォルトは99です。
+�@Event Log�o�͂�Internal Error�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��99�ł��B
 
 .PARAMETER ErrorEventID
-　Event Log出力でErrorに対するEvent IDを指定します。デフォルトは100です。
+�@Event Log�o�͂�Error�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��100�ł��B
 
 .PARAMETER ErrorAsWarning
-　異常終了しても警告終了のReturnCodeを返します。
+�@�ُ�I�����Ă��x���I����ReturnCode��Ԃ��܂��B
 
 .PARAMETER WarningAsNormal
-　警告終了しても正常終了のReturnCodeを返します。
+�@�x���I�����Ă�����I����ReturnCode��Ԃ��܂��B
 
 .PARAMETER ExecutableUser
-　このプログラムを実行可能なユーザを正規表現で指定します。
-デフォルトは[.*]で全てのユーザが実行可能です。　
-記述はシングルクオーテーションで括って下さい。
-正規表現のため、ドメインのバックスラッシュは[domain\\.*]の様にバックスラッシュでエスケープして下さい。　
+�@���̃v���O���������s�\�ȃ��[�U�𐳋K�\���Ŏw�肵�܂��B
+�f�t�H���g��[.*]�őS�Ẵ��[�U�����s�\�ł��B�@
+�L�q�̓V���O���N�I�[�e�[�V�����Ŋ����ĉ������B
+���K�\���̂��߁A�h���C���̃o�b�N�X���b�V����[domain\\.*]�̗l�Ƀo�b�N�X���b�V���ŃG�X�P�[�v���ĉ������B�@
 
 .NOTES
 
@@ -145,7 +145,7 @@ Param(
 [parameter(position = 0, mandatory, HelpMessage = 'Specify Drive Letter (ex. F:) or Get-Help UnMountDrive.ps1')]
 [String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
 
-#[parameter(position=0, mandatory=$true , HelpMessage = 'ドライブレターを指定(ex. F:) 全てのHelpはGet-Help UnMountDrive.ps1')][String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
+#[parameter(position=0, mandatory=$true , HelpMessage = '�h���C�u���^�[���w��(ex. F:) �S�Ă�Help��Get-Help UnMountDrive.ps1')][String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
 #[String][ValidatePattern('^[d-z]:$')]$MountedDrive="F:",
 
 
@@ -160,7 +160,7 @@ Param(
 [Switch]$NoLog2File,
 [String][ValidatePattern('^(\.+\\|[C-Z]:\\).*')]$LogPath ,
 [String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default�w���Shift-Jis
 
 [int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
 [int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
@@ -184,7 +184,7 @@ Param(
 
 Try{
 
-    #CommonFunctions.ps1の配置先を変更した場合は、ここを変更。同一フォルダに配置前提
+    #CommonFunctions.ps1�̔z�u���ύX�����ꍇ�́A������ύX�B����t�H���_�ɔz�u�O��
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
@@ -193,31 +193,31 @@ Try{
     }
 
 
-################ 設定が必要なのはここまで ##################
+################ �ݒ肪�K�v�Ȃ̂͂����܂� ##################
 
-################# 共通部品、関数  #######################
+################# ���ʕ��i�A�֐�  #######################
 
 
 function Initialize {
 
 $ShellName = $PSCommandPath | Split-Path -Leaf
 
-#イベントソース未設定時の処理
-#ログファイル出力先確認
-#ReturnCode確認
-#実行ユーザ確認
-#プログラム起動メッセージ
+#�C�x���g�\�[�X���ݒ莞�̏���
+#���O�t�@�C���o�͐�m�F
+#ReturnCode�m�F
+#���s���[�U�m�F
+#�v���O�����N�����b�Z�[�W
 
 . Invoke-PreInitialize
 
-#ここまで完了すれば業務的なロジックのみを確認すれば良い
+#�����܂Ŋ�������΋Ɩ��I�ȃ��W�b�N�݂̂��m�F����Ηǂ�
 
 
 
-#パラメータの確認
+#�p�����[�^�̊m�F
 
 
-#ドライブが既にマウントされているか
+#�h���C�u�����Ƀ}�E���g����Ă��邩
 
     $driveLetters = (Get-WmiObject Win32_LogicalDisk).DeviceID
 
@@ -238,7 +238,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
         Finalize $ErrorReturnCode
         }
 
-#処理開始メッセージ出力
+#�����J�n���b�Z�[�W�o��
 
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
@@ -261,16 +261,16 @@ Param(
 }
 
 
-#####################   ここから本体  ######################
+#####################   ��������{��  ######################
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200330_1000'
+$Version = "2.0.0-beta.7"
 
 $psDrive = $MountedDrive -replace ":" 
 
 
-#初期設定、パラメータ確認、起動メッセージ出力
+#�����ݒ�A�p�����[�^�m�F�A�N�����b�Z�[�W�o��
 
 . Initialize
 

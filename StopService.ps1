@@ -1,4 +1,4 @@
-﻿#Requires -Version 3.0
+#Requires -Version 3.0
 
 
 <#
@@ -9,11 +9,11 @@ You can process multiple Windows services with Wrapper.ps1
 <Common Parameters> is not supported.
 
 
-指定したサービスを起動,停止するプログラムです。
-実行にはCommonFunctions.ps1が必要です。
-セットで開発しているFileMaintenance.ps1と併用すると複数のサービスを一括起動,停止できます。
+�w�肵���T�[�r�X���N��,��~����v���O�����ł��B
+���s�ɂ�CommonFunctions.ps1���K�v�ł��B
+�Z�b�g�ŊJ�����Ă���FileMaintenance.ps1�ƕ��p����ƕ����̃T�[�r�X���ꊇ�N��,��~�ł��܂��B
 
-<Common Parameters>はサポートしていません
+<Common Parameters>�̓T�|�[�g���Ă��܂���
 
 .DESCRIPTION
 This scipt start or stop Windows Service specified.
@@ -22,10 +22,10 @@ If start(stop) Windows serivce already started(stopped), will temrminate as WARN
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
 
-指定したサービスを起動,停止するプログラムです。
-(停止|起動)済サービスを(停止|起動)指定すると警告終了します。
+�w�肵���T�[�r�X���N��,��~����v���O�����ł��B
+(��~|�N��)�σT�[�r�X��(��~|�N��)�w�肷��ƌx���I�����܂��B
 
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
+���O�o�͐��[Windows EventLog][�R���\�[��][���O�t�@�C��]���I���\�ł��B���ꂼ��o�́A�}�~���w��ł��܂��B
 
 
 .EXAMPLE
@@ -36,10 +36,10 @@ If it dose not stop immediately, retry 5times every 5seconds.
 
 If the service is stoped already, terminate as WARNING.
 
-サービス名:Spooler（表示名はPrint Spooler）を停止します。
-直ぐに停止しない場合は、5秒間隔で最大5回試行します。
+�T�[�r�X��:Spooler�i�\������Print Spooler�j���~���܂��B
+�����ɒ�~���Ȃ��ꍇ�́A5�b�Ԋu�ōő�5�񎎍s���܂��B
 
-停止済サービスを停止しようとした場合は、警告終了します。
+��~�σT�[�r�X���~���悤�Ƃ����ꍇ�́A�x���I�����܂��B
 
 
 
@@ -52,10 +52,10 @@ If it dose not start immediately, retry 5times every 5seconds.
 Specified -WarningAsNormal option and, if the service is started already, terminate as NORMAL.
 
 
-サービス名:Spooler（表示名はPrint Spooler）を起動します。
-直ぐに起動しない場合は、5秒間隔で最大5回試行します。
+�T�[�r�X��:Spooler�i�\������Print Spooler�j���N�����܂��B
+�����ɋN�����Ȃ��ꍇ�́A5�b�Ԋu�ōő�5�񎎍s���܂��B
 
-起動済サービスを停止しようとした場合は、正常終了します。
+�N���σT�[�r�X���~���悤�Ƃ����ꍇ�́A����I�����܂��B
 
 
 
@@ -67,18 +67,18 @@ Display Name:Print Spooler
  
 Specification is required.
 
-　(停止|起動)するサービス名を指定します。
-「サービス名」と（サービスの）「表示名」は異なりますので留意して下さい。
-例えば「表示名:Print Spooler」は「サービス名:Spooler」となっています。
-指定必須です。
+�@(��~|�N��)����T�[�r�X�����w�肵�܂��B
+�u�T�[�r�X���v�Ɓi�T�[�r�X�́j�u�\�����v�͈قȂ�܂��̂ŗ��ӂ��ĉ������B
+�Ⴆ�΁u�\����:Print Spooler�v�́u�T�[�r�X��:Spooler�v�ƂȂ��Ă��܂��B
+�w��K�{�ł��B
 
 .PARAMETER TargetStatus
 Specify target status (Stopped|Running) of the service.
 Specification is required.
 
-遷移するサービス状態を指定します。
-(Stopped|Running)どちらかを指定して下さい。
-指定必須です。
+�J�ڂ���T�[�r�X��Ԃ��w�肵�܂��B
+(Stopped|Running)�ǂ��炩���w�肵�ĉ������B
+�w��K�{�ł��B
 
 .PARAMETER RetrySpanSec
 Specify interval to check service status.
@@ -86,96 +86,96 @@ Some services require long time to translate serivce status, specify appropriate
 Default is 3seconds.
 
 
-　サービス停止再確認の間隔秒数を指定します。
-サービスによっては数秒必要なものもあるので適切な秒数に設定して下さい。
-デフォルトは3秒です。
+�@�T�[�r�X��~�Ċm�F�̊Ԋu�b�����w�肵�܂��B
+�T�[�r�X�ɂ���Ă͐��b�K�v�Ȃ��̂�����̂œK�؂ȕb���ɐݒ肵�ĉ������B
+�f�t�H���g��3�b�ł��B
 
 .PARAMETER RetryTimes
 Specify times to check service status.
 Some services require long time to translate serivce status, specify appropriate value.
 Default is 5times.
 
-　サービス停止再確認の回数を指定します。
-サービスによっては数秒必要なものもあるので適切な回数に設定して下さい。
-デフォルトは5回です。
+�@�T�[�r�X��~�Ċm�F�̉񐔂��w�肵�܂��B
+�T�[�r�X�ɂ���Ă͐��b�K�v�Ȃ��̂�����̂œK�؂ȉ񐔂ɐݒ肵�ĉ������B
+�f�t�H���g��5��ł��B
 
 
 
 
 
 .PARAMETER Log2EventLog
-　Windows Event Logへの出力を制御します。
-デフォルトは$TRUEでEvent Log出力します。
+�@Windows Event Log�ւ̏o�͂𐧌䂵�܂��B
+�f�t�H���g��$TRUE��Event Log�o�͂��܂��B
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
+�@Event Log�o�͂�}�~���܂��B-Log2EventLog $FALSE�Ɠ����ł��B
 
 .PARAMETER ProviderName
-　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
+�@Windows Event Log�o�͂̃v���o�C�_�����w�肵�܂��B�f�t�H���g��[Infra]�ł��B
 
 .PARAMETER EventLogLogName
-　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
+�@Windows Event Log�o�͂̃��O�������Ă��܂��B�f�t�H���g��[Application]�ł��B
 
 .PARAMETER Log2Console 
-　コンソールへのログ出力を制御します。
-デフォルトは$TRUEでコンソール出力します。
+�@�R���\�[���ւ̃��O�o�͂𐧌䂵�܂��B
+�f�t�H���g��$TRUE�ŃR���\�[���o�͂��܂��B
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
+�@�R���\�[�����O�o�͂�}�~���܂��B-Log2Console $FALSE�Ɠ����ł��B
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$FALSEでログファイル出力しません。
+�@���O�t�B���ւ̏o�͂𐧌䂵�܂��B�f�t�H���g��$FALSE�Ń��O�t�@�C���o�͂��܂���B
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
+�@���O�t�@�C���o�͂�}�~���܂��B-Log2File $FALSE�Ɠ����ł��B
 
 .PARAMETER LogPath
-　ログファイル出力パスを指定します。デフォルトは$NULLです。
-相対、絶対パスで指定可能です。
-ファイルが存在しない場合は新規作成します。
-ファイルが既存の場合は追記します。
+�@���O�t�@�C���o�̓p�X���w�肵�܂��B�f�t�H���g��$NULL�ł��B
+���΁A��΃p�X�Ŏw��\�ł��B
+�t�@�C�������݂��Ȃ��ꍇ�͐V�K�쐬���܂��B
+�t�@�C���������̏ꍇ�͒ǋL���܂��B
 
 .PARAMETER LogDateFormat
-　ログファイル出力に含まれる日時表示フォーマットを指定します。デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
+�@���O�t�@�C���o�͂Ɋ܂܂������\���t�H�[�}�b�g���w�肵�܂��B�f�t�H���g��[yyyy-MM-dd-HH:mm:ss]�`���ł��B
 
 .PARAMETER NormalReturnCode
-　正常終了時のリターンコードを指定します。デフォルトは0です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@����I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��0�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER WarningReturnCode
-　警告終了時のリターンコードを指定します。デフォルトは1です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�x���I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��1�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER ErrorReturnCode
-　異常終了時のリターンコードを指定します。デフォルトは8です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�ُ�I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��8�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER InternalErrorReturnCode
-　プログラム内部異常終了時のリターンコードを指定します。デフォルトは16です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�v���O���������ُ�I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��16�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER InfoEventID
-　Event Log出力でInformationに対するEvent IDを指定します。デフォルトは1です。
+�@Event Log�o�͂�Information�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��1�ł��B
 
 .PARAMETER WarningEventID
-　Event Log出力でWarningに対するEvent IDを指定します。デフォルトは10です。
+�@Event Log�o�͂�Warning�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��10�ł��B
 
 .PARAMETER SuccessErrorEventID
-　Event Log出力でSuccessに対するEvent IDを指定します。デフォルトは73です。
+�@Event Log�o�͂�Success�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��73�ł��B
 
 .PARAMETER InternalErrorEventID
-　Event Log出力でInternal Errorに対するEvent IDを指定します。デフォルトは99です。
+�@Event Log�o�͂�Internal Error�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��99�ł��B
 
 .PARAMETER ErrorEventID
-　Event Log出力でErrorに対するEvent IDを指定します。デフォルトは100です。
+�@Event Log�o�͂�Error�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��100�ł��B
 
 .PARAMETER ErrorAsWarning
-　異常終了しても警告終了のReturnCodeを返します。
+�@�ُ�I�����Ă��x���I����ReturnCode��Ԃ��܂��B
 
 .PARAMETER WarningAsNormal
-　警告終了しても正常終了のReturnCodeを返します。
+�@�x���I�����Ă�����I����ReturnCode��Ԃ��܂��B
 
 .PARAMETER ExecutableUser
-　このプログラムを実行可能なユーザを正規表現で指定します。
-デフォルトは[.*]で全てのユーザが実行可能です。　
-記述はシングルクオーテーションで括って下さい。
-正規表現のため、ドメインのバックスラッシュは[domain\\.*]の様にバックスラッシュでエスケープして下さい。　
+�@���̃v���O���������s�\�ȃ��[�U�𐳋K�\���Ŏw�肵�܂��B
+�f�t�H���g��[.*]�őS�Ẵ��[�U�����s�\�ł��B�@
+�L�q�̓V���O���N�I�[�e�[�V�����Ŋ����ĉ������B
+���K�\���̂��߁A�h���C���̃o�b�N�X���b�V����[domain\\.*]�̗l�Ƀo�b�N�X���b�V���ŃG�X�P�[�v���ĉ������B�@
 
 .NOTES
 
@@ -229,7 +229,7 @@ Param(
 [Switch]$NoLog2File,
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath ,
 [String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default�w���Shift-Jis
 
 [int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
 [int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
@@ -255,7 +255,7 @@ Param(
 
 Try{
 
-    #CommonFunctions.ps1の配置先を変更した場合は、ここを変更。同一フォルダに配置前提
+    #CommonFunctions.ps1�̔z�u���ύX�����ꍇ�́A������ύX�B����t�H���_�ɔz�u�O��
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception] {
@@ -264,26 +264,26 @@ Try{
     }
 
 
-################ 設定が必要なのはここまで ##################
+################ �ݒ肪�K�v�Ȃ̂͂����܂� ##################
 
-################# 共通部品、関数  #######################
+################# ���ʕ��i�A�֐�  #######################
 
 function Initialize {
 
 $ShellName = $PSCommandPath | Split-Path -Leaf
 
-#イベントソース未設定時の処理
-#ログファイル出力先確認
-#ReturnCode確認
-#実行ユーザ確認
-#プログラム起動メッセージ
+#�C�x���g�\�[�X���ݒ莞�̏���
+#���O�t�@�C���o�͐�m�F
+#ReturnCode�m�F
+#���s���[�U�m�F
+#�v���O�����N�����b�Z�[�W
 
 . Invoke-PreInitialize
 
-#ここまで完了すれば業務的なロジックのみを確認すれば良い
+#�����܂Ŋ�������΋Ɩ��I�ȃ��W�b�N�݂̂��m�F����Ηǂ�
 
 
-#パラメータの確認
+#�p�����[�^�̊m�F
 
 
     IF (-not($Service | Test-ServiceExist -NoMessage)) {
@@ -306,7 +306,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 
 
-#処理開始メッセージ出力
+#�����J�n���b�Z�[�W�o��
 
 
 Write-Log -Id $InfoEventID -Type Information -Message "All parameters are valid."
@@ -329,18 +329,18 @@ Param(
 }
 
 
-#####################   ここから本体  ######################
+#####################   ��������{��  ######################
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200330_1000'
+$Version = "2.0.0-beta.7"
 
 [String]$computer = "localhost" 
 [String]$class = "win32_service" 
 [Object]$WmiService = Get-WMIobject -Class $class -computer $computer -filter "name = '$Service'" 
 
 
-#初期設定、パラメータ確認、起動メッセージ出力
+#�����ݒ�A�p�����[�^�m�F�A�N�����b�Z�[�W�o��
 
 . Initialize
 
@@ -362,7 +362,7 @@ $Version = '20200330_1000'
 
 
 
-#以下のコードはMSのサンプルを参考
+#�ȉ��̃R�[�h��MS�̃T���v�����Q�l
 #MICROSOFT LIMITED PUBLIC LICENSE version 1.1
 #https://gallery.technet.microsoft.com/scriptcenter/aa73bb75-38a6-4bd4-b72e-a6aede76d6ad
 #https://devblogs.microsoft.com/scripting/hey-scripting-guy-how-can-i-use-windows-powershell-to-stop-services/
@@ -370,7 +370,7 @@ $Version = '20200330_1000'
 
 For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
 
-      # サービス存在確認
+      # �T�[�r�X���݊m�F
       IF (-not($Service | Test-ServiceExist)) {
           Finalize $ErrorReturnCode
           }
@@ -440,7 +440,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
       }  
     
 
-      #チェック回数の上限に達していない場合は、指定秒待機
+      #�`�F�b�N�񐔂̏���ɒB���Ă��Ȃ��ꍇ�́A�w��b�ҋ@
 
       Write-Log -Id $InfoEventID -Type Information -Message "Serivce [$($Service)] exists and service status dose not switch to [$($TargetStatus)] Wait for $($RetrySpanSec) seconds."
       Start-Sleep $RetrySpanSec

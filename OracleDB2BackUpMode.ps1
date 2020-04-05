@@ -1,4 +1,4 @@
-﻿#Requires -Version 3.0
+#Requires -Version 3.0
 
 <#
 .SYNOPSIS
@@ -7,24 +7,24 @@ CommonFunctions.ps1 is required.
 
 <Common Parameters> is not supported.
 
-Oracle Databaseをバックアップ前にバックアップモードへ切替するスクリプトです。
+Oracle Database���o�b�N�A�b�v�O�Ƀo�b�N�A�b�v���[�h�֐ؑւ���X�N���v�g�ł��B
 
-<Common Parameters>はサポートしていません
+<Common Parameters>�̓T�|�[�g���Ă��܂���
 
 .DESCRIPTION
 This script siwtch to Backup mode Oracle Database before starting backup software.
 The script loads SQLs.ps1, place SQLs.ps1 previously.
 OracleDB2NormalMode.ps1 is offered also, you may use it with this script.
 
-Oracle Databaseをバックアップするには、予めデータベースの停止、またはバックアップモードへ切替が必要です。
-従来はデータベースの停止(Shutdown Immediate)で実装する例が大半ですが、停止はセッションが存在すると停止しない等で障害となる例もあります。
-そのため本スクリプトはOracle Databaseを停止するのではなく、表領域をバックアップモードへ切替してバックアップを開始する運用を前提として作成しています。
+Oracle Database���o�b�N�A�b�v����ɂ́A�\�߃f�[�^�x�[�X�̒�~�A�܂��̓o�b�N�A�b�v���[�h�֐ؑւ��K�v�ł��B
+�]���̓f�[�^�x�[�X�̒�~(Shutdown Immediate)�Ŏ�������Ⴊ�唼�ł����A��~�̓Z�b�V���������݂���ƒ�~���Ȃ����ŏ�Q�ƂȂ�������܂��B
+���̂��ߖ{�X�N���v�g��Oracle Database���~����̂ł͂Ȃ��A�\�̈���o�b�N�A�b�v���[�h�֐ؑւ��ăo�b�N�A�b�v���J�n����^�p��O��Ƃ��č쐬���Ă��܂��B
 
-セットで使用するSQLs.PS1を読み込み、実行します。予め配置してください。
-対になるバックアップモードから通常モードへ切替するスクリプトを用意しておりますので、セットで運用してください。
+�Z�b�g�Ŏg�p����SQLs.PS1��ǂݍ��݁A���s���܂��B�\�ߔz�u���Ă��������B
+�΂ɂȂ�o�b�N�A�b�v���[�h����ʏ탂�[�h�֐ؑւ���X�N���v�g��p�ӂ��Ă���܂��̂ŁA�Z�b�g�ŉ^�p���Ă��������B
 
 
-配置例
+�z�u��
 
 .\OracleDB2NormalMode.ps1
 .\OracleDB2BackUpMode.ps1
@@ -46,10 +46,10 @@ If the flag file exists, terminate as ERROR.
 Authentification to connecting to Oracle is used OS authentification with OS user running the script.
 At last stop Listener.
 
-Windowsサービス名OracleServiceMCDB、インスタンス名MCDBのOracle Databaseの全ての表領域をバックアップモードへ切替します。
-Oracle Databaseの認証はOS認証を用います。このスクリプトが実行されるOSユーザで認証します。
-バックアップ中フラグ..\Flag\BackUp.FLGの存在を確認し、存在した場合はバックアップ中と判定して異常終了します。
-切替後にListenerを停止します。
+Windows�T�[�r�X��OracleServiceMCDB�A�C���X�^���X��MCDB��Oracle Database�̑S�Ă̕\�̈���o�b�N�A�b�v���[�h�֐ؑւ��܂��B
+Oracle Database�̔F�؂�OS�F�؂�p���܂��B���̃X�N���v�g�����s�����OS���[�U�ŔF�؂��܂��B
+�o�b�N�A�b�v���t���O..\Flag\BackUp.FLG�̑��݂��m�F���A���݂����ꍇ�̓o�b�N�A�b�v���Ɣ��肵�Ĉُ�I�����܂��B
+�ؑ֌��Listener���~���܂��B
 
 .\OracleDB2BackUpMode -oracleSerivce MCDB -BackUpFlagPath ..\Flag\BackUp.FLG -NoStopListener -ExecUser FOO -ExecUserPassword BAR -PasswordAuthorization
 
@@ -58,32 +58,32 @@ Authentification to connecting to Oracle is used password authentification.
 Oracle user is used 'FOO', Oracle user password is used 'BAR'
 The script dose not stop Listener.
 
-Windowsサービス名OracleServiceMCDB、インスタンス名MCDBのOracle Databaseの全ての表領域をバックアップモードへ切替します。
-OracleDatabaseの認証はパスワード認証を用いています。ユーザID BackUpUpser、パスワード FOOBARでログイン認証します。
-バックアップ中フラグ..\Flag\BackUp.FLGの存在を確認し、存在した場合はバックアップ中と判定して異常終了します。
-切替後にListenerは停止しません。
+Windows�T�[�r�X��OracleServiceMCDB�A�C���X�^���X��MCDB��Oracle Database�̑S�Ă̕\�̈���o�b�N�A�b�v���[�h�֐ؑւ��܂��B
+OracleDatabase�̔F�؂̓p�X���[�h�F�؂�p���Ă��܂��B���[�UID BackUpUpser�A�p�X���[�h FOOBAR�Ń��O�C���F�؂��܂��B
+�o�b�N�A�b�v���t���O..\Flag\BackUp.FLG�̑��݂��m�F���A���݂����ꍇ�̓o�b�N�A�b�v���Ɣ��肵�Ĉُ�I�����܂��B
+�ؑ֌��Listener�͒�~���܂���B
 
 
 .PARAMETER OracleSID
 Specify Oracle_SID.
 Should set '$Env:ORACLE_SID' by default.
 
-対象のOracleSIDを指定します。
+�Ώۂ�OracleSID���w�肵�܂��B
 
 
 .PARAMETER OracleService
 This parameter is planed to obsolute.
 
-RMAN Logを削除する対象のOracleSIDを指定します。
-このパラメータは廃止予定です。
+RMAN Log���폜����Ώۂ�OracleSID���w�肵�܂��B
+���̃p�����[�^�͔p�~�\��ł��B
 
 
 .PARAMETER OracleHomeBinPath
 Specify Oracle 'BIN' path in the child path Oracle home. 
 Should set "$Env:ORACLE_HOME +'\BIN'" by default.
 
-Oracle Home配下のBINフォルダまでのパスを指定します。
-通常は標準設定である$Env:ORACLE_HOME +'\BIN'（Powershellでの表記）で良いのですが、OSで環境変数%ORACLE_HOME%が未設定環境では当該を設定してください。
+Oracle Home�z����BIN�t�H���_�܂ł̃p�X���w�肵�܂��B
+�ʏ�͕W���ݒ�ł���$Env:ORACLE_HOME +'\BIN'�iPowershell�ł̕\�L�j�ŗǂ��̂ł����AOS�Ŋ��ϐ�%ORACLE_HOME%�����ݒ���ł͓��Y��ݒ肵�Ă��������B
 
 .PARAMETER SQLLogPath
 Specify path of SQL log file.
@@ -91,126 +91,126 @@ If the file dose not exist, create a new file.
 Can specify relative or absolute path format.
 
 .PARAMETER SQLCommandsPath
-予め用意した、実行するSQL文群を記述したps1ファイルのパスを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
+�\�ߗp�ӂ����A���s����SQL���Q���L�q����ps1�t�@�C���̃p�X���w�肵�܂��B
+�w��͕K�{�ł��B
+���΁A��΃p�X�Ŏw��\�ł��B
 
 .PARAMETER BackUpFlagPath
-バックアップ中を示すフラグファイルのパスを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
+�o�b�N�A�b�v���������t���O�t�@�C���̃p�X���w�肵�܂��B
+�w��͕K�{�ł��B
+���΁A��΃p�X�Ŏw��\�ł��B
 
 
 .PARAMETER PasswordAuthorization
 Specify authentification with password authorization.
 Should use OS authentification.
 
-パスワード認証を指定します。
-OS認証が使えない時に使用する事を推奨します。
+�p�X���[�h�F�؂��w�肵�܂��B
+OS�F�؂��g���Ȃ����Ɏg�p���鎖�𐄏����܂��B
 
 .PARAMETER ExecUser
 Specify Oracle User to connect. 
 Should use OS authentification.
 
-パスワード認証時のユーザを設定します。
-OS認証が使えない時に使用する事を推奨します。
+�p�X���[�h�F�؎��̃��[�U��ݒ肵�܂��B
+OS�F�؂��g���Ȃ����Ɏg�p���鎖�𐄏����܂��B
 
 .PARAMETER ExecUserPassword
 Specify Oracle user Password to connect. 
 Should use OS authentification.
 
-パスワード認証時のユーザパスワードを設定します。
-OS認証が使えない時に使用する事を推奨します。
+�p�X���[�h�F�؎��̃��[�U�p�X���[�h��ݒ肵�܂��B
+OS�F�؂��g���Ȃ����Ɏg�p���鎖�𐄏����܂��B
 
 
 .PARAMETER NoChangeToBackUpMode
-バックアップモードへの切替不要を指定します。
-バックアップソフトウエアによっては、バックアップソフトウエアがOracleをバックアップモードへ切替します。
-その場合は当スイッチをOnにして下さい。
+�o�b�N�A�b�v���[�h�ւ̐ؑ֕s�v���w�肵�܂��B
+�o�b�N�A�b�v�\�t�g�E�G�A�ɂ���ẮA�o�b�N�A�b�v�\�t�g�E�G�A��Oracle���o�b�N�A�b�v���[�h�֐ؑւ��܂��B
+���̏ꍇ�͓��X�C�b�`��On�ɂ��ĉ������B
 
 .PARAMETER NoStopListener
-リスナー停止不要を指定します。
-業務断面が必要な場合、バックアップ前にリスナーを停止しますが、業務断面が不要or無停止とする場合は当スイッチをOnにして下さい。
+���X�i�[��~�s�v���w�肵�܂��B
+�Ɩ��f�ʂ��K�v�ȏꍇ�A�o�b�N�A�b�v�O�Ƀ��X�i�[���~���܂����A�Ɩ��f�ʂ��s�vor����~�Ƃ���ꍇ�͓��X�C�b�`��On�ɂ��ĉ������B
 
 
 
 
 .PARAMETER Log2EventLog
-　Windows Event Logへの出力を制御します。
-デフォルトは$TRUEでEvent Log出力します。
+�@Windows Event Log�ւ̏o�͂𐧌䂵�܂��B
+�f�t�H���g��$TRUE��Event Log�o�͂��܂��B
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
-Log2EventLogより優先します。
+�@Event Log�o�͂�}�~���܂��B-Log2EventLog $FALSE�Ɠ����ł��B
+Log2EventLog���D�悵�܂��B
 
 .PARAMETER ProviderName
-　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
+�@Windows Event Log�o�͂̃v���o�C�_�����w�肵�܂��B�f�t�H���g��[Infra]�ł��B
 
 .PARAMETER EventLogLogName
-　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
+�@Windows Event Log�o�͂̃��O�������Ă��܂��B�f�t�H���g��[Application]�ł��B
 
 .PARAMETER Log2Console 
-　コンソールへのログ出力を制御します。
-デフォルトは$TRUEでコンソール出力します。
+�@�R���\�[���ւ̃��O�o�͂𐧌䂵�܂��B
+�f�t�H���g��$TRUE�ŃR���\�[���o�͂��܂��B
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
-Log2Consoleより優先します。
+�@�R���\�[�����O�o�͂�}�~���܂��B-Log2Console $FALSE�Ɠ����ł��B
+Log2Console���D�悵�܂��B
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$FALSEでログファイル出力しません。
+�@���O�t�B���ւ̏o�͂𐧌䂵�܂��B�f�t�H���g��$FALSE�Ń��O�t�@�C���o�͂��܂���B
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
-Log2Fileより優先します。
+�@���O�t�@�C���o�͂�}�~���܂��B-Log2File $FALSE�Ɠ����ł��B
+Log2File���D�悵�܂��B
 
 .PARAMETER LogPath
-　ログファイル出力パスを指定します。デフォルトは$NULLです。
-相対、絶対パスで指定可能です。
-ファイルが存在しない場合は新規作成します。
-ファイルが既存の場合は追記します。
+�@���O�t�@�C���o�̓p�X���w�肵�܂��B�f�t�H���g��$NULL�ł��B
+���΁A��΃p�X�Ŏw��\�ł��B
+�t�@�C�������݂��Ȃ��ꍇ�͐V�K�쐬���܂��B
+�t�@�C���������̏ꍇ�͒ǋL���܂��B
 
 .PARAMETER LogDateFormat
-　ログファイル出力に含まれる日時表示フォーマットを指定します。デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
+�@���O�t�@�C���o�͂Ɋ܂܂������\���t�H�[�}�b�g���w�肵�܂��B�f�t�H���g��[yyyy-MM-dd-HH:mm:ss]�`���ł��B
 
 .PARAMETER NormalReturnCode
-　正常終了時のリターンコードを指定します。デフォルトは0です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@����I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��0�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER WarningReturnCode
-　警告終了時のリターンコードを指定します。デフォルトは1です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�x���I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��1�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER ErrorReturnCode
-　異常終了時のリターンコードを指定します。デフォルトは8です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�ُ�I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��8�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER InternalErrorReturnCode
-　プログラム内部異常終了時のリターンコードを指定します。デフォルトは16です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�v���O���������ُ�I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��16�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER InfoEventID
-　Event Log出力でInformationに対するEvent IDを指定します。デフォルトは1です。
+�@Event Log�o�͂�Information�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��1�ł��B
 
 .PARAMETER WarningEventID
-　Event Log出力でWarningに対するEvent IDを指定します。デフォルトは10です。
+�@Event Log�o�͂�Warning�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��10�ł��B
 
 .PARAMETER SuccessErrorEventID
-　Event Log出力でSuccessに対するEvent IDを指定します。デフォルトは73です。
+�@Event Log�o�͂�Success�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��73�ł��B
 
 .PARAMETER InternalErrorEventID
-　Event Log出力でInternal Errorに対するEvent IDを指定します。デフォルトは99です。
+�@Event Log�o�͂�Internal Error�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��99�ł��B
 
 .PARAMETER ErrorEventID
-　Event Log出力でErrorに対するEvent IDを指定します。デフォルトは100です。
+�@Event Log�o�͂�Error�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��100�ł��B
 
 .PARAMETER ErrorAsWarning
-　異常終了しても警告終了のReturnCodeを返します。
+�@�ُ�I�����Ă��x���I����ReturnCode��Ԃ��܂��B
 
 .PARAMETER WarningAsNormal
-　警告終了しても正常終了のReturnCodeを返します。
+�@�x���I�����Ă�����I����ReturnCode��Ԃ��܂��B
 
 .PARAMETER ExecutableUser
-　このプログラムを実行可能なユーザを正規表現で指定します。
-デフォルトは[.*]で全てのユーザが実行可能です。　
-記述はシングルクオーテーションで括って下さい。
-正規表現のため、ドメインのバックスラッシュは[domain\\.*]の様にバックスラッシュでエスケープして下さい。　
+�@���̃v���O���������s�\�ȃ��[�U�𐳋K�\���Ŏw�肵�܂��B
+�f�t�H���g��[.*]�őS�Ẵ��[�U�����s�\�ł��B�@
+�L�q�̓V���O���N�I�[�e�[�V�����Ŋ����ĉ������B
+���K�\���̂��߁A�h���C���̃o�b�N�X���b�V����[domain\\.*]�̗l�Ƀo�b�N�X���b�V���ŃG�X�P�[�v���ĉ������B�@
 
 .NOTES
 
@@ -257,7 +257,7 @@ Param(
 [Switch]$NoChangeToBackUpMode,
 [Switch]$NoStopListener,
 
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default�w���Shift-Jis
 
 #Planed to obsolute
 [Switch]$NoCheckBackUpFlag = $TRUE ,
@@ -300,7 +300,7 @@ Param(
 
 Try {
 
-    #CommonFunctions.ps1の配置先を変更した場合は、ここを変更。同一フォルダに配置前提
+    #CommonFunctions.ps1�̔z�u���ύX�����ꍇ�́A������ύX�B����t�H���_�ɔz�u�O��
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception] {
@@ -308,34 +308,34 @@ Try {
     Exit 1
     }
 
-################# 共通部品、関数  #######################
+################# ���ʕ��i�A�֐�  #######################
 
 
 function Initialize {
 
 $ShellName = $PSCommandPath | Split-Path -Leaf
 
-#イベントソース未設定時の処理
-#ログファイル出力先確認
-#ReturnCode確認
-#実行ユーザ確認
-#プログラム起動メッセージ
+#�C�x���g�\�[�X���ݒ莞�̏���
+#���O�t�@�C���o�͐�m�F
+#ReturnCode�m�F
+#���s���[�U�m�F
+#�v���O�����N�����b�Z�[�W
 
 . Invoke-PreInitialize
 
-#ここまで完了すれば業務的なロジックのみを確認すれば良い
+#�����܂Ŋ�������΋Ɩ��I�ȃ��W�b�N�݂̂��m�F����Ηǂ�
 
 
-#パラメータの確認
+#�p�����[�^�̊m�F
 
-#OracleBINフォルダの指定、存在確認
+#OracleBIN�t�H���_�̎w��A���݊m�F
 
     $OracleHomeBinPath = $OracleHomeBinPath | ConvertTo-AbsolutePath -Name  '-oracleHomeBinPath'
 
     $OracleHomeBinPath | Test-Container -Name '-oracleHomeBinPath' -IfNoExistFinalize > $NULL
 
 
-#BackUpFlagフォルダの指定、存在確認
+#BackUpFlag�t�H���_�̎w��A���݊m�F
 
 
     IF (-not($NoCheckBackUpFlag)) {
@@ -346,14 +346,14 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
         }
 
 
-#SQLLogファイルの指定、存在、書き込み権限確認
+#SQLLog�t�@�C���̎w��A���݁A�������݌����m�F
 
     $SQLLogPath = $SQLLogPath | ConvertTo-AbsolutePath -ObjectName '-SQLLogPath'
 
     $SQLLogPath | Test-LogPath -Name '-SQLLogPath' > $NULL
 
 
-#SQLコマンド群の指定、存在確認、Load
+#SQL�R�}���h�Q�̎w��A���݊m�F�ALoad
 
     $SQLCommandsPath = $SQLCommandsPath | ConvertTo-AbsolutePath -ObjectName '-SQLCommandPath'
 
@@ -373,7 +373,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
     Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to load SQLs Version $($SQLsVersion) in -SQLCommandsPath"
 
 
-#Oracle起動確認
+#Oracle�N���m�F
 
     $targetWindowsOracleService = "OracleService"+$OracleSID
 
@@ -387,7 +387,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
         }
 
 
-#処理開始メッセージ出力
+#�����J�n���b�Z�[�W�o��
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
@@ -408,7 +408,7 @@ Pop-Location
 
 }
 
-#####################   ここから本体  ######################
+#####################   ��������{��  ######################
 
 
 [boolean]$ErrorFlag = $FALSE
@@ -422,11 +422,11 @@ Pop-Location
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200207_1615'
+$Version = "2.0.0-beta.7"
 
 
 
-#初期設定、パラメータ確認、起動メッセージ出力
+#�����ݒ�A�p�����[�^�m�F�A�N�����b�Z�[�W�o��
 
 . Initialize
 
@@ -434,7 +434,7 @@ $Version = '20200207_1615'
 Push-Location $OracleHomeBinPath
 
  
-#planed to obsolute バックアップ実行中かを確認
+#planed to obsolute �o�b�N�A�b�v���s�������m�F
 
     IF ($NoCheckBackUpFlag) {
 
@@ -446,10 +446,10 @@ Push-Location $OracleHomeBinPath
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Running Back Up now. Can not start duplicate execution."
             Finalize $ErrorReturnCode
             }
-#planed to obsolute バックアップ実行中かを確認
+#planed to obsolute �o�b�N�A�b�v���s�������m�F
     
 
-#セッション情報を出力
+#�Z�b�V���������o��
 
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Export Session Info."
 
@@ -466,7 +466,7 @@ Push-Location $OracleHomeBinPath
         }
 
 
-#Redo Log強制書き出し
+#Redo Log���������o��
 
   Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Export Redo Log."
 
@@ -483,7 +483,7 @@ Push-Location $OracleHomeBinPath
         }
 
 
-#BackUp/Normal Modeどちらかを確認
+#BackUp/Normal Mode�ǂ��炩���m�F
 
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Check Database running status in which mode"
 
@@ -521,7 +521,7 @@ Push-Location $OracleHomeBinPath
 
 
 
-#Back Up Modeへ切替
+#Back Up Mode�֐ؑ�
 
     IF ($NoChangeToBackUpMode) {
 
@@ -547,7 +547,7 @@ Push-Location $OracleHomeBinPath
 
 
 
-#Listner停止
+#Listner��~
 
     $returnMessage = LSNRCTL.exe status  2>&1
 
@@ -558,13 +558,13 @@ Push-Location $OracleHomeBinPath
 
     Switch -Regex ($listenerStatus) { 
 
-        'インスタンスがあります' {
+        '�C���X�^���X������܂�' {
 
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Listener is running."
             $needToStopListener = $TRUE
             }
 
-        'リスナーがありません' {
+        '���X�i�[������܂���' {
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Listener is stopped."
             $needToStopListener = $FALSE
             }   

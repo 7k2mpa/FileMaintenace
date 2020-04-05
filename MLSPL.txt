@@ -1,18 +1,18 @@
-ï»¿
+
 
 MICROSOFT LIMITED PUBLIC LICENSE version 1.1
 
-This license governs use of code marked as â€œsampleâ€ or â€œexampleâ€ available on this web site without a license agreement, as provided under the section above titled â€œNOTICE SPECIFIC TO SOFTWARE AVAILABLE ON THIS WEB SITE.â€ If you use such code (the â€œsoftwareâ€), you accept this license. If you do not accept the license, do not use the software.
+This license governs use of code marked as gsampleh or gexampleh available on this web site without a license agreement, as provided under the section above titled gNOTICE SPECIFIC TO SOFTWARE AVAILABLE ON THIS WEB SITE.h If you use such code (the gsoftwareh), you accept this license. If you do not accept the license, do not use the software.
 
 1. Definitions
 
-The terms â€œreproduce,â€ â€œreproduction,â€ â€œderivative works,â€ and â€œdistributionâ€ have the same meaning here as under U.S. copyright law.
+The terms greproduce,h greproduction,h gderivative works,h and gdistributionh have the same meaning here as under U.S. copyright law.
 
-A â€œcontributionâ€ is the original software, or any additions or changes to the software.
+A gcontributionh is the original software, or any additions or changes to the software.
 
-A â€œcontributorâ€ is any person that distributes its contribution under this license.
+A gcontributorh is any person that distributes its contribution under this license.
 
-â€œLicensed patentsâ€ are a contributorâ€™s patent claims that read directly on its contribution.
+gLicensed patentsh are a contributorfs patent claims that read directly on its contribution.
 
 2. Grant of Rights
 
@@ -22,7 +22,7 @@ A â€œcontributorâ€ is any person that distributes its contribution under this l
 
 3. Conditions and Limitations
 
-(A) No Trademark License- This license does not grant you rights to use any contributorsâ€™ name, logo, or trademarks.
+(A) No Trademark License- This license does not grant you rights to use any contributorsf name, logo, or trademarks.
 
 (B) If you bring a patent claim against any contributor over patents that you claim are infringed by the software, your patent license from such contributor to the software ends automatically.
 
@@ -30,44 +30,44 @@ A â€œcontributorâ€ is any person that distributes its contribution under this l
 
 (D) If you distribute any portion of the software in source code form, you may do so only under this license by including a complete copy of this license with your distribution. If you distribute any portion of the software in compiled or object code form, you may only do so under a license that complies with this license.
 
-(E) The software is licensed â€œas-is.â€ You bear the risk of using it. The contributors give no express warranties, guarantees or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular purpose and non-infringement.
+(E) The software is licensed gas-is.h You bear the risk of using it. The contributors give no express warranties, guarantees or conditions. You may have additional consumer rights under your local laws which this license cannot change. To the extent permitted under your local laws, the contributors exclude the implied warranties of merchantability, fitness for a particular purpose and non-infringement.
 
 (F) Platform Limitation - The licenses granted in sections 2(A) and 2(B) extend only to the software or derivative works that you create that run directly on a Microsoft Windows operating system product, Microsoft run-time technology (such as the .NET Framework or Silverlight), or Microsoft application platform (such as Microsoft Office or Microsoft Dynamics).
 
 
 
- åˆ¥ç´™ B
+ •Ê† B
 
 Microsoft Limited Public License
 
-æœ¬ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã¯ã€ä¸Šè¨˜ã®ã€Œæœ¬ Web ã‚µã‚¤ãƒˆã§å…¥æ‰‹å¯èƒ½ãªã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã«é–¢ã™ã‚‹æ³¨æ„ã€ã®è¦å®šã«å¾“ã„ã€ãƒ©ã‚¤ã‚»ãƒ³ã‚¹å¥‘ç´„ãªã—ã§æœ¬ Web ã‚µã‚¤ãƒˆã§å…¥æ‰‹å¯èƒ½ãªã€Œã‚µãƒ³ãƒ—ãƒ«ã€ã¾ãŸã¯ã€Œä¾‹ã€ã¨è¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹ã‚³ãƒ¼ãƒ‰ã®ä½¿ç”¨ã«ã¤ã„ã¦è¦å®šã™ã‚‹ã‚‚ã®ã§ã™ã€‚ãŠå®¢æ§˜ã¯ã€ã‹ã‹ã‚‹ã‚³ãƒ¼ãƒ‰ (ä»¥ä¸‹ã€Œã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã€ã¨ã„ã„ã¾ã™) ã‚’ä½¿ç”¨ã—ãŸå ´åˆã€æœ¬ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã«åŒæ„ã—ãŸã“ã¨ã«ãªã‚Šã¾ã™ã€‚ æœ¬ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã«åŒæ„ã•ã‚Œãªã„å ´åˆã€ãã®ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã‚’ä½¿ç”¨ã™ã‚‹ã“ã¨ã¯ã§ãã¾ã›ã‚“ã€‚
+–{ƒ‰ƒCƒZƒ“ƒX‚ÍAã‹L‚Ìu–{ Web ƒTƒCƒg‚Å“üè‰Â”\‚Èƒ\ƒtƒgƒEƒFƒA‚ÉŠÖ‚·‚é’ˆÓv‚Ì‹K’è‚É]‚¢Aƒ‰ƒCƒZƒ“ƒXŒ_–ñ‚È‚µ‚Å–{ Web ƒTƒCƒg‚Å“üè‰Â”\‚ÈuƒTƒ“ƒvƒ‹v‚Ü‚½‚Íu—áv‚Æ•\¦‚³‚ê‚Ä‚¢‚éƒR[ƒh‚Ìg—p‚É‚Â‚¢‚Ä‹K’è‚·‚é‚à‚Ì‚Å‚·B‚¨‹q—l‚ÍA‚©‚©‚éƒR[ƒh (ˆÈ‰ºuƒ\ƒtƒgƒEƒFƒAv‚Æ‚¢‚¢‚Ü‚·) ‚ğg—p‚µ‚½ê‡A–{ƒ‰ƒCƒZƒ“ƒX‚É“¯ˆÓ‚µ‚½‚±‚Æ‚É‚È‚è‚Ü‚·B –{ƒ‰ƒCƒZƒ“ƒX‚É“¯ˆÓ‚³‚ê‚È‚¢ê‡A‚»‚Ìƒ\ƒtƒgƒEƒFƒA‚ğg—p‚·‚é‚±‚Æ‚Í‚Å‚«‚Ü‚¹‚ñB
 
-1. å®šç¾©
+1. ’è‹`
 
-ã€Œè¤‡è£½ã™ã‚‹ã€ã€ã€Œè¤‡è£½ã€ã€ã€ŒäºŒæ¬¡çš„è‘—ä½œç‰©ã€ã€ã€Œé ’å¸ƒã€ã¨ã„ã†ç”¨èªã¯ãã‚Œãã‚Œã€ã‚¢ãƒ¡ãƒªã‚«åˆè¡†å›½è‘—ä½œæ¨©æ³•ã«ãŠã‘ã‚‹å ´åˆã¨åŒæ§˜ã®æ„å‘³ã‚’æœ‰ã—ã¾ã™ã€‚
+u•¡»‚·‚évAu•¡»vAu“ñŸ“I’˜ì•¨vAu”Ğ•zv‚Æ‚¢‚¤—pŒê‚Í‚»‚ê‚¼‚êAƒAƒƒŠƒJ‡O‘’˜ìŒ –@‚É‚¨‚¯‚éê‡‚Æ“¯—l‚ÌˆÓ–¡‚ğ—L‚µ‚Ü‚·B
 
-ã€ŒæŠ•ç¨¿ç‰©ã€ã¨ã¯ã€ã‚ªãƒªã‚¸ãƒŠãƒ«ã®ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã€ã¾ãŸã¯ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã¸ã®è¿½åŠ ã‚‚ã—ãã¯å¤‰æ›´ã‚’æ„å‘³ã—ã¾ã™ã€‚
+u“Še•¨v‚Æ‚ÍAƒIƒŠƒWƒiƒ‹‚Ìƒ\ƒtƒgƒEƒFƒAA‚Ü‚½‚Íƒ\ƒtƒgƒEƒFƒA‚Ö‚Ì’Ç‰Á‚à‚µ‚­‚Í•ÏX‚ğˆÓ–¡‚µ‚Ü‚·B
 
-ã€ŒæŠ•ç¨¿è€…ã€ã¨ã¯ã€æœ¬ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã«åŸºã¥ã„ã¦æŠ•ç¨¿ã‚’è¡Œã†äººã‚’æ„å‘³ã—ã¾ã™ã€‚
+u“ŠeÒv‚Æ‚ÍA–{ƒ‰ƒCƒZƒ“ƒX‚ÉŠî‚Ã‚¢‚Ä“Še‚ğs‚¤l‚ğˆÓ–¡‚µ‚Ü‚·B
 
-ã€Œä½¿ç”¨è¨±è«¾ã•ã‚ŒãŸç‰¹è¨±ã€ã¨ã¯ã€æŠ•ç¨¿ç‰©ãŒç›´æ¥æŠµè§¦ã™ã‚‹æŠ•ç¨¿è€…ã®ç‰¹è¨±ã‚¯ãƒ¬ãƒ¼ãƒ ã‚’æ„å‘³ã—ã¾ã™ã€‚
+ug—p‹–‘ø‚³‚ê‚½“Á‹–v‚Æ‚ÍA“Še•¨‚ª’¼Ú’ïG‚·‚é“ŠeÒ‚Ì“Á‹–ƒNƒŒ[ƒ€‚ğˆÓ–¡‚µ‚Ü‚·B
 
-2. æ¨©åˆ©ã®è¨±å¯
+2. Œ —˜‚Ì‹–‰Â
 
-(A) è‘—ä½œæ¨©ã®è¨±è«¾ â€“ ç¬¬ 3 æ¡ã®ä½¿ç”¨è¨±è«¾æ¡ä»¶ãŠã‚ˆã³åˆ¶é™ã‚’å«ã‚€æœ¬ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã®è¦å®šã«å¾“ã„ã€å„æŠ•ç¨¿è€…ã¯ãŠå®¢æ§˜ã«å¯¾ã—ã¦ã€ãã‚Œãã‚Œã®æŠ•ç¨¿ç‰©ã‚’è¤‡è£½ã—ã€æŠ•ç¨¿ç‰©ã®äºŒæ¬¡çš„è‘—ä½œç‰©ã‚’ä½œæˆã—ã€æŠ•ç¨¿ç‰©ã¾ãŸã¯ãŠå®¢æ§˜ãŒä½œæˆã—ãŸäºŒæ¬¡çš„è‘—ä½œç‰©ã‚’é ’å¸ƒã™ã‚‹ãŸã‚ã®éç‹¬å çš„ã‹ã¤åœ°åŸŸç„¡åˆ¶é™ã®è‘—ä½œæ¨©ã‚’ç„¡å„Ÿã§è¨±è«¾ã—ã¾ã™ã€‚
+(A) ’˜ìŒ ‚Ì‹–‘ø ? ‘æ 3 ğ‚Ìg—p‹–‘øğŒ‚¨‚æ‚Ñ§ŒÀ‚ğŠÜ‚Ş–{ƒ‰ƒCƒZƒ“ƒX‚Ì‹K’è‚É]‚¢AŠe“ŠeÒ‚Í‚¨‹q—l‚É‘Î‚µ‚ÄA‚»‚ê‚¼‚ê‚Ì“Še•¨‚ğ•¡»‚µA“Še•¨‚Ì“ñŸ“I’˜ì•¨‚ğì¬‚µA“Še•¨‚Ü‚½‚Í‚¨‹q—l‚ªì¬‚µ‚½“ñŸ“I’˜ì•¨‚ğ”Ğ•z‚·‚é‚½‚ß‚Ì”ñ“Æè“I‚©‚Â’nˆæ–³§ŒÀ‚Ì’˜ìŒ ‚ğ–³‚Å‹–‘ø‚µ‚Ü‚·B
 
-(B) ç‰¹è¨±è¨±è«¾ â€“ ç¬¬ 3 æ¡ã®ä½¿ç”¨è¨±è«¾æ¡ä»¶ãŠã‚ˆã³åˆ¶é™ã‚’å«ã‚€æœ¬å¥‘ç´„æ›¸ã®è¦å®šã«å¾“ã„ã€å„æŠ•ç¨¿è€…ã¯ãŠå®¢æ§˜ã«å¯¾ã—ã¦ã€æœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢å†…ã®æŠ•ç¨¿ç‰©ã‚‚ã—ãã¯æœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢å†…ã®æŠ•ç¨¿ç‰©ã®äºŒæ¬¡çš„è‘—ä½œç‰©ã«ã¤ãã€ä½¿ç”¨è¨±è«¾ã•ã‚ŒãŸç‰¹è¨±ã«åŸºã¥ã„ã¦ä½œæˆã€ç¬¬ä¸‰è€…ã«ã‚ˆã‚‹ä½œæˆã€ä½¿ç”¨ã€è²©å£²ã€è¼¸å…¥ãã®ä»–ã®æ‰‹æ®µã«ã‚ˆã‚‹å‡¦åˆ†ã‚’å®Ÿæ–½ã™ã‚‹ãŸã‚ã®éç‹¬å çš„ã‹ã¤åœ°åŸŸç„¡åˆ¶é™ã®è‘—ä½œæ¨©ã‚’ç„¡å„Ÿã§è¨±è«¾ã—ã¾ã™ã€‚
+(B) “Á‹–‹–‘ø ? ‘æ 3 ğ‚Ìg—p‹–‘øğŒ‚¨‚æ‚Ñ§ŒÀ‚ğŠÜ‚Ş–{Œ_–ñ‘‚Ì‹K’è‚É]‚¢AŠe“ŠeÒ‚Í‚¨‹q—l‚É‘Î‚µ‚ÄA–{ƒ\ƒtƒgƒEƒFƒA“à‚Ì“Še•¨‚à‚µ‚­‚Í–{ƒ\ƒtƒgƒEƒFƒA“à‚Ì“Še•¨‚Ì“ñŸ“I’˜ì•¨‚É‚Â‚«Ag—p‹–‘ø‚³‚ê‚½“Á‹–‚ÉŠî‚Ã‚¢‚Äì¬A‘æOÒ‚É‚æ‚éì¬Ag—pA”Ì”„A—A“ü‚»‚Ì‘¼‚Ìè’i‚É‚æ‚éˆ•ª‚ğÀ{‚·‚é‚½‚ß‚Ì”ñ“Æè“I‚©‚Â’nˆæ–³§ŒÀ‚Ì’˜ìŒ ‚ğ–³‚Å‹–‘ø‚µ‚Ü‚·B
 
-3. æ¡ä»¶ã¨åˆ¶é™
+3. ğŒ‚Æ§ŒÀ
 
-(A) å•†æ¨™ä½¿ç”¨è¨±è«¾ã®æ’é™¤ â€“ æœ¬ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã¯ãŠå®¢æ§˜ã«å¯¾ã—ã€æŠ•ç¨¿è€…ã®åç§°ã€ãƒ­ã‚´ã¾ãŸã¯å•†æ¨™ã‚’ä½¿ç”¨ã™ã‚‹æ¨©åˆ©ã‚’ä»˜ä¸ã™ã‚‹ã‚‚ã®ã§ã¯ã‚ã‚Šã¾ã›ã‚“ã€‚
+(A) ¤•Wg—p‹–‘ø‚Ì”rœ ? –{ƒ‰ƒCƒZƒ“ƒX‚Í‚¨‹q—l‚É‘Î‚µA“ŠeÒ‚Ì–¼ÌAƒƒS‚Ü‚½‚Í¤•W‚ğg—p‚·‚éŒ —˜‚ğ•t—^‚·‚é‚à‚Ì‚Å‚Í‚ ‚è‚Ü‚¹‚ñB
 
-(B) æœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã«ã‚ˆã£ã¦ç‰¹è¨±ãŒä¾µå®³ã•ã‚ŒãŸã¨ã—ã¦ã€ãŠå®¢æ§˜ãŒæŠ•ç¨¿è€…ã«å¯¾ã—ã¦ç‰¹è¨±æ¨©ã«åŸºã¥ãè«‹æ±‚ã‚’ç”³ã—ç«‹ã¦ã‚‹å ´åˆã€ã‹ã‹ã‚‹æŠ•ç¨¿è€…ã‹ã‚‰ãŠå®¢æ§˜ã«ä»˜ä¸ã•ã‚Œã¦ã„ãŸç‰¹è¨±ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã¯è‡ªå‹•çš„ã«çµ‚äº†ã™ã‚‹ã‚‚ã®ã¨ã—ã¾ã™ã€‚
+(B) –{ƒ\ƒtƒgƒEƒFƒA‚É‚æ‚Á‚Ä“Á‹–‚ªNŠQ‚³‚ê‚½‚Æ‚µ‚ÄA‚¨‹q—l‚ª“ŠeÒ‚É‘Î‚µ‚Ä“Á‹–Œ ‚ÉŠî‚Ã‚­¿‹‚ğ\‚µ—§‚Ä‚éê‡A‚©‚©‚é“ŠeÒ‚©‚ç‚¨‹q—l‚É•t—^‚³‚ê‚Ä‚¢‚½“Á‹–ƒ‰ƒCƒZƒ“ƒX‚Í©“®“I‚ÉI—¹‚·‚é‚à‚Ì‚Æ‚µ‚Ü‚·B
 
-(C) æœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã®ä¸€éƒ¨ã‚’é ’å¸ƒã™ã‚‹å ´åˆã€ãŠå®¢æ§˜ã¯ã€æœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã«ã‚ã‚‹è‘—ä½œæ¨©ã€ç‰¹è¨±æ¨©ã€å•†æ¨™ã€å¸°å±æ¨©ã«é–¢ã™ã‚‹ã™ã¹ã¦ã®é€šçŸ¥ã‚’ãã®ã¾ã¾è¡¨ç¤ºã™ã‚‹ã‚‚ã®ã¨ã—ã¾ã™ã€‚
+(C) –{ƒ\ƒtƒgƒEƒFƒA‚Ìˆê•”‚ğ”Ğ•z‚·‚éê‡A‚¨‹q—l‚ÍA–{ƒ\ƒtƒgƒEƒFƒA‚É‚ ‚é’˜ìŒ A“Á‹–Œ A¤•WA‹A‘®Œ ‚ÉŠÖ‚·‚é‚·‚×‚Ä‚Ì’Ê’m‚ğ‚»‚Ì‚Ü‚Ü•\¦‚·‚é‚à‚Ì‚Æ‚µ‚Ü‚·B
 
-(D) æœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã®ä¸€éƒ¨ã‚’ã‚½ãƒ¼ã‚¹ ã‚³ãƒ¼ãƒ‰å½¢å¼ã§é ’å¸ƒã™ã‚‹å ´åˆã€ãŠå®¢æ§˜ã¯ã€æœ¬ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã®å®Œå…¨ãªå†™ã—ã‚’ãŠå®¢æ§˜ã®é ’å¸ƒç‰©ã«çµ„ã¿å…¥ã‚Œã‚‹ã“ã¨ã«ã‚ˆã‚Šã€æœ¬ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã«åŸºã¥ã„ã¦ã®ã¿é ’å¸ƒã‚’è¡Œã†ã“ã¨ãŒã§ãã¾ã™ã€‚ æœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã®ä¸€éƒ¨ã‚’ã‚³ãƒ³ãƒ‘ã‚¤ãƒ«æ¸ˆã¿ã‚³ãƒ¼ãƒ‰å½¢å¼ã¾ãŸã¯ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ ã‚³ãƒ¼ãƒ‰å½¢å¼ã§é ’å¸ƒã™ã‚‹å ´åˆã€ãŠå®¢æ§˜ã¯ã€æœ¬ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã«æº–æ‹ ã—ãŸãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã«åŸºã¥ã„ã¦ã®ã¿é ’å¸ƒã‚’è¡Œã†ã“ã¨ãŒã§ãã¾ã™ã€‚
+(D) –{ƒ\ƒtƒgƒEƒFƒA‚Ìˆê•”‚ğƒ\[ƒX ƒR[ƒhŒ`®‚Å”Ğ•z‚·‚éê‡A‚¨‹q—l‚ÍA–{ƒ‰ƒCƒZƒ“ƒX‚ÌŠ®‘S‚ÈÊ‚µ‚ğ‚¨‹q—l‚Ì”Ğ•z•¨‚É‘g‚İ“ü‚ê‚é‚±‚Æ‚É‚æ‚èA–{ƒ‰ƒCƒZƒ“ƒX‚ÉŠî‚Ã‚¢‚Ä‚Ì‚İ”Ğ•z‚ğs‚¤‚±‚Æ‚ª‚Å‚«‚Ü‚·B –{ƒ\ƒtƒgƒEƒFƒA‚Ìˆê•”‚ğƒRƒ“ƒpƒCƒ‹Ï‚İƒR[ƒhŒ`®‚Ü‚½‚ÍƒIƒuƒWƒFƒNƒg ƒR[ƒhŒ`®‚Å”Ğ•z‚·‚éê‡A‚¨‹q—l‚ÍA–{ƒ‰ƒCƒZƒ“ƒX‚É€‹’‚µ‚½ƒ‰ƒCƒZƒ“ƒX‚ÉŠî‚Ã‚¢‚Ä‚Ì‚İ”Ğ•z‚ğs‚¤‚±‚Æ‚ª‚Å‚«‚Ü‚·B
 
-(E) æœ¬ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã¯ã€Œç¾çŠ¶æœ‰å§¿ã®ã¾ã¾ã€ã§ä½¿ç”¨è¨±è«¾ã•ã‚Œã¾ã™ã€‚æœ¬ã‚µãƒ¼ãƒ“ã‚¹ã®ä½¿ç”¨ã‹ã‚‰ç”Ÿã˜ã‚‹å±é™ºã¯ã€ãŠå®¢æ§˜ãŒè² æ‹…ã™ã‚‹ã‚‚ã®ã¨ã—ã¾ã™ã€‚ æŠ•ç¨¿è€…ã¯ã€ä»–ã®æ˜ç¤ºçš„ãªä¿è¨¼ã€æ‹…ä¿ã€ã¾ãŸã¯æ¡ä»¶ã«ã¤ã„ã¦ã¯ä¸€åˆ‡ã®è²¬ä»»ã‚’è² ã„ã¾ã›ã‚“ã€‚ ãŠå®¢æ§˜ã®åœ°åŸŸã®æ³•ä»¤ã«ã‚ˆã£ã¦ã¯ã€æœ¬ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã«ã‚ˆã£ã¦å¤‰æ›´ã™ã‚‹ã“ã¨ã®ã§ããªã„ã€ãã®ä»–ã®æ¶ˆè²»è€…ã¨ã—ã¦ã®æ¨©åˆ©ãŒå­˜åœ¨ã™ã‚‹å ´åˆãŒã‚ã‚Šã¾ã™ã€‚ ãŠå®¢æ§˜ã®åœ°åŸŸã®æ³•å¾‹ã«ã‚ˆã£ã¦èªã‚ã‚‰ã‚Œã‚‹ç¯„å›²ã«ãŠã„ã¦ã€æŠ•ç¨¿è€…ã¯ã€å•†å“æ€§ã€ç‰¹å®šç›®çš„é©åˆæ€§ãŠã‚ˆã³ç¬¬ä¸‰è€…ã®æ¨©åˆ©ã®éä¾µå®³æ€§ã«é–¢ã™ã‚‹é»™ç¤ºã®ä¿è¨¼ã‚’ã„ãŸã—ã¾ã›ã‚“ã€‚
+(E) –{ƒ\ƒtƒgƒEƒFƒA‚ÍuŒ»ó—Lp‚Ì‚Ü‚Üv‚Åg—p‹–‘ø‚³‚ê‚Ü‚·B–{ƒT[ƒrƒX‚Ìg—p‚©‚ç¶‚¶‚éŠëŒ¯‚ÍA‚¨‹q—l‚ª•‰’S‚·‚é‚à‚Ì‚Æ‚µ‚Ü‚·B “ŠeÒ‚ÍA‘¼‚Ì–¾¦“I‚È•ÛØA’S•ÛA‚Ü‚½‚ÍğŒ‚É‚Â‚¢‚Ä‚ÍˆêØ‚ÌÓ”C‚ğ•‰‚¢‚Ü‚¹‚ñB ‚¨‹q—l‚Ì’nˆæ‚Ì–@—ß‚É‚æ‚Á‚Ä‚ÍA–{ƒ‰ƒCƒZƒ“ƒX‚É‚æ‚Á‚Ä•ÏX‚·‚é‚±‚Æ‚Ì‚Å‚«‚È‚¢A‚»‚Ì‘¼‚ÌÁ”ïÒ‚Æ‚µ‚Ä‚ÌŒ —˜‚ª‘¶İ‚·‚éê‡‚ª‚ ‚è‚Ü‚·B ‚¨‹q—l‚Ì’nˆæ‚Ì–@—¥‚É‚æ‚Á‚Ä”F‚ß‚ç‚ê‚é”ÍˆÍ‚É‚¨‚¢‚ÄA“ŠeÒ‚ÍA¤•i«A“Á’è–Ú“I“K‡«‚¨‚æ‚Ñ‘æOÒ‚ÌŒ —˜‚Ì”ñNŠQ«‚ÉŠÖ‚·‚é–Ù¦‚Ì•ÛØ‚ğ‚¢‚½‚µ‚Ü‚¹‚ñB
 
-(F) ãƒ—ãƒ©ãƒƒãƒˆãƒ•ã‚©ãƒ¼ãƒ ã®é™å®š â€“ ç¬¬ 2 æ¡ (A) é …ãŠã‚ˆã³ç¬¬ 2 æ¡ (B) é …ã§ä»˜ä¸ã•ã‚Œã‚‹ãƒ©ã‚¤ã‚»ãƒ³ã‚¹ã¯ã€ãŠå®¢æ§˜ãŒä½œæˆã—ã€Microsoft Windows ã‚ªãƒšãƒ¬ãƒ¼ãƒ†ã‚£ãƒ³ã‚° ã‚·ã‚¹ãƒ†ãƒ è£½å“ä¸Šã§å‹•ä½œã™ã‚‹ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã¾ãŸã¯äºŒæ¬¡çš„è‘—ä½œç‰©ã®ã¿ã«é©ç”¨ã•ã‚Œã¾ã™ã€‚
+(F) ƒvƒ‰ƒbƒgƒtƒH[ƒ€‚ÌŒÀ’è ? ‘æ 2 ğ (A) €‚¨‚æ‚Ñ‘æ 2 ğ (B) €‚Å•t—^‚³‚ê‚éƒ‰ƒCƒZƒ“ƒX‚ÍA‚¨‹q—l‚ªì¬‚µAMicrosoft Windows ƒIƒyƒŒ[ƒeƒBƒ“ƒO ƒVƒXƒeƒ€»•iã‚Å“®ì‚·‚éƒ\ƒtƒgƒEƒFƒA‚Ü‚½‚Í“ñŸ“I’˜ì•¨‚Ì‚İ‚É“K—p‚³‚ê‚Ü‚·B

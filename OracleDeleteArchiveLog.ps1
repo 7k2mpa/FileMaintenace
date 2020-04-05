@@ -1,4 +1,4 @@
-﻿#Requires -Version 3.0
+#Requires -Version 3.0
 
 <#
 .SYNOPSIS
@@ -9,11 +9,11 @@ CommonFunctions.ps1 is required.
 <Common Parameters> is not supported.
 
 
-指定日以前のOracle Archive Logを削除するツールです。
-Oracleの仕様上、Oracleから古いArchive Logは認識されなくなりますが、ファイルシステム上のファイルは削除されません。
-別途、OSコマンドやFileMaintenance.ps1でファイルを削除してください。 
+�w����ȑO��Oracle Archive Log���폜����c�[���ł��B
+Oracle�̎d�l��AOracle����Â�Archive Log�͔F������Ȃ��Ȃ�܂����A�t�@�C���V�X�e����̃t�@�C���͍폜����܂���B
+�ʓr�AOS�R�}���h��FileMaintenance.ps1�Ńt�@�C�����폜���Ă��������B 
 
-<Common Parameters>はサポートしていません
+<Common Parameters>�̓T�|�[�g���Ă��܂���
 
 .DESCRIPTION 
 This script deletes Oracle Achive logs older than specified days.
@@ -26,11 +26,11 @@ If you connect another target, set $env:ORACLE_SID before start the script.
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
 
-指定日以前のOracle Archive Logを削除するツールです。
-セットで使用するDeleteArchivelog.rmanを読み込み、実行します。予め配置してください。
-実行の際に、何日前を削除するか、引数で指定が可能です。
+�w����ȑO��Oracle Archive Log���폜����c�[���ł��B
+�Z�b�g�Ŏg�p����DeleteArchivelog.rman��ǂݍ��݁A���s���܂��B�\�ߔz�u���Ă��������B
+���s�̍ۂɁA�����O���폜���邩�A�����Ŏw�肪�\�ł��B
 
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
+���O�o�͐��[Windows EventLog][�R���\�[��][���O�t�@�C��]���I���\�ł��B���ꂼ��o�́A�}�~���w��ł��܂��B
 
 
 File Path sample
@@ -57,12 +57,12 @@ $ORACLE_HOME\network\admin\sqlnet.ora
 SQLNET.AUTHENTICATION_SERVICES = (NTS)
 
 
-予め設定済OracleSIDのインスタンスの7日以前のarchive logを削除します。
-RMAN実行結果のログは本スクリプト配置から見て、相対パスの..\Log\Rman.logに出力します。
-Rman.logが存在しない場合はファイルを新規作成します。
-RMAN実行時の認証はOS認証となり、このスクリプトを実行しているユーザがスクリプト実行ユーザとなります。
-当該実行ユーザに対してOracle Administration Assistant for Windowsを使って、管理者権限を付与しておいて下さい。
-$ORACLE_HOME\network\admin\sqlnet.ora ファイルに以下の記述が必要です。
+�\�ߐݒ��OracleSID�̃C���X�^���X��7���ȑO��archive log���폜���܂��B
+RMAN���s���ʂ̃��O�͖{�X�N���v�g�z�u���猩�āA���΃p�X��..\Log\Rman.log�ɏo�͂��܂��B
+Rman.log�����݂��Ȃ��ꍇ�̓t�@�C����V�K�쐬���܂��B
+RMAN���s���̔F�؂�OS�F�؂ƂȂ�A���̃X�N���v�g�����s���Ă��郆�[�U���X�N���v�g���s���[�U�ƂȂ�܂��B
+���Y���s���[�U�ɑ΂���Oracle Administration Assistant for Windows���g���āA�Ǘ��Ҍ�����t�^���Ă����ĉ������B
+$ORACLE_HOME\network\admin\sqlnet.ora �t�@�C���Ɉȉ��̋L�q���K�v�ł��B
 SQLNET.AUTHENTICATION_SERVICES = (NTS)
 
 
@@ -77,11 +77,11 @@ Authentification for connecting is with plain text user 'foo' and password 'bar'
 Recommend OS authentification for security.
 
 
-Oracleサービス名MCFRAME（OS上のサービス名OracleMCFRAME）のインスタンスの7日以前のarchive logを削除します。
-RMAN実行結果のログは本スクリプト配置から見て、相対パスの..\Log\Rman.logに出力します。
-Rman.logが存在しない場合はファイルを新規作成します。
-RMAN実行時の認証はパスワード認証となり、-ExecUser、-ExecUserPasswordで指定されたユーザfoo、パスワードbarでOracleへ接続します。
-セキュリティの観点から極力OS認証を利用される事を推奨します。
+Oracle�T�[�r�X��MCFRAME�iOS��̃T�[�r�X��OracleMCFRAME�j�̃C���X�^���X��7���ȑO��archive log���폜���܂��B
+RMAN���s���ʂ̃��O�͖{�X�N���v�g�z�u���猩�āA���΃p�X��..\Log\Rman.log�ɏo�͂��܂��B
+Rman.log�����݂��Ȃ��ꍇ�̓t�@�C����V�K�쐬���܂��B
+RMAN���s���̔F�؂̓p�X���[�h�F�؂ƂȂ�A-ExecUser�A-ExecUserPassword�Ŏw�肳�ꂽ���[�Ufoo�A�p�X���[�hbar��Oracle�֐ڑ����܂��B
+�Z�L�����e�B�̊ϓ_����ɗ�OS�F�؂𗘗p����鎖�𐄏����܂��B
 
 
 
@@ -89,30 +89,30 @@ RMAN実行時の認証はパスワード認証となり、-ExecUser、-ExecUserP
 Specify Oracle_SID for deleting RMAN log.
 Should set '$Env:ORACLE_SID' by default.
 
-RMAN Logを削除する対象のOracleSIDを指定します。
+RMAN Log���폜����Ώۂ�OracleSID���w�肵�܂��B
 
 
 .PARAMETER OracleService
 This parameter is planed to obsolute.
 
-RMAN Logを削除する対象のOracleSIDを指定します。
-このパラメータは廃止予定です。
+RMAN Log���폜����Ώۂ�OracleSID���w�肵�܂��B
+���̃p�����[�^�͔p�~�\��ł��B
 
 
 .PARAMETER OracleHomeBinPath
 Specify Oracle 'BIN' path in the child path Oracle home. 
 Should set "$Env:ORACLE_HOME +'\BIN'" by default.
 
-Oracle Home配下のBINフォルダまでのパスを指定します。
-通常は標準設定である$Env:ORACLE_HOME +'\BIN'（Powershellでの表記）で良いのですが、OSで環境変数%ORACLE_HOME%が未設定環境では当該を設定してください。
+Oracle Home�z����BIN�t�H���_�܂ł̃p�X���w�肵�܂��B
+�ʏ�͕W���ݒ�ł���$Env:ORACLE_HOME +'\BIN'�iPowershell�ł̕\�L�j�ŗǂ��̂ł����AOS�Ŋ��ϐ�%ORACLE_HOME%�����ݒ���ł͓��Y��ݒ肵�Ă��������B
 
 
 .PARAMETER ExecRMANPath
 Specify path of DeleteArchiveLog.rman
 Can specify relative or absolute path format.
 
-実行するRMANファイルのパスを指定します。
-相対パス、絶対パスでの指定が可能です。
+���s����RMAN�t�@�C���̃p�X���w�肵�܂��B
+���΃p�X�A��΃p�X�ł̎w�肪�\�ł��B
 
 
 .PARAMETER OracleRmanLogPath
@@ -121,114 +121,114 @@ If the file dose not exist, create a new file.
 Can specify relative or absolute path format.
 
 
-RMAN実行時のログ出力先ファイルパスを指定します。
-ログ出力先ファイルが存在しない場合は新規作成します。
-相対パス、絶対パスでの指定が可能です。
+RMAN���s���̃��O�o�͐�t�@�C���p�X���w�肵�܂��B
+���O�o�͐�t�@�C�������݂��Ȃ��ꍇ�͐V�K�쐬���܂��B
+���΃p�X�A��΃p�X�ł̎w�肪�\�ł��B
 
 
 .PARAMETER Days
 Specify days to delete.
 
-削除対象にするRMANの経過日数を指定します。
+�폜�Ώۂɂ���RMAN�̌o�ߓ������w�肵�܂��B
 
 
 .PARAMETER PasswordAuthorization
 Specify authentification with password authorization.
 Should use OS authentification.
 
-パスワード認証を指定します。
-OS認証が使えない時に使用する事を推奨します。
+�p�X���[�h�F�؂��w�肵�܂��B
+OS�F�؂��g���Ȃ����Ɏg�p���鎖�𐄏����܂��B
 
 .PARAMETER ExecUser
 Specify Oracle User to connect. 
 Should use OS authentification.
 
-パスワード認証時のユーザを設定します。
-OS認証が使えない時に使用する事を推奨します。
+�p�X���[�h�F�؎��̃��[�U��ݒ肵�܂��B
+OS�F�؂��g���Ȃ����Ɏg�p���鎖�𐄏����܂��B
 
 .PARAMETER ExecUserPassword
 Specify Oracle user Password to connect. 
 Should use OS authentification.
 
-パスワード認証時のユーザパスワードを設定します。
-OS認証が使えない時に使用する事を推奨します。
+�p�X���[�h�F�؎��̃��[�U�p�X���[�h��ݒ肵�܂��B
+OS�F�؂��g���Ȃ����Ɏg�p���鎖�𐄏����܂��B
 
 
 
 
 .PARAMETER Log2EventLog
-　Windows Event Logへの出力を制御します。
-デフォルトは$TRUEでEvent Log出力します。
+�@Windows Event Log�ւ̏o�͂𐧌䂵�܂��B
+�f�t�H���g��$TRUE��Event Log�o�͂��܂��B
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $Falseと等価です。
+�@Event Log�o�͂�}�~���܂��B-Log2EventLog $False�Ɠ����ł��B
 
 .PARAMETER ProviderName
-　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
+�@Windows Event Log�o�͂̃v���o�C�_�����w�肵�܂��B�f�t�H���g��[Infra]�ł��B
 
 .PARAMETER EventLogLogName
-　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
+�@Windows Event Log�o�͂̃��O�������Ă��܂��B�f�t�H���g��[Application]�ł��B
 
 .PARAMETER Log2Console 
-　コンソールへのログ出力を制御します。
-デフォルトは$TRUEでコンソール出力します。
+�@�R���\�[���ւ̃��O�o�͂𐧌䂵�܂��B
+�f�t�H���g��$TRUE�ŃR���\�[���o�͂��܂��B
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $Falseと等価です。
+�@�R���\�[�����O�o�͂�}�~���܂��B-Log2Console $False�Ɠ����ł��B
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$Falseでログファイル出力しません。
+�@���O�t�B���ւ̏o�͂𐧌䂵�܂��B�f�t�H���g��$False�Ń��O�t�@�C���o�͂��܂���B
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $Falseと等価です。
+�@���O�t�@�C���o�͂�}�~���܂��B-Log2File $False�Ɠ����ł��B
 
 .PARAMETER LogPath
-　ログファイル出力パスを指定します。デフォルトは$NULLです。
-相対、絶対パスで指定可能です。
-ファイルが存在しない場合は新規作成します。
-ファイルが既存の場合は追記します。
+�@���O�t�@�C���o�̓p�X���w�肵�܂��B�f�t�H���g��$NULL�ł��B
+���΁A��΃p�X�Ŏw��\�ł��B
+�t�@�C�������݂��Ȃ��ꍇ�͐V�K�쐬���܂��B
+�t�@�C���������̏ꍇ�͒ǋL���܂��B
 
 .PARAMETER LogDateFormat
-　ログファイル出力に含まれる日時表示フォーマットを指定します。デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
+�@���O�t�@�C���o�͂Ɋ܂܂������\���t�H�[�}�b�g���w�肵�܂��B�f�t�H���g��[yyyy-MM-dd-HH:mm:ss]�`���ł��B
 
 .PARAMETER NormalReturnCode
-　正常終了時のリターンコードを指定します。デフォルトは0です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@����I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��0�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER WarningReturnCode
-　警告終了時のリターンコードを指定します。デフォルトは1です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�x���I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��1�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER ErrorReturnCode
-　異常終了時のリターンコードを指定します。デフォルトは8です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�ُ�I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��8�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER InternalErrorReturnCode
-　プログラム内部異常終了時のリターンコードを指定します。デフォルトは16です。正常終了=<警告終了=<（内部）異常終了として下さい。
+�@�v���O���������ُ�I�����̃��^�[���R�[�h���w�肵�܂��B�f�t�H���g��16�ł��B����I��=<�x���I��=<�i�����j�ُ�I���Ƃ��ĉ������B
 
 .PARAMETER InfoEventID
-　Event Log出力でInformationに対するEvent IDを指定します。デフォルトは1です。
+�@Event Log�o�͂�Information�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��1�ł��B
 
 .PARAMETER WarningEventID
-　Event Log出力でWarningに対するEvent IDを指定します。デフォルトは10です。
+�@Event Log�o�͂�Warning�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��10�ł��B
 
 .PARAMETER SuccessErrorEventID
-　Event Log出力でSuccessに対するEvent IDを指定します。デフォルトは73です。
+�@Event Log�o�͂�Success�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��73�ł��B
 
 .PARAMETER InternalErrorEventID
-　Event Log出力でInternal Errorに対するEvent IDを指定します。デフォルトは99です。
+�@Event Log�o�͂�Internal Error�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��99�ł��B
 
 .PARAMETER ErrorEventID
-　Event Log出力でErrorに対するEvent IDを指定します。デフォルトは100です。
+�@Event Log�o�͂�Error�ɑ΂���Event ID���w�肵�܂��B�f�t�H���g��100�ł��B
 
 .PARAMETER ErrorAsWarning
-　異常終了しても警告終了のReturnCodeを返します。
+�@�ُ�I�����Ă��x���I����ReturnCode��Ԃ��܂��B
 
 .PARAMETER WarningAsNormal
-　警告終了しても正常終了のReturnCodeを返します。
+�@�x���I�����Ă�����I����ReturnCode��Ԃ��܂��B
 
 .PARAMETER ExecutableUser
-　このプログラムを実行可能なユーザを正規表現で指定します。
-デフォルトは[.*]で全てのユーザが実行可能です。　
-記述はシングルクオーテーションで括って下さい。
-正規表現のため、ドメインのバックスラッシュは[domain\\.*]の様にバックスラッシュでエスケープして下さい。　
+�@���̃v���O���������s�\�ȃ��[�U�𐳋K�\���Ŏw�肵�܂��B
+�f�t�H���g��[.*]�őS�Ẵ��[�U�����s�\�ł��B�@
+�L�q�̓V���O���N�I�[�e�[�V�����Ŋ����ĉ������B
+���K�\���̂��߁A�h���C���̃o�b�N�X���b�V����[domain\\.*]�̗l�Ƀo�b�N�X���b�V���ŃG�X�P�[�v���ĉ������B�@
 
 .NOTES
 
@@ -310,7 +310,7 @@ Param(
 
 Try {
 
-    #CommonFunctions.ps1の配置先を変更した場合は、ここを変更。同一フォルダに配置前提
+    #CommonFunctions.ps1�̔z�u���ύX�����ꍇ�́A������ύX�B����t�H���_�ɔz�u�O��
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception] {
@@ -318,51 +318,51 @@ Try {
     Exit 1
     }
 
-################ 設定が必要なのはここまで ##################
+################ �ݒ肪�K�v�Ȃ̂͂����܂� ##################
 
 
 
-################# 共通部品、関数  #######################
+################# ���ʕ��i�A�֐�  #######################
 
 
 function Initialize {
 
 $ShellName = $PSCommandPath | Split-Path -Leaf
 
-#イベントソース未設定時の処理
-#ログファイル出力先確認
-#ReturnCode確認
-#実行ユーザ確認
-#プログラム起動メッセージ
+#�C�x���g�\�[�X���ݒ莞�̏���
+#���O�t�@�C���o�͐�m�F
+#ReturnCode�m�F
+#���s���[�U�m�F
+#�v���O�����N�����b�Z�[�W
 
 . Invoke-PreInitialize
 
-#ここまで完了すれば業務的なロジックのみを確認すれば良い
+#�����܂Ŋ�������΋Ɩ��I�ȃ��W�b�N�݂̂��m�F����Ηǂ�
 
 
-#パラメータの確認
+#�p�����[�^�̊m�F
 
-#OracleBINフォルダの指定、存在確認
+#OracleBIN�t�H���_�̎w��A���݊m�F
 
     $OracleHomeBinPath = $OracleHomeBinPath | ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath'
 
     $OracleHomeBinPath | Test-Container -Name '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
 
-#OracleRmanLogファイルの指定、存在、書き込み権限確認
+#OracleRmanLog�t�@�C���̎w��A���݁A�������݌����m�F
 
     $OracleRMANLogPath = $OracleRMANLogPath | ConvertTo-AbsolutePath -Name '-OracleRmanLogPath'
 
     $OracleRMANLogPath | Test-LogPath -Name '-OracleRMANLLogPath' > $NULL
 
 
-#実行するRMANファイルの存在確認
+#���s����RMAN�t�@�C���̑��݊m�F
    
     $ExecRmanPath = $ExecRmanPath  | ConvertTo-AbsolutePath -Name '-ExecRmanPath'
 
     $ExecRmanPath | Test-Leaf -Name '-ExecRmanPath' -IfNoExistFinalize > $NULL
 
 
-#対象のOracleがサービス起動しているか確認
+#�Ώۂ�Oracle���T�[�r�X�N�����Ă��邩�m�F
 
     $targetWindowsOracleService = "OracleService"+$OracleSID
 
@@ -377,7 +377,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 
 
-#処理開始メッセージ出力
+#�����J�n���b�Z�[�W�o��
 
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
@@ -397,14 +397,14 @@ Pop-Location
  Invoke-PostFinalize $ReturnCode
 }
 
-#####################   ここから本体  ######################
+#####################   ��������{��  ######################
 
 $DatumPath = $PSScriptRoot
 
-$Version = '20200313_1415'
+$Version = "2.0.0-beta.7"
 
 
-#初期設定、パラメータ確認、起動メッセージ出力
+#�����ݒ�A�p�����[�^�m�F�A�N�����b�Z�[�W�o��
 
 . Initialize
 
