@@ -18,7 +18,7 @@ for %%a in ( %* ) do set /a argc=argc+1
 
 if not %argc% == 3 (
 rem ˆø”ŒÂ”ˆá‚¢
-	eventcreate /L Application /T WARNING /SO Infra /D "[%MYSELF_NAME%]invalid numbers of augments" /ID 99
+	eventcreate /L Application /T WARNING /SO Infra /D "[%MYSELF_NAME%]invalid numbers of arguments" /ID 99
   	exit /b 1
 	)
 
