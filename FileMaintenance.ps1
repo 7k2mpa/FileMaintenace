@@ -375,11 +375,6 @@ If has skip to process, terminate as NORMAL.
 -Continueに優先します。
 デフォルトではスキップせずに異常終了します。
 
-.PARAMETER NoAction
-このパラメータは廃止予定です。後方互換性のために残していますが、-Whatifを使用してください。
-ファイル、フォルダを実際に削除等の操作をせずに実行します。全ての処理は成功扱いになります。
-動作確認するときに当該スイッチを指定してください。
-ログ上は警告が出力されますが、実行結果ではこの警告は無視されます。
 
 .PARAMETER NoneTargetAsWarning
 Specify if you want to terminate as WARNING with no files existed in the folder.
@@ -611,8 +606,7 @@ Param(
 [Switch]$MoveNewFile,
 [Switch]$NullOriginalFile,
 #Switches planned to obsolute please use -PreAction end
-[Switch]$NoAction,
-#Switches planned to obsolute end
+
 
 
 [Boolean]$Log2EventLog = $TRUE,
@@ -1052,8 +1046,8 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
                         } elseIF ($PreAction -contains '7zZIP') {
                             $message += "with compress method [7zZip] "
                             } else {
-                            $message += "with compress method [Powershell cmdlet Compress-Archive] "
-                            }                          
+                                $message += "with compress method [Powershell cmdlet Compress-Archive] "
+                                }                          
             }
             
             $message += ("recursively [$($Recurse)] PreAction(Add time stamp to filename["+[Boolean]($PreAction -contains 'AddTimeStamp')+"] | " + 
@@ -1084,9 +1078,6 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
             }
     }
 
-    IF ($NoAction) {
-        Write-Log -ID $InfoEventID -Type Information -Message "Specified -NoAction[$($NoAction)] option, thus do not process files or folders."
-        }
 
     IF ($OverRide) {
         Write-Log -ID $InfoEventID -Type Information -Message ("Specified -OverRide[$($OverRide)] option, " +

@@ -9,7 +9,7 @@ cd /D %SC_DIR%
 
 set P_NAME=OracleDB2NormalMode.ps1
 
-powershell -Noninteractive -Command ".\OracleDB2NormalMode.ps1 ; exit $LASTEXITCODE"
+powershell -Noninteractive -Command ".\%P_NAME% ; exit $LASTEXITCODE"
 
 	IF %errorlevel%==8 (
 		call %SC_DIR%MSGPRINT.bat "%P_NAME% terminated as Error Erro LevelÅÅ%errorlevel%" ERROR 100
@@ -19,7 +19,7 @@ powershell -Noninteractive -Command ".\OracleDB2NormalMode.ps1 ; exit $LASTEXITC
 
 set P_NAME=OracleDeleteArchiveLog.ps1
 
-powershell -Noninteractive -Command ".\OracleDeleteArchiveLog.ps1 -Days 1 ; exit $LASTEXITCODE"
+powershell -Noninteractive -Command ".\%P_NAME% -Days 1 ; exit $LASTEXITCODE"
 
 	IF %errorlevel%==8 (
 		call %SC_DIR%MSGPRINT.bat "%P_NAME% terminated as Error Erro LevelÅÅ%errorlevel%" ERROR 100
@@ -29,7 +29,7 @@ powershell -Noninteractive -Command ".\OracleDeleteArchiveLog.ps1 -Days 1 ; exit
 
 set P_NAME=Wrapper.ps1
 
-powershell -Noninteractive -Command ".\Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Config\Command.txt ; exit $LASTEXITCODE"
+powershell -Noninteractive -Command ".\%P_NAME% -CommandPath .\FileMaintenance.ps1 -CommandFile .\Config\Command.txt ; exit $LASTEXITCODE"
 
 	IF %errorlevel%==8 (
 		call %SC_DIR%MSGPRINT.bat "%P_NAME% terminated as Error Erro LevelÅÅ%errorlevel%" ERROR 100
@@ -39,7 +39,7 @@ powershell -Noninteractive -Command ".\Wrapper.ps1 -CommandPath .\FileMaintenanc
 
 #set P_NAME=LoopWrapper.ps1
 
-#powershell -Noninteractive -Command ".\LoopWrapper.ps1 -CommandPath .\CheckFlag.ps1 -CommandFile .\Config\LoopWrapperCommand.txt ; exit $LASTEXITCODE"
+#powershell -Noninteractive -Command ".\LoopWrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Config\LoopWrapperCommand.txt ; exit $LASTEXITCODE"
 
 #	IF %errorlevel%==1 (
 #		set P_NAME=FileMaintenance.ps1

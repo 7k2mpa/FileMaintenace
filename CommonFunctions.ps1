@@ -200,9 +200,16 @@ Param(
 [String][parameter(position = 1, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 [Alias("Path" , "FullName")]$ActionFrom ,
 
-[String]$ActionTo,
-[String]$ActionError,
-[String]$FileValue
+[String][parameter(position = 2)]$ActionTo,
+[String][parameter(position = 3)]$ActionError,
+[String][parameter(position = 4)]$FileValue,
+
+[Boolean]$WhatIfFlag = $WhatIfFlag ,
+[Boolean]$OverRideFlag = $OverRideFlag ,
+[Boolean]$ForceEndLoop = $ForceEndLoop ,
+[Boolean]$Continue = $Continue ,
+[String]$7zFolder = $7zFolder 
+
 )
 begin {
     IF (-not($ActionType -match "^(Delete|NullClear|MakeNewFolder|Rename)$" ) -and ($NULL -eq $ActionTo)) {
@@ -212,7 +219,7 @@ begin {
         }
 }
 process {
-    IF ($NoAction -or ($WhatIfFlag -and ($ActionType -match "(Compress|Archive)") ))  {
+    IF ($WhatIfFlag -and ($ActionType -match "(Compress|Archive)") ) {
     
         Write-Log -Id $WarningEventID -Type Warning -Message "Specified -WhatIf[$($WhatIfFlag)] option, thus do not execute [$($ActionType)] [$($ActionError)]"
         $Script:NormalFlag = $TRUE
@@ -387,7 +394,9 @@ function ConvertTo-AbsolutePath {
 [CmdletBinding()]
 Param(
 [String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path ,
-[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name
+[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name ,
+
+[String]$DatumPath = $DatumPath
 )
 
 begin {
