@@ -204,11 +204,11 @@ Param(
 [String][parameter(position = 3)]$ActionError,
 [String][parameter(position = 4)]$FileValue,
 
-[Boolean]$WhatIfFlag = $WhatIfFlag ,
-[Boolean]$OverRideFlag = $OverRideFlag ,
-[Boolean]$ForceEndLoop = $ForceEndLoop ,
-[Boolean]$Continue = $Continue ,
-[String]$7zFolder = $7zFolder 
+$WhatIfFlag = $WhatIfFlag ,
+$OverRideFlag = $OverRideFlag ,
+$ForceEndLoop = $ForceEndLoop ,
+$Continue = $Continue ,
+$7zFolder = $7zFolder 
 
 )
 begin {
