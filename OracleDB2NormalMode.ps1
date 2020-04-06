@@ -16,7 +16,7 @@ Oracle Databaseをバックアップ後に通常モードへ切替するスクリプトです。
 This script siwtch to Normal mode(Ending Backup Mode) Oracle Database after finishing backup software.
 The script loads SQLs.ps1, place SQLs.ps1 previously.
 OracleDB2BackUpMode.ps1 is offered also, you may use it with this script.
-If Windows Oracle service or Listener service, start them automatically.
+If Windows Oracle service or Listener service is stopped, start them automatically.
 
 Oracle Databaseをバックアップするには、予めデータベースの停止、またはバックアップモードへ切替が必要です。
 従来はデータベースの停止(Shutdown Immediate)で実装する例が大半ですが、停止はセッションが存在すると停止しない等で障害となる例もあります。
@@ -262,7 +262,7 @@ Param(
 
 [String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
 
-[String]$StartServicePath = '.\StartService.ps1' ,
+[String]$StartServicePath = '.\ChangeServiceStatus.ps1' ,
 
 [int][ValidateRange(1,65535)]$RetrySpanSec = 20,
 [int][ValidateRange(1,65535)]$RetryTimes = 15,
@@ -505,7 +505,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is already running."
         
         } else {
-        $serviceCommand = "$StartServicePath -Service $TargetOracleService -RetrySpanSec $RetrySpanSec -RetryTimes $RetryTimes"
+        $serviceCommand = "$StartServicePath -Service $TargetOracleService -Status Running -RetrySpanSec $RetrySpanSec -RetryTimes $RetryTimes"
 
 
         Try {
