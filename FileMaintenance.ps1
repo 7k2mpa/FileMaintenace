@@ -359,7 +359,7 @@ Specify if you want to override old same name files moved or copied.
 .PARAMETER Continue
 Specify if you want to skip old files do not want to override.
 If has skip to process, terminate as WARNING.
-[terminate as ERROR and do not skipp] is default. 
+[terminate as ERROR and do not skip] is default. 
 
 　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
 スキップすると警告終了します。
@@ -368,7 +368,7 @@ If has skip to process, terminate as WARNING.
 .PARAMETER ContinueAsNormal
 Specify if you want to skip old files do not want to override.
 If has skip to process, terminate as NORMAL.
-[terminate as ERROR and do not skipp] is default. 
+[terminate as ERROR and do not skip] is default. 
 
 　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
 -Continueと異なりスキップしても正常終了します。ファイルの差分コピー等で利用してください。
