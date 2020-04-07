@@ -348,6 +348,6 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
       Start-Sleep $RetrySpanSec
 }
 
-Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting prede times , site [$($Site)] state did not switch to [$($TargetState)]."
+Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting specified times , site [$($Site)] state did not switch to [$($TargetState)]."
 
 Finalize $ErrorReturnCode
