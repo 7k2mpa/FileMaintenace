@@ -408,19 +408,32 @@ Specify how many newer files in the folder to keep with -Action KeepFileCount op
 デフォルトは1です。
 
 .PARAMETER Compress
+Planed to obsolute.
+use -PreAction Compress
+
 このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction Compressを使用してください。
 対象ファイルを圧縮して別ファイルとして保存します。
 
 .PARAMETER AddTimeStamp
+Planed to obsolute.
+use -PreAction AddTimeStamp
+
+
 このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction AddTimeStampを使用してください。
 対象ファイル名に日時を付加して別ファイルとして保存します。
 
 .PARAMETER MoveNewFile
+Planed to obsolute.
+use -PreAction MoveNewFile
+
 このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction MoveNewFileを使用してください。
 -PreAction Compress , AddTimeStampを指定した際に生成される別ファイルを-MoveToFolderの指定先に保存します。
 デフォルトは対象ファイルと同一ディレクトリへ保存します。
 
 .PARAMETER NullOriginalFile
+Planed to obsolute.
+use -PostAction NullClear or -Action NullClear
+
 このパラメータは廃止予定です。後方互換性のために残していますが、-PostAction NullClearまたは-Action NullClearを使用してください。
 対象ファイルの内容消去（ヌルクリア）します。
 -PostAction NullClearと等価です。
@@ -428,38 +441,81 @@ Specify how many newer files in the folder to keep with -Action KeepFileCount op
 
 
 .PARAMETER Log2EventLog
+
+Specify if you want to output log to Windows Event Log.
+[$TRUE] is default.
+
 　Windows Event Logへの出力を制御します。
 デフォルトは$TRUEでEvent Log出力します。
 
 .PARAMETER NoLog2EventLog
+Specify if you want to suppress log to Windows Event Log.
+Specification override -Log2EventLog
+
 　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
 Log2EventLogより優先します。
 
 .PARAMETER ProviderName
+
+Specify provider name of Windows Event Log.
+[Infra] is default.
+
+
 　Windows Event Log出力のプロバイダ名を指定します。
 デフォルトは[Infra]です。
 
 .PARAMETER EventLogLogName
+
+Specify log name of Windows Event Log.
+[Application] is default.
+
 　Windows Event Log出力のログ名を指定します。
 デフォルトは[Application]です。
 
-.PARAMETER Log2Console 
+.PARAMETER Log2Console
+
+Specify if you want to output log to PowerShell console.
+[$TRUE] is default.
+
 　コンソールへのログ出力を制御します。
 デフォルトは$TRUEでコンソール出力します。
 
 .PARAMETER NoLog2Console
+
+Specify if you want to suppress log to PowerShell console.
+Specification override -Log2Console
+
 　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
 Log2Consoleより優先します。
 
 .PARAMETER Log2File
+
+Specify if you want to output log to text log.
+[$FALSE] is default.
+
 　ログフィルへの出力を制御します。
 デフォルトは$FALSEでログファイル出力しません。
 
 .PARAMETER NoLog2File
+
+Specify if you want to suppress log to PowerShell console.
+Specification override -Log2File
+
 　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
 Log2Fileより優先します。
 
 .PARAMETER LogPath
+
+Specify the path of text log.
+[$NULL] is default.
+
+Can specify relative or absolute path format.
+Relative path format must be starting with 'dot.'
+The path must not contain wild cards shch as asterisk* question?
+If the path contains bracket[] , specify path literally and do not escape.
+If the log file dose not exist, make new file.
+If the log file exist, write log additionally.
+
 　ログファイル出力パスを指定します。デフォルトは$NULLです。
 相対、絶対パスで指定可能です。
 相対パス表記は、.から始める表記にして下さい。（例 .\Log\Log.txt , ..\Script\log\log.txt）
@@ -469,53 +525,126 @@ Log2Fileより優先します。
 ファイルが既存の場合は追記します。
 
 .PARAMETER LogDateFormat
+
+Specicy time stamp format in the text log.
+[yyyy-MM-dd-HH:mm:ss] is default.
+
 　ログファイル出力に含まれる日時表示フォーマットを指定します。
 デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
 
 .PARAMETER LogFileEncode
+
+Specify the character encode in the log file.
+[Default] is default and it works as ShiftJIS.
+
+
 ログファイルの文字コードを指定します。
 デフォルトはShift-JISです。
 
 .PARAMETER NormalReturnCode
+
+Specify Normal Return code.
+[0] is default.
+Must specify NormarReturnCode =< WarningReturnCode =< ErrorReturnCode(InternalErrorReturnCode)
+
+
 　正常終了時のリターンコードを指定します。デフォルトは0です。正常終了=<警告終了=<（内部）異常終了として下さい。
 
 .PARAMETER WarningReturnCode
+
+Specify Warning Return code.
+[1] is default.
+Must specify NormarReturnCode =< WarningReturnCode =< ErrorReturnCode(InternalErrorReturnCode)
+
 　警告終了時のリターンコードを指定します。デフォルトは1です。正常終了=<警告終了=<（内部）異常終了として下さい。
 
 .PARAMETER ErrorReturnCode
+
+Specify Error Return code.
+[8] is default.
+Must specify NormarReturnCode =< WarningReturnCode =< ErrorReturnCode(InternalErrorReturnCode)
+
 　異常終了時のリターンコードを指定します。デフォルトは8です。正常終了=<警告終了=<（内部）異常終了として下さい。
 
 .PARAMETER InternalErrorReturnCode
+
+Specify Internal Error Return code.
+[16] is default.
+Must specify NormarReturnCode =< WarningReturnCode =< ErrorReturnCode(InternalErrorReturnCode)
+
 　プログラム内部異常終了時のリターンコードを指定します。デフォルトは16です。正常終了=<警告終了=<（内部）異常終了として下さい。
 
 .PARAMETER InfoEventID
-　Event Log出力でInformationに対するEvent IDを指定します。デフォルトは1です。
+
+Specify information event id in the log.
+[1] is default.
+
 
 .PARAMETER InfoLoopStartEventID
+
+Specify start loop event id in the log.
+[2] is default.
+
+
 　Event Log出力でファイル/フォルダ処理開始のInformationに対するEvent IDを指定します。デフォルトは2です。
 
 .PARAMETER InfoLoopEndEventID
+
+Specify end loop event id in the log.
+[3] is default.
+
 　Event Log出力でファイル/フォルダ処理終了のInformationに対するEvent IDを指定します。デフォルトは3です。
 
 .PARAMETER WarningEventID
+
+
+Specify Warning event id in the log.
+[10] is default.
+
+
 　Event Log出力でWarningに対するEvent IDを指定します。デフォルトは10です。
 
 .PARAMETER SuccessEventID
+
+Specify Successfully complete event id in the log.
+[73] is default.
+
 　Event Log出力でSuccessに対するEvent IDを指定します。デフォルトは73です。
 
 .PARAMETER InternalErrorEventID
+
+Specify Internal Error event id in the log.
+[99] is default.
+
 　Event Log出力でInternal Errorに対するEvent IDを指定します。デフォルトは99です。
 
 .PARAMETER ErrorEventID
+
+Specify Error event id in the log.
+[100] is default.
+
 　Event Log出力でErrorに対するEvent IDを指定します。デフォルトは100です。
 
 .PARAMETER ErrorAsWarning
+
+Specify if you want the script terminate as ERROR, return WARNING exit code.
+
 　異常終了しても警告終了のReturnCodeを返します。
 
 .PARAMETER WarningAsNormal
+
+Specify if you want the script terminate as WARNING, return NORMAL exit code.
+
 　警告終了しても正常終了のReturnCodeを返します。
 
 .PARAMETER ExecutableUser
+
+Specify the user who is allowed to execute the script in regular expression.
+[.*] is default and all users can execute.
+Parameter must be quoted with single quote'
+Escape the back slash in the separeter of a domain name.
+example [domain\\.*]
+
 　このプログラムを実行可能なユーザを正規表現で指定します。
 デフォルトは[.*]で全てのユーザが実行可能です。　
 記述はシングルクオーテーションで括って下さい。
