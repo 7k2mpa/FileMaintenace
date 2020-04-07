@@ -351,15 +351,15 @@ Recurseパラメータより優先します。
 
 .PARAMETER OverRide
 Specify if you want to override old same name files moved or copied.
-[terminate as ERROR and do not override] is default.
+[terminate with an Error and do not override] is default.
 
 　移動、コピー先に既に同名のファイルが存在しても強制的に上書きします。
 デフォルトでは上書きせずに異常終了します。
 
 .PARAMETER Continue
 Specify if you want to skip old files do not want to override.
-If has skip to process, terminate as WARNING.
-[terminate as ERROR and do not skip] is default. 
+If has skip to process, terminate with a Warning.
+[terminate with an Error and do not skip] is default. 
 
 　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
 スキップすると警告終了します。
@@ -367,8 +367,8 @@ If has skip to process, terminate as WARNING.
 
 .PARAMETER ContinueAsNormal
 Specify if you want to skip old files do not want to override.
-If has skip to process, terminate as NORMAL.
-[terminate as ERROR and do not skip] is default. 
+If has skip to process, exit successfully.
+[terminate with an Error and do not skip] is default. 
 
 　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
 -Continueと異なりスキップしても正常終了します。ファイルの差分コピー等で利用してください。
@@ -377,8 +377,8 @@ If has skip to process, terminate as NORMAL.
 
 
 .PARAMETER NoneTargetAsWarning
-Specify if you want to terminate as WARNING with no files existed in the folder.
-[Exit as NORMAL with no files existed in the folder] is default.
+Specify if you want to terminate with a Warning with no files existed in the folder.
+[exit with Normal with no files existed in the folder] is default.
 
 操作対象のファイル、フォルダが存在しない場合に警告終了します。
 このスイッチを設定しないと存在しない場合は通常終了します。
@@ -627,20 +627,20 @@ Specify Error event id in the log.
 
 .PARAMETER ErrorAsWarning
 
-Specify if you want the script terminate as ERROR, return WARNING exit code.
+Specfy if you want to return WARNING exit code when the script terminate with an Error.
 
 　異常終了しても警告終了のReturnCodeを返します。
 
-.PARAMETER WarningAsNormal
+.PARAMETER WarningAsNormalaaaaaaa
 
-Specify if you want the script terminate as WARNING, return NORMAL exit code.
+Specify if you want to return NORMAL exit code when the script terminate with a Warning.
 
 　警告終了しても正常終了のReturnCodeを返します。
 
 .PARAMETER ExecutableUser
 
 Specify the user who is allowed to execute the script in regular expression.
-[.*] is default and all users can execute.
+[.*] is default and all users are allowed to execute.
 Parameter must be quoted with single quote'
 Escape the back slash in the separeter of a domain name.
 example [domain\\.*]
@@ -1215,11 +1215,11 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
 
     IF ($ContinueAsNormal) {
         Write-Log -ID $InfoEventID -Type Information -Message ("Specified -ContinueAsNormal[$($ContinueAsNormal)] option, " +
-            "thus if file exist in the same name already, will process next file as NORMAL without termination.")
+            "thus if file exist in the same name already, will process next file with a NORMAL logging without termination.")
         
         } elseIF ($Continue) {
             Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Continue[$($Continue)] option, " +
-                "thus if a file exist in the same name already, will process next file as WARNING without termination.")
+                "thus if a file exist in the same name already, will process next file with a WARNING logging and without termination.")
             }
 
 }
@@ -1379,7 +1379,7 @@ Param(
 [String]$DatumPath = $PSScriptRoot
 [Boolean]$WhatIfFlag = (($PSBoundParameters['WhatIf']) -ne $NULL)
 
-$Version = "2.0.0-beta.7"
+$Version = "2.0.0-beta.8"
 
 [Boolean]$ForceEndloop  = $FALSE          ;#$FALSEではFinalize , $TRUEではループ内でBreak
 
@@ -1442,7 +1442,7 @@ IF ($PreAction -contains 'Archive') {
     IF (-not($archive.Path | Test-LeafNotExists)) {
         
         Write-Log -ID $ErrorEventID -Type Error -Message ("File/Folder exists in the path [$($archive.Path)] already, " +
-            "thus terminate $($ShellName) with ERROR")
+            "thus terminate $($ShellName) with an Error")
         Finalize $ErrorReturnCode        
         }
 }

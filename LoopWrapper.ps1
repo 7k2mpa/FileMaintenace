@@ -78,12 +78,12 @@ Execute CheckFlag.ps1 in the same folder with arugument 1st line of Command.txt
 If CheckFlag.ps1 end as Normal, this program exits as Normal.
 
 CheckFlag.ps1 test a flag file and if a flag file dose not exist, CheckFlag.ps1 ends as Normal,
-if a flag file exists, CheckFlag.ps1 end as Error.
+if a flag file exists, CheckFlag.ps1 end with error.
 
 With this configuration, untill this script execute CheckFlag.ps1 specified times.
 After specified times, this script end as Warning.
 
-If CheckFlag.ps1 ends as Error, this script ends as Error.
+If CheckFlag.ps1 ends with error, this script ends with error.
 
 
 　このプログラムと同一フォルダに存在するCheckFlag.ps1を起動します。
@@ -109,12 +109,12 @@ Execute CheckFlag.ps1 in the same folder with arugument 1st line of Command.txt
 If CheckFlag.ps1 end as Normal, this program exits as Normal.
 
 CheckFlag.ps1 test a flag file and if a flag file dose not exist, CheckFlag.ps1 ends as Normal,
-if a flag file exists, CheckFlag.ps1 end as Error.
+if a flag file exists, CheckFlag.ps1 end with error.
 
 With this configuration, untill this script execute CheckFlag.ps1 120 times every 60 seconds.
-After specified times, this script end as Warning.
+After specified times, this script end with warning.
 
-If CheckFlag.ps1 ends as Error, this script ends as Error.
+If CheckFlag.ps1 ends with error, this script ends with error.
 
 　このプログラムと同一フォルダに存在するCheckFlag.ps1を起動します。
 起動する際に渡すパラメータは設定ファイルComman.txtの1行目です。
@@ -183,8 +183,8 @@ Specify how many times to execute the script.
 
 .PARAMETER Continue
 
-If you want to execute script again with argument 1st line in the command file ending the script as error.
-[This script ends as Error] is default.
+If you want to execute script again with argument 1st line in the command file ending the script with error.
+[This script ends with error] is default.
 
 起動したプログラムが異常終了してもループ処理を継続します。
 
@@ -418,7 +418,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.0.0-beta.7"
+$Version = "2.0.0-beta.8"
 
 #初期設定、パラメータ確認、起動メッセージ出力
 
@@ -505,6 +505,6 @@ For ( $i = 1 ; $i -le $UpTo ; $i++ ) {
 #対象群の処理ループ終端
 }
 
-Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Although with [$($UpTo)] times retry, did not complete successfully. Thus terminate as WARNING." 
+Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Although with [$($UpTo)] times retry, did not complete successfully. Thus terminate with warning." 
 
 Finalize $WarningReturnCode

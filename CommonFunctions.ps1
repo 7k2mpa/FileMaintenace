@@ -27,7 +27,7 @@ https://github.com/7k2mpa/FileMaintenace
 
 #>
 
-$Script:CommonFunctionsVersion = '20200221_2145'
+$Script:CommonFunctionsVersion = '2.0.0-beta.8'
 
 
 #ÉçÉOìôÇÃïœêîÇàÍäáê›íËÇµÇΩÇ¢èÍçáÇÕà»â∫ÇóòópÇµÇƒâ∫Ç≥Ç¢ÅB
@@ -109,7 +109,7 @@ process {
 
     IF ($Log2Console -or $ForceConsole -or $ForceConsoleEventLog) {
 
-        $consoleWrite = $EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
+        $consoleWrite = $EventType.PadRight(14) + "EventID " + ([String]$EventID).PadLeft(6) + "  " + $EventMessage
         Write-Host $consoleWrite
         }   
 
@@ -117,7 +117,7 @@ process {
     IF ($Log2File -and -not($ForceConsole -or $ForceConsoleEventLog )) {
 
         $logFormattedDate = (Get-Date).ToString($LogDateFormat)
-        $logWrite = $logFormattedDate+" "+$ShellName+" "+$EventType.PadRight(14)+"EventID "+([String]$EventID).PadLeft(6)+"  "+$EventMessage
+        $logWrite = $logFormattedDate + " " + $ShellName + " " + $EventType.PadRight(14) + "EventID " + ([String]$EventID).PadLeft(6) + "  " + $EventMessage
         Write-Output $logWrite | Out-File -FilePath $LogPath -Append -Encoding $LogFileEncode
         }   
 }
@@ -157,12 +157,12 @@ function Test-EventLogSource {
            
                 New-EventLog -LogName $EventLogLogName -Source $ProviderName  -ErrorAction Stop
                 $ForceConsoleEventLog = $TRUE    
-                Write-Log -EventId $InfoEventID -Type Information -Message "Regist new source event [$($ProviderName)] to [$($EventLogLogName)]"
+                Write-Log -EventId $InfoEventID -Type Information -Message "Regist a new source event [$($ProviderName)] to [$($EventLogLogName)]"
                 }
         }
         Catch [Exception] {
         Write-Log -EventId $ErrorEventID -Type Error -Message ("Failed to regist new source event because no source $($ProviderName) exists in event log, " +
-            "must have administrator privilage for registing new source. Start Powershell with administrator privilage and start the script.")
+            "must have administrator privilage for registing a new source. Start PowerShell with administrator privilage and start the script.")
         Write-Log -EventId $ErrorEventID -Type Error -Message "Execution Error Message : $Error[0]"
         Exit $ErrorReturnCode
         }
@@ -851,22 +851,22 @@ Param(
     IF (($ErrorCount -gt 0) -or ($ReturnCode -ge $ErrorReturnCode)) {
 
         IF ($ErrorAsWarning) {
-            Write-Log -Id $WarningEventID -Type Warning -Message "An ERROR termination occurred, specified -ErrorAsWarning[$($ErrorAsWarning)] option, thus the exit code is [$($WarningReturnCode)]"  
+            Write-Log -Id $WarningEventID -Type Warning -Message "Terminated with an Error, specified -ErrorAsWarning[$($ErrorAsWarning)] option, thus the exit code is [$($WarningReturnCode)]"  
             $returnCode = $WarningReturnCode
            
             } else {
-            Write-Log -Id $ErrorEventID -Type Error -Message "An ERROR termination occurred, the exit code is [$($ErrorReturnCode)]"
+            Write-Log -Id $ErrorEventID -Type Error -Message "Terminated with An Error, thus the exit code is [$($ErrorReturnCode)]"
             $returnCode = $ErrorReturnCode
             }
 
         } elseIF (($WarningCount -gt 0) -or ($ReturnCode -ge $WarningReturnCode)) {
 
             IF ($WarningAsNormal) {
-                Write-Log -Id $InfoEventID -Type Information -Message "A WARNING termination occurred, specified -WarningAsNormal[$($WarningAsNormal)] option, thus the exit code is [$($NormalReturnCode)]" 
+                Write-Log -Id $InfoEventID -Type Information -Message "Terminated with a Warning, specified -WarningAsNormal[$($WarningAsNormal)] option, thus the exit code is [$($NormalReturnCode)]" 
                 $returnCode = $NormalReturnCode
            
                 } else {
-                Write-Log -Id $WarningEventID -Type Warning -Message "A WARNING termination occurred, the exit code is [$($WarningReturnCode)]"
+                Write-Log -Id $WarningEventID -Type Warning -Message "Terminated with a Warning, thus the exit code is [$($WarningReturnCode)]"
                 $returnCode = $WarningReturnCode
                 }
         

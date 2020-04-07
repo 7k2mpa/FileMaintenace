@@ -11,7 +11,7 @@ With Wrapper.ps1 start or stop multiple IIS sites.
 
 .DESCRIPTION
 Script to Stop or Start IIS site.
-If start(stop) IIS site already started(stopped), will temrminate as WARNING.
+If start(stop) IIS site already started(stopped), will temrminate with WARNING.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
@@ -274,7 +274,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.0.0-beta.7"
+$Version = "2.0.0-beta.8"
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
@@ -348,6 +348,6 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
       Start-Sleep $RetrySpanSec
 }
 
-Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting predeterminated times , site [$($Site)] state did not change to [$($TargetState)]."
+Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting prede times , site [$($Site)] state did not switch to [$($TargetState)]."
 
 Finalize $ErrorReturnCode

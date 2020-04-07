@@ -112,8 +112,8 @@ Specify encode chracter code in the command file.
 
 .PARAMETER Continue
 
-If you want to execute script with argument next line in the command file ending the script as error.
-[This script ends as Error] is default.
+If you want to execute script with argument next line in the command file ending the script with error.
+[This script terminates with Error] is default.
 
 　起動したプログラムが異常終了しても、コマンドファイルの次行を継続処理します。
 デフォルトではそのまま異常終了します。
@@ -336,7 +336,7 @@ Param(
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execution Results NORMAL[$($NormalCount)], WARNING[$($WarningCount)], ERROR[$($ErrorCount)]"
 
         If (($Continue) -and ($ErrorCount -gt 0)){
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "An ERROR termination occurred. Specified -Continue[${Continue}] option, thus will terminate as ERROR and had executed command of the next lines."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "An ERROR termination occurred. Specified -Continue[${Continue}] option, thus will terminate with ERROR and had executed command of the next lines."
             }
 
 
@@ -357,7 +357,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.0.0-beta.7"
+$Version = "2.0.0-beta.8"
 
 #初期設定、パラメータ確認、起動メッセージ出力
 

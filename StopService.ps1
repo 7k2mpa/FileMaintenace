@@ -333,7 +333,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.0.0-beta.7"
+$Version = "2.0.0-beta.8"
 
 [String]$computer = "localhost" 
 [String]$class = "win32_service" 
