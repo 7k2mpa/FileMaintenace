@@ -15,8 +15,8 @@ You can process files in multiple folders with Wrapper.ps1
 
 
 .DESCRIPTION
-This script filters files and folders with multiple criterias.
-And process the files and folders filtered in multiple methods as PreAction, Action and PostAction.
+This script filters files and folders with multiple criteria.
+And process the files and folders filtered in multiple methods with PreAction, Action and PostAction.
 
 Methods are
 
@@ -77,7 +77,7 @@ https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows
 FileMaintenace.ps1 -TargetFolder C:\TEST -noLog2Console -verbose
 
 Find files in C:\TEST and child folders recuresively.
-Verbose logs are not output at console.
+All logs are not output at console.
 You would confirm getting files to process. 
 
 C:\TEST以下のファイルを再帰的に検索だけします（子フォルダも対象）
@@ -179,7 +179,7 @@ Specify a folder of the target files or the folders placed.
 Specification is required.
 Can specify relative or absolute path format.
 Relative path format must be starting with 'dot.'
-The path must not contain wild cards shch as asterisk* question? bracket[]
+Wild cards are not accepted shch as asterisk* question? bracket[]
 If the path contains bracket[] , specify path literally and do not escape.
 
 
@@ -196,11 +196,11 @@ Specify methods to process files.
 -PreAction option accept multiple arguments.
 Separate arguments with comma,
 
-None:Do nothing, and is default. If you want to test the action, specify -WhatIf option.
+None:Do nothing, and is default. If you want to test the action, specify -WhatIf or -Confirm option.
 Compress:Create compressed files from the original files.
 AddTimeStamp:Create new files with file name added time stamp.
 Archive:Create an archive file from files. Specify archive file name with -ArchiveFileName option.
-MoveNewFile:place new files to -MoveNewFolder path.
+MoveNewFile:place new files in -MoveNewFolder path.
 7z:Specify to use 7-Zip and make .7z(LZMA2) for compress or archive option.
 7zZip:Specify to use 7-Zip and make .zip(Deflate) for compress or arvhice option.
 
@@ -220,10 +220,10 @@ MoveNewFile:-PreActionの新規生成ファイルを-TargetFolderと同一ではなく、-MoveToFo
 
 Specify method to process files.
 
-None:Do nothing, and is default. If you want to test the action, specify -WhatIf option.
+None:Do nothing, and is default. If you want to test the action, specify -WhatIf or -Confirm option.
 Move:Move the files to -MoveNewFolder path.
 Delete:Delete the files.
-Copy:Copy the files and place to -MoveNewFolder path.
+Copy:Copy the files and place in -MoveNewFolder path.
 DeleteEmptyFolders:Delete empty folders.
 KeepFilesCount:Delete old generation files.
 NullClear:Clear the files with null.
@@ -242,7 +242,7 @@ NullClear:ファイルの内容削除 NullClearします。
 
 Specify method to process files.
 
-None:Do nothing, and is default. If you want to test the action, specify -WhatIf option.
+None:Do nothing, and is default. If you want to test the action, specify -WhatIf or -Confirm option.
 Rename:Rename the files with -RenameToRegularExpression
 NullClear:Clear the files with null.
 
@@ -256,10 +256,10 @@ NullClear:ファイルの内容削除 NullClearします。PostActionのため、Actionと併用可能
 
 .PARAMETER MoveToFolder
 
-Specify a desitination folder of the target files moveing to.
+Specify a desitination folder of the target files moved to.
 Can specify relative or absolute path format.
 Relative path format must be starting with 'dot.'
-The path must not contain wild cards shch as asterisk* question?
+Wild cards are not accepted shch as asterisk* question? bracket[]
 If the path contains bracket[] , specify path literally and do not escape.
 
 
@@ -316,7 +316,7 @@ PowerShellの仕様上、大文字小文字の区別はしない筈ですが、実際には区別されるので注
 
 .PARAMETER ParentRegularExpression
 
-Specify regular expression to match processing path of files.
+Specify regular expression to match processing path of the files.
 '.*' is default, and process all files.
 
 　処理対象のファイル、フォルダの上位パスから-TargetFolderのパスまでを正規表現でフィルタします。-TargetFolderに含まれるパスはフィルタ対象外です。
@@ -343,7 +343,7 @@ Specify if you want to process the files or folders in the path recursively or n
 デフォルトは$TRUEで再帰的処理です。
 
 .PARAMETER NoRecurse
-Specify if you want to process non-recursively.
+Specify if you want to filter files non-recursively.
 The option override -Recurse option.
 
 　-TargetFolderの直下のみを処理対象とします。-Recurse $FALSEと等価です。
@@ -357,9 +357,9 @@ Specify if you want to override old same name files moved or copied.
 デフォルトでは上書きせずに異常終了します。
 
 .PARAMETER Continue
-Specify if you want to skip old files do not want to override.
-If has skip to process, terminate with a Warning.
-[terminate with an Error and do not skip] is default. 
+Specify if you want to skip the process when old files existed and to process remains.
+If skip the process, process remains and terminate with a Warning.
+[terminate with an Error immediately and do not skip] is default. 
 
 　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
 スキップすると警告終了します。
@@ -368,7 +368,7 @@ If has skip to process, terminate with a Warning.
 .PARAMETER ContinueAsNormal
 Specify if you want to skip old files do not want to override.
 If has skip to process, exit successfully.
-[terminate with an Error and do not skip] is default. 
+[terminate with an Error immediately and do not skip] is default. 
 
 　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
 -Continueと異なりスキップしても正常終了します。ファイルの差分コピー等で利用してください。
@@ -377,8 +377,8 @@ If has skip to process, exit successfully.
 
 
 .PARAMETER NoneTargetAsWarning
-Specify if you want to terminate with a Warning with no files existed in the folder.
-[exit with Normal with no files existed in the folder] is default.
+Specify if you want to terminate with a Warning when no file exists in the folder.
+[exit with Normal when no file exists in the folder] is default.
 
 操作対象のファイル、フォルダが存在しない場合に警告終了します。
 このスイッチを設定しないと存在しない場合は通常終了します。
@@ -483,7 +483,7 @@ Specify if you want to output log to PowerShell console.
 .PARAMETER NoLog2Console
 
 Specify if you want to suppress log to PowerShell console.
-Specification override -Log2Console
+Specification overrides -Log2Console
 
 　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
 Log2Consoleより優先します。
@@ -499,7 +499,7 @@ Specify if you want to output log to text log.
 .PARAMETER NoLog2File
 
 Specify if you want to suppress log to PowerShell console.
-Specification override -Log2File
+Specification overrides -Log2File
 
 　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
 Log2Fileより優先します。
@@ -511,10 +511,10 @@ Specify the path of text log.
 
 Can specify relative or absolute path format.
 Relative path format must be starting with 'dot.'
-The path must not contain wild cards shch as asterisk* question?
+Wild cards are not accepted shch as asterisk* question? bracket[]
 If the path contains bracket[] , specify path literally and do not escape.
 If the log file dose not exist, make new file.
-If the log file exist, write log additionally.
+If the log file exists, write log additionally.
 
 　ログファイル出力パスを指定します。デフォルトは$NULLです。
 相対、絶対パスで指定可能です。
