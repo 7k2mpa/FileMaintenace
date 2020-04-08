@@ -505,7 +505,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is already running."
         
         } else {
-        $serviceCommand = "$StartServicePath -Service $TargetOracleService -Status Running -RetrySpanSec $RetrySpanSec -RetryTimes $RetryTimes"
+        $serviceCommand = "$StartServicePath -Service $targetWindowsOracleService -Status Running -RetrySpanSec $RetrySpanSec -RetryTimes $RetryTimes"
 
 
         Try {
