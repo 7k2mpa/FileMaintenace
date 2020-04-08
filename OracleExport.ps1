@@ -341,7 +341,7 @@ Pop-Location
 
 #####################   ‚±‚±‚©‚ç–{‘Ì  ######################
 
-$Version = "2.0.0-beta.8"
+$Version = "2.0.0-beta.9"
 
 $DatumPath = $PSScriptRoot
 
