@@ -337,7 +337,7 @@ Write-Verbose $return
 
             # 対象のバックアップポリシーが実行中又は実行完了となったら終了
 
-        if (($return.status -eq "In Progress") -or ($return.status -eq "Backup Successful")) {
+        if (($return.status -match "(In Progress|Backup(| Partially) Successful)")) {
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Policy [$($PolicyName)] was switched to [$($return.status)]."
             $status = $TRUE
             break                
@@ -398,7 +398,7 @@ process {
 
 Write-Verbose $return
  
-        IF ($return.status -match '^(Backup Successful|Backup Partially Successful)$') {
+        IF ($return.status -match '^(Backup(| Partially) Successful)$') {
 
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Policy [$($PolicyName)] ID [$($id."backup-id")] was switched to [$($return.status)]."
             $status = $TRUE
