@@ -682,7 +682,7 @@ Param(
 
 [String]
 [parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify the folder to process (ex. D:\Logs)  or Get-Help FileMaintenance.ps1')]
-[ValidateNotNullOrEmpty()][ValidateScript({ Test-Path $_  -PathType container })]
+[ValidateNotNullOrEmpty()]
 [ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName")]$TargetFolder ,
 
 #[String]$TargetFolder,  #for Validation debug
@@ -699,7 +699,7 @@ Param(
 
 
 [String][parameter(position = 4)]
-[ValidateNotNullOrEmpty()][ValidateScript({ Test-Path $_  -PathType container })]
+[ValidateNotNullOrEmpty()]
 [ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("DestinationPath")]$MoveToFolder ,
 
 
@@ -725,7 +725,7 @@ Param(
 [Switch]$NoneTargetAsWarning ,
 
 [String]$CompressedExtString = '.zip',
-[String][ValidateNotNullOrEmpty()][ValidateScript({ Test-Path $_  -PathType container })]$7zFolder = 'C:\Program Files\7-Zip' ,
+[String][ValidateNotNullOrEmpty()]$7zFolder = 'C:\Program Files\7-Zip' ,
 
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss' ,
 
