@@ -282,7 +282,7 @@ $DatumPath = $PSScriptRoot
 
 $Version = "2.0.0-beta.10"
 
-$psDrive = $MountedDrive.Replace(":","") 
+$psDrive = $MountDrive.Replace(":","") 
 
 #初期設定、パラメータ確認、起動メッセージ出力
 
