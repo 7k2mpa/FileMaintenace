@@ -1045,14 +1045,14 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 
 #移動先フォルダの要不要と有無を確認
 
-    IF ( ($Action -match "^(Move|Copy)$") -or ($PreAction -contains 'MoveNewFile') ) {    
+    IF (($Action -match "^(Move|Copy)$") -or ($PreAction -contains 'MoveNewFile')) {    
 
         $MoveToFolder = $MoveToFolder | ConvertTo-AbsolutePath -Name '-MoveToFolder'
-
+    
         $MoveToFolder | Test-Container -Name '-MoveToFolder' -IfNoExistFinalize > $NULL
- 
        
-    } elseIF (-not ($MoveToFolder | Test-PathNullOrEmpty)) {
+    } elseIF (-not($MoveToFolder | Test-PathNullOrEmpty)) {
+    
         Write-Log -ID $ErrorEventID -Type Error -Message "Specified -Action [$($Action)] option, must not specifiy -MoveToFolder option."
         Finalize $ErrorReturnCode
         }
@@ -1061,6 +1061,7 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 #ArchiveFileNameの要不要と有無、Validation
 
     IF ($PreAction -contains 'Archive') {
+
         $ArchiveFileName | Test-PathNullOrEmpty -Name '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL
         
         IF ($ArchiveFileName -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
@@ -1083,7 +1084,8 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 #組み合わせが不正な指定を確認
 
 
-    IF (($TargetFolder -eq $MoveToFolder) -and (($Action -match "move|copy") -or  ($PreAction -contains 'MoveNewFile'))) {
+    IF (($TargetFolder -eq $MoveToFolder) -and   (($Action -match "(move|copy)") -or ($PreAction -contains 'MoveNewFile'))) {
+    
         Write-Log -Type Error -ID $ErrorEventID -Message ("Specified -(Pre)Action option for Move or Copy files, " +
             "-TargetFolder and -MoveToFolder must not be same.")
 		Finalize $ErrorReturnCode
@@ -1096,7 +1098,7 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 		Finalize $ErrorReturnCode
         }
 
-   IF (($PreAction -contains 'MoveNewFile' ) -and (-not($PreAction -match "^(Compress|AddTimeStamp|Archive)$") )) {
+   IF (($PreAction -contains 'MoveNewFile') -and ($PreAction -notmatch "^(Compress|AddTimeStamp|Archive)$") ) {
 
 		Write-Log -Type Error -ID $ErrorEventID -Message ("Secified -PreAction MoveNewFile option, " + 
             "must specify -PreAction Compres or AddTimeStamp or Archive option also. " +
@@ -1104,19 +1106,19 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 		Finalize $ErrorReturnCode
         }
 
-   IF (($PreAction -contains 'Compress') -and  ($PreAction -contains 'Archive')) {
+   IF (($PreAction -contains 'Compress') -and ($PreAction -contains 'Archive')) {
 
 		Write-Log -Type Error -ID $ErrorEventID "Must not specify -PreAction both Compress and Archive options in the same time."
 		Finalize $ErrorReturnCode
         }
 
-   IF (($PreAction -contains '7z' ) -and  ($PreAction -Contains '7zZip')) {
+   IF (($PreAction -contains '7z') -and ($PreAction -Contains '7zZip')) {
 
 		Write-Log -Type Error -ID $ErrorEventID -Message "Must not specify -PreAction both 7z and 7zZip options for the archive method in the same time."
 		Finalize $ErrorReturnCode
         }
 
-   IF (($PreAction -match "^(7z|7zZip)$" ) -and  (-not($PreAction -match "^(Compress|Archive)$"))) {
+   IF (($PreAction -match "^(7z|7zZip)$") -and ($PreAction -notmatch "^(Compress|Archive)$")) {
 
 		Write-Log -Type Error -ID $ErrorEventID -Message ("Must not specify -PreAction only 7z or 7zZip option. " +
             "Must specify -PreAction Compress or Archive option with them.")
@@ -1124,13 +1126,15 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
         }
 
    IF ($Action -eq "DeleteEmptyFolders") {
-        IF ( ($PreAction -match '^(Compress|Archive|AddTimeStamp)$') -or ($PostAction -ne 'none' )) {
+    
+        IF (($PreAction -match '^(Compress|Archive|AddTimeStamp)$')  -or ($PostAction -ne 'none' )) {
     
                 Write-Log -Type Error -ID $ErrorEventID -Message ("Specified -Action [$Action] , " +
                     "must not specify -PreAction or -PostAction options for modify files.")
 				Finalize $ErrorReturnCode
 
         } elseIF ($Size -ne 0) {
+    
                 Write-Log -Type Error -ID $ErrorEventID -Message "Specified -Action [$Action] , must not specify -size option."
 				Finalize $ErrorReturnCode
                 }

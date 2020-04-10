@@ -393,22 +393,17 @@ function ConvertTo-AbsolutePath {
 [OutputType([String])]
 [CmdletBinding()]
 Param(
-[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path ,
+[String][parameter(position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path ,
 [String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name ,
 
 [String]$DatumPath = $DatumPath
 )
-
 begin {
 }
-
 Process {
-    IF ([String]::IsNullOrEmpty($Path)) {
-           
-        Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
-        Finalize $ErrorReturnCode
-        }
 
+    $Path | Test-PathNullOrEmpty -Name $Name -IfNullOrEmptyFinalize > $NULL
+    
     #Windowsではパス区切に/も使用できる。しかしながら、処理を簡単にするため\に統一する
 
     $Path = $Path.Replace('/','\')
