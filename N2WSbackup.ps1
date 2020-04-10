@@ -204,7 +204,7 @@ Param(
 Try{
 
     #CommonFunctions.ps1の配置先を変更した場合は、ここを変更。同一フォルダに配置前提
-    ."$PSScriptRoot\1CommonFunctions.ps1"
+    ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
     Write-Output "Fail to load CommonFunctions.ps1 Please verfy existence of CommonFunctions.ps1 in the same folder."
@@ -342,7 +342,7 @@ Write-Verbose $return
             $status = $TRUE
             break                
             }
-
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Policy [$($PolicyName)] was still [$($return.status)]. Wait for [$($RetryInterval)] seconds. Retry [$($retryCount)/$($MaxRetry)]"
         Start-Sleep -Seconds $RetryInterval
         $retryCount++            
         }
@@ -412,6 +412,7 @@ Write-Verbose $return
 
                 } else {
                 $retryCount++
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Policy [$($PolicyName)] ID [$($id."backup-id")] was still [$($return.status)]. Wait for [$($RetryInterval)] seconds. Retry [$($retryCount)/$($MaxRetry)]"
                 Start-Sleep -Seconds $RetryInterval
                 }            
         }
@@ -482,7 +483,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
-Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to request N2WS backup policy [$($PolicyName)]"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to [$($Job)] N2WS backup policy [$($PolicyName)]"
 
 }
 
