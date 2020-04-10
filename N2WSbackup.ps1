@@ -204,7 +204,7 @@ Param(
 Try{
 
     #CommonFunctions.ps1の配置先を変更した場合は、ここを変更。同一フォルダに配置前提
-    ."$PSScriptRoot\1CommonFunctions.ps1"
+    ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception]{
     Write-Output "Fail to load CommonFunctions.ps1 Please verfy existence of CommonFunctions.ps1 in the same folder."
