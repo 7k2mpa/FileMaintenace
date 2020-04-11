@@ -19,10 +19,10 @@ You can select files and folders with various creiteria such as file size , numb
 At once manage only one folder. With Wrapper.ps1 you can manage multiple folders.
 
 
-### StopService.ps1 / StartService.ps1 / ChangeServiceStatus.ps1
+### ChangeServiceStatus.ps1 / retired(StopService.ps1 / StartService.ps1)
 
 Start and stop Windows service.
-These scripts have same code. Difference of them is only one line at the parameter section.
+If you need StopService.ps1 and StartService.ps1 , change comment line at the parameter section.
 
 ### ChangeIISstate.ps1
 
