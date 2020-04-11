@@ -683,7 +683,7 @@ Param(
 [String]
 [parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify the folder to process (ex. D:\Logs)  or Get-Help FileMaintenance.ps1')]
 [ValidateNotNullOrEmpty()]
-[ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName")]$TargetFolder ,
+[ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName")]$TargetFolder ,
 
 #[String]$TargetFolder,  #for Validation debug
  
@@ -700,8 +700,9 @@ Param(
 
 [String][parameter(position = 4)]
 [ValidateNotNullOrEmpty()]
-[ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("DestinationPath")]$MoveToFolder ,
+[ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("DestinationPath")]$MoveToFolder ,
 
+#[String]$MoveToFolder,  #for Validation debug
 
 [String][ValidateNotNullOrEmpty()][ValidatePattern('^(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$ArchiveFileName = "archive" ,
 
@@ -725,7 +726,9 @@ Param(
 [Switch]$NoneTargetAsWarning ,
 
 [String]$CompressedExtString = '.zip',
-[String][ValidateNotNullOrEmpty()]$7zFolder = 'C:\Program Files\7-Zip' ,
+
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
+[ValidateNotNullOrEmpty()]$7zFolder = 'C:\Program Files\7-Zip' ,
 
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss' ,
 
@@ -738,19 +741,20 @@ Param(
 
 
 
-[Boolean]$Log2EventLog = $TRUE,
-[Switch]$NoLog2EventLog,
-[String]$ProviderName = 'Infra',
-[String][ValidateSet("Application")]$EventLogLogName = 'Application',
+[Boolean]$Log2EventLog = $TRUE ,
+[Switch]$NoLog2EventLog ,
+[String]$ProviderName = 'Infra' ,
+[String][ValidateSet("Application")]$EventLogLogName = 'Application' ,
 
-[Boolean]$Log2Console = $TRUE,
-[Switch]$NoLog2Console,
+[Boolean]$Log2Console = $TRUE ,
+[Switch]$NoLog2Console ,
 
-[Boolean]$Log2File = $FALSE,
-[Switch]$NoLog2File,
-#[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath = '.\SC_Logs\Infra.log',
-#[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath = ..\Log\FileMaintenance.log ,
-[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath  ,
+[Boolean]$Log2File = $FALSE ,
+[Switch]$NoLog2File ,
+
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
+[ValidateNotNullOrEmpty()]$LogPath ,
+
 [String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss',
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default ShiftJIS
 
@@ -1098,7 +1102,7 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 		Finalize $ErrorReturnCode
         }
 
-   IF (($PreAction -contains 'MoveNewFile') -and ($PreAction -notmatch "^(Compress|AddTimeStamp|Archive)$") ) {
+   IF (($PreAction -contains 'MoveNewFile') -and (-not($PreAction -match "^(Compress|AddTimeStamp|Archive)$")) ) {
 
 		Write-Log -Type Error -ID $ErrorEventID -Message ("Secified -PreAction MoveNewFile option, " + 
             "must specify -PreAction Compres or AddTimeStamp or Archive option also. " +
@@ -1118,7 +1122,7 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 		Finalize $ErrorReturnCode
         }
 
-   IF (($PreAction -match "^(7z|7zZip)$") -and ($PreAction -notmatch "^(Compress|Archive)$")) {
+   IF (($PreAction -match "^(7z|7zZip)$") -and (-not($PreAction -match "^(Compress|Archive)$"))) {
 
 		Write-Log -Type Error -ID $ErrorEventID -Message ("Must not specify -PreAction only 7z or 7zZip option. " +
             "Must specify -PreAction Compress or Archive option with them.")

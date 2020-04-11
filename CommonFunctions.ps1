@@ -434,6 +434,17 @@ Process {
         "^[c-zC-Z]:\\.*" {
 
             Write-Log -Id $InfoEventID -Type Information -Message "$Name[$($Path)] is absolute path format."
+            
+            $Path = $Path | ForEach-Object {[System.IO.Path]::GetFullPath($_)}            
+            
+            }
+
+        "^\\\\.*\\.*" {
+
+            Write-Log -Id $InfoEventID -Type Information -Message "$Name[$($Path)] is UNC path format."
+            
+            $Path = $Path | ForEach-Object {[System.IO.Path]::GetFullPath($_)}            
+            
             }
 
         Default {
@@ -443,18 +454,18 @@ Process {
             }
     }
 
-    #パス末尾に\\が連続すると処理が複雑になるので、使わせない
+    #パスに\\が連続すると処理が複雑になるので、使わせない
 
-    IF ($Path -match '\\\\') {
+#    IF ($Path -match '^..\\\\') {
  
-        Write-Log -Id $InfoEventID -Type Information -Message "NTFS allows multiple path separators such as '\\' , due to processing limitation, convert multiple path separators to a single."
+#        Write-Log -Id $InfoEventID -Type Information -Message "NTFS allows multiple path separators such as '\\' , due to processing limitation, convert multiple path separators to a single."
 
-            For ( $i = 0 ; $i -lt $Path.Length-1 ; $i++ ) {
-                $Path = $Path.Replace('\\','\')
-                }
+#            For ( $i = 0 ; $i -lt $Path.Length-1 ; $i++ ) {
+#                $Path = $Path.Replace('\\','\')
+#                }
 
-        Write-Log -Id $InfoEventID -Type Information -Message "$Name[$($Path)] is created by converting multiple path separators to a single."
-        }
+#        Write-Log -Id $InfoEventID -Type Information -Message "$Name[$($Path)] is created by converting multiple path separators to a single."
+#        }
 
 
     #パスがフォルダで末尾に\が存在した場合は削除する。末尾の\有無で結果は一緒なのだが、統一しないと文字列数が異なるためパス文字列切り出しが誤動作する。
