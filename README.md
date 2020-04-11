@@ -3,7 +3,7 @@
 A set of useful utility scripts written in Powershell for Microsoft Windows Platform.
 
  - [File Maintenance](#filemaintenanceps1)
- - [Windows Service Control](#stopserviceps1--startserviceps1--changeservicestatusps1)
+ - [Windows Service Control](#changeservicestatusps1--stopserviceps1--startserviceps1obsoluted)
  - [Internet Information Server Control](#changeiisstateps1)
  - [UNC Path Mount](#mountdriveps1--unmountdriveps1)
  - [Oracle Database](#oracledb2backupmodeps1--oracledb2normalmodeps1--oraclearchivelogdeleteps1--oracleexportps1)
@@ -19,10 +19,10 @@ You can select files and folders with various creiteria such as file size , numb
 At once manage only one folder. With Wrapper.ps1 you can manage multiple folders.
 
 
-### StopService.ps1 / StartService.ps1 / ChangeServiceStatus.ps1
+### ChangeServiceStatus.ps1 / (StopService.ps1 / StartService.ps1)...obsoluted
 
 Start and stop Windows service.
-These scripts have same code. Difference of them is only one line at the parameter section.
+If you need script files StopService.ps1 and StartService.ps1 , change comment line at the parameter section.
 
 ### ChangeIISstate.ps1
 
