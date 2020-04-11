@@ -751,6 +751,12 @@ begin {
     $logFormattedDate = (Get-Date).ToString($LogDateFormat)
 }
 process {
+ 
+    IF (-not($Path | Split-Path -Parent)) {
+        Write-Log -Id $ErrorEventID -Type Error -Message "$($Name)[$($Path)] is invalid specification."   
+        Finalize $ErrorReturnCode
+        }
+
     #ログ出力先ファイルの親フォルダが存在しなければ異常終了
 
     $Path | Split-Path -Parent | Test-Container -ObjectName $Name -IfNoExistFinalize > $NULL

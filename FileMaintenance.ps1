@@ -506,7 +506,7 @@ Log2FileÇÊÇËóDêÊÇµÇ‹Ç∑ÅB
 
 .PARAMETER LogPath
 
-Specify the path of text log.
+Specify the path of text log file.
 [$NULL] is default.
 
 Can specify relative or absolute path format.
