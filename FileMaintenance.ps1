@@ -316,7 +316,7 @@ PowerShellの仕様上、大文字小文字の区別はしない筈ですが、実際には区別されるので注
 
 .PARAMETER ParentRegularExpression
 
-Specify regular expression to match processing path of the files.
+Specify regular expression to match processing path of the files excluding -TargetFolder.
 '.*' is default, and process all files.
 
 　処理対象のファイル、フォルダの上位パスから-TargetFolderのパスまでを正規表現でフィルタします。-TargetFolderに含まれるパスはフィルタ対象外です。
@@ -336,7 +336,7 @@ https://docs.microsoft.com/ja-jp/dotnet/standard/base-types/substitutions-in-reg
 
 
 .PARAMETER Recurse
-Specify if you want to process the files or folders in the path recursively or non-recuresively.
+Specify to process the files or folders in the path recursively or non-recuresively.
 [$TRUE(recuresively)] is default.
 
 　-TargetFolderの直下の再帰的または非再帰に処理の指定が可能です。
