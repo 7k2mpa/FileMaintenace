@@ -39,7 +39,7 @@ Specify job type [Request] to start new backup job or [GetResult] the result of 
 Specify checking interval the result of the job in seconds.
 [60] seconds is default.
 
-.PARAMETER MaxRetry      = 90 ,
+.PARAMETER MaxRetry
 
 Specify how many times to check the result of the job.
 [90] times is default.
