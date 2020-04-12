@@ -177,7 +177,7 @@ C:\OLD\Log\Infra.log
 .PARAMETER TargetFolder
 Specify a folder of the target files or the folders placed.
 Specification is required.
-Can specify relative or absolute path format.
+Can specify relative, absolute or UNC path format.
 Relative path format must be starting with 'dot.'
 Wild cards are not accepted shch as asterisk* question? bracket[]
 If the path contains bracket[] , specify path literally and do not escape.
@@ -257,7 +257,7 @@ NullClear:ファイルの内容削除 NullClearします。PostActionのため、Actionと併用可能
 .PARAMETER MoveToFolder
 
 Specify a desitination folder of the target files moved to.
-Can specify relative or absolute path format.
+Can specify relative, absolute or UNC path format.
 Relative path format must be starting with 'dot.'
 Wild cards are not accepted shch as asterisk* question? bracket[]
 If the path contains bracket[] , specify path literally and do not escape.
@@ -507,12 +507,12 @@ Log2Fileより優先します。
 .PARAMETER LogPath
 
 Specify the path of text log file.
-[$NULL] is default.
-
-Can specify relative or absolute path format.
+Can specify relative, absolute or UNC path format.
 Relative path format must be starting with 'dot.'
 Wild cards are not accepted shch as asterisk* question? bracket[]
 If the path contains bracket[] , specify path literally and do not escape.
+[$NULL] is default.
+
 If the log file dose not exist, make new file.
 If the log file exists, write log additionally.
 
@@ -698,8 +698,7 @@ Param(
 [ValidateSet("none" , "NullClear" , "Rename")]$PostAction = 'none' ,
 
 
-[String][parameter(position = 4)]
-[ValidateNotNullOrEmpty()]
+[String][parameter(position = 4)][ValidateNotNullOrEmpty()]
 [ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("DestinationPath")]$MoveToFolder ,
 
 #[String]$MoveToFolder,  #for Validation debug
@@ -732,13 +731,13 @@ Param(
 
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss' ,
 
-#Switches planned to obsolute please use -PreAction start
+
+#Switches planned to be obsolute please use -PreAction start
 [Switch]$Compress,
 [Switch]$AddTimeStamp,
 [Switch]$MoveNewFile,
 [Switch]$NullOriginalFile,
-#Switches planned to obsolute please use -PreAction end
-
+#Switches planned to be obsolute please use -PreAction end
 
 
 [Boolean]$Log2EventLog = $TRUE ,
@@ -797,8 +796,6 @@ Try{
 ################# 共通部品、関数  #######################
 
 
-
-
 function Test-LeafNotExists {
 
 <#
@@ -822,26 +819,25 @@ function Test-LeafNotExists {
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+[Alias("CheckPath" , "FullName")]$Path ,
+
 [Switch]$ForceEndLoop = $ForceEndLoop ,
 [Switch]$OverRide = $OverRide ,
 [Switch]$Continue = $Continue ,
 [Switch]$ContinueAsNormal = $ContinueAsNormal ,
 [int]$InfoEventID = $InfoEventID ,
 [int]$WarningEventID = $WarningEventID ,
-[int]$ErrorEventID = $ErrorEventID ,
-
-[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-[Alias("CheckPath" , "FullName")]$Path
+[int]$ErrorEventID = $ErrorEventID
 )
 
 begin {
 }
-
 process {
 Write-Log -ID $InfoEventID -Type Information -Message "Check existence of $($Path)"
 
-DO
-{
+Do {
+
     #Case 7
     IF (-not(Test-Path -LiteralPath $Path)) {
 
@@ -860,7 +856,6 @@ DO
         $noExistFlag = $TRUE
         Break
         }
-
 
     IF (Test-Path -LiteralPath $Path -PathType Leaf) {
         
@@ -906,10 +901,8 @@ While ($FALSE)
 
 Write-Output $noExistFlag
 }
-
 end {
 }
-
 }
 
 
@@ -962,11 +955,11 @@ PSObject
 [OutputType([PSObject])]
 [CmdletBinding()]
 Param(
-[Switch]$Recurse = $Recurse,
-[String]$Action = $Action,
-
 [String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("TargetFolder" , "FullName")]$Path ,
-[String][parameter(position = 1, mandatory)][ValidateSet("File" , "Folder")]$FilterType
+[String][parameter(position = 1, mandatory)][ValidateSet("File" , "Folder")]$FilterType ,
+
+[Switch]$Recurse = $Recurse ,
+[String]$Action = $Action
 )
 
 begin {
@@ -1007,6 +1000,114 @@ process {
 end {
 }
 
+}
+
+
+function ConvertTo-PreActionPath {
+
+<#
+.SYNOPSIS
+ConvertTo new path with extention .zip or adding time stamp
+
+.INPUT
+System.String. Path of the file
+
+.OUTPUT
+PSobject
+#>
+
+[OutputType([PSObject])]
+[CmdletBinding()]
+Param(
+[String][parameter(position = 0 ,mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("TargetObject" , "FullName")]$Path , 
+[String][parameter(position = 1 ,mandatory, ValueFromPipelineByPropertyName)][Alias("destinationFolder")]$DestinationPath ,
+
+[Array]$PreAction = $PreAction ,
+[String]$CompressedExtString =  $CompressedExtString ,
+[String]$TimeStampFormat = $TimeStampFormat
+) 
+
+begin {
+    $archive = New-Object PSObject -Property @{
+        Path = ''
+        Type = ''
+        }
+}
+process {
+    IF (($PreAction -match '^(Compress|Archive)$')) {
+
+        #$PreActionは配列である。それをSwitch処理すると1要素づつループする。
+        #'Compress'等は一旦Defaultに落ちるが、'7z' or '7zZip'があれば$ActionTypeは上書きされる
+
+        Switch -Regex ($PreAction) {    
+        
+          '^7z$' {
+                $archive.Type = "7z"
+                $extension = '.7z'
+                Break                
+                }
+                
+           '^7zZip$' {
+                $archive.Type = "7zZip"
+                $extension = '.zip'
+                Break
+                }
+                    
+             Default {
+                $archive.Type = ''
+                $extension = $CompressedExtString
+                }    
+        }
+
+    } else {
+    $archive.Type = '' 
+    $extension = ''
+    }
+ 
+    Switch -Regex ($PreAction) {    
+        
+          '^Compress$' {
+                $archive.Type += "Compress"
+                Break                
+                }
+                
+           '^Archive$' {
+                $archive.Type += "Archive"
+                Break
+                }
+                    
+             Default {
+                }    
+    }
+
+    IF ($PreAction -contains 'AddTimeStamp') {
+
+        $archive.Path = $DestinationPath | Join-Path -ChildPath (($Path | Split-Path -Leaf | ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat) + $extension)
+
+        IF ($PreAction -match '^(Compress|Archive)$') {
+
+            $archive.Type += "AndAddTimeStamp"
+           
+            } else {
+            $archive.Type += "AddTimeStamp"        
+            }
+
+        } else {        
+        $archive.Path = $DestinationPath | Join-Path -ChildPath (($Path | Split-Path -Leaf) + $extension )        
+        }
+
+        Write-Log -ID $InfoEventID -Type Information -Message "Create a new file [$($archive.Path | Split-Path -Leaf)] with action [$($archive.Type)]"
+
+    IF ($PreAction -contains 'MoveNewFile') {
+
+            Write-Log -ID $InfoEventID -Type Information -Message ("Specified -PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"] option, " + 
+                "thus place the new file in the folder [$($DestinationPath)]")
+            }
+
+    Write-Output $archive
+}
+end {
+}
 }
 
 
@@ -1194,7 +1295,6 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
             }
 
 
-
         IF ($Action -ne 'none') {
 
             $message = "Process files matched "
@@ -1233,114 +1333,6 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
 }
 
 
-function ConvertTo-PreActionPath {
-
-<#
-.SYNOPSIS
-ConvertTo new path with extention .zip or adding time stamp
-
-.INPUT
-System.String. Path of the file
-
-.OUTPUT
-PSobject
-#>
-
-[OutputType([PSObject])]
-[CmdletBinding()]
-Param(
-[Array]$PreAction = $PreAction ,
-[String]$CompressedExtString =  $CompressedExtString ,
-[String]$TimeStampFormat = $TimeStampFormat ,
-
-[String][parameter(position = 0 ,mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("TargetObject" , "FullName")]$Path , 
-[String][parameter(position = 1 ,mandatory, ValueFromPipelineByPropertyName)][Alias("destinationFolder")]$DestinationPath
-) 
-
-begin {
-    $archive = New-Object PSObject -Property @{
-        Path = ''
-        Type = ''
-        }
-}
-process {
-    IF (($PreAction -match '^(Compress|Archive)$')) {
-
-        #$PreActionは配列である。それをSwitch処理すると1要素づつループする。
-        #'Compress'等は一旦Defaultに落ちるが、'7z' or '7zZip'があれば$ActionTypeは上書きされる
-
-        Switch -Regex ($PreAction) {    
-        
-          '^7z$' {
-                $archive.Type = "7z"
-                $extension = '.7z'
-                Break                
-                }
-                
-           '^7zZip$' {
-                $archive.Type = "7zZip"
-                $extension = '.zip'
-                Break
-                }
-                    
-             Default {
-                $archive.Type = ''
-                $extension = $CompressedExtString
-                }    
-        }
-
-    } else {
-    $archive.Type = '' 
-    $extension = ''
-    }
- 
-    Switch -Regex ($PreAction) {    
-        
-          '^Compress$' {
-                $archive.Type += "Compress"
-                Break                
-                }
-                
-           '^Archive$' {
-                $archive.Type += "Archive"
-                Break
-                }
-                    
-             Default {
-                }    
-    }
-
-    IF ($PreAction -contains 'AddTimeStamp') {
-
-        $archive.Path = $DestinationPath | Join-Path -ChildPath (($Path | Split-Path -Leaf | ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat) + $extension)
-
-        IF ($PreAction -match '^(Compress|Archive)$') {
-
-            $archive.Type += "AndAddTimeStamp"
-           
-            } else {
-            $archive.Type += "AddTimeStamp"        
-            }
-
-        } else {        
-        $archive.Path = $DestinationPath | Join-Path -ChildPath (($Path | Split-Path -Leaf) + $extension )        
-        }
-
-        Write-Log -ID $InfoEventID -Type Information -Message "Create a new file [$($archive.Path | Split-Path -Leaf)] with action [$($archive.Type)]"
-
-    IF ($PreAction -contains 'MoveNewFile') {
-
-            Write-Log -ID $InfoEventID -Type Information -Message ("Specified -PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"] option, " + 
-                "thus place the new file in the folder [$($DestinationPath)]")
-            }
-
-    Write-Output $archive
-}
-end {
-}
-}
-
-
 function Finalize {
 
 Param(
@@ -1366,7 +1358,6 @@ Param(
 
  Invoke-PostFinalize $ReturnCode
 }
-
 
 
 #####################   ここから本体  ######################
@@ -1458,8 +1449,7 @@ IF ($PreAction -contains 'Archive') {
 
 #対象フォルダorファイル群の処理ループ
 
-ForEach ($Target in $targets)
-{
+ForEach ($Target in $targets) {
 <#
 PowershellはGOTO文が存在せず処理分岐ができない。
 そのためDo/Whileを用いて処理途中でエラーが発生した場合の分岐を実装している
@@ -1478,8 +1468,8 @@ Do/Whileはループのため、処理途中でBreakすると、Whileへjumpする。
  Finalize $ErrorReturnCode
 #>
 
-Do
-{
+Do {
+
 [Boolean]$ErrorFlag     = $FALSE
 [Boolean]$WarningFlag   = $FALSE
 [Boolean]$NormalFlag    = $FALSE
