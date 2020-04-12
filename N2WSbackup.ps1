@@ -329,7 +329,7 @@ Pop-Location
 Start-Sleep -Seconds $RetryInterval
 
 
-    while ($retryCount -le $MaxRetry) {
+    for ($retryCount = 0 ; $retryCount -le $MaxRetry ; $retryCount++) {
 
         $return = Test-N2WS -Date $bkupDate -PolicyName $PolicyName
             
@@ -337,22 +337,25 @@ Write-Verbose $return
 
             # 対象のバックアップポリシーが実行中又は実行完了となったら終了
 
-        if (($return.status -match "(In Progress|Backup(| Partially) Successful)")) {
+        IF (($return.status -match "(In Progress|Backup(| Partially) Successful)")) {
+
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Policy [$($PolicyName)] was switched to [$($return.status)]."
             $status = $TRUE
-            break                
+            Break                
             }
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Policy [$($PolicyName)] was still [$($return.status)]. Wait for [$($RetryInterval)] seconds. Retry [$($retryCount)/$($MaxRetry)]"
+
+        IF ($retryCount -ge $MaxRetry) {
+
+            Write-Log -Id $ErrorEventID -Type Error -Message "Retried specified times, but did not switch to 'In Progress' or 'Backup Successful' Retry over."
+            $status = $FALSE
+            Break
+            }
+
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Policy [$($PolicyName)] was still [$($return.status)]. Wait for [$($RetryInterval)] seconds. Retry [($retryCount+1)/$($MaxRetry)]"
         Start-Sleep -Seconds $RetryInterval
-        $retryCount++            
-        }
+    }
            
 
-    IF ($retryCount -gt $MaxRetry) {
-
-        Write-Log -Id $ErrorEventID -Type Error -Message "Retried specified times, but did not switch to 'In Progress' or 'Backup Successful' Retry over."
-        $status = $FALSE
-        }
 
 Write-Output $status
 }
@@ -388,7 +391,7 @@ process {
         Finalize $WarningReturnCode
         }
 
-    while ($retryCount -le $MaxRetry) {
+    for ($retryCount = 0 ; $retryCount -le $MaxRetry ; $retryCount++) {
 
         Push-Location $N2WScliPath
 
@@ -403,26 +406,27 @@ Write-Verbose $return
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Policy [$($PolicyName)] ID [$($id."backup-id")] was switched to [$($return.status)]."
             $status = $TRUE
             break
-                
-            } elseIF ($NULL -eq $return.Status) {
+            }
+                    
+        IF ($NULL -eq $return.Status) {
 
-                Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to get backup status."
-                $status = $FLASE
-                break
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to get backup status."
+            $status = $FLASE
+            break
+            }
 
-                } else {
-                $retryCount++
-                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Policy [$($PolicyName)] ID [$($id."backup-id")] was still [$($return.status)]. Wait for [$($RetryInterval)] seconds. Retry [$($retryCount)/$($MaxRetry)]"
-                Start-Sleep -Seconds $RetryInterval
-                }            
-        }
-           
-        # リトライオーバー判定
-        IF ($retryCount -gt $MaxRetry) {
-                
+        IF ($retryCount -ge $MaxRetry) {
+         
             Write-Log -Id $ErrorEventID -Type Error -Message "Retried specified times, but did not switch to 'Backup Successful' or 'Backup Partially Successful' Retry over."
             $status = $FALSE
-            }
+            Break
+            }        
+
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage ("Policy [$($PolicyName)] ID [$($id."backup-id")] was still [$($return.status)]. " +
+            "Wait for [$($RetryInterval)] seconds. Retry [($retryCount+1)/$($MaxRetry)]")
+        Start-Sleep -Seconds $RetryInterval
+            
+    }
 
 Write-Output $status
 }
