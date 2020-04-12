@@ -317,7 +317,7 @@ process {
    
    
     }   
-    catch [Exception]{
+    catch [Exception] {
        
         Write-Log -Id $ErrorEventID -Type Error -Message "Failed to execute [$($ActionType)] to [$($ActionError)]"
         IF (-not($processErrorFlag)) {
@@ -417,7 +417,6 @@ Process {
         }
 
 
-
     Switch -Regex ($Path) {
 
         "^\.+\\.*" {
@@ -454,19 +453,7 @@ Process {
             }
     }
 
-    #パスに\\が連続すると処理が複雑になるので、使わせない
-
-#    IF ($Path -match '^..\\\\') {
- 
-#        Write-Log -Id $InfoEventID -Type Information -Message "NTFS allows multiple path separators such as '\\' , due to processing limitation, convert multiple path separators to a single."
-
-#            For ( $i = 0 ; $i -lt $Path.Length-1 ; $i++ ) {
-#                $Path = $Path.Replace('\\','\')
-#                }
-
-#        Write-Log -Id $InfoEventID -Type Information -Message "$Name[$($Path)] is created by converting multiple path separators to a single."
-#        }
-
+#パスに\\が連続すると処理が複雑になるので、使わせない[System.IO.Path]::GetFullPath()で処理される
 
     #パスがフォルダで末尾に\が存在した場合は削除する。末尾の\有無で結果は一緒なのだが、統一しないと文字列数が異なるためパス文字列切り出しが誤動作する。
 
@@ -592,44 +579,55 @@ function Test-ServiceStatus {
 [CmdletBinding()]
 Param(
 [String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("Name")]$ServiceName ,
-[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][ValidateSet("Running", "Stopped")][Alias("Status")]$Health = 'Running',
-[int][ValidateRange(0,2147483647)]$Span = 3,
+[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][ValidateSet("Running", "Stopped")][Alias("Status")]$Health = 'Running' ,
+
+[int][ValidateRange(0,2147483647)]$Span = 3 ,
 [int][ValidateRange(0,2147483647)]$UpTo = 10
 )
-
-    For ( $i = 0 ; $i -lt $UpTo; $i++ )
-    {
+begin {
+}
+process {
+    For ( $i = 0 ; $i -lt $UpTo; $i++ ) {
         # サービス存在確認
         IF (-not($ServiceName | Test-ServiceExist -NoMessage)) {
-            Return $FALSE
+            $status = $FALSE
+            Break
             }
-
 
         # サービス状態判定
         $service = Get-Service | Where-Object {$_.Name -eq $ServiceName}
 
         IF ($service.Status -eq $Health) {
             Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists and status is [$($service.Status)]"
-            Return $TRUE     
+            $status = $TRUE
+            Break     
             }
 
         IF (($Span -eq 0) -and ($UpTo -eq 1)) {
                 
             Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists and status is [$($service.Status)]"
-            Return $FALSE
+            $status = $FALSE
+            Break
             }
 
         # 指定間隔(秒)待機
 
-        Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists and status is [$($Service.Status)] , is not [$($Health)] Wait for $($Span)seconds."
-        Start-Sleep $Span
+        Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists and status is [$($Service.Status)] , is not [$($Health)] Wait for $($Span)seconds. Retry [$i/$UpTo]"
+        Start-Sleep -Seconds $Span
     }
 
     # サービスは指定状態へ遷移しなかった
 
-Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists and status is [$($Service.Status)] now. The specified number of seconds has elapsed but the service has not transitioned to status [$($Health)]"
-Return $FALSE
+    IF ($i -ge $UpTo) {
+        Write-Log -Id $InfoEventID -Type Information -Message ("Service [$($ServiceName)] exists and status is [$($Service.Status)] now. " +
+            "The specified number of seconds has elapsed but the service has not transitioned to status [$($Health)]")
+        $status = $FALSE
+        }
 
+Write-Output $status
+}
+end {
+}
 }
 
 
@@ -643,7 +641,6 @@ Param(
 
 [Switch]$IfNullOrEmptyFinalize,
 [Switch]$NoMessage
-
 )
 begin {
 }

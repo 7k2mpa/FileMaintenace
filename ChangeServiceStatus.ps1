@@ -449,6 +449,6 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
       Start-Sleep $RetrySpanSec
 }
 
-Write-Log -Id $ErrorEventID -Type Error -Message "Although waiting predeterminated times , service [$($Service)] status is not switch to [$($TargetStatus)]"
+Write-Log -Id $ErrorEventID -Type Error -Message "Although waiting specified times , service [$($Service)] status is not switched to [$($TargetStatus)]"
 
 Finalize $ErrorReturnCode
