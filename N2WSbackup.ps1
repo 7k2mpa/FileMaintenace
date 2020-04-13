@@ -351,7 +351,8 @@ Write-Verbose $return
             Break
             }
 
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Policy [$($PolicyName)] was still [$($return.status)]. Wait for [$($RetryInterval)] seconds. Retry [($retryCount+1)/$($MaxRetry)]"
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage ("Policy [$($PolicyName)] was still [$($return.status)]. " +
+            "Wait for [$($RetryInterval)] seconds. Retry [" + ($retryCount+1) + "/$($MaxRetry)]")
         Start-Sleep -Seconds $RetryInterval
     }
            
@@ -423,7 +424,7 @@ Write-Verbose $return
             }        
 
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage ("Policy [$($PolicyName)] ID [$($id."backup-id")] was still [$($return.status)]. " +
-            "Wait for [$($RetryInterval)] seconds. Retry [($retryCount+1)/$($MaxRetry)]")
+            "Wait for [$($RetryInterval)] seconds. Retry [" + ($retryCount+1) + "/$($MaxRetry)]")
         Start-Sleep -Seconds $RetryInterval
             
     }

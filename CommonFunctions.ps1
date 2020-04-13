@@ -587,10 +587,12 @@ Param(
 begin {
 }
 process {
-    For ( $i = 0 ; $i -lt $UpTo; $i++ ) {
+
+$status = $FALSE
+
+    For ( $i = 0 ; $i -le $UpTo; $i++ ) {
         # サービス存在確認
         IF (-not($ServiceName | Test-ServiceExist -NoMessage)) {
-            $status = $FALSE
             Break
             }
 
@@ -601,28 +603,29 @@ process {
             Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists and status is [$($service.Status)]"
             $status = $TRUE
             Break     
-            }
-
-        IF (($Span -eq 0) -and ($UpTo -eq 1)) {
+            
+            } elseIF (($Span -eq 0) -and ($UpTo -le 1)) {
                 
-            Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists and status is [$($service.Status)]"
-            $status = $FALSE
+                Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists and status is [$($service.Status)]"
+                Break
+                }
+
+
+        # サービスは指定状態へ遷移しなかった
+
+        IF ($i -ge $UpTo) {
+            Write-Log -Id $InfoEventID -Type Information -Message ("Service [$($ServiceName)] exists and status is [$($Service.Status)] now. " +
+                "The specified waiting times has elapsed but the service has not switched to status [$($Health)]")
             Break
             }
 
+
         # 指定間隔(秒)待機
 
-        Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists and status is [$($Service.Status)] , is not [$($Health)] Wait for $($Span)seconds. Retry [$i/$UpTo]"
-        Start-Sleep -Seconds $Span
+        Write-Log -Id $InfoEventID -Type Information -Message ("Service [$($ServiceName)] exists and status is [$($Service.Status)] , " +
+            "is not [$($Health)] Wait for $($Span)seconds. Retry [" + ($i+1) + "/$UpTo]")
+        Start-Sleep -Seconds $Span        
     }
-
-    # サービスは指定状態へ遷移しなかった
-
-    IF ($i -ge $UpTo) {
-        Write-Log -Id $InfoEventID -Type Information -Message ("Service [$($ServiceName)] exists and status is [$($Service.Status)] now. " +
-            "The specified number of seconds has elapsed but the service has not transitioned to status [$($Health)]")
-        $status = $FALSE
-        }
 
 Write-Output $status
 }
