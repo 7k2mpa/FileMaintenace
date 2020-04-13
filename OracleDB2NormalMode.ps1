@@ -359,14 +359,13 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 
     Try {
-
         . $SQLCommandsPath
         }
 
         Catch [Exception] {
         Write-Log -EventType Error -EventID $ErrorEventID -EventMessage  "Fail to load SQLs in -SQLCommandsPath"
         Finalize $ErrorReturnCode
-    }
+        }
 
     Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to load SQLs Version $($SQLsVersion) in -SQLCommandsPath"
 
@@ -474,8 +473,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
         Default {
             Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Listener status is unknown."
             $needToStartListener = $TRUE
-            }
-     
+            }     
      }
 
 
@@ -486,7 +484,6 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
         Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
     
  
-
         IF ($LASTEXITCODE -eq 0) {
             Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfulley complete to start Listener."
             
@@ -553,7 +550,6 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle instance SID [$($OracleSID)] is not OPEN."        
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Switch Oracle instance SID [$($OracleSID)] to OPEN."
 
-
             $invokeResult = Invoke-SQL -SQLCommand $DBStart -SQLName 'Oracle DB Instance OPEN' -SQLLogPath $SQLLogPath
 
                 IF ($invokeResult.Status) {
@@ -583,7 +579,6 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
         } else { 
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Check Back Up Mode."
         }
-
 
 
  IF (-not($status.BackUp) -and ($status.Normal)) {

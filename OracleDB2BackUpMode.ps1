@@ -375,7 +375,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 #Oracle起動確認
 
-    $targetWindowsOracleService = "OracleService"+$OracleSID
+    $targetWindowsOracleService = "OracleService" + $OracleSID
 
     IF (-not(Test-ServiceStatus -ServiceName $targetWindowsOracleService -Health Running)) {
 
@@ -434,7 +434,7 @@ $Version = "2.0.0-beta.13"
 Push-Location $OracleHomeBinPath
 
  
-#planed to obsolute バックアップ実行中かを確認
+#planed to be obsolute バックアップ実行中かを確認
 
     IF ($NoCheckBackUpFlag) {
 
@@ -446,7 +446,7 @@ Push-Location $OracleHomeBinPath
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Running Back Up now. Can not start duplicate execution."
             Finalize $ErrorReturnCode
             }
-#planed to obsolute バックアップ実行中かを確認
+#planed to be obsolute バックアップ実行中かを確認
     
 
 #セッション情報を出力
@@ -462,7 +462,6 @@ Push-Location $OracleHomeBinPath
         } else {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Export Session Info."
 	    Finalize $ErrorReturnCode
-        
         }
 
 
@@ -479,7 +478,6 @@ Push-Location $OracleHomeBinPath
         } else {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Export Redo Log."
 	    Finalize $ErrorReturnCode
-
         }
 
 
@@ -538,11 +536,8 @@ Push-Location $OracleHomeBinPath
             
             } else {
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to switch to Back Up Mode."
-
-	        Finalize $ErrorReturnCode
-            
+	        Finalize $ErrorReturnCode            
             }
-
     }
 
 
