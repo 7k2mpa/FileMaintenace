@@ -541,17 +541,17 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
 
         IF ($invokeResult.log -match 'OPEN') {
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle instance [SID $($OracleSID)] is already OPEN."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle instance SID [$($OracleSID)] is already OPEN."
          
   
         }elseIF ($invokeResult.log -match '(STARTED|MOUNTED)') {
             
-            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Oracle instance [SID $($OracleSID)] is MOUNT or NOMOUNT. Shutdown and start up manually."
+            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Oracle instance SID [$($OracleSID)] is MOUNT or NOMOUNT. Shutdown and start up manually."
             Finalize $ErrorReturnCode
 
         } else {
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle instance [SID $($OracleSID)] is not OPEN."        
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Switch Oracle instance [SID $($OracleSID)] to OPEN."
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Oracle instance SID [$($OracleSID)] is not OPEN."        
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Switch Oracle instance SID [$($OracleSID)] to OPEN."
 
 
             $invokeResult = Invoke-SQL -SQLCommand $DBStart -SQLName 'Oracle DB Instance OPEN' -SQLLogPath $SQLLogPath
