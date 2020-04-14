@@ -72,7 +72,10 @@ If fail to delte, the script exit with error return code.
 
 .PARAMETER FlagFolder
 Specify the folder to check existence of flag file.
-Can specify relative or absolute path format.
+Can specify relative, absolute or UNC path format.
+Relative path format must be starting with 'dot.'
+Wild cards are not accepted shch as asterisk* question? bracket[]
+If the path contains bracket[] , specify path literally and do not escape.
 
 フラグファイルを確認、配置するフォルダを指定します。
 相対パス、絶対パスでの指定が可能です。
@@ -197,7 +200,8 @@ https://github.com/7k2mpa/FileMaintenace
 Param(
 
 [String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify the folder of a flag file placed.(ex. D:\Logs)or Get-Help CheckFlag.ps1')]
-[ValidateNotNullOrEmpty()][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')][Alias("Path","LiteralPath")]$FlagFolder ,
+[ValidateNotNullOrEmpty()]
+[ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName")]$FlagFolder ,
 
 [String][parameter(position = 1, mandatory)][ValidateNotNullOrEmpty()][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
 [String][parameter(position = 2)][ValidateNotNullOrEmpty()][ValidateSet("Exist","NoExist")]$Status = 'NoExist' ,
@@ -344,16 +348,15 @@ $Version = "2.0.0-beta.14"
 
 . Initialize
 
-[String]$flagValue = $ShellName +" "+ (Get-Date).ToString($LogDateFormat)
+[String]$flagValue = $ShellName + " " + (Get-Date).ToString($LogDateFormat)
 [String]$flagPath = $FlagFolder | Join-Path -ChildPath $FlagFile
 
 
 Switch -Regex ($Status) {
 
-
     '^NoExist$' {
 
-        IF (-not($flagPath | Test-Leaf -Name 'Flag file') -and -not($flagPath | Test-Container -Name 'Same Name file')) {
+        IF (-not($flagPath | Test-Leaf -Name 'Flag file') -and -not($flagPath | Test-Container -Name 'Same name folder')) {
 
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exists and terminate as NORMAL." 
 
@@ -362,7 +365,6 @@ Switch -Regex ($Status) {
             Finalize $WarningReturnCode    
             }
         }
-
 
     '^Exist$' {
     
@@ -376,11 +378,11 @@ Switch -Regex ($Status) {
             }        
         }
 
-
     Default {
-            Write-Log -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error. Switch Status exception has occurred. "
-            Finalize $InternalErrorReturnCode    
-            }
+            
+        Write-Log -EventID $InternalErrorEventID -EventType Error -EventMessage "Internal Error. Switch Status exception has occurred. "
+        Finalize $InternalErrorReturnCode    
+        }
 }
 
 
@@ -392,14 +394,16 @@ Switch -Regex ($PostAction) {
 
 
     'Create' {
-    
+
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Specified -PostAction [$($PostAction)] option, thus $PostAction a flag file."        
             Invoke-Action -ActionType MakeNewFileWithValue -ActionFrom $flagPath -ActionError $flagPath -FileValue $flagValue
             Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to create the flag file [$($flagPath)]"
             }
 
 
     'Delete' {
-    
+ 
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Specified -PostAction [$($PostAction)] option, thus $PostAction a flag file."             
             Invoke-Action -ActionType Delete -ActionFrom $flagPath -ActionError $flagPath
             Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to delete the flag file [$($flagPath)]"
             }
