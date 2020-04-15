@@ -27,7 +27,7 @@ https://github.com/7k2mpa/FileMaintenace
 
 #>
 
-$Script:CommonFunctionsVersion = "2.0.0-beta.14"
+$Script:CommonFunctionsVersion = "2.0.0-RC.1"
 
 
 #ƒƒO“™‚Ì•Ï”‚ğˆêŠ‡İ’è‚µ‚½‚¢ê‡‚ÍˆÈ‰º‚ğ—˜—p‚µ‚Ä‰º‚³‚¢B
