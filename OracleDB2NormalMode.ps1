@@ -503,10 +503,9 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
         
         } else {
         $serviceCommand = "$StartServicePath -Service $targetWindowsOracleService -Status Running -RetrySpanSec $RetrySpanSec -RetryTimes $RetryTimes"
-
-
+        
         Try {
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start Windows Serive [$($targetWindowsOracleService)] with StartService.ps1"
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start Windows Serive [$($targetWindowsOracleService)] with [$($StartServicePath)]"
             Invoke-Expression $serviceCommand        
             }
 
