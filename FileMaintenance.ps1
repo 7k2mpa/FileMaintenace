@@ -754,24 +754,24 @@ Param(
 [String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
 [ValidateNotNullOrEmpty()]$LogPath ,
 
-[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss',
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default ShiftJIS
+[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
 
-[Int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
-[Int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
-[Int][ValidateRange(0,2147483647)]$ErrorReturnCode = 8,
-[Int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16,
+[Int][ValidateRange(0,2147483647)]$NormalReturnCode = 0 ,
+[Int][ValidateRange(0,2147483647)]$WarningReturnCode = 1 ,
+[Int][ValidateRange(0,2147483647)]$ErrorReturnCode = 8 ,
+[Int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16 ,
 
-[Int][ValidateRange(1,65535)]$InfoEventID = 1,
-[Int][ValidateRange(1,65535)]$InfoLoopStartEventID = 2,
-[Int][ValidateRange(1,65535)]$InfoLoopEndEventID = 3,
-[Int][ValidateRange(1,65535)]$WarningEventID = 10,
-[Int][ValidateRange(1,65535)]$SuccessEventID = 73,
-[Int][ValidateRange(1,65535)]$InternalErrorEventID = 99,
-[Int][ValidateRange(1,65535)]$ErrorEventID = 100,
+[Int][ValidateRange(1,65535)]$InfoEventID = 1 ,
+[Int][ValidateRange(1,65535)]$InfoLoopStartEventID = 2 ,
+[Int][ValidateRange(1,65535)]$InfoLoopEndEventID = 3 ,
+[Int][ValidateRange(1,65535)]$WarningEventID = 10 ,
+[Int][ValidateRange(1,65535)]$SuccessEventID = 73 ,
+[Int][ValidateRange(1,65535)]$InternalErrorEventID = 99 ,
+[Int][ValidateRange(1,65535)]$ErrorEventID = 100 ,
 
-[Switch]$ErrorAsWarning,
-[Switch]$WarningAsNormal,
+[Switch]$ErrorAsWarning ,
+[Switch]$WarningAsNormal ,
 
 [Regex]$ExecutableUser = '.*'
 
@@ -790,10 +790,10 @@ Try{
     }
 
 
-################ 設定が必要なのはここまで ##################
+################ specify upper lines ##################
 
 
-################# 共通部品、関数  #######################
+################# functions  #######################
 
 
 function Test-LeafNotExists {
@@ -1360,7 +1360,7 @@ Param(
 }
 
 
-#####################   ここから本体  ######################
+#####################  main  ######################
 
 [Boolean]$ErrorFlag     = $FALSE
 [Boolean]$WarningFlag   = $FALSE
