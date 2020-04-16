@@ -1172,7 +1172,7 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
         IF ($ArchiveFileName -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
                 Write-Log -Type Error -ID $ErrorEventID -Message "-ArchiveFileName may contain characters that can not use by NTFS."
-				Finalize $ErrorReturnCode
+                Finalize $ErrorReturnCode
                 } 
         }
 
@@ -1193,41 +1193,41 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
     
         Write-Log -Type Error -ID $ErrorEventID -Message ("Specified -(Pre)Action option for Move or Copy files, " +
             "-TargetFolder and -MoveToFolder must not be same.")
-		Finalize $ErrorReturnCode
+        Finalize $ErrorReturnCode
         }
 
     IF (($Action -match "^(Move|Delete|KeepFilesCount)$") -and  ($PostAction -ne 'none')) {
 
-		Write-Log -Type Error -ID $ErrorEventID -Message ("Specified -Action[$($Action)] option for Delete or Move files, " +
+        Write-Log -Type Error -ID $ErrorEventID -Message ("Specified -Action[$($Action)] option for Delete or Move files, " +
             "must not specify -PostAction[$($PostAction)] option.")
-		Finalize $ErrorReturnCode
+        Finalize $ErrorReturnCode
         }
 
    IF (($PreAction -contains 'MoveNewFile') -and (-not($PreAction -match "^(Compress|AddTimeStamp|Archive)$")) ) {
 
-		Write-Log -Type Error -ID $ErrorEventID -Message ("Secified -PreAction MoveNewFile option, " + 
+        Write-Log -Type Error -ID $ErrorEventID -Message ("Secified -PreAction MoveNewFile option, " + 
             "must specify -PreAction Compres or AddTimeStamp or Archive option also. " +
             "If you move the original files, will specify -Action Move option.")
-		Finalize $ErrorReturnCode
+        Finalize $ErrorReturnCode
         }
 
    IF (($PreAction -contains 'Compress') -and ($PreAction -contains 'Archive')) {
 
-		Write-Log -Type Error -ID $ErrorEventID "Must not specify -PreAction both Compress and Archive options in the same time."
-		Finalize $ErrorReturnCode
+        Write-Log -Type Error -ID $ErrorEventID "Must not specify -PreAction both Compress and Archive options in the same time."
+        Finalize $ErrorReturnCode
         }
 
    IF (($PreAction -contains '7z') -and ($PreAction -Contains '7zZip')) {
 
-		Write-Log -Type Error -ID $ErrorEventID -Message "Must not specify -PreAction both 7z and 7zZip options for the archive method in the same time."
-		Finalize $ErrorReturnCode
+        Write-Log -Type Error -ID $ErrorEventID -Message "Must not specify -PreAction both 7z and 7zZip options for the archive method in the same time."
+        Finalize $ErrorReturnCode
         }
 
    IF (($PreAction -match "^(7z|7zZip)$") -and (-not($PreAction -match "^(Compress|Archive)$"))) {
 
-		Write-Log -Type Error -ID $ErrorEventID -Message ("Must not specify -PreAction only 7z or 7zZip option. " +
+        Write-Log -Type Error -ID $ErrorEventID -Message ("Must not specify -PreAction only 7z or 7zZip option. " +
             "Must specify -PreAction Compress or Archive option with them.")
-		Finalize $ErrorReturnCode
+        Finalize $ErrorReturnCode
         }
 
    IF ($Action -eq "DeleteEmptyFolders") {
@@ -1236,12 +1236,12 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
     
                 Write-Log -Type Error -ID $ErrorEventID -Message ("Specified -Action [$Action] , " +
                     "must not specify -PreAction or -PostAction options for modify files.")
-				Finalize $ErrorReturnCode
+                Finalize $ErrorReturnCode
 
         } elseIF ($Size -ne 0) {
     
                 Write-Log -Type Error -ID $ErrorEventID -Message "Specified -Action [$Action] , must not specify -size option."
-				Finalize $ErrorReturnCode
+                Finalize $ErrorReturnCode
                 }
     }
 
@@ -1249,7 +1249,7 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
     IF ($TimeStampFormat -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
         Write-Log -Type Error -ID $ErrorEventID -Message "-TimeStampFormat  may contain characters that can not use by NTFS."
-		Finalize $ErrorReturnCode
+        Finalize $ErrorReturnCode
         }
 
 
@@ -1489,7 +1489,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 #Action[(Move|Copy)]以外はファイル移動が無い。移動先パスを確認する必要がないのでスキップ
 #PreAction[Archive]はMoveNewFile[TRUE]でも出力ファイルは1個で階層構造を取らない。よってスキップ
 
-    IF ( (($Action -match "^(Move|Copy)$")) -or (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive')) ) {
+    IF ( ($Action -match "^(Move|Copy)$") -or (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive')) ) {
 
         #ファイルが移動するAction用にファイル移動先の親フォルダパス$MoveToNewFolderを生成する
         
@@ -1524,7 +1524,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
 #Pre Action
 
-    IF (( $PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')) {
+    IF (($PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')) {
 
         IF ($PreAction -contains 'MoveNewFile') {        
 
