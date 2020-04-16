@@ -56,7 +56,7 @@ For backward compatibility, run without specification -Status option, -Status wi
 .\CheckFlag -FlagFolder ..\Lock -FlagFile BackUp.Flg -Status Exist -PostAction Delete
 
 Check BackUp.Flg file in the ..\Lock folder.
-If the file dose not exists, the script exit with warning return code.
+If the file dose not exist, the script exit with warning return code.
 If the file exists, the script delete the flag file.
 
 If success to delete, the script exit with normal return code.
@@ -358,7 +358,7 @@ Switch -Regex ($Status) {
 
         IF (-not($flagPath | Test-Leaf -Name 'Flag file') -and -not($flagPath | Test-Container -Name 'Same name folder')) {
 
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exists and terminates as NORMAL." 
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exist and terminates as NORMAL." 
 
             } else {
             Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] exists already and terminates as WARNING."

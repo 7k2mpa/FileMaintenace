@@ -256,21 +256,20 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[String][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,
+[int][parameter(Position = 0, mandatory)][ValidateRange(1,65535)]$Days = 1 ,
 
-[String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
+[String][parameter(Position = 1)][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,
+
+[String][parameter(Position = 2)][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$OracleRMANLogPath = '.\SC_Logs\RMAN.log' ,
 
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$ExecRMANPath = '.\SQL\DeleteArchiveLog.rman' ,
 
-[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$OracleRMANLogPath = '.\SC_Logs\RMAN.log',
-
-[parameter(mandatory=$true)][int][ValidateRange(1,65535)]$Days = 1,
+[String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
 
 
 [Switch]$PasswordAuthorization ,
 [String]$ExecUser = 'hogehoge',
 [String]$ExecUserPassword = 'hogehoge',
-
 
 
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default for ShiftJIS

@@ -361,7 +361,7 @@ $DatumPath = $PSScriptRoot
 
         $execCommand = $ExecUser+"/"+$ExecUserPassword+"@"+$OracleSID+" Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y"
     
-        }else{
+        } else {
 
         $execCommand = "`' /@"+$OracleSID+" as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
         }
@@ -376,9 +376,7 @@ IF ($process.ExitCode -ne 0) {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to export DB with Oracle data pump command."
 	    Finalize $ErrorReturnCode
 
-        }else{
+        } else {
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to export DB with Oracle data pump command."
         Finalize $NormalReturnCode
         }
-                   
-

@@ -237,7 +237,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
         Finalize $ErrorReturnCode
 
         } else {
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Drive $($MountDrive) dose not exists."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Drive $($MountDrive) dose not exist."
         }
 
 
@@ -250,7 +250,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath $($TargetPath) exists."
         
         } else {
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath $($TargetPath) dose not exists."
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "UNC Path -TargetPath $($TargetPath) dose not exist."
         Finalize $ErrorReturnCode
         }
 

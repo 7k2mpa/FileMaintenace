@@ -631,7 +631,7 @@ Specfy if you want to return WARNING exit code when the script terminate with an
 
 　異常終了しても警告終了のReturnCodeを返します。
 
-.PARAMETER WarningAsNormalaaaaaaa
+.PARAMETER WarningAsNormal
 
 Specify if you want to return NORMAL exit code when the script terminate with a Warning.
 
