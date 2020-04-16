@@ -12,7 +12,7 @@ set P_NAME=OracleDB2NormalMode.ps1
 powershell -Noninteractive -Command ".\%P_NAME% ; exit $LASTEXITCODE"
 
 	IF %errorlevel%==8 (
-		call %SC_DIR%MSGPRINT.bat "%P_NAME% terminated as Error Erro LevelÅÅ%errorlevel%" ERROR 100
+		call %SC_DIR%MSGPRINT.bat "%P_NAME% terminated with an Error Error LevelÅÅ%errorlevel%" ERROR 100
 		goto :ERR
 		)
 
@@ -22,7 +22,7 @@ set P_NAME=OracleDeleteArchiveLog.ps1
 powershell -Noninteractive -Command ".\%P_NAME% -Days 1 ; exit $LASTEXITCODE"
 
 	IF %errorlevel%==8 (
-		call %SC_DIR%MSGPRINT.bat "%P_NAME% terminated as Error Erro LevelÅÅ%errorlevel%" ERROR 100
+		call %SC_DIR%MSGPRINT.bat "%P_NAME% terminated with an Error Error LevelÅÅ%errorlevel%" ERROR 100
 		goto :ERR
 		)
 
@@ -32,7 +32,7 @@ set P_NAME=Wrapper.ps1
 powershell -Noninteractive -Command ".\%P_NAME% -CommandPath .\FileMaintenance.ps1 -CommandFile .\Config\Command.txt ; exit $LASTEXITCODE"
 
 	IF %errorlevel%==8 (
-		call %SC_DIR%MSGPRINT.bat "%P_NAME% terminated as Error Erro LevelÅÅ%errorlevel%" ERROR 100
+		call %SC_DIR%MSGPRINT.bat "%P_NAME% terminated with an Error Error LevelÅÅ%errorlevel%" ERROR 100
 		goto :ERR
 		)
 
