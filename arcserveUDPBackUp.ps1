@@ -626,7 +626,7 @@ $Version = "2.0.0-RC.1"
      $extension                = [System.IO.Path]::GetExtension((Split-Path -Path $BackupFlagFilePath -Leaf))
      $fileNameWithOutExtention = [System.IO.Path]::GetFileNameWithoutExtension((Split-Path -Path $BackupFlagFilePath -Leaf))
 
-     $BackupFlagFileName = $fileNameWithOutExtention + "_"+$Plan+"_"+$Server+$extension
+     $BackupFlagFileName = $fileNameWithOutExtention + "_" + $Plan + "_" + $Server+$extension
         
      $BackupFlagFilePath = $BackupFlagFilePath | Split-Path -Parent | Join-Path -ChildPath $BackupFlagFileName
 
@@ -634,9 +634,9 @@ $Version = "2.0.0-RC.1"
 
     IF ($BackupFlagFilePath | Test-Leaf -Name 'Back up flag') {
 
-            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Back Up is running. Stop for avoiding overlap."
-            Finalize $ErrorReturnCode
-            }
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Back Up is running. Stop for avoiding overlap."
+        Finalize $ErrorReturnCode
+        }
 
     Test-LogPath -CheckPath $BackupFlagFilePath -ObjectName 'Folder of backup flag'
 
