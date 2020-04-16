@@ -516,7 +516,7 @@ $Version = "2.0.0-RC.1"
 
 . Initialize
 
-[String]$BackUpTempPath = $BackUpLogPath | Join-Path -ChildPath "backup-info_$PolicyName.txt" 
+[String]$BackUpTempPath = $BackUpLogPath | Join-Path -ChildPath "backup-info_$($PolicyName).txt" 
 
 Switch -Regex ($Job) {
 
