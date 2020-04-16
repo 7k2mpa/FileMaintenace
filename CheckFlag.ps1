@@ -358,10 +358,10 @@ Switch -Regex ($Status) {
 
         IF (-not($flagPath | Test-Leaf -Name 'Flag file') -and -not($flagPath | Test-Container -Name 'Same name folder')) {
 
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exists and terminate as NORMAL." 
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exists and terminates as NORMAL." 
 
             } else {
-            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] exists already and terminate as WARNING."
+            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] exists already and terminates as WARNING."
             Finalize $WarningReturnCode    
             }
         }
@@ -370,10 +370,10 @@ Switch -Regex ($Status) {
     
         IF ($flagPath | Test-Leaf -Name 'Flag file') {
 
-            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] exists and terminate as NORMAL."    
+            Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] exists and terminates as NORMAL."    
 
             } else {
-            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] is deleted already and terminate as WARNING."
+            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Flag file [$($flagPath)] is deleted already and terminates as WARNING."
             Finalize $WarningReturnCode
             }        
         }
