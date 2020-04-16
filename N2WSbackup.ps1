@@ -156,9 +156,9 @@ https://github.com/7k2mpa/FileMaintenace
 [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="High")]
 Param(
 
-[String][Parameter(position = 0, mandatory)]$PolicyName  ,   
+[String][Parameter(position = 0, mandatory)]$PolicyName ,   
 
-[String][Parameter(position = 1)][ValidateSet("Request", "GetResult")]$Job = 'GetResult',
+[String][Parameter(position = 1)][ValidateSet("Request", "GetResult")]$Job = 'GetResult' ,
 
 
 [int][Parameter(position = 2)][ValidateRange(1,120)]$RetryInterval = 60 ,
@@ -166,6 +166,7 @@ Param(
 
 [String]$N2WScliPath = "D:\N2WS" ,
 [String]$BackUpLogPath = "..\tmp\" ,
+
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
