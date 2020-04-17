@@ -709,7 +709,7 @@ Param(
 [Int][ValidateRange(0,730000)]$Days = 0 ,
 [Int64][ValidateRange(0,9223372036854775807)]$Size = 0 ,
 
-#[Regex][Alias("Regex")]$RegularExpression = '$(.*)\.txt$' , #RenameRegex Sample
+#[Regex][Alias("Regex")]$RegularExpression = '^(.*)\.txt$' , #RenameRegex Sample
 
 [Regex][Alias("Regex")]$RegularExpression = '.*' ,
 [Regex][Alias("PathRegex")]$ParentRegularExpression = '.*' ,

@@ -344,18 +344,17 @@ process {
             }   
     }
 
-   IF ($ActionType -match '^(Copy|AddTimeStamp|Rename|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$' ) {
-        Write-Log -Id $InfoEventID -Type Information -Message "$($ActionTo) was created."
-        }
-
-
     IF ($OverRideFlag) {
         $Script:OverRideCount ++
         $Script:InLoopOverRideCount ++
         $Script:OverRideFlag = $FALSE
         }
-           
-    Write-Log -Id $SuccessEventID -Type Success -Message "Successfully completed to [$($ActionType)] to [$($ActionError)]"
+
+   IF ($ActionType -match '^(Copy|AddTimeStamp|Rename|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$' ) {
+        $addMessage = " to [$($ActionTo)]"
+        }
+        
+    Write-Log -Id $SuccessEventID -Type Success -Message ("Successfully completed to [$($ActionType)] [$($ActionError)]" + $addMessage)
     $Script:NormalFlag = $TRUE
 }
 end {
@@ -459,27 +458,27 @@ Process {
 
     IF ($Path.EndsWith('\')) {
     
-            Write-Log -Id $InfoEventID -Type Information -Message "Windows path format allows the end of path with a path separator '\' , due to processing limitation, remove it."
-            $Path = $Path.Substring(0, $Path.Length -1)
-            }
+        Write-Log -Id $InfoEventID -Type Information -Message "Windows path format allows the end of path with a path separator '\' , due to processing limitation, remove it."
+        $Path = $Path.Substring(0, $Path.Length -1)
+        }
 
 
     #TEST-Path -isvalidÇÕÉRÉçÉì:ÇÃä‹Ç‹ÇÍÇƒÇ¢ÇÈPathÇê≥ÇµÇ≠îªíËÇµÇ»Ç¢ÇÃÇ≈å¬ï Ç…îªíË
 
     IF (($Path | Split-Path -noQualifier) -match '(\/|:|\?|`"|<|>|\||\*)') {
     
-                Write-Log -Type Error -Id $ErrorEventID -Message "$Name may contain characters that can not use by NTFS  such as BackSlash/ Colon: Question? DoubleQuote`" less or greater than<> astarisk* pipe| "
-                Finalize $ErrorReturnCode
-                }
+        Write-Log -Type Error -Id $ErrorEventID -Message "$Name may contain characters that can not use by NTFS  such as BackSlash/ Colon: Question? DoubleQuote`" less or greater than<> astarisk* pipe| "
+        Finalize $ErrorReturnCode
+        }
 
 
     #Windowsó\ñÒåÍÇ™ÉpÉXÇ…ä‹Ç‹ÇÍÇƒÇ¢ÇÈÇ©îªíË
 
     IF ($Path -match '\\(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])(\\|$|\..*$)') {
 
-                Write-Log -Type Error -Id $ErrorEventID -Message "$Name may contain the Windows reserved words such as (AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
-                Finalize $ErrorReturnCode
-                }        
+        Write-Log -Type Error -Id $ErrorEventID -Message "$Name may contain the Windows reserved words such as (AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
+        Finalize $ErrorReturnCode
+        }        
 
     Write-Output $Path
 }
