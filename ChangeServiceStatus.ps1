@@ -205,7 +205,6 @@ https://github.com/7k2mpa/FileMaintenace
 [CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
 Param(
 
-
 [parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help StartService.ps1')]
 [String][Alias("Name")]$Service ,
 
@@ -296,7 +295,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 
      IF ($TargetStatus -notmatch '(Running|Stopped)') {
-        Write-Log -Id $ErrorEventID -Type Error -Message "-TargetStatus is invalid."
+        Write-Log -Id $ErrorEventID -Type Error -Message "-TargetStatus [$($TargetStatus)] is invalid specification."
         Finalize $ErrorReturnCode   
         }
 
@@ -373,10 +372,10 @@ $Version = "2.0.0-RC.1"
 
 For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
 
-      # サービス存在確認
-      IF (-not($Service | Test-ServiceExist)) {
-          Finalize $ErrorReturnCode
-          }
+    # サービス存在確認
+    IF (-not($Service | Test-ServiceExist)) {
+        Finalize $ErrorReturnCode
+        }
 
     Write-Log -Id $InfoEventID -Type Information -Message "With WMIService.(start|stop)Service, starting to switch Service [$($Service)] status from [$($originalStatus)] to [$($TargetStatus)]"
 
@@ -446,7 +445,7 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
       #チェック回数の上限に達していない場合は、指定秒待機
 
       Write-Log -Id $InfoEventID -Type Information -Message "Serivce [$($Service)] exists and service status dose not switch to [$($TargetStatus)] Wait for $($RetrySpanSec) seconds."
-      Start-Sleep $RetrySpanSec
+      Start-Sleep -Seconds $RetrySpanSec
 }
 
 Write-Log -Id $ErrorEventID -Type Error -Message "Although waiting specified times , service [$($Service)] status is not switched to [$($TargetStatus)]"

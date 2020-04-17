@@ -581,8 +581,8 @@ Param(
 [String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("Name")]$ServiceName ,
 [String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][ValidateSet("Running", "Stopped")][Alias("Status")]$Health = 'Running' ,
 
-[int][ValidateRange(0,2147483647)]$Span = 3 ,
-[int][ValidateRange(0,2147483647)]$UpTo = 10
+[int][ValidateRange(0,2147483647)][Alias("RetrySpacSec")]$Span = 3 ,
+[int][ValidateRange(0,2147483647)][Alias("RetryTimes")]$UpTo = 10
 )
 begin {
 }
