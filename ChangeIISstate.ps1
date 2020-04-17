@@ -317,22 +317,23 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "With Power
             }
     }
 
+$result = $ErrorReturnCode
 
-For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
+:ForLoop For ( $i = 0 ; $i -le $RetryTimes ; $i++ ) {
 
       $siteState = Get-Website | Where-Object{$_.Name -eq $Site} | ForEach-Object{$_.State}
 
            Switch ($siteState) {
         
                 $TargetState {
-
-                    Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Site[$($Site)] state was [$($SiteState)]."
-                    Finalize $NormalReturnCode
+                    Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Site[$($Site)] state was [$($SiteState)]"
+                    $result = $NormalReturnCode
+                    Break ForLoop
                     }
 
 
                 $OriginalState {
-                    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] state is still [$($SiteState)]. "
+                    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] state is still [$($SiteState)]"
                     }
 
               
@@ -341,13 +342,16 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
                     } 
             }  
     
+    IF ($i -ge $RetryTimes) {
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting specified times , site [$($Site)] state did not switch to [$($TargetState)]"
+        Break
+        }
 
-      #チェック回数の上限に達していない場合は、指定秒待機
+    #チェック回数の上限に達していない場合は、指定秒待機
 
-      Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Site [$($Site)] exists and site state did not change to [$($TargetState)]. Wait for $($RetrySpanSec) seconds."
-      Start-Sleep $RetrySpanSec
+    Write-Log -EventID $InfoEventID -EventType Information -EventMessage ("Site [$($Site)] exists and site state did not change to [$($TargetState)] " +
+        "Wait for $($RetrySpanSec) seconds. Retry [" + ($i+1) + "/$RetryTimes]")
+    Start-Sleep -Seconds $RetrySpanSec
 }
 
-Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting specified times , site [$($Site)] state did not switch to [$($TargetState)]."
-
-Finalize $ErrorReturnCode
+Finalize $result

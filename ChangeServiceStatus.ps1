@@ -339,7 +339,7 @@ $Version = "2.0.0-RC.1"
 
 [String]$computer = "localhost" 
 [String]$class = "win32_service" 
-[Object]$WmiService = Get-WMIobject -Class $class -computer $computer -filter "name = '$Service'" 
+[Object]$WMIservice = Get-WMIobject -Class $class -computer $computer -filter "name = '$Service'" 
 
 
 #初期設定、パラメータ確認、起動メッセージ出力
@@ -369,59 +369,63 @@ $Version = "2.0.0-RC.1"
 #https://gallery.technet.microsoft.com/scriptcenter/aa73bb75-38a6-4bd4-b72e-a6aede76d6ad
 #https://devblogs.microsoft.com/scripting/hey-scripting-guy-how-can-i-use-windows-powershell-to-stop-services/
 
+$result = $ErrorReturnCode
 
-For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
+:ForLoop For ( $i = 0 ; $i -le $RetryTimes ; $i++ ) {
 
     # サービス存在確認
     IF (-not($Service | Test-ServiceExist)) {
-        Finalize $ErrorReturnCode
+        Break
         }
 
     Write-Log -Id $InfoEventID -Type Information -Message "With WMIService.(start|stop)Service, starting to switch Service [$($Service)] status from [$($originalStatus)] to [$($TargetStatus)]"
 
+Write-Debug (Get-Service | Where-Object {$_.Name -eq $Service}).Status
+
     Switch -Regex ($TargetStatus) {
  
         'Stopped' {
-            IF ($WMIService.AcceptStop) {
-                $return = $WMIService.stopService()
+            IF ($WMIservice.AcceptStop) {
+                $return = $WMIservice.stopService()
 
                 } else {
                 Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] will not accept a stop request. Wait for $($RetrySpanSec) seconds."
-                Start-Sleep $RetrySpanSec
-                Continue
+                Start-Sleep -Seconds $RetrySpanSec
+                Continue ForLoop
                 }
             }
     
         'Running' {
 
             #https://docs.microsoft.com/ja-jp/windows/win32/cimwin32prov/win32-service
-            #No AcceptStart Class
+            #[AcceptStart Class] dose not exist
 
-            $return = $WMIService.startService()
+            $return = $WMIservice.startService()
             }
 
         Default {
             Write-Log -Id $InternalErrorEventID -Type Error -Message 'Internal Error. $TargetStatus is invalid. '
-            Finalize $InternalErrorReturnCode    
+            $result = $InternalErrorReturnCode
+            Break ForLoop
             }
     }
 
 
 
-     Switch ($return.returnvalue) {
+    Switch ($return.returnvalue) {
         
             0 {
                 $serviceStatus = $Service | Test-ServiceStatus -Status $TargetStatus -Span $RetrySpanSec -UpTo $RetryTimes
 
                 IF ($serviceStatus) {
                     Write-Log -Id $SuccessEventID -Type Success -Message "Service [$($Service)] is [$($TargetStatus)]"
-                    Finalize $NormalReturnCode
-                
+                    $result = $NormalReturnCode
+                    Break ForLoop
+
                     } else {
-                    Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] is not [$($TargetStatus)] Retry."
+                    Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] is not [$($TargetStatus)]"
                     }
                 }
-
 
             2 {
                 Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] reports access denied."
@@ -433,21 +437,25 @@ For ( $i = 0 ; $i -lt $RetryTimes ; $i++ ) {
             
             10 {
                 Write-Log -Id $WarningEventID -Type Warning -Message "Service [$($Service)] is already [$($TargetStatus)]"
-                Finalize $WarningErrorCode
+                $result = $WarningErrorCode
+                Break ForLoop
                 }
               
             DEFAULT {
                 Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] reports ERROR $($Return.returnValue)"
                 } 
-      }  
+    }  
     
+    IF ($i -ge $RetryTimes) {
+        Write-Log -Id $ErrorEventID -Type Error -Message "Although retry specified times, service [$($Service)] status is not switched to [$($TargetStatus)]"
+        Break
+        }
 
       #チェック回数の上限に達していない場合は、指定秒待機
 
-      Write-Log -Id $InfoEventID -Type Information -Message "Serivce [$($Service)] exists and service status dose not switch to [$($TargetStatus)] Wait for $($RetrySpanSec) seconds."
+      Write-Log -Id $InfoEventID -Type Information -Message ("Serivce [$($Service)] exists and service status dose not switch to [$($TargetStatus)] " +
+        "Wait for $($RetrySpanSec) seconds. Retry [" + ($i+1) + "/$RetryTimes]")
       Start-Sleep -Seconds $RetrySpanSec
 }
 
-Write-Log -Id $ErrorEventID -Type Error -Message "Although waiting specified times , service [$($Service)] status is not switched to [$($TargetStatus)]"
-
-Finalize $ErrorReturnCode
+Finalize $result
