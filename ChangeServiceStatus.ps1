@@ -216,8 +216,8 @@ Param(
 #[String][parameter(position=1)][ValidateSet("Running", "Stopped")]$TargetStatus = 'Stopped', 
 
 
-[int][parameter(position=2)][ValidateRange(1,65535)]$RetrySpanSec = 3 ,
-[int][parameter(position=3)][ValidateRange(1,65535)]$RetryTimes = 5 ,
+[int][parameter(position=2)][ValidateRange(1,65535)]$RetrySpanSec = 10 ,
+[int][parameter(position=3)][ValidateRange(1,65535)]$RetryTimes = 18 ,
 
 
 [boolean]$Log2EventLog = $TRUE,
@@ -294,11 +294,31 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
         }
 
 
-     IF ($TargetStatus -notmatch '(Running|Stopped)') {
+    IF ($TargetStatus -notmatch '(Running|Stopped)') {
         Write-Log -Id $ErrorEventID -Type Error -Message "-TargetStatus [$($TargetStatus)] is invalid specification."
         Finalize $ErrorReturnCode   
         }
 
+
+    For ($i = 0 ; $i -le $RetryTimes ; $i++ ) {
+
+        IF ($i -ge $RetryTimes) {
+
+            Write-Log -Id $ErrorEventID -Type Error -Message "Although retry specified times, service [$($Service)] status is in [$($status)]"
+            Finalize $ErrorReturnCode                         
+            }
+
+        $status = (Get-Service | Where-Object {$_.Name -eq $Service}).Status
+
+        IF ($status -match "Pending") {
+
+            Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] is in [$($status)] status. Wait for $($RetrySpanSec) seconds."
+            Start-Sleep -Seconds $RetrySpanSec
+            
+            } else {
+            Break
+            }
+    }
 
     IF ($Service | Test-ServiceStatus -Status $TargetStatus -Span 0 -UpTo 1 ) {
         Write-Log -Id $WarningEventID -Type Warning -Message "Service [$($Service)] status is already [$($TargetStatus)]"
@@ -363,7 +383,6 @@ $Version = "2.0.0-RC.1"
  }
 
 
-
 #以下のコードはMSのサンプルを参考
 #MICROSOFT LIMITED PUBLIC LICENSE version 1.1
 #https://gallery.technet.microsoft.com/scriptcenter/aa73bb75-38a6-4bd4-b72e-a6aede76d6ad
@@ -385,16 +404,20 @@ Write-Debug (Get-Service | Where-Object {$_.Name -eq $Service}).Status
     Switch -Regex ($TargetStatus) {
  
         'Stopped' {
-            IF ($WMIservice.AcceptStop) {
-                $return = $WMIservice.stopService()
 
-                } else {
-                Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] will not accept a stop request. Wait for $($RetrySpanSec) seconds."
-                Start-Sleep -Seconds $RetrySpanSec
-                Continue ForLoop
-                }
+            IF ((Get-Service | Where-Object {$_.Name -eq $Service}).Status -match "Pending") {
+                Break
+                } elseIF ($WMIservice.AcceptStop) {
+                    $return = $WMIservice.stopService()
+
+                    } else {
+                    Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] will not accept a stop request. Wait for $($RetrySpanSec) seconds."
+                    Start-Sleep -Seconds $RetrySpanSec
+                    Continue ForLoop
+                    }
+                
             }
-    
+   
         'Running' {
 
             #https://docs.microsoft.com/ja-jp/windows/win32/cimwin32prov/win32-service
@@ -409,7 +432,6 @@ Write-Debug (Get-Service | Where-Object {$_.Name -eq $Service}).Status
             Break ForLoop
             }
     }
-
 
 
     Switch ($return.returnvalue) {
@@ -442,7 +464,7 @@ Write-Debug (Get-Service | Where-Object {$_.Name -eq $Service}).Status
                 }
               
             DEFAULT {
-                Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] reports ERROR $($Return.returnValue)"
+                Write-Log -Id $InfoEventID -Type Information -Message "Service [$($Service)] reports ERROR $($return.returnvalue)"
                 } 
     }  
     

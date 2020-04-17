@@ -1468,7 +1468,7 @@ Do/Whileはループのため、処理途中でBreakすると、Whileへjumpする。
  Finalize $ErrorReturnCode
 #>
 
-Do: Do {
+Do {
 
 [Boolean]$ErrorFlag     = $FALSE
 [Boolean]$WarningFlag   = $FALSE
@@ -1606,7 +1606,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
                 #$Invoke-Actionが異常終了&-Continue $TRUEだと$ContinueFlag $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
                 IF ($ContinueFlag) {
-                    Break Do             
+                    Break      
                     }
                 $InLoopDeletedFilesCount++
             
@@ -1665,7 +1665,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
 #異常終了などはBreakしてファイル処理終端へ抜ける。
 }
-While($FALSE)
+While ($FALSE)
 
 
 #異常、警告を確認。異常>警告>正常の順位で実行結果数カウントアップ
