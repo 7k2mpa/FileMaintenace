@@ -574,7 +574,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Check Back Up Mode."
 
-	    Finalize $ErrorReturnCode
+        Finalize $ErrorReturnCode
         } else { 
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Check Back Up Mode."
         }
@@ -633,7 +633,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
     IF ($invokeResult.Status) {
 
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to export Redo Log."
-	    
+        
         } else {
         Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Failed to export Redo Log."
         $WarningCount ++

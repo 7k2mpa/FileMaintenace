@@ -374,7 +374,7 @@ $process = Start-Process .\EXPDP.exe -ArgumentList $execCommand -Wait -NoNewWind
 IF ($process.ExitCode -ne 0) {
 
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to export DB with Oracle data pump command."
-	    Finalize $ErrorReturnCode
+        Finalize $ErrorReturnCode
 
         } else {
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully completed to export DB with Oracle data pump command."

@@ -461,7 +461,7 @@ Push-Location $OracleHomeBinPath
 
         } else {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Export Session Info."
-	    Finalize $ErrorReturnCode
+        Finalize $ErrorReturnCode
         }
 
 
@@ -477,7 +477,7 @@ Push-Location $OracleHomeBinPath
         
         } else {
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Export Redo Log."
-	    Finalize $ErrorReturnCode
+        Finalize $ErrorReturnCode
         }
 
 
@@ -490,7 +490,7 @@ Push-Location $OracleHomeBinPath
       IF ($LASTEXITCODE -ne 0) {
 
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to Check Database running status ."
-	    Finalize $ErrorReturnCode
+        Finalize $ErrorReturnCode
         
         } else {
         Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to Check Database running status."
@@ -536,7 +536,7 @@ Push-Location $OracleHomeBinPath
             
             } else {
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to switch to Back Up Mode."
-	        Finalize $ErrorReturnCode            
+            Finalize $ErrorReturnCode            
             }
     }
 

@@ -424,7 +424,7 @@ $Version = "2.0.0-RC.1"
 
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to delete Oracle archive logs older than $($Days)days."
 
-	    Finalize $ErrorReturnCode
+        Finalize $ErrorReturnCode
         }
 
 
