@@ -150,7 +150,7 @@ Param(
 
 [String][parameter(position = 0, mandatory, HelpMessage = 'Enter IIS site name. To view all help , Get-Help ChangeIISstate.ps1')]$Site ,
 
-[String][parameter(position = 1)][ValidateNotNullOrEmpty()][ValidateSet("Started", "Stopped")]$TargetState = 'Stopped' , 
+[String][parameter(position = 1)][ValidateNotNullOrEmpty()][ValidateSet("Started", "Stopped")][Alias("State")]$TargetState = 'Stopped' , 
 [int][parameter(position = 2)][ValidateRange(1,65535)]$RetrySpanSec = 3 ,
 [int][parameter(position = 3)][ValidateRange(1,65535)]$RetryTimes = 5 ,
 
@@ -228,7 +228,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
         }
  
      IF ($TargetState -notmatch '^(Started|Stopped)$') {
-        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "-TargetState is invalid."
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "-TargetState [$($TargetState)] is invalid specification."
         Finalize $ErrorReturnCode   
         }
        
@@ -299,7 +299,7 @@ $Version = "2.0.0-RC.1"
  }
 
 
-Write-Log -EventID $InfoEventID -EventType Information -EventMessage "With Powershell Cmdlet , Starting to change site [$($Site)] state from [$($OriginalState)] to [$($TargetState)]"
+Write-Log -EventID $InfoEventID -EventType Information -EventMessage "With Powershell Cmdlet, Starting to switch site [$($Site)] state from [$($OriginalState)] to [$($TargetState)]"
         
     Switch -Regex ($TargetState) {
  
