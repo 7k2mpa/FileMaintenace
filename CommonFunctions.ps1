@@ -858,8 +858,13 @@ function Invoke-PostFinalize {
 Param(
 [parameter(mandatory)][int]$ReturnCode
 )
+Write-Debug "ReturnCode [$ReturnCode]"
 
-    IF (($ErrorCount -gt 0) -or ($ReturnCode -ge $ErrorReturnCode)) {
+IF ($ReturnCode -ge $InternalErrorReturnCode) {
+
+    Write-Log -Id $ErrorEventID -Type Error -Message "Terminated with An InternalError, thus the exit code is [$($InternalErrorReturnCode)]"
+
+    } elseIF (($ErrorCount -gt 0) -or ($ReturnCode -ge $ErrorReturnCode)) {
 
         IF ($ErrorAsWarning) {
             Write-Log -Id $WarningEventID -Type Warning -Message "Terminated with an Error, specified -ErrorAsWarning[$($ErrorAsWarning)] option, thus the exit code is [$($WarningReturnCode)]"  
@@ -889,7 +894,6 @@ Param(
     Write-Log -Id $EndEventID -Type Information -Message "Exit $($ShellName) Version $($Version)"
 
 Exit $returnCode
-
 }
 
 

@@ -545,34 +545,29 @@ Specify the character encode in the log file.
 
 Specify Normal Return code.
 [0] is default.
-Must specify NormarReturnCode =< WarningReturnCode =< ErrorReturnCode(InternalErrorReturnCode)
+Must specify NormalReturnCode =< WarningReturnCode =< ErrorReturnCode =< InternalErrorReturnCode
 
-
-　正常終了時のリターンコードを指定します。デフォルトは0です。正常終了=<警告終了=<（内部）異常終了として下さい。
 
 .PARAMETER WarningReturnCode
 
 Specify Warning Return code.
 [1] is default.
-Must specify NormarReturnCode =< WarningReturnCode =< ErrorReturnCode(InternalErrorReturnCode)
+Must specify NormalReturnCode =< WarningReturnCode =< ErrorReturnCode =< InternalErrorReturnCode
 
-　警告終了時のリターンコードを指定します。デフォルトは1です。正常終了=<警告終了=<（内部）異常終了として下さい。
 
 .PARAMETER ErrorReturnCode
 
 Specify Error Return code.
 [8] is default.
-Must specify NormarReturnCode =< WarningReturnCode =< ErrorReturnCode(InternalErrorReturnCode)
+Must specify NormalReturnCode =< WarningReturnCode =< ErrorReturnCode =< InternalErrorReturnCode
 
-　異常終了時のリターンコードを指定します。デフォルトは8です。正常終了=<警告終了=<（内部）異常終了として下さい。
 
 .PARAMETER InternalErrorReturnCode
 
 Specify Internal Error Return code.
 [16] is default.
-Must specify NormarReturnCode =< WarningReturnCode =< ErrorReturnCode(InternalErrorReturnCode)
+Must specify NormalReturnCode =< WarningReturnCode =< ErrorReturnCode =< InternalErrorReturnCode
 
-　プログラム内部異常終了時のリターンコードを指定します。デフォルトは16です。正常終了=<警告終了=<（内部）異常終了として下さい。
 
 .PARAMETER InfoEventID
 
