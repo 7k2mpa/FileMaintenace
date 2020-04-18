@@ -6,13 +6,10 @@
 This script loads a configuration file including arguments, execute the other script with arguments in every lines.
 CommonFunctions.ps1 is required.
 You can process log files in multiple folders with FileMaintenance.ps1
-<Common Parameters> is not supported.
 
 指定したプログラムを設定ファイルに書かれたパラメータを読み込んで、順次呼び出すプログラムです。
 実行にはCommonFunctions.ps1が必要です。
 セットで開発しているFileMaintenance.ps1と併用すると複数のログ処理を一括実行できます。
-
-<Common Parameters>はサポートしていません
 
 .DESCRIPTION
 
@@ -219,6 +216,7 @@ https://github.com/7k2mpa/FileMaintenace
 
 #>
 
+[CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="High")]
 Param(
 
 [String]
@@ -343,10 +341,7 @@ Param(
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage ("An ERROR termination occurred. Specified -Continue[${Continue}] option, " +
                 "thus will terminate with ERROR and had executed command of the next lines.")
             }
-
-
     }
-
 
  Invoke-PostFinalize $ReturnCode
 
@@ -381,12 +376,13 @@ $Version = "2.0.0-RC.2"
             }
 
 
-For ( $i = 0 ; $i -lt $lines.Count; $i++ ) {
+:ForLoop For ( $i = 0 ; $i -lt $lines.Count; $i++ ) {
 
     $line = $lines[$i]
 
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execute line [$($i+1)/$($lines.Count)] in -CommandFile [$($CommandFile)]"
 
+    Write-Debug "Command[$($CommandPath)] Arguments[$($line)] Line[$($i+1)]"   
 
     Switch -Regex ($line) {
 
@@ -404,16 +400,17 @@ For ( $i = 0 ; $i -lt $lines.Count; $i++ ) {
         default {
 
             Try{        
-                    Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execute Command [$($CommandPath)] with arguments [$($line)]"
-                    Invoke-Expression "$CommandPath $line" -ErrorAction Stop
-                    }
+                Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execute Command [$($CommandPath)] with arguments [$($line)]"
+                Invoke-Expression "$CommandPath $line" -ErrorAction Stop
+                }
 
-                catch [Exception] {
-                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute [$($CommandPath)] and force to exit."
-                    $errorDetail = $ERROR[0] | Out-String
-                    Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
-                    Finalize $ErrorReturnCode
-                    }
+            catch [Exception] {
+                Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute [$($CommandPath)] and force to exit."
+                $errorDetail = $ERROR[0] | Out-String
+                Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
+                $ErrorCount++
+                Break ForLoop
+                }
 
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execution Result is [$($LASTEXITCODE)] at line [$($i+1)/$($lines.Count)] in -CommandFile [$($CommandFile)]"
                     
@@ -421,39 +418,39 @@ For ( $i = 0 ; $i -lt $lines.Count; $i++ ) {
             #終了コードで分岐
             Switch ($LASTEXITCODE) {
 
-                        #条件1 異常終了
-                        {$_ -ge $ErrorReturnCode} {
+                #条件1 異常終了
+                {$_ -ge $ErrorReturnCode} {
  
-                            $ErrorCount++
-                            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred at line [$($i+1)/$($Lines.Count)] in -CommandFile [$($CommandFile)]"
+                    $ErrorCount++
+                    Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "An ERROR termination occurred at line [$($i+1)/$($Lines.Count)] in -CommandFile [$($CommandFile)]"
        
-                            IF ($Continue) {
-                                Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Specified -Continue[$($Continue)] option, thus execute next line."   
-                                Break     
+                    IF ($Continue) {
+                        Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Specified -Continue[$($Continue)] option, thus execute next line."   
+                        Break
      
-                                }else{
-                                Finalize $ErrorReturnCode
-                                }
-                            }
+                        }else{
+                        Break ForLoop
+                        }
+                    }
                     
-                        #条件2 警告終了
-                        {$_ -ge $WarningReturnCode} {
+                #条件2 警告終了
+                {$_ -ge $WarningReturnCode} {
                             
-                            $WarningCount++
-                            Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred at line [$($i+1)/$($lines.Count)] in -CommandFile [$($CommandFile)] Will execute next line." 
-                            Break        
-                            }
+                    $WarningCount++
+                    Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred at line [$($i+1)/$($lines.Count)] in -CommandFile [$($CommandFile)] Will execute next line." 
+                    Break        
+                    }
                         
-                        #条件3 正常終了
-                        Default {
-                            $NormalCount++
-                            Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully at line [$($i+1)/$($lines.Count)] in -CommandFile [$($CommandFile)]"
-                            }
-                   }
-    
-   
-                # 分岐3 コマンド実行 default終端 
-                }
+                #条件3 正常終了
+                Default {
+
+                    $NormalCount++
+                    Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully at line [$($i+1)/$($lines.Count)] in -CommandFile [$($CommandFile)]"
+                    }
+            }
+                      
+        # 分岐3 コマンド実行 default終端 
+        }
 
     #Switch -Regex ($Line)終端
     }
@@ -461,7 +458,12 @@ For ( $i = 0 ; $i -lt $lines.Count; $i++ ) {
 #対象群の処理ループ終端
 }
 
+IF ($ErrorCount -gt 0) {
+    $result = $ErrorReturnCode
+    } elseIF ($WarningCount -gt 0) {
+        $result = $WarningReturnCode
+        } else {
+            $result = $NormalReturnCode
+            }
 
-#終了メッセージ出力。ここではNormalReturnCodeで呼び出すが、Finalizeでエラーカウントを見て処理してくれる
-
-Finalize $NormalReturnCode
+Finalize -ReturnCode $result

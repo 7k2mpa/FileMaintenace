@@ -1416,13 +1416,13 @@ $targets = $TargetFolder | Get-Object -FilterType $FilterType
             }
     }
 
-Write-Log -ID $InfoEventID -Type Information -Message ("["+@($targets).Length+"] [$($FilterType)(s)] exist for processing.")
+Write-Log -ID $InfoEventID -Type Information -Message "[$(@($targets).Length)] [$($FilterType)(s)] exist for processing."
 
-Write-Debug   ("["+@($targets).Length+"][$($FilterType)(s)] are for processing...")
+Write-Debug   "[$(@($targets).Length)][$($FilterType)(s)] are for processing..."
 
 Write-Debug   ("`r`n" + ($targets.Object.fullname | Out-String))
 
-Write-Verbose ("["+@($targets).Length+"][$($FilterType)(s)] are for processing..." + "`r`n" + ($targets.Object.fullname | Out-String))
+Write-Verbose ("[$(@($targets).Length)][$($FilterType)(s)] are for processing..." + "`r`n" + ($targets.Object.fullname | Out-String))
 
 #-PreAction Archiveは複数ファイルを1ファイルに圧縮する。よって、ループ前に圧縮先の1ファイルのフルパスを確定しておく
 
@@ -1449,7 +1449,7 @@ IF ($PreAction -contains 'Archive') {
 
 #対象フォルダorファイル群の処理ループ
 
-ForEach ($Target in $targets) {
+:ForLoop ForEach ($Target in $targets) {
 <#
 PowershellはGOTO文が存在せず処理分岐ができない。
 そのためDo/Whileを用いて処理途中でエラーが発生した場合の分岐を実装している
