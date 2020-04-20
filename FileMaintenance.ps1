@@ -960,7 +960,15 @@ Param(
 begin {
 }
 process {
-    $candidateObjects = Get-ChildItem -LiteralPath $Path -Recurse:$Recurse -Include * -File:($FilterType -eq 'File') -Directory:($FilterType -eq 'Folder')
+
+$parameter = @{
+    LiteralPath = $Path
+    Recurse     = $Recurse
+    Include     = '*'    
+    File        = ($FilterType -eq 'File')
+    Directory   = ($FilterType -eq 'Folder')
+}
+    $candidateObjects = Get-ChildItem @parameter
 
     $objects = @()
 
@@ -1077,7 +1085,8 @@ process {
 
     IF ($PreAction -contains 'AddTimeStamp') {
 
-        $archive.Path = $DestinationPath | Join-Path -ChildPath (($Path | Split-Path -Leaf | ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat) + $extension)
+        $archive.Path = $DestinationPath |
+            Join-Path -ChildPath (($Path | Split-Path -Leaf | ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat) + $extension)
 
         IF ($PreAction -match '^(Compress|Archive)$') {
 
@@ -1243,7 +1252,7 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 
     IF ($TimeStampFormat -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
-        Write-Log -Type Error -ID $ErrorEventID -Message "-TimeStampFormat  may contain characters that can not use by NTFS."
+        Write-Log -Type Error -ID $ErrorEventID -Message "-TimeStampFormat may contain characters that can not use by NTFS."
         Finalize $ErrorReturnCode
         }
 
@@ -1507,7 +1516,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
                 Write-Log -ID $InfoEventID -Type Information -Message "Create a new folder $($destinationFolder)"
 
-                Invoke-Action -ActionType MakeNewFolder -ActionFrom $destinationFolder -ActionError $destinationFolder
+                Invoke-Action -Type MakeNewFolder -ActionFrom $destinationFolder -ActionError $destinationFolder
 
                 #$Invoke-Actionが異常終了&-Continue $TRUEだと$ContinueFlag $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
                 IF ($ContinueFlag) {
@@ -1533,12 +1542,12 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
         IF ($archive.Path | Test-LeafNotExists) {
 
-            Invoke-Action -ActionType $archive.Type -ActionFrom $Target.Object.FullName -ActionTo $archive.Path -ActionError $Target.Object.FullName
+            Invoke-Action -Type $archive.Type -ActionFrom $Target.Object.FullName -ActionTo $archive.Path -ActionError $Target.Object.FullName
             }
         
     } elseIF ($PreAction -contains 'Archive') {
        
-        Invoke-Action -ActionType $archive.Type -ActionFrom $Target.Object.FullName -ActionTo $archive.Path -ActionError $Target.Object.FullName
+        Invoke-Action -Type $archive.Type -ActionFrom $Target.Object.FullName -ActionTo $archive.Path -ActionError $Target.Object.FullName
         }
 
 
@@ -1557,7 +1566,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
     #分岐2 削除
     '^Delete$' {
-            Invoke-Action -ActionType Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
+            Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
             } 
 
     #分岐3 移動 or 複製 　同一のファイルが（移動|複製先）に存在しないことを確認してから処理
@@ -1566,7 +1575,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
             IF ($destinationPath | Test-LeafNotExists) {
 
-                Invoke-Action -ActionType $Action -ActionFrom $Target.Object.FullName -ActionTo $destinationPath -ActionError $Target.Object.FullName 
+                Invoke-Action -Type $Action -ActionFrom $Target.Object.FullName -ActionTo $destinationPath -ActionError $Target.Object.FullName 
                 }
             }
 
@@ -1577,7 +1586,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
             IF ($Target.Object.GetFileSystemInfos().Count -eq 0) {
 
                 Write-Log -ID $InfoEventID -Type Information -Message  "The folder $($Target.Object.FullName) is empty."
-                Invoke-Action -ActionType Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
+                Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
 
                 } else {
                 Write-Log -ID $InfoEventID -Type Information -Message "The folder $($Target.Object.FullName) is not empty." 
@@ -1587,7 +1596,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
     #分岐5 NullClear
     '^NullClear$' {
-            Invoke-Action -ActionType NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
+            Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
             }
 
     #分岐6 KeepFilesCount
@@ -1597,7 +1606,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
                 Write-Log -ID $InfoEventID -Type Information -Message  ("More than [$($KeepFiles)] files exist in the folder, " +
                     "thus delete the oldest [$($Target.Object.FullName)]")
 
-                Invoke-Action -ActionType Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
+                Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
 
                 #$Invoke-Actionが異常終了&-Continue $TRUEだと$ContinueFlag $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
                 IF ($ContinueFlag) {
@@ -1635,7 +1644,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
                             
             IF ($newFilePath | Test-LeafNotExists) {
 
-                Invoke-Action -ActionType Rename -ActionFrom $Target.Object.FullName -ActionTo $newFilePath -ActionError $Target.Object.FullName
+                Invoke-Action -Type Rename -ActionFrom $Target.Object.FullName -ActionTo $newFilePath -ActionError $Target.Object.FullName
     
                 } else {
                 Write-Log -ID $InfoEventID -Type Information -Message  ("A file [$($newFilePath)] already exists same as attempting rename, " +
@@ -1645,7 +1654,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
     #分岐3 NullClear
     '^NullClear$' {
-            Invoke-Action -ActionType NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
+            Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
             }
 
 

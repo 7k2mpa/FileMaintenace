@@ -48,7 +48,7 @@ https://github.com/7k2mpa/FileMaintenace
 Param(
 )
 $Script:CommonFunctionsVersion = "2.0.0-RC.3"
-Write-Verbose "Version $CommonFunctionsVersion"
+Write-Verbose "CommonFunctions.ps1 Version $CommonFunctionsVersion"
 
 #ƒƒO“™‚Ì•Ï”‚ğˆêŠ‡İ’è‚µ‚½‚¢ê‡‚ÍˆÈ‰º‚ğ—˜—p‚µ‚Ä‰º‚³‚¢B
 #
@@ -215,7 +215,8 @@ function Invoke-Action {
 [CmdletBinding()]    
 Param(
 [String][parameter(position = 0, mandatory)]
-[ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|MakeNew(FileWithValue|Folder)|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$")]$ActionType,
+[ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|MakeNew(FileWithValue|Folder)|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$")]
+[Alias("Type")]$ActionType,
 
 [String][parameter(position = 1, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 [Alias("Path" , "FullName")]$ActionFrom ,
