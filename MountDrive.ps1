@@ -151,13 +151,13 @@ https://github.com/7k2mpa/FileMaintenace
 Param(
 
 [parameter(position = 0, mandatory, HelpMessage = 'Specify UNC Path to mount (ex. \\FileServer\Share) or Get-Help MountDrive.ps1')]
-[String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath,    
+[String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath ,   
 
 [parameter(position = 1, mandatory, HelpMessage = 'Specify Drive Letter (ex. F:)  or Get-Help MountDrive.ps1')]
-[String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive,
+[String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive ,
 
-#[String][validatePattern("^\\\\\w+\\\w+")]$TargetPath="\\hogehost\hogehoge",                                                                          
-#[String][ValidatePattern("^[d-z]:$")]$MountDrive= 'F:',
+#[String][validatePattern("^\\\\\w+\\\w+")]$TargetPath = "\\hogehost\hogehoge" ,                                                                          
+#[String][ValidatePattern("^[d-z]:$")]$MountDrive= 'F:' ,
 
 
 [boolean]$Log2EventLog = $TRUE,

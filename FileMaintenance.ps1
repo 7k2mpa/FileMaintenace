@@ -1,6 +1,6 @@
-#Requires -Version 5.0
-#If you do not use '-PreAction compress or archive', install WMF 3.0 and place '#Requires -Version 3.0' insted of '#Requires -Version 5.0'
-#If you use '-PreAction compress or archive' with 7z, install WMF 3.0 and place '#Requires -Version 3.0' insted of '#Requires -Version 5.0'
+#Requires -Version 3.0
+#If you want to use '-PreAction compress or archive' option in FileMaintenance.ps1, install WMF 5.0 or later, and place '#Requires -Version 5.0' insted of '#Requires -Version 3.0'
+#If you want to use '-PreAction compress or archive' option with 7-Zip in FileMaintenance.ps1, do not need to replace.
 
 <#
 .SYNOPSIS
@@ -21,8 +21,8 @@ And process the files and folders filtered in multiple methods with PreAction, A
 Methods are
 
 -PreAction:
-Create new files from filtered files. Methods [Add time stamp to file name][Compress][Archive to 1file][Move the file created to new location]
-are offered and can be used together.
+Create new files from filtered files.
+Methods [Add time stamp to file name][Compress][Archive to 1file][Move the file created to new location] are offered and can be used together.
 Without specification -MoveNewFile option, place the file created in the same folder of the original file.
 
 -Action:
@@ -39,11 +39,16 @@ If you process multiple folders, can do with Wrapper.ps1
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
-This scrpit requires Powershell 5.0 or later basically.
+This scrpit requires Powershell 3.0 or later.
+If you run the scripts on Windows Server 2008 or 2008R2, must install latest WMF.
 
-If the script run on Windows Server 2008, 2008R2, 2012 and 2012R2, install WMF(Windows Management Framework)5.0.
-If you do not use '-PreAction compress or archive', install WMF 3.0 and place '#Requires -Version 3.0' insted of '#Requires -Version 5.0' at top of the script.
-If you use '-PreAction compress or archive' with 7z, install WMF 3.0 and place '#Requires -Version 3.0' insted of '#Requires -Version 5.0' at top of the script.
+This script can use cmdlet Compress-Archive for '-PreAction compress or archive option'. 
+
+But cmdlet Compress-Archive can not handle wild card characters bracket[] for desitination path corectly, you should install 7-Zip. This script can use 7-Zip for compress or archive also.
+
+If you want to specify '-PreAction compress or archive' option in FileMaintenance.ps1 without installing 7-Zip, install WMF 5.0 or later, and place '#Requires -Version 5.0' insted of '#Requires -Version 3.0'
+
+If you can install 7-Zip for compress or archive, do not need to replace.
 
 https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows-powershell?view=powershell-7#upgrading-existing-windows-powershell
 
@@ -65,11 +70,6 @@ https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows
 
 
 ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
-
-このプログラムはPowerShell 5.0以降が必要です。
-Windows Server 2008,2008R2はWMF(Windows Management Framework)5.0以降を追加インストールしてください。それ以前のOSでは稼働しません。
-
-https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows-powershell?view=powershell-7#upgrading-existing-windows-powershell
 
 
 .EXAMPLE
@@ -545,28 +545,28 @@ Specify the character encode in the log file.
 
 Specify Normal Return code.
 [0] is default.
-Must specify NormalReturnCode =< WarningReturnCode =< ErrorReturnCode =< InternalErrorReturnCode
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
 
 
 .PARAMETER WarningReturnCode
 
 Specify Warning Return code.
 [1] is default.
-Must specify NormalReturnCode =< WarningReturnCode =< ErrorReturnCode =< InternalErrorReturnCode
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
 
 
 .PARAMETER ErrorReturnCode
 
 Specify Error Return code.
 [8] is default.
-Must specify NormalReturnCode =< WarningReturnCode =< ErrorReturnCode =< InternalErrorReturnCode
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
 
 
 .PARAMETER InternalErrorReturnCode
 
 Specify Internal Error Return code.
 [16] is default.
-Must specify NormalReturnCode =< WarningReturnCode =< ErrorReturnCode =< InternalErrorReturnCode
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
 
 
 .PARAMETER InfoEventID
@@ -672,7 +672,7 @@ https://github.com/7k2mpa/FileMaintenace
 
 #>
 
-[CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="High")]
+[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = "High")]
 Param(
 
 [String]

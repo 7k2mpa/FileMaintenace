@@ -1,8 +1,26 @@
-#Requires -Version 5.0
-#If you do not use '-PreAction compress or archive', install WMF 3.0 and place '#Requires -Version 3.0' insted of '#Requires -Version 5.0' in FileMaintenance.ps1
-#If you use '-PreAction compress or archive' with 7z, install WMF 3.0 and place '#Requires -Version 3.0' insted of '#Requires -Version 5.0' in FileMaintenance.ps1
+#Requires -Version 3.0
+#If you want to use '-PreAction compress or archive' option in FileMaintenance.ps1, install WMF 5.0 or later, and place '#Requires -Version 5.0' insted of '#Requires -Version 3.0'
+#If you want to use '-PreAction compress or archive' option with 7-Zip in FileMaintenance.ps1, do not need to replace.
 
 <#
+
+.SYNOPSIS
+This script is used with FileMaintenance.ps1 and others.
+
+.DESCRIPTION
+This script is used with FileMaintenance.ps1 and others.
+Place this script in the same directory of FileMaintenance.ps1.
+
+This script can use cmdlet Compress-Archive.
+
+But cmdlet Compress-Archive can not handle wild card characters bracket[] for desitination path corectly, you should install 7-Zip. This script can use 7-Zip for compress or archive also.
+
+If you want to use '-PreAction compress or archive' option in FileMaintenance.ps1 without installing 7-Zip, install WMF 5.0 or later, and place '#Requires -Version 5.0' insted of '#Requires -Version 3.0'
+
+If you can install 7-Zip for compress or archive, do not need to replace.
+
+You can get the version of this script with '.\CommonFunctions.ps1 -verbose'.
+
 
 .NOTES
 
@@ -24,11 +42,13 @@ limitations under the License.
 
 https://github.com/7k2mpa/FileMaintenace
 
-
 #>
 
+[CmdletBinding()]
+Param(
+)
 $Script:CommonFunctionsVersion = "2.0.0-RC.3"
-
+Write-Verbose "Version $CommonFunctionsVersion"
 
 #ƒƒO“™‚Ì•Ï”‚ğˆêŠ‡İ’è‚µ‚½‚¢ê‡‚ÍˆÈ‰º‚ğ—˜—p‚µ‚Ä‰º‚³‚¢B
 #
@@ -200,7 +220,7 @@ Param(
 [String][parameter(position = 1, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
 [Alias("Path" , "FullName")]$ActionFrom ,
 
-[String][parameter(position = 2)]$ActionTo,
+[String][parameter(position = 2)][Alias("DestinationPath")]$ActionTo,
 [String][parameter(position = 3)]$ActionError,
 [String][parameter(position = 4)]$FileValue,
 
