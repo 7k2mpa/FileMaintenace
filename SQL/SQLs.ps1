@@ -1,6 +1,6 @@
 ﻿#Requires -Version 3.0
 
-$Script:SQLsVersion = '20200117_2012'
+$Script:SQLsVersion = '2.0.0'
 
 [String]$DBStart = @'
 

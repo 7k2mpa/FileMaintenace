@@ -687,7 +687,6 @@ end {
 }
 }
 
-
 function Test-Container {
 
 [OutputType([Boolean])]
@@ -698,26 +697,10 @@ Param(
 
 [Switch]$IfNoExistFinalize
 )
-begin {
-}
+
 process {
 
-    IF (Test-Path -LiteralPath $Path -PathType Container) {
-
-        Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] exists."
-        Write-Output $TRUE
-
-        } else {
-        Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] dose not exist."
-        Write-Output $FALSE
-            
-        IF($IfNoExistFinalize){
-            Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
-            Finalize $ErrorReturnCode
-            }
-    }
-}
-end {
+Write-Output Test-PathVerbose -Path $Path -Name $Name -Type Container -IfNoExistFinalize:$IfNoExistFinalize
 }
 }
 
@@ -732,11 +715,29 @@ Param(
 
 [Switch]$IfNoExistFinalize
 )
+process {
+
+Write-Output Test-PathVerbose -Path $Path -Name $Name -Type Leaf -IfNoExistFinalize:$IfNoExistFinalize
+}
+}
+
+
+function Test-PathVerbose {
+
+[OutputType([Boolean])]
+[CmdletBinding()]
+Param(
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path ,
+[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name ,
+[String][parameter(position = 2)][ValidateSet("Leaf","Container")]$Type ,
+
+[Switch]$IfNoExistFinalize
+)
 begin {
 }
 process {
 
-    IF (Test-Path -LiteralPath $Path -PathType Leaf) {
+    IF (Test-Path -LiteralPath $Path -PathType $Type) {
 
         Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] exists."
         Write-Output $TRUE
@@ -755,7 +756,6 @@ process {
 end {
 }
 }
-
 
 function Test-LogPath {
 [OutputType([boolean])]

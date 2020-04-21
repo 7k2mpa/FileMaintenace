@@ -554,8 +554,8 @@ $Version = "2.0.0-RC.3"
 
     [Array]$userInfo = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name -split '\\'
 
-    $DoDomain = $userInfo[0]
-    $DoUser   = $userInfo[1]
+    $doDomain = $userInfo[0]
+    $doUser   = $userInfo[1]
 
 #Create Invoke Command Strings
 
@@ -593,25 +593,25 @@ $Version = "2.0.0-RC.3"
         $extension                = [System.IO.Path]::GetExtension((Split-Path -Path $ExecUserPasswordFilePath -Leaf))
         $fileNameWithOutExtention = [System.IO.Path]::GetFileNameWithoutExtension((Split-Path -Path $ExecUserPasswordFilePath -Leaf))
 
-        $ExecUserPasswordFileName = $fileNameWithOutExtention + "_"+$DoUser+$extension
+        $ExecUserPasswordFileName = $fileNameWithOutExtention + "_" + $doUser + $extension
         
         $ExecUserPasswordFilePath = $ExecUserPasswordFilePath | Split-Path -Parent | Join-Path -ChildPath $ExecUserPasswordFileName
 
         $ExecUserPasswordFilePath | Test-Leaf -Name '-ExecUserPasswordFilePath' -IfNoExistFinalize > $NULL
 
-        $command += " -UDPConsoleUserName `'$DoUser`' -UDPConsoleDomainName `'$DoDomain`' -UDPConsolePasswordFile `'$ExecUserPasswordFilePath`' "
+        $command += " -UDPConsoleUserName `'$doUser`' -UDPConsoleDomainName `'$doDomain`' -UDPConsolePasswordFile `'$ExecUserPasswordFilePath`' "
         }
 
     '^FixedPasswordFile$' {
 
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Authorization type is [$($AuthorizationType)] Authorize with user specified and the password file specified."
-        $Command += "-UDPConsoleDomainName `'$ExecUserDomain`' -UDPConsoleUserName `'$ExecUser`' -UDPConsolePasswordFile `'$FixedPasswordFilePath`' "
+        $command += "-UDPConsoleDomainName `'$ExecUserDomain`' -UDPConsoleUserName `'$ExecUser`' -UDPConsolePasswordFile `'$FixedPasswordFilePath`' "
         }
 
     '^PlainText$' {
 
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Authorization type is [$($AuthorizationType)] Authorize with user specified and plain password text."
-        $Command += "-UDPConsoleDomainName `'$ExecUserDomain`' -UDPConsoleUserName `'$ExecUser`' -UDPConsolePassword `'$ExecUserPassword`' "
+        $command += "-UDPConsoleDomainName `'$ExecUserDomain`' -UDPConsoleUserName `'$ExecUser`' -UDPConsolePassword `'$ExecUserPassword`' "
         }
 
     Default {
@@ -626,7 +626,7 @@ $Version = "2.0.0-RC.3"
      $extension                = [System.IO.Path]::GetExtension((Split-Path -Path $BackupFlagFilePath -Leaf))
      $fileNameWithOutExtention = [System.IO.Path]::GetFileNameWithoutExtension((Split-Path -Path $BackupFlagFilePath -Leaf))
 
-     $BackupFlagFileName = $fileNameWithOutExtention + "_" + $Plan + "_" + $Server+$extension
+     $BackupFlagFileName = $fileNameWithOutExtention + "_" + $Plan + "_" + $Server + $extension
         
      $BackupFlagFilePath = $BackupFlagFilePath | Split-Path -Parent | Join-Path -ChildPath $BackupFlagFileName
 
@@ -647,7 +647,7 @@ $Version = "2.0.0-RC.3"
     Push-Location (Split-Path $UDPCLIPath -Parent)
 
     Try {
-        $Return = Invoke-Expression $command 2>$errorMessage -ErrorAction Stop 
+        $return = Invoke-Expression $command 2>$errorMessage -ErrorAction Stop 
         }
 
         catch [Exception]{
@@ -659,7 +659,7 @@ $Version = "2.0.0-RC.3"
         }
 
 
-        IF ($Return -ne 0) {
+        IF ($return -ne 0) {
                    
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Falied to start backup Server [$($Server)] in the Plan [$($Plan)] Method [$($BackUpJobType)]"
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Error Message [$($errorMessage)]"
