@@ -273,8 +273,8 @@ Pop-Location
         Pop-Location
         $errorDetail = $ERROR[0] | Out-String
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
-        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to exec cpm_cli.py $($MountDrive)"
-	    Finalize $ErrorReturnCode
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to exec cpm_cli.py $($PolicyName)"
+        Finalize $ErrorReturnCode
         }
 
 
