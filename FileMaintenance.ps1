@@ -513,7 +513,7 @@ Wild cards are not accepted shch as asterisk* question? bracket[]
 If the path contains bracket[] , specify path literally and do not escape.
 [$NULL] is default.
 
-If the log file dose not exist, make new file.
+If the log file dose not exist, make a new file.
 If the log file exists, write log additionally.
 
 　ログファイル出力パスを指定します。デフォルトは$NULLです。
@@ -581,44 +581,47 @@ Specify start loop event id in the log.
 [2] is default.
 
 
-　Event Log出力でファイル/フォルダ処理開始のInformationに対するEvent IDを指定します。デフォルトは2です。
-
 .PARAMETER InfoLoopEndEventID
 
 Specify end loop event id in the log.
 [3] is default.
 
-　Event Log出力でファイル/フォルダ処理終了のInformationに対するEvent IDを指定します。デフォルトは3です。
+
+.PARAMETER StartEventID
+
+Specify start script id in the log.
+[8] is default.
+
+
+.PARAMETER EndEventID
+
+Specify end script event id in the log.
+[9] is default.
+
 
 .PARAMETER WarningEventID
-
 
 Specify Warning event id in the log.
 [10] is default.
 
-
-　Event Log出力でWarningに対するEvent IDを指定します。デフォルトは10です。
 
 .PARAMETER SuccessEventID
 
 Specify Successfully complete event id in the log.
 [73] is default.
 
-　Event Log出力でSuccessに対するEvent IDを指定します。デフォルトは73です。
 
 .PARAMETER InternalErrorEventID
 
 Specify Internal Error event id in the log.
 [99] is default.
 
-　Event Log出力でInternal Errorに対するEvent IDを指定します。デフォルトは99です。
 
 .PARAMETER ErrorEventID
 
 Specify Error event id in the log.
 [100] is default.
 
-　Event Log出力でErrorに対するEvent IDを指定します。デフォルトは100です。
 
 .PARAMETER ErrorAsWarning
 
@@ -634,7 +637,7 @@ Specify if you want to return NORMAL exit code when the script terminate with a 
 
 .PARAMETER ExecutableUser
 
-Specify the user who is allowed to execute the script in regular expression.
+Specify the users who are allowed to execute the script in regular expression.
 [.*] is default and all users are allowed to execute.
 Parameter must be quoted with single quote'
 Escape the back slash in the separeter of a domain name.
@@ -719,7 +722,7 @@ Param(
 [Switch]$ContinueAsNormal ,
 [Switch]$NoneTargetAsWarning ,
 
-[String]$CompressedExtString = '.zip',
+[String][ValidatePattern('^\.(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CompressedExtString = '.zip',
 
 [String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
 [ValidateNotNullOrEmpty()]$7zFolder = 'C:\Program Files\7-Zip' ,
@@ -752,18 +755,21 @@ Param(
 [String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
 
-[Int][ValidateRange(0,2147483647)]$NormalReturnCode = 0 ,
-[Int][ValidateRange(0,2147483647)]$WarningReturnCode = 1 ,
-[Int][ValidateRange(0,2147483647)]$ErrorReturnCode = 8 ,
+
+[Int][ValidateRange(0,2147483647)]$NormalReturnCode        =  0 ,
+[Int][ValidateRange(0,2147483647)]$WarningReturnCode       =  1 ,
+[Int][ValidateRange(0,2147483647)]$ErrorReturnCode         =  8 ,
 [Int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16 ,
 
-[Int][ValidateRange(1,65535)]$InfoEventID = 1 ,
-[Int][ValidateRange(1,65535)]$InfoLoopStartEventID = 2 ,
-[Int][ValidateRange(1,65535)]$InfoLoopEndEventID = 3 ,
-[Int][ValidateRange(1,65535)]$WarningEventID = 10 ,
-[Int][ValidateRange(1,65535)]$SuccessEventID = 73 ,
-[Int][ValidateRange(1,65535)]$InternalErrorEventID = 99 ,
-[Int][ValidateRange(1,65535)]$ErrorEventID = 100 ,
+[Int][ValidateRange(1,65535)]$InfoEventID          =   1 ,
+[Int][ValidateRange(1,65535)]$InfoLoopStartEventID =   2 ,
+[Int][ValidateRange(1,65535)]$InfoLoopEndEventID   =   3 ,
+[int][ValidateRange(1,65535)]$StartEventID         =   8 ,
+[int][ValidateRange(1,65535)]$EndEventID           =   9 ,
+[Int][ValidateRange(1,65535)]$WarningEventID       =  10 ,
+[Int][ValidateRange(1,65535)]$SuccessEventID       =  73 ,
+[Int][ValidateRange(1,65535)]$InternalErrorEventID =  99 ,
+[Int][ValidateRange(1,65535)]$ErrorEventID         = 100 ,
 
 [Switch]$ErrorAsWarning ,
 [Switch]$WarningAsNormal ,
@@ -1096,16 +1102,16 @@ process {
             }
 
         } else {        
-        $archive.Path = $DestinationPath | Join-Path -ChildPath (($Path | Split-Path -Leaf) + $extension )        
+        $archive.Path = $DestinationPath | Join-Path -ChildPath (($Path | Split-Path -Leaf) + $extension)        
         }
 
         Write-Log -ID $InfoEventID -Type Information -Message "Create a new file [$($archive.Path | Split-Path -Leaf)] with action [$($archive.Type)]"
 
     IF ($PreAction -contains 'MoveNewFile') {
 
-            Write-Log -ID $InfoEventID -Type Information -Message ("Specified -PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"] option, " + 
-                "thus place the new file in the folder [$($DestinationPath)]")
-            }
+        Write-Log -ID $InfoEventID -Type Information -Message ("Specified -PreAction MoveNewFile["+[Boolean]($PreAction -contains 'MoveNewFile')+"] option, " + 
+            "thus place the new file in the folder [$($DestinationPath)]")
+        }
 
     Write-Output $archive
 }
@@ -1174,9 +1180,9 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
         
         IF ($ArchiveFileName -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
-                Write-Log -Type Error -ID $ErrorEventID -Message "-ArchiveFileName may contain characters that can not use by NTFS."
-                Finalize $ErrorReturnCode
-                } 
+            Write-Log -Type Error -ID $ErrorEventID -Message "-ArchiveFileName may contain characters that can not use by NTFS."
+            Finalize $ErrorReturnCode
+            } 
         }
 
 
@@ -1237,15 +1243,15 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
     
         IF (($PreAction -match '^(Compress|Archive|AddTimeStamp)$')  -or ($PostAction -ne 'none' )) {
     
-                Write-Log -Type Error -ID $ErrorEventID -Message ("Specified -Action [$Action] , " +
-                    "must not specify -PreAction or -PostAction options for modify files.")
-                Finalize $ErrorReturnCode
+            Write-Log -Type Error -ID $ErrorEventID -Message ("Specified -Action [$Action] , " +
+                "must not specify -PreAction or -PostAction options for modify files.")
+            Finalize $ErrorReturnCode
 
         } elseIF ($Size -ne 0) {
     
-                Write-Log -Type Error -ID $ErrorEventID -Message "Specified -Action [$Action] , must not specify -size option."
-                Finalize $ErrorReturnCode
-                }
+            Write-Log -Type Error -ID $ErrorEventID -Message "Specified -Action [$Action] , must not specify -size option."
+            Finalize $ErrorReturnCode
+            }
     }
 
 
@@ -1322,7 +1328,7 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
     IF ($OverRide) {
         Write-Log -ID $InfoEventID -Type Information -Message ("Specified -OverRide[$($OverRide)] option, " +
             "thus if files exist with the same name, will override them.")
-        }
+            }
 
     IF ($ContinueAsNormal) {
         Write-Log -ID $InfoEventID -Type Information -Message ("Specified -ContinueAsNormal[$($ContinueAsNormal)] option, " +
@@ -1355,7 +1361,7 @@ Param(
 
         IF (($Continue) -and ($ContinueCount -gt 0)) {
             Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Continue[$($Continue)] option, " +
-                "thus continued to process next objects in [$($ContinueCount)] times even though error occured with the same name file/folders existed already.")
+                "thus continued to process next objects in [$($ContinueCount)] times even though error occured with the same name file/folders existing already.")
             }
     }
 
@@ -1371,12 +1377,12 @@ Param(
 [Boolean]$OverRideFlag  = $FALSE
 [Boolean]$ContinueFlag  = $FALSE
 
-[Int][ValidateRange(0,2147483647)]$ErrorCount    = 0
-[Int][ValidateRange(0,2147483647)]$WarningCount  = 0
-[Int][ValidateRange(0,2147483647)]$NormalCount   = 0
-[Int][ValidateRange(0,2147483647)]$OverRideCount = 0
-[Int][ValidateRange(0,2147483647)]$ContinueCount = 0
-[Int][ValidateRange(0,2147483647)]$InLoopDeletedFilesCount = 0
+[Int]$ErrorCount    = 0
+[Int]$WarningCount  = 0
+[Int]$NormalCount   = 0
+[Int]$OverRideCount = 0
+[Int]$ContinueCount = 0
+[Int]$InLoopDeletedFilesCount = 0
 
 [String]$DatumPath = $PSScriptRoot
 [Boolean]$WhatIfFlag = (($PSBoundParameters['WhatIf']) -ne $NULL)
@@ -1411,7 +1417,7 @@ $targets = $TargetFolder | Get-Object -FilterType $FilterType
 
         IF ($NoneTargetAsWarning) {
             Write-Log -ID $WarningEventID -Type Warning -Message ("Specified -NoneTargetAsWarning option, " +
-                "thus terminiate $($ShellName) with WARNING.")
+                "thus terminiate $($ShellName) with a Warning.")
             Finalize $WarningReturnCode
 
             } else {
@@ -1444,7 +1450,7 @@ IF ($PreAction -contains 'Archive') {
     IF (-not($archive.Path | Test-LeafNotExists)) {
         
         Write-Log -ID $ErrorEventID -Type Error -Message ("File/Folder exists in the path [$($archive.Path)] already, " +
-            "thus terminate $($ShellName) with an Error")
+            "thus terminate $($ShellName) with an Error.")
         Finalize $ErrorReturnCode        
         }
 }
@@ -1492,7 +1498,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 #Action[(Move|Copy)]以外はファイル移動が無い。移動先パスを確認する必要がないのでスキップ
 #PreAction[Archive]はMoveNewFile[TRUE]でも出力ファイルは1個で階層構造を取らない。よってスキップ
 
-    IF ( ($Action -match "^(Move|Copy)$") -or (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive')) ) {
+    IF (($Action -match "^(Move|Copy)$") -or (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive')) ) {
 
         #ファイルが移動するAction用にファイル移動先の親フォルダパス$MoveToNewFolderを生成する
         
@@ -1556,74 +1562,74 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
     #分岐1 何もしない
     '^none$' {
-            IF ( ($PostAction -eq 'none') -and ($PreAction -contains 'none') ) {
+        IF ( ($PostAction -eq 'none') -and ($PreAction -contains 'none') ) {
 
-                Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Action [$($Action)] option, " +
-                    "thus do not process $($Target.Object.FullName)")
-                }
+            Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Action [$($Action)] option, " +
+                "thus do not process $($Target.Object.FullName)")
             }
+        }
 
     #分岐2 削除
     '^Delete$' {
-            Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
-            } 
+        Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
+        } 
 
     #分岐3 移動 or 複製 　同一のファイルが（移動|複製先）に存在しないことを確認してから処理
     '^(Move|Copy)$' {
-            $destinationPath = $destinationFolder | Join-Path -ChildPath ($Target.Object.Name)
+        $destinationPath = $destinationFolder | Join-Path -ChildPath ($Target.Object.Name)
 
-            IF ($destinationPath | Test-LeafNotExists) {
+        IF ($destinationPath | Test-LeafNotExists) {
 
-                Invoke-Action -Type $Action -ActionFrom $Target.Object.FullName -ActionTo $destinationPath -ActionError $Target.Object.FullName 
-                }
+            Invoke-Action -Type $Action -ActionFrom $Target.Object.FullName -ActionTo $destinationPath -ActionError $Target.Object.FullName 
             }
+        }
 
     #分岐4 空フォルダを判定して削除
     '^DeleteEmptyFolders$' {
-            Write-Log -ID $InfoEventID -Type Information -Message  "Check the folder $($Target.Object.FullName) is empty."
+        Write-Log -ID $InfoEventID -Type Information -Message  "Check the folder $($Target.Object.FullName) is empty."
 
-            IF ($Target.Object.GetFileSystemInfos().Count -eq 0) {
+        IF ($Target.Object.GetFileSystemInfos().Count -eq 0) {
 
-                Write-Log -ID $InfoEventID -Type Information -Message  "The folder $($Target.Object.FullName) is empty."
-                Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
+            Write-Log -ID $InfoEventID -Type Information -Message  "The folder $($Target.Object.FullName) is empty."
+            Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
 
-                } else {
-                Write-Log -ID $InfoEventID -Type Information -Message "The folder $($Target.Object.FullName) is not empty." 
-                }
+            } else {
+            Write-Log -ID $InfoEventID -Type Information -Message "The folder $($Target.Object.FullName) is not empty." 
             }
+        }
 
 
     #分岐5 NullClear
     '^NullClear$' {
-            Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
-            }
+        Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
+        }
 
     #分岐6 KeepFilesCount
     '^KeepFilesCount$' {
-            IF ((@($targets).Length - $InLoopDeletedFilesCount) -gt $KeepFiles) {
+        IF ((@($targets).Length - $InLoopDeletedFilesCount) -gt $KeepFiles) {
 
-                Write-Log -ID $InfoEventID -Type Information -Message  ("More than [$($KeepFiles)] files exist in the folder, " +
-                    "thus delete the oldest [$($Target.Object.FullName)]")
+            Write-Log -ID $InfoEventID -Type Information -Message  ("More than [$($KeepFiles)] files exist in the folder, " +
+                "thus delete the oldest [$($Target.Object.FullName)]")
 
-                Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
+            Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
 
-                #$Invoke-Actionが異常終了&-Continue $TRUEだと$ContinueFlag $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
-                IF ($ContinueFlag) {
-                    Break      
-                    }
-                $InLoopDeletedFilesCount++
-            
-                } else {
-                Write-Log -ID $InfoEventID -Type Information -Message  ("Less [$($KeepFiles)] files exist in the folder, " +
-                    "thus do not delete [$($Target.Object.FullName)]")
+            #$Invoke-Actionが異常終了&-Continue $TRUEだと$ContinueFlag $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
+            IF ($ContinueFlag) {
+                Break      
                 }
+            $InLoopDeletedFilesCount++
+            
+            } else {
+            Write-Log -ID $InfoEventID -Type Information -Message  ("Less [$($KeepFiles)] files exist in the folder, " +
+                "thus do not delete [$($Target.Object.FullName)]")
             }
+        }
 
     #分岐7 $Actionが条件式のどれかに適合しない場合は、プログラムミス
     Default {
-            Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal Error at Switch Action section. It may cause a bug in regex."
-            Finalize $InternalErrorReturnCode
-            }
+        Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal Error at Switch Action section. It may cause a bug in regex."
+        Finalize $InternalErrorReturnCode
+        }
     }
 
 
@@ -1633,35 +1639,35 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
     #分岐1 何もしない
     '^none$' {            
-            }
+        }
 
     #分岐2 Rename Rename後の同一名称ファイルが存在しないことを確認してから処理
     '^Rename$' {
-            $newFilePath = $Target.Object.DirectoryName |
-                            Join-Path -ChildPath (($Target.Object.Name) -replace "$RegularExpression" , "$RenameToRegularExpression") |
-                            ConvertTo-AbsolutePath -Name 'Filename renamed'
+        $newFilePath = $Target.Object.DirectoryName |
+                        Join-Path -ChildPath (($Target.Object.Name) -replace "$RegularExpression" , "$RenameToRegularExpression") |
+                        ConvertTo-AbsolutePath -Name 'Filename renamed'
                             
-            IF ($newFilePath | Test-LeafNotExists) {
+        IF ($newFilePath | Test-LeafNotExists) {
 
-                Invoke-Action -Type Rename -ActionFrom $Target.Object.FullName -ActionTo $newFilePath -ActionError $Target.Object.FullName
+            Invoke-Action -Type Rename -ActionFrom $Target.Object.FullName -ActionTo $newFilePath -ActionError $Target.Object.FullName
     
-                } else {
-                Write-Log -ID $InfoEventID -Type Information -Message  ("A file [$($newFilePath)] already exists same as attempting rename, " +
-                    "thus do not rename [$($Target.Object.FullName)]")
-                }
+            } else {
+            Write-Log -ID $InfoEventID -Type Information -Message  ("A file [$($newFilePath)] already exists same as attempting rename, " +
+                "thus do not rename [$($Target.Object.FullName)]")
             }
+        }
 
     #分岐3 NullClear
     '^NullClear$' {
-            Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
-            }
+        Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
+        }
 
 
     #分岐4 $Actionが条件式のどれかに適合しない場合は、プログラムミス
     Default {
-            Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal error at Switch PostAction section. It may cause a bug in regex."
-            Finalize $InternalErrorReturnCode
-            }
+        Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal error at Switch PostAction section. It may cause a bug in regex."
+        Finalize $InternalErrorReturnCode
+        }
     }
 
 
