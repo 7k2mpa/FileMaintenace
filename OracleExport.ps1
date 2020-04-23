@@ -344,8 +344,6 @@ Param(
 [String]$LogFile  = "$HostName_$Schema_PUMP.log" ,
 
 
-
-
 [Boolean]$Log2EventLog = $TRUE ,
 [Switch]$NoLog2EventLog ,
 [String]$ProviderName = 'Infra' ,
@@ -484,12 +482,9 @@ $DatumPath = $PSScriptRoot
     IF ($PasswordAuthorization) {
 
         $execCommand = "$ExecUser/$ExecUserPassword@$OracleSID Directory=$DumpDirectoryObject Schemas=$Schema DumpFile=$DumpFile LogFile=$LogFile Reuse_DumpFiles=y"
-#        $execCommand = $ExecUser+"/"+$ExecUserPassword+"@"+$OracleSID+" Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y"
     
         } else {
-
         $execCommand = "`' /@$OracleSID as sysdba `' Directory=$DumpDirectoryObject Schemas=$Schema DumpFile=$DumpFile LogFile=$LogFile Reuse_DumpFiles=y"
-#        $execCommand = "`' /@"+$OracleSID+" as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
         }
 
 Write-Debug "Command[$($execCommand)]"
