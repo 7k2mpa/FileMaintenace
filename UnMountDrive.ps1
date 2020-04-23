@@ -264,7 +264,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.0.0-RC.5"
+$Version = "2.0.0-RC.6"
 
 $psDrive = $MountedDrive.Replace(":","") 
 
