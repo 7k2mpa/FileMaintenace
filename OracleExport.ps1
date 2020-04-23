@@ -7,16 +7,11 @@
 This script export Oracle data with Data Pump.
 CommonFunctions.ps1 is required.
 
-<Common Parameters> is not supported.
-
-Oracle DatabaseからDatapumpを使用してexportを実行します。
-
-<Common Parameters>はサポートしていません
 
 .DESCRIPTION
 This script export Oracle data with Data Pump.
+CommonFunctions.ps1 is required.
 
-Oracle DatabaseからDatapumpを使用してexportを実行します。
 
 
 Sample path setting
@@ -34,148 +29,266 @@ Export data of Schema MCFRAME with Oracle Data Pump.
 Specify export destination path with Oracle Directory Object named MCDATA_PUMP_DIR 
 
 
-Oracle Datapumpを用いて、スキーマ名MCFRAMEのデータをexportします。
-出力先ディレクトリはOracle Directory Object名MCDATA_PUMP_DIRに指定したものとします。
+.PARAMETER Schema
+Specify shcema to export.
+Specification is required.
 
+
+.PARAMETER DumpDirectoryObject
+Specify Oracle Directory Object for exporting.
+Specification is required.
+
+
+.PARAMETER AddtimeStamp
+Specify if you want to add time stamp to file name.
+Time stamp strings are added between filename and extension.
+
+Sample:host_schema_PUMP_yyyyMMdd_HHmmss.dmp
+
+
+.PARAMETER TimeStampFormat
+Specify time stamp format
+[_yyyyMMdd_HHmmss] is default
 
 
 .PARAMETER OracleSID
 Specify Oracle_SID for deleting RMAN log.
 Should set '$Env:ORACLE_SID' by default.
 
-RMAN Logを削除する対象のOracleSIDを指定します。
-
-
-.PARAMETER OracleService
-This parameter is planed to obsolute.
-
-RMAN Logを削除する対象のOracleSIDを指定します。
-このパラメータは廃止予定です。
-
-
 .PARAMETER OracleHomeBinPath
 Specify Oracle 'BIN' path in the child path Oracle home. 
 Should set "$Env:ORACLE_HOME +'\BIN'" by default.
 
-Oracle Home配下のBINフォルダまでのパスを指定します。
-通常は標準設定である$Env:ORACLE_HOME +'\BIN'（Powershellでの表記）で良いのですが、OSで環境変数%ORACLE_HOME%が未設定環境では当該を設定してください。
 
-
-.PARAMETER SQLLogPath
-Specify path of SQL log file.
-If the file dose not exist, create a new file.
-Can specify relative or absolute path format.
-
-実行するSQL文群のログ出力先を指定します。
-指定は必須です。
-
-.PARAMETER Schema
-Specify shcema to export.
-
-Datapump出力対象のスキーマを指定します。
 
 
 .PARAMETER PasswordAuthorization
 Specify authentification with password authorization.
 Should use OS authentification.
 
-パスワード認証を指定します。
-OS認証が使えない時に使用する事を推奨します。
 
 .PARAMETER ExecUser
 Specify Oracle User to connect. 
 Should use OS authentification.
 
-パスワード認証時のユーザを設定します。
-OS認証が使えない時に使用する事を推奨します。
 
 .PARAMETER ExecUserPassword
 Specify Oracle user Password to connect. 
 Should use OS authentification.
 
-パスワード認証時のユーザパスワードを設定します。
-OS認証が使えない時に使用する事を推奨します。
 
+.PARAMETER DumpFile
+Specify dump file name.
+[$HostName_$Schema_PUMP.dmp] is default.
 
+.PARAMETER LogFile
+[HostName_$Schema_PUMP.log] is default.
 
-.PARAMETER DumpDirectoryObject
-Specify Oracle Directory Object for exporting.
-
-Datapumpを出力するOracleに設定したDirectory Objectを指定します。
 
 
 .PARAMETER Log2EventLog
+
+Specify if you want to output log to Windows Event Log.
+[$TRUE] is default.
+
 　Windows Event Logへの出力を制御します。
 デフォルトは$TRUEでEvent Log出力します。
 
 .PARAMETER NoLog2EventLog
+Specify if you want to suppress log to Windows Event Log.
+Specification override -Log2EventLog
+
 　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
 Log2EventLogより優先します。
 
 .PARAMETER ProviderName
-　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
+
+Specify provider name of Windows Event Log.
+[Infra] is default.
+
+
+　Windows Event Log出力のプロバイダ名を指定します。
+デフォルトは[Infra]です。
 
 .PARAMETER EventLogLogName
-　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
 
-.PARAMETER Log2Console 
+Specify log name of Windows Event Log.
+[Application] is default.
+
+　Windows Event Log出力のログ名を指定します。
+デフォルトは[Application]です。
+
+.PARAMETER Log2Console
+
+Specify if you want to output log to PowerShell console.
+[$TRUE] is default.
+
 　コンソールへのログ出力を制御します。
 デフォルトは$TRUEでコンソール出力します。
 
 .PARAMETER NoLog2Console
+
+Specify if you want to suppress log to PowerShell console.
+Specification overrides -Log2Console
+
 　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
 Log2Consoleより優先します。
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$FALSEでログファイル出力しません。
+
+Specify if you want to output log to text log.
+[$FALSE] is default.
+
+　ログフィルへの出力を制御します。
+デフォルトは$FALSEでログファイル出力しません。
 
 .PARAMETER NoLog2File
+
+Specify if you want to suppress log to PowerShell console.
+Specification overrides -Log2File
+
 　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
 Log2Fileより優先します。
 
 .PARAMETER LogPath
+
+Specify the path of text log file.
+Can specify relative, absolute or UNC path format.
+Relative path format must be starting with 'dot.'
+Wild cards are not accepted shch as asterisk* question? bracket[]
+If the path contains bracket[] , specify path literally and do not escape.
+[$NULL] is default.
+
+If the log file dose not exist, make a new file.
+If the log file exists, write log additionally.
+
 　ログファイル出力パスを指定します。デフォルトは$NULLです。
 相対、絶対パスで指定可能です。
+相対パス表記は、.から始める表記にして下さい。（例 .\Log\Log.txt , ..\Script\log\log.txt）
+ワイルドカード* ? []は使用できません。
+フォルダ、ファイル名に括弧 [ , ] を含む場合はエスケープせずにそのまま入力してください。
 ファイルが存在しない場合は新規作成します。
 ファイルが既存の場合は追記します。
 
 .PARAMETER LogDateFormat
-　ログファイル出力に含まれる日時表示フォーマットを指定します。デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
+
+Specicy time stamp format in the text log.
+[yyyy-MM-dd-HH:mm:ss] is default.
+
+　ログファイル出力に含まれる日時表示フォーマットを指定します。
+デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
+
+.PARAMETER LogFileEncode
+
+Specify the character encode in the log file.
+[Default] is default and it works as ShiftJIS.
+
+
+ログファイルの文字コードを指定します。
+デフォルトはShift-JISです。
 
 .PARAMETER NormalReturnCode
-　正常終了時のリターンコードを指定します。デフォルトは0です。正常終了=<警告終了=<（内部）異常終了として下さい。
+
+Specify Normal Return code.
+[0] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER WarningReturnCode
-　警告終了時のリターンコードを指定します。デフォルトは1です。正常終了=<警告終了=<（内部）異常終了として下さい。
+
+Specify Warning Return code.
+[1] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER ErrorReturnCode
-　異常終了時のリターンコードを指定します。デフォルトは8です。正常終了=<警告終了=<（内部）異常終了として下さい。
+
+Specify Error Return code.
+[8] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER InternalErrorReturnCode
-　プログラム内部異常終了時のリターンコードを指定します。デフォルトは16です。正常終了=<警告終了=<（内部）異常終了として下さい。
+
+Specify Internal Error Return code.
+[16] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER InfoEventID
-　Event Log出力でInformationに対するEvent IDを指定します。デフォルトは1です。
+
+Specify information event id in the log.
+[1] is default.
+
+
+.PARAMETER InfoLoopStartEventID
+
+Specify start loop event id in the log.
+[2] is default.
+
+
+.PARAMETER InfoLoopEndEventID
+
+Specify end loop event id in the log.
+[3] is default.
+
+
+.PARAMETER StartEventID
+
+Specify start script id in the log.
+[8] is default.
+
+
+.PARAMETER EndEventID
+
+Specify end script event id in the log.
+[9] is default.
+
 
 .PARAMETER WarningEventID
-　Event Log出力でWarningに対するEvent IDを指定します。デフォルトは10です。
 
-.PARAMETER SuccessErrorEventID
-　Event Log出力でSuccessに対するEvent IDを指定します。デフォルトは73です。
+Specify Warning event id in the log.
+[10] is default.
+
+
+.PARAMETER SuccessEventID
+
+Specify Successfully complete event id in the log.
+[73] is default.
+
 
 .PARAMETER InternalErrorEventID
-　Event Log出力でInternal Errorに対するEvent IDを指定します。デフォルトは99です。
+
+Specify Internal Error event id in the log.
+[99] is default.
+
 
 .PARAMETER ErrorEventID
-　Event Log出力でErrorに対するEvent IDを指定します。デフォルトは100です。
+
+Specify Error event id in the log.
+[100] is default.
+
 
 .PARAMETER ErrorAsWarning
+
+Specfy if you want to return WARNING exit code when the script terminate with an Error.
+
 　異常終了しても警告終了のReturnCodeを返します。
 
 .PARAMETER WarningAsNormal
+
+Specify if you want to return NORMAL exit code when the script terminate with a Warning.
+
 　警告終了しても正常終了のReturnCodeを返します。
 
 .PARAMETER ExecutableUser
+
+Specify the users who are allowed to execute the script in regular expression.
+[.*] is default and all users are allowed to execute.
+Parameter must be quoted with single quote'
+Escape the back slash in the separeter of a domain name.
+example [domain\\.*]
+
 　このプログラムを実行可能なユーザを正規表現で指定します。
 デフォルトは[.*]で全てのユーザが実行可能です。　
 記述はシングルクオーテーションで括って下さい。
@@ -204,61 +317,72 @@ https://github.com/7k2mpa/FileMaintenace
 
 #>
 
-
+[CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = "High")]
 Param(
 
-[String]$ExecUser = 'foo',
-[String]$ExecUserPassword = 'hogehoge',
+[String][parameter(position = 0)][ValidateNotNullOrEmpty()]$Schema = 'MCFRAME' ,
+[String][parameter(position = 1)][ValidateNotNullOrEmpty()]$DumpDirectoryObject = 'MCFDATA_PUMP_DIR' ,
 
-[String][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,
 
-#[parameter(mandatory=$TRUE)][String]$Schema  ,
-[String]$Schema = 'MCFRAME' ,
+
+[Switch]$AddtimeStamp ,
+
+[String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss' ,
 
 [String]$HostName = $Env:COMPUTERNAME,
 
-[String]$DumpDirectoryObject='MCFDATA_PUMP_DIR' ,
+[String][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,
 
-[String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
+[String]$OracleHomeBinPath = $Env:ORACLE_HOME + '\BIN' ,
 
+[String]$ExecUser = 'foo' ,
+[String]$ExecUserPassword = 'hogehoge' ,
 [Switch]$PasswordAuthorization ,
 
-[String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss',
 
-[String]$DumpFile = $HostName+"_"+$Schema+"_PUMP.dmp",
-[String]$LogFile  = $HostName+"_"+$Schema+"_PUMP.log",
-
-[Switch]$AddtimeStamp,
+[String]$DumpFile = "$HostName_$Schema_PUMP.dmp" ,
+[String]$LogFile  = "$HostName_$Schema_PUMP.log" ,
 
 
-[boolean]$Log2EventLog = $TRUE,
-[Switch]$NoLog2EventLog,
-[String]$ProviderName = "Infra",
-[String][ValidateSet("Application")]$EventLogLogName = 'Application',
 
-[boolean]$Log2Console =$TRUE,
-[Switch]$NoLog2Console,
-[boolean]$Log2File = $FALSE,
-[Switch]$NoLog2File,
-[String][ValidatePattern('^(\.+\\|[C-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\|)).*$')]$LogPath ,
-[String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
 
-[int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
-[int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
-[int][ValidateRange(0,2147483647)]$ErrorReturnCode = 8,
-[int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16,
+[Boolean]$Log2EventLog = $TRUE ,
+[Switch]$NoLog2EventLog ,
+[String]$ProviderName = 'Infra' ,
+[String][ValidateSet("Application")]$EventLogLogName = 'Application' ,
 
-[int][ValidateRange(1,65535)]$InfoEventID = 1,
-[int][ValidateRange(1,65535)]$WarningEventID = 10,
-[int][ValidateRange(1,65535)]$SuccessEventID = 73,
-[int][ValidateRange(1,65535)]$InternalErrorEventID = 99,
-[int][ValidateRange(1,65535)]$ErrorEventID = 100,
+[Boolean]$Log2Console = $TRUE ,
+[Switch]$NoLog2Console ,
 
-[Switch]$ErrorAsWarning,
-[Switch]$WarningAsNormal,
+[Boolean]$Log2File = $FALSE ,
+[Switch]$NoLog2File ,
 
-[Regex]$ExecutableUser ='.*'
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
+[ValidateNotNullOrEmpty()]$LogPath ,
+
+[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
+
+
+[Int][ValidateRange(0,2147483647)]$NormalReturnCode        =  0 ,
+[Int][ValidateRange(0,2147483647)]$WarningReturnCode       =  1 ,
+[Int][ValidateRange(0,2147483647)]$ErrorReturnCode         =  8 ,
+[Int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16 ,
+
+[Int][ValidateRange(1,65535)]$InfoEventID          =   1 ,
+[Int][ValidateRange(1,65535)]$InfoLoopStartEventID =   2 ,
+[Int][ValidateRange(1,65535)]$InfoLoopEndEventID   =   3 ,
+[int][ValidateRange(1,65535)]$StartEventID         =   8 ,
+[int][ValidateRange(1,65535)]$EndEventID           =   9 ,
+[Int][ValidateRange(1,65535)]$WarningEventID       =  10 ,
+[Int][ValidateRange(1,65535)]$SuccessEventID       =  73 ,
+[Int][ValidateRange(1,65535)]$InternalErrorEventID =  99 ,
+[Int][ValidateRange(1,65535)]$ErrorEventID         = 100 ,
+
+[Switch]$ErrorAsWarning ,
+[Switch]$WarningAsNormal ,
+
+[Regex]$ExecutableUser = '.*'
 
 )
 
@@ -368,6 +492,7 @@ $DatumPath = $PSScriptRoot
 #        $execCommand = "`' /@"+$OracleSID+" as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
         }
 
+Write-Debug "Command[$($execCommand)]"
 
 Push-Location $OracleHomeBinPath
 
