@@ -306,7 +306,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 #対象のOracleがサービス起動しているか確認
 
-    $targetWindowsOracleService = "OracleService"+$OracleSID
+    $targetWindowsOracleService = "OracleService" + $OracleSID
 
     IF (-not($targetWindowsOracleService | Test-ServiceStatus -Status Running)) {
 
@@ -336,7 +336,7 @@ Param(
 
 Pop-Location
 
- Invoke-PostFinalize $ReturnCode
+Invoke-PostFinalize $ReturnCode
 }
 
 #####################   ここから本体  ######################
@@ -359,11 +359,13 @@ $DatumPath = $PSScriptRoot
 
     IF ($PasswordAuthorization) {
 
-        $execCommand = $ExecUser+"/"+$ExecUserPassword+"@"+$OracleSID+" Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y"
+        $execCommand = "$ExecUser/$ExecUserPassword@$OracleSID Directory=$DumpDirectoryObject Schemas=$Schema DumpFile=$DumpFile LogFile=$LogFile Reuse_DumpFiles=y"
+#        $execCommand = $ExecUser+"/"+$ExecUserPassword+"@"+$OracleSID+" Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y"
     
         } else {
 
-        $execCommand = "`' /@"+$OracleSID+" as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
+        $execCommand = "`' /@$OracleSID as sysdba `' Directory=$DumpDirectoryObject Schemas=$Schema DumpFile=$DumpFile LogFile=$LogFile Reuse_DumpFiles=y"
+#        $execCommand = "`' /@"+$OracleSID+" as sysdba `' Directory="+$DumpDirectoryObject+" Schemas="+$Schema+" DumpFile="+$DumpFile+" LogFile="+$LogFile+" Reuse_DumpFiles=y "
         }
 
 
