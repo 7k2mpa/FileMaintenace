@@ -15,24 +15,24 @@ You can process files in multiple folders with Wrapper.ps1
 
 
 .DESCRIPTION
-This script filters files and folders with multiple criteria.
-And process the files and folders filtered in multiple methods with PreAction, Action and PostAction.
+This script finds files and folders that match multiple criteria.
+And process the files and folders found with multiple methods with PreAction, Action and PostAction.
 
 Methods are
 
 -PreAction:
-Create new files from filtered files.
+Create new files from files found.
 Methods [Add time stamp to file name][Compress][Archive to 1file][Move the file created to new location] are offered and can be used together.
 Without specification -MoveNewFile option, place the file created in the same folder of the original file.
 
 -Action:
-Process files filtered to [Move][Copy][Delete][NullClear][KeepFilesCount] , folders filtered to [DeleteEmptyFolders]
+Process files found to [Move][Copy][Delete][NullClear][KeepFilesCount] , folders filtered to [DeleteEmptyFolders]
 
 -PostAction:
-Process files filtered to [NullClear][Rename]
+Process files found to [NullClear][Rename]
 
 
-Filtering criteria are [(Older than)-Days][-Size][-RegularExpression][-Parent(Path)RegularExpression]
+Finding criteria are [(Older than)-Days][-Size][-RegularExpression][-Parent(Path)RegularExpression]
 
 This script processes only 1 folder at once.
 If you process multiple folders, can do with Wrapper.ps1
@@ -124,7 +124,7 @@ C:\TESTˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚Å10KBˆÈã‚Ì‚à‚Ì‚ğÄ‹A“I‚ÉC:\TEST1‚Ö•¡»‚µ‚Ü‚·BˆÚ“®æ‚Éqƒ
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -PreAction Compress,AddTimeStamp -Action NullClear
 
-Filter files ending with '.log' and older 10days in C:\TEST recuresively.
+Find files ending with '.log' and older 10days in C:\TEST recuresively.
 Create new files compressed and added time stamp to file name from files filtered.
 New files place in the same folder.
 The filtered files dose not be deleted, but are null cleared.
@@ -136,7 +136,7 @@ C:\TESTˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ğÄ‹A“I‚É u.log‚ÅI‚í‚év‚à‚Ì‚Öƒtƒ@ƒCƒ‹–¼‚É“ú•t‚ğ•t‰Á‚µ‚Ä
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -PreAction Compress,MoveNewFile -Action Delete -MoveToFolder C:\TEST1 -OverRide -Days 10
 
-Filter files ending with '.log' and older 10days in C:\TEST recuresively.
+Find files ending with '.log' and older 10days in C:\TEST recuresively.
 Create new files compressed and move to C:\TEST1
 If same name file exists in the destination, override old one.
 The original files are deleted. 
@@ -150,7 +150,7 @@ C:\TESTˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ğÄ‹A“I‚É u.log‚ÅI‚í‚év‚©‚Â10“úˆÈ‘O‚Ì‚à‚Ì‚ğˆ³kŒãC:\TES
 
 FileMaintenace.ps1 -TargetFolder C:\OLD\Log -RegularExpression '^.*\.log$' -Action Delete -ParentRegularExpression '\\OLD\\'
 
-Filter files ending with '.log' recuresively.
+Find files ending with '.log' recuresively.
 -ParentRegularExpresssion option is specified with regular expression, thus path's backslash\ is escaped with backslash\
 Delete them with '\OLD\' in the rest of the path characters next to the -TargetFolder(C:\OLD\Log).
 At the sample blow, 'C:\OLD\Los' is not for -ParentRegularExpression matching.
@@ -197,9 +197,9 @@ Specify methods to process files.
 Separate arguments with comma,
 
 None:Do nothing, and is default. If you want to test the action, specify -WhatIf or -Confirm option.
-Compress:Create compressed files from the original files.
+Compress:Create new files compressed from the original files.
 AddTimeStamp:Create new files with file name added time stamp.
-Archive:Create an archive file from files. Specify archive file name with -ArchiveFileName option.
+Archive:Create an archive file from files found. Specify archive file name with -ArchiveFileName option.
 MoveNewFile:place new files in -MoveNewFolder path.
 7z:Specify to use 7-Zip and make .7z(LZMA2) for compress or archive option.
 7zZip:Specify to use 7-Zip and make .zip(Deflate) for compress or arvhice option.
@@ -221,12 +221,12 @@ MoveNewFile:-PreAction‚ÌV‹K¶¬ƒtƒ@ƒCƒ‹‚ğ-TargetFolder‚Æ“¯ˆê‚Å‚Í‚È‚­A-MoveToFo
 Specify method to process files.
 
 None:Do nothing, and is default. If you want to test the action, specify -WhatIf or -Confirm option.
-Move:Move the files to -MoveNewFolder path.
+Move:Move the files found to -MoveNewFolder path.
 Delete:Delete the files.
-Copy:Copy the files and place in -MoveNewFolder path.
+Copy:Copy the files found and place in -MoveNewFolder path.
 DeleteEmptyFolders:Delete empty folders.
 KeepFilesCount:Delete old generation files.
-NullClear:Clear the files with null.
+NullClear:Clear the files found with null.
 
 ˆ—‘ÎÛ‚Ìƒtƒ@ƒCƒ‹‚É‘Î‚·‚é‘€ì‚ğİ’è‚µ‚Ü‚·BˆÈ‰º‚Ìƒpƒ‰ƒ[ƒ^‚ğw’è‚µ‚Ä‰º‚³‚¢B
 
@@ -243,7 +243,7 @@ NullClear:ƒtƒ@ƒCƒ‹‚Ì“à—eíœ NullClear‚µ‚Ü‚·B
 Specify method to process files.
 
 None:Do nothing, and is default. If you want to test the action, specify -WhatIf or -Confirm option.
-Rename:Rename the files with -RenameToRegularExpression
+Rename:Rename the files found with -RenameToRegularExpression
 NullClear:Clear the files with null.
 
 
@@ -256,7 +256,7 @@ NullClear:ƒtƒ@ƒCƒ‹‚Ì“à—eíœ NullClear‚µ‚Ü‚·BPostAction‚Ì‚½‚ßAAction‚Æ•¹—p‰Â”\
 
 .PARAMETER MoveToFolder
 
-Specify a desitination folder of the target files moved to.
+Specify a desitination folder of the files found moved to.
 Can specify relative, absolute or UNC path format.
 Relative path format must be starting with 'dot.'
 Wild cards are not accepted shch as asterisk* question? bracket[]
@@ -344,7 +344,7 @@ Specify to process the files or folders in the path recursively or non-recuresiv
 
 .PARAMETER NoRecurse
 Specify if you want to filter files non-recursively.
-The option override -Recurse option.
+The option overrides -Recurse option.
 
 @-TargetFolder‚Ì’¼‰º‚Ì‚İ‚ğˆ—‘ÎÛ‚Æ‚µ‚Ü‚·B-Recurse $FALSE‚Æ“™‰¿‚Å‚·B
 Recurseƒpƒ‰ƒ[ƒ^‚æ‚è—Dæ‚µ‚Ü‚·B
@@ -357,8 +357,8 @@ Specify if you want to override old same name files moved or copied.
 ƒfƒtƒHƒ‹ƒg‚Å‚Íã‘‚«‚¹‚¸‚ÉˆÙíI—¹‚µ‚Ü‚·B
 
 .PARAMETER Continue
-Specify if you want to skip the process when old files existed and to process remains.
-If skip the process, process remains and terminate with a Warning.
+Specify if you want to skip the process when files exist in -MoveToFolder alredy and to process remains.
+If the script skips the process, processes remains and terminates with a Warning.
 [terminate with an Error immediately and do not skip] is default. 
 
 @ˆÚ“®AƒRƒs[æ‚ÉŠù‚É“¯–¼‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚½ê‡“–ŠYƒtƒ@ƒCƒ‹‚Ìˆ—‚ğƒXƒLƒbƒv‚µ‚Ü‚·B
@@ -366,8 +366,8 @@ If skip the process, process remains and terminate with a Warning.
 ƒfƒtƒHƒ‹ƒg‚Å‚ÍƒXƒLƒbƒv‚¹‚¸‚ÉˆÙíI—¹‚µ‚Ü‚·B
 
 .PARAMETER ContinueAsNormal
-Specify if you want to skip old files do not want to override.
-If has skip to process, exit successfully.
+Specify if you do not want to override a files and to want to continue processing and to exit with Normal return code.
+If the script skips to process, exits successfully.
 [terminate with an Error immediately and do not skip] is default. 
 
 @ˆÚ“®AƒRƒs[æ‚ÉŠù‚É“¯–¼‚Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚½ê‡“–ŠYƒtƒ@ƒCƒ‹‚Ìˆ—‚ğƒXƒLƒbƒv‚µ‚Ü‚·B
@@ -394,7 +394,7 @@ Specify file extention strings in specifing -PreAction Compress option.
 .PARAMETER TimeStampFormat
 Specify time stamp format in specifing -PreAction AddTimeStamp option
 [_yyyyMMdd_HHmmss] is default.
-It is deffernt from time stamp format of script log.
+It is deffernt from -LogDateFormat option.
 
 
 @-PreAction AddTimeStampw’è‚Ì‘®‚ğw’è‚Å‚«‚Ü‚·B
@@ -445,15 +445,11 @@ use -PostAction NullClear or -Action NullClear
 Specify if you want to output log to Windows Event Log.
 [$TRUE] is default.
 
-@Windows Event Log‚Ö‚Ìo—Í‚ğ§Œä‚µ‚Ü‚·B
-ƒfƒtƒHƒ‹ƒg‚Í$TRUE‚ÅEvent Logo—Í‚µ‚Ü‚·B
 
 .PARAMETER NoLog2EventLog
 Specify if you want to suppress log to Windows Event Log.
-Specification override -Log2EventLog
+Specification overrides -Log2EventLog
 
-@Event Logo—Í‚ğ—}~‚µ‚Ü‚·B-Log2EventLog $FALSE‚Æ“™‰¿‚Å‚·B
-Log2EventLog‚æ‚è—Dæ‚µ‚Ü‚·B
 
 .PARAMETER ProviderName
 
@@ -461,48 +457,35 @@ Specify provider name of Windows Event Log.
 [Infra] is default.
 
 
-@Windows Event Logo—Í‚ÌƒvƒƒoƒCƒ_–¼‚ğw’è‚µ‚Ü‚·B
-ƒfƒtƒHƒ‹ƒg‚Í[Infra]‚Å‚·B
-
 .PARAMETER EventLogLogName
 
 Specify log name of Windows Event Log.
 [Application] is default.
 
-@Windows Event Logo—Í‚ÌƒƒO–¼‚ğw’è‚µ‚Ü‚·B
-ƒfƒtƒHƒ‹ƒg‚Í[Application]‚Å‚·B
 
 .PARAMETER Log2Console
 
 Specify if you want to output log to PowerShell console.
 [$TRUE] is default.
 
-@ƒRƒ“ƒ\[ƒ‹‚Ö‚ÌƒƒOo—Í‚ğ§Œä‚µ‚Ü‚·B
-ƒfƒtƒHƒ‹ƒg‚Í$TRUE‚ÅƒRƒ“ƒ\[ƒ‹o—Í‚µ‚Ü‚·B
 
 .PARAMETER NoLog2Console
 
 Specify if you want to suppress log to PowerShell console.
 Specification overrides -Log2Console
 
-@ƒRƒ“ƒ\[ƒ‹ƒƒOo—Í‚ğ—}~‚µ‚Ü‚·B-Log2Console $FALSE‚Æ“™‰¿‚Å‚·B
-Log2Console‚æ‚è—Dæ‚µ‚Ü‚·B
 
 .PARAMETER Log2File
 
 Specify if you want to output log to text log.
 [$FALSE] is default.
 
-@ƒƒOƒtƒBƒ‹‚Ö‚Ìo—Í‚ğ§Œä‚µ‚Ü‚·B
-ƒfƒtƒHƒ‹ƒg‚Í$FALSE‚ÅƒƒOƒtƒ@ƒCƒ‹o—Í‚µ‚Ü‚¹‚ñB
 
 .PARAMETER NoLog2File
 
 Specify if you want to suppress log to PowerShell console.
 Specification overrides -Log2File
 
-@ƒƒOƒtƒ@ƒCƒ‹o—Í‚ğ—}~‚µ‚Ü‚·B-Log2File $FALSE‚Æ“™‰¿‚Å‚·B
-Log2File‚æ‚è—Dæ‚µ‚Ü‚·B
 
 .PARAMETER LogPath
 
@@ -513,33 +496,21 @@ Wild cards are not accepted shch as asterisk* question? bracket[]
 If the path contains bracket[] , specify path literally and do not escape.
 [$NULL] is default.
 
-If the log file dose not exist, make a new file.
-If the log file exists, write log additionally.
+If the log file dose not exist, the script makes a new file.
+If the log file exists, the script writes log additionally.
 
-@ƒƒOƒtƒ@ƒCƒ‹o—ÍƒpƒX‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í$NULL‚Å‚·B
-‘Š‘ÎAâ‘ÎƒpƒX‚Åw’è‰Â”\‚Å‚·B
-‘Š‘ÎƒpƒX•\‹L‚ÍA.‚©‚çn‚ß‚é•\‹L‚É‚µ‚Ä‰º‚³‚¢Bi—á .\Log\Log.txt , ..\Script\log\log.txtj
-ƒƒCƒ‹ƒhƒJ[ƒh* ? []‚Íg—p‚Å‚«‚Ü‚¹‚ñB
-ƒtƒHƒ‹ƒ_Aƒtƒ@ƒCƒ‹–¼‚ÉŠ‡ŒÊ [ , ] ‚ğŠÜ‚Şê‡‚ÍƒGƒXƒP[ƒv‚¹‚¸‚É‚»‚Ì‚Ü‚Ü“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B
-ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢ê‡‚ÍV‹Kì¬‚µ‚Ü‚·B
-ƒtƒ@ƒCƒ‹‚ªŠù‘¶‚Ìê‡‚Í’Ç‹L‚µ‚Ü‚·B
 
 .PARAMETER LogDateFormat
 
 Specicy time stamp format in the text log.
 [yyyy-MM-dd-HH:mm:ss] is default.
 
-@ƒƒOƒtƒ@ƒCƒ‹o—Í‚ÉŠÜ‚Ü‚ê‚é“ú•\¦ƒtƒH[ƒ}ƒbƒg‚ğw’è‚µ‚Ü‚·B
-ƒfƒtƒHƒ‹ƒg‚Í[yyyy-MM-dd-HH:mm:ss]Œ`®‚Å‚·B
 
 .PARAMETER LogFileEncode
 
 Specify the character encode in the log file.
 [Default] is default and it works as ShiftJIS.
 
-
-ƒƒOƒtƒ@ƒCƒ‹‚Ì•¶šƒR[ƒh‚ğw’è‚µ‚Ü‚·B
-ƒfƒtƒHƒ‹ƒg‚ÍShift-JIS‚Å‚·B
 
 .PARAMETER NormalReturnCode
 
@@ -1263,26 +1234,26 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 
 
 
-#ˆ—ŠJnƒƒbƒZ[ƒWo—Í
+#Output starting messages
 
 
 Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid."
 
     IF ($Action -eq "DeleteEmptyFolders") {
 
-        Write-Log -ID $InfoEventID -Type Information -Message ("Delete empty folders [in target folder $($TargetFolder)]" + 
-            "[older than $($Days)days][match to regular expression [$($RegularExpression)]][recursively[$($Recurse)]]")
+        Write-Log -ID $InfoEventID -Type Information -Message ("Find and Delete empty folders in target folder [$($TargetFolder)], " + 
+            "older than [$($Days)]days, match to regular expression [$($RegularExpression)], recursively[$($Recurse)]")
         
         } else {
 
-        Write-Log -ID $InfoEventID -Type Information -Message ("Files [in the folder $($TargetFolder)][older than $($Days)days]" + 
-            "[match to regular expression [$($RegularExpression)]]" +
-            "[parent path match to regular expression [$($ParentRegularExpression)]]" +
-            "[size is over"+($Size / 1KB)+"KB]")
+        Write-Log -ID $InfoEventID -Type Information -Message ("Find files in the folder [$($TargetFolder)], older than [$($Days)]days, " + 
+            "match to regular expression [$($RegularExpression)], " +
+            "parent path match to regular expression [$($ParentRegularExpression)], " +
+            "size is over["+($Size / 1KB)+"]KB")
 
         IF ($PreAction -notcontains 'none') {
 
-            $message = "Process files matched "
+            $message = "Process files found "
             IF ($PreAction -contains 'MoveNewFile') { $message += "to move to [$($MoveToFolder)] "}
 
             IF ($PreAction -match "^(Compress|Archive)$") {
@@ -1306,7 +1277,7 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
 
         IF ($Action -ne 'none') {
 
-            $message = "Process files matched "
+            $message = "Process files found "
             IF ($Action -eq 'KeepFilesCount') { $message += "[keep file generation only($($KeepFiles))] "}
             IF ($Action -match '^(Copy|Move)$') { $message += "moving to[$($MoveToFolder)] "}
             $message += "recursively[$($Recurse)] Action[$($Action)]"
@@ -1316,7 +1287,7 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
 
         IF ($PostAction -ne 'none') {
 
-            $message = "Process files matched"
+            $message = "Process files found"
             IF ($PostAction -eq 'Rename') { $message += "rename with rule[$($RenameToRegularExpression)] "}
             $message += "recursively[$($Recurse)] PostAction[$($PostAction)]"
 

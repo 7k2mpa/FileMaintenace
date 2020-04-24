@@ -238,6 +238,10 @@ begin {
         Write-Log -Id $InternalErrorEventID -Type Error -Message "Internal Error at Function Invoke-Action  [$($ActionType)] requires [$($ActionTo)]"
         Finalize $InternalErrorReturnCode
         }
+
+    IF ($ActionType -match '^(Copy|AddTimeStamp|Rename|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$' ) {
+        $addMessage = " to [$($ActionTo)]"
+        }
 }
 process {
     IF ($WhatIfFlag -and ($ActionType -match "(Compress|Archive)") ) {
@@ -317,7 +321,7 @@ process {
             
                 Default {
                     Pop-Location 
-                    Throw "Internal error in 7Zip Section with Action Type"
+                    Throw "Internal error in 7-Zip Switch section with Action Type"
                     }            
                 }
 
@@ -325,7 +329,7 @@ process {
             $processErrorFlag = $TRUE
             IF ($LASTEXITCODE -ne 0) {
 
-                Throw "error in 7zip"            
+                Throw "error occure in 7-Zip"            
                 }
             }
                                            
@@ -340,7 +344,7 @@ process {
     }   
     catch [Exception] {
        
-        Write-Log -Id $ErrorEventID -Type Error -Message "Failed to execute [$($ActionType)] to [$($ActionError)]"
+        Write-Log -Id $ErrorEventID -Type Error -Message ("Failed to execute [$($ActionType)] [$($ActionError)]" + $addMessage)
         IF (-not($processErrorFlag)) {
             $errorDetail = $Error[0] | Out-String
             }
@@ -348,7 +352,7 @@ process {
         $Script:ErrorFlag = $TRUE
 
         IF ($Continue) {
-            Write-Log -Id $WarningEventID -Type Warning -Message "Specified -Continue option, continue to process next objects."
+            Write-Log -Id $WarningEventID -Type Warning -Message "Specified -Continue option, thus continue to process next objects."
             $Script:WarningFlag = $TRUE
             $Script:ContinueFlag = $TRUE
             Return
@@ -369,10 +373,6 @@ process {
         $Script:OverRideCount ++
         $Script:InLoopOverRideCount ++
         $Script:OverRideFlag = $FALSE
-        }
-
-   IF ($ActionType -match '^(Copy|AddTimeStamp|Rename|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$' ) {
-        $addMessage = " to [$($ActionTo)]"
         }
         
     Write-Log -Id $SuccessEventID -Type Success -Message ("Successfully completed to [$($ActionType)] [$($ActionError)]" + $addMessage)
@@ -468,7 +468,7 @@ Process {
 
         Default {
       
-            Write-Log -Id $ErrorEventID -Type Error -Message "$Name[$($Path)] is neither absolute path format nor relative path format."
+            Write-Log -Id $ErrorEventID -Type Error -Message "$Name[$($Path)] is neither absolute nor relative nor UNC path format."
             Finalize $ErrorReturnCode
             }
     }
