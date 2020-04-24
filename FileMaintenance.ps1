@@ -598,13 +598,11 @@ Specify Error event id in the log.
 
 Specfy if you want to return WARNING exit code when the script terminate with an Error.
 
-　異常終了しても警告終了のReturnCodeを返します。
 
 .PARAMETER WarningAsNormal
 
 Specify if you want to return NORMAL exit code when the script terminate with a Warning.
 
-　警告終了しても正常終了のReturnCodeを返します。
 
 .PARAMETER ExecutableUser
 
@@ -614,10 +612,6 @@ Parameter must be quoted with single quote'
 Escape the back slash in the separeter of a domain name.
 example [domain\\.*]
 
-　このプログラムを実行可能なユーザを正規表現で指定します。
-デフォルトは[.*]で全てのユーザが実行可能です。　
-記述はシングルクオーテーションで括って下さい。
-正規表現のため、ドメインのバックスラッシュは[domain\\.*]の様にバックスラッシュでエスケープして下さい。　
 
 .NOTES
 

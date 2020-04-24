@@ -101,82 +101,177 @@ Default is 5times.
 
 
 
-
-
 .PARAMETER Log2EventLog
-　Windows Event Logへの出力を制御します。
-デフォルトは$TRUEでEvent Log出力します。
+
+Specify if you want to output log to Windows Event Log.
+[$TRUE] is default.
+
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
+Specify if you want to suppress log to Windows Event Log.
+Specification overrides -Log2EventLog
+
 
 .PARAMETER ProviderName
-　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
+
+Specify provider name of Windows Event Log.
+[Infra] is default.
+
 
 .PARAMETER EventLogLogName
-　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
 
-.PARAMETER Log2Console 
-　コンソールへのログ出力を制御します。
-デフォルトは$TRUEでコンソール出力します。
+Specify log name of Windows Event Log.
+[Application] is default.
+
+
+.PARAMETER Log2Console
+
+Specify if you want to output log to PowerShell console.
+[$TRUE] is default.
+
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
+
+Specify if you want to suppress log to PowerShell console.
+Specification overrides -Log2Console
+
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$FALSEでログファイル出力しません。
+
+Specify if you want to output log to text log.
+[$FALSE] is default.
+
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
+
+Specify if you want to suppress log to PowerShell console.
+Specification overrides -Log2File
+
 
 .PARAMETER LogPath
-　ログファイル出力パスを指定します。デフォルトは$NULLです。
-相対、絶対パスで指定可能です。
-ファイルが存在しない場合は新規作成します。
-ファイルが既存の場合は追記します。
+
+Specify the path of text log file.
+Can specify relative, absolute or UNC path format.
+Relative path format must be starting with 'dot.'
+Wild cards are not accepted shch as asterisk* question? bracket[]
+If the path contains bracket[] , specify path literally and do not escape.
+[$NULL] is default.
+
+If the log file dose not exist, the script makes a new file.
+If the log file exists, the script writes log additionally.
+
 
 .PARAMETER LogDateFormat
-　ログファイル出力に含まれる日時表示フォーマットを指定します。デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
+
+Specicy time stamp format in the text log.
+[yyyy-MM-dd-HH:mm:ss] is default.
+
+
+.PARAMETER LogFileEncode
+
+Specify the character encode in the log file.
+[Default] is default and it works as ShiftJIS.
+
 
 .PARAMETER NormalReturnCode
-　正常終了時のリターンコードを指定します。デフォルトは0です。正常終了=<警告終了=<（内部）異常終了として下さい。
+
+Specify Normal Return code.
+[0] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER WarningReturnCode
-　警告終了時のリターンコードを指定します。デフォルトは1です。正常終了=<警告終了=<（内部）異常終了として下さい。
+
+Specify Warning Return code.
+[1] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER ErrorReturnCode
-　異常終了時のリターンコードを指定します。デフォルトは8です。正常終了=<警告終了=<（内部）異常終了として下さい。
+
+Specify Error Return code.
+[8] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER InternalErrorReturnCode
-　プログラム内部異常終了時のリターンコードを指定します。デフォルトは16です。正常終了=<警告終了=<（内部）異常終了として下さい。
+
+Specify Internal Error Return code.
+[16] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER InfoEventID
-　Event Log出力でInformationに対するEvent IDを指定します。デフォルトは1です。
+
+Specify information event id in the log.
+[1] is default.
+
+
+.PARAMETER InfoLoopStartEventID
+
+Specify start loop event id in the log.
+[2] is default.
+
+
+.PARAMETER InfoLoopEndEventID
+
+Specify end loop event id in the log.
+[3] is default.
+
+
+.PARAMETER StartEventID
+
+Specify start script id in the log.
+[8] is default.
+
+
+.PARAMETER EndEventID
+
+Specify end script event id in the log.
+[9] is default.
+
 
 .PARAMETER WarningEventID
-　Event Log出力でWarningに対するEvent IDを指定します。デフォルトは10です。
 
-.PARAMETER SuccessErrorEventID
-　Event Log出力でSuccessに対するEvent IDを指定します。デフォルトは73です。
+Specify Warning event id in the log.
+[10] is default.
+
+
+.PARAMETER SuccessEventID
+
+Specify Successfully complete event id in the log.
+[73] is default.
+
 
 .PARAMETER InternalErrorEventID
-　Event Log出力でInternal Errorに対するEvent IDを指定します。デフォルトは99です。
+
+Specify Internal Error event id in the log.
+[99] is default.
+
 
 .PARAMETER ErrorEventID
-　Event Log出力でErrorに対するEvent IDを指定します。デフォルトは100です。
+
+Specify Error event id in the log.
+[100] is default.
+
 
 .PARAMETER ErrorAsWarning
-　異常終了しても警告終了のReturnCodeを返します。
+
+Specfy if you want to return WARNING exit code when the script terminate with an Error.
+
 
 .PARAMETER WarningAsNormal
-　警告終了しても正常終了のReturnCodeを返します。
+
+Specify if you want to return NORMAL exit code when the script terminate with a Warning.
+
 
 .PARAMETER ExecutableUser
-　このプログラムを実行可能なユーザを正規表現で指定します。
-デフォルトは[.*]で全てのユーザが実行可能です。　
-記述はシングルクオーテーションで括って下さい。
-正規表現のため、ドメインのバックスラッシュは[domain\\.*]の様にバックスラッシュでエスケープして下さい。　
 
+Specify the users who are allowed to execute the script in regular expression.
+[.*] is default and all users are allowed to execute.
+Parameter must be quoted with single quote'
+Escape the back slash in the separeter of a domain name.
+example [domain\\.*]
 .NOTES
 
 Copyright 2020 Masayuki Sudo
@@ -205,7 +300,7 @@ https://github.com/7k2mpa/FileMaintenace
 [CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
 Param(
 
-[parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help StartService.ps1')]
+[parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help ChangeServiceStatus.ps1')]
 [String][Alias("Name")]$Service ,
 
 [parameter(position = 1, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
@@ -220,35 +315,38 @@ Param(
 [int][parameter(position=3)][ValidateRange(1,65535)]$RetryTimes = 18 ,
 
 
-[boolean]$Log2EventLog = $TRUE,
-[Switch]$NoLog2EventLog,
-[String]$ProviderName = "Infra",
-[String][ValidateSet("Application")]$EventLogLogName = 'Application',
+[Boolean]$Log2Console = $TRUE ,
+[Switch]$NoLog2Console ,
 
-[boolean]$Log2Console = $TRUE,
-[Switch]$NoLog2Console,
-[boolean]$Log2File = $FALSE,
-[Switch]$NoLog2File,
-[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath ,
-[String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
+[Boolean]$Log2File = $FALSE ,
+[Switch]$NoLog2File ,
 
-[int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
-[int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
-[int][ValidateRange(0,2147483647)]$ErrorReturnCode = 8,
-[int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16,
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
+[ValidateNotNullOrEmpty()]$LogPath ,
 
-[int][ValidateRange(1,65535)]$InfoEventID = 1,
-[int][ValidateRange(1,65535)]$WarningEventID = 10,
-[int][ValidateRange(1,65535)]$SuccessEventID = 73,
-[int][ValidateRange(1,65535)]$InternalErrorEventID = 99,
-[int][ValidateRange(1,65535)]$ErrorEventID = 100,
+[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
 
 
-[Switch]$ErrorAsWarning,
-[Switch]$WarningAsNormal,
+[Int][ValidateRange(0,2147483647)]$NormalReturnCode        =  0 ,
+[Int][ValidateRange(0,2147483647)]$WarningReturnCode       =  1 ,
+[Int][ValidateRange(0,2147483647)]$ErrorReturnCode         =  8 ,
+[Int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16 ,
 
-[Regex]$ExecutableUser ='.*'
+[Int][ValidateRange(1,65535)]$InfoEventID          =   1 ,
+[Int][ValidateRange(1,65535)]$InfoLoopStartEventID =   2 ,
+[Int][ValidateRange(1,65535)]$InfoLoopEndEventID   =   3 ,
+[int][ValidateRange(1,65535)]$StartEventID         =   8 ,
+[int][ValidateRange(1,65535)]$EndEventID           =   9 ,
+[Int][ValidateRange(1,65535)]$WarningEventID       =  10 ,
+[Int][ValidateRange(1,65535)]$SuccessEventID       =  73 ,
+[Int][ValidateRange(1,65535)]$InternalErrorEventID =  99 ,
+[Int][ValidateRange(1,65535)]$ErrorEventID         = 100 ,
+
+[Switch]$ErrorAsWarning ,
+[Switch]$WarningAsNormal ,
+
+[Regex]$ExecutableUser = '.*'
 
 
 )

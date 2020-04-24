@@ -3,7 +3,7 @@
 <#
 .SYNOPSIS
 This script siwtch to Back Up mode Oracle Database before starting backup software .
-CommonFunctions.ps1 is required.
+CommonFunctions.ps1 , SQLs.ps1 , ChangeServiceStatus.ps1 are required.
 
 <Common Parameters> is not supported.
 
@@ -28,12 +28,10 @@ Oracle Database‚ğƒoƒbƒNƒAƒbƒv‚·‚é‚É‚ÍA—\‚ßƒf[ƒ^ƒx[ƒX‚Ì’â~A‚Ü‚½‚ÍƒoƒbƒNƒAƒbƒ
 
 .\OracleDB2NormalMode.ps1
 .\OracleDB2BackUpMode.ps1
-.\StartService.ps1
+.\ChangeServiceStatus.ps1
 .\CommonFunctions.ps1
 ..\SQL\SQLs.PS1
 ..\Log\SQL.LOG
-..\Lock\BkUp.flg
-
 
 
 .EXAMPLE
@@ -136,81 +134,176 @@ OS”FØ‚ªg‚¦‚È‚¢‚Ég—p‚·‚é–‚ğ„§‚µ‚Ü‚·B
 
 
 .PARAMETER Log2EventLog
-@Windows Event Log‚Ö‚Ìo—Í‚ğ§Œä‚µ‚Ü‚·B
-ƒfƒtƒHƒ‹ƒg‚Í$TRUE‚ÅEvent Logo—Í‚µ‚Ü‚·B
+
+Specify if you want to output log to Windows Event Log.
+[$TRUE] is default.
+
 
 .PARAMETER NoLog2EventLog
-@Event Logo—Í‚ğ—}~‚µ‚Ü‚·B-Log2EventLog $FALSE‚Æ“™‰¿‚Å‚·B
-Log2EventLog‚æ‚è—Dæ‚µ‚Ü‚·B
+Specify if you want to suppress log to Windows Event Log.
+Specification overrides -Log2EventLog
+
 
 .PARAMETER ProviderName
-@Windows Event Logo—Í‚ÌƒvƒƒoƒCƒ_–¼‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í[Infra]‚Å‚·B
+
+Specify provider name of Windows Event Log.
+[Infra] is default.
+
 
 .PARAMETER EventLogLogName
-@Windows Event Logo—Í‚ÌƒƒO–¼‚ğ‚µ‚Ä‚¢‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í[Application]‚Å‚·B
 
-.PARAMETER Log2Console 
-@ƒRƒ“ƒ\[ƒ‹‚Ö‚ÌƒƒOo—Í‚ğ§Œä‚µ‚Ü‚·B
-ƒfƒtƒHƒ‹ƒg‚Í$TRUE‚ÅƒRƒ“ƒ\[ƒ‹o—Í‚µ‚Ü‚·B
+Specify log name of Windows Event Log.
+[Application] is default.
+
+
+.PARAMETER Log2Console
+
+Specify if you want to output log to PowerShell console.
+[$TRUE] is default.
+
 
 .PARAMETER NoLog2Console
-@ƒRƒ“ƒ\[ƒ‹ƒƒOo—Í‚ğ—}~‚µ‚Ü‚·B-Log2Console $FALSE‚Æ“™‰¿‚Å‚·B
-Log2Console‚æ‚è—Dæ‚µ‚Ü‚·B
+
+Specify if you want to suppress log to PowerShell console.
+Specification overrides -Log2Console
+
 
 .PARAMETER Log2File
-@ƒƒOƒtƒBƒ‹‚Ö‚Ìo—Í‚ğ§Œä‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í$FALSE‚ÅƒƒOƒtƒ@ƒCƒ‹o—Í‚µ‚Ü‚¹‚ñB
+
+Specify if you want to output log to text log.
+[$FALSE] is default.
+
 
 .PARAMETER NoLog2File
-@ƒƒOƒtƒ@ƒCƒ‹o—Í‚ğ—}~‚µ‚Ü‚·B-Log2File $FALSE‚Æ“™‰¿‚Å‚·B
-Log2File‚æ‚è—Dæ‚µ‚Ü‚·B
+
+Specify if you want to suppress log to PowerShell console.
+Specification overrides -Log2File
+
 
 .PARAMETER LogPath
-@ƒƒOƒtƒ@ƒCƒ‹o—ÍƒpƒX‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í$NULL‚Å‚·B
-‘Š‘ÎAâ‘ÎƒpƒX‚Åw’è‰Â”\‚Å‚·B
-ƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢ê‡‚ÍV‹Kì¬‚µ‚Ü‚·B
-ƒtƒ@ƒCƒ‹‚ªŠù‘¶‚Ìê‡‚Í’Ç‹L‚µ‚Ü‚·B
+
+Specify the path of text log file.
+Can specify relative, absolute or UNC path format.
+Relative path format must be starting with 'dot.'
+Wild cards are not accepted shch as asterisk* question? bracket[]
+If the path contains bracket[] , specify path literally and do not escape.
+[$NULL] is default.
+
+If the log file dose not exist, the script makes a new file.
+If the log file exists, the script writes log additionally.
+
 
 .PARAMETER LogDateFormat
-@ƒƒOƒtƒ@ƒCƒ‹o—Í‚ÉŠÜ‚Ü‚ê‚é“ú•\¦ƒtƒH[ƒ}ƒbƒg‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í[yyyy-MM-dd-HH:mm:ss]Œ`®‚Å‚·B
+
+Specicy time stamp format in the text log.
+[yyyy-MM-dd-HH:mm:ss] is default.
+
+
+.PARAMETER LogFileEncode
+
+Specify the character encode in the log file.
+[Default] is default and it works as ShiftJIS.
+
 
 .PARAMETER NormalReturnCode
-@³íI—¹‚ÌƒŠƒ^[ƒ“ƒR[ƒh‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í0‚Å‚·B³íI—¹=<ŒxI—¹=<i“à•”jˆÙíI—¹‚Æ‚µ‚Ä‰º‚³‚¢B
+
+Specify Normal Return code.
+[0] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER WarningReturnCode
-@ŒxI—¹‚ÌƒŠƒ^[ƒ“ƒR[ƒh‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í1‚Å‚·B³íI—¹=<ŒxI—¹=<i“à•”jˆÙíI—¹‚Æ‚µ‚Ä‰º‚³‚¢B
+
+Specify Warning Return code.
+[1] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER ErrorReturnCode
-@ˆÙíI—¹‚ÌƒŠƒ^[ƒ“ƒR[ƒh‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í8‚Å‚·B³íI—¹=<ŒxI—¹=<i“à•”jˆÙíI—¹‚Æ‚µ‚Ä‰º‚³‚¢B
+
+Specify Error Return code.
+[8] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER InternalErrorReturnCode
-@ƒvƒƒOƒ‰ƒ€“à•”ˆÙíI—¹‚ÌƒŠƒ^[ƒ“ƒR[ƒh‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í16‚Å‚·B³íI—¹=<ŒxI—¹=<i“à•”jˆÙíI—¹‚Æ‚µ‚Ä‰º‚³‚¢B
+
+Specify Internal Error Return code.
+[16] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER InfoEventID
-@Event Logo—Í‚ÅInformation‚É‘Î‚·‚éEvent ID‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í1‚Å‚·B
+
+Specify information event id in the log.
+[1] is default.
+
+
+.PARAMETER InfoLoopStartEventID
+
+Specify start loop event id in the log.
+[2] is default.
+
+
+.PARAMETER InfoLoopEndEventID
+
+Specify end loop event id in the log.
+[3] is default.
+
+
+.PARAMETER StartEventID
+
+Specify start script id in the log.
+[8] is default.
+
+
+.PARAMETER EndEventID
+
+Specify end script event id in the log.
+[9] is default.
+
 
 .PARAMETER WarningEventID
-@Event Logo—Í‚ÅWarning‚É‘Î‚·‚éEvent ID‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í10‚Å‚·B
 
-.PARAMETER SuccessErrorEventID
-@Event Logo—Í‚ÅSuccess‚É‘Î‚·‚éEvent ID‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í73‚Å‚·B
+Specify Warning event id in the log.
+[10] is default.
+
+
+.PARAMETER SuccessEventID
+
+Specify Successfully complete event id in the log.
+[73] is default.
+
 
 .PARAMETER InternalErrorEventID
-@Event Logo—Í‚ÅInternal Error‚É‘Î‚·‚éEvent ID‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í99‚Å‚·B
+
+Specify Internal Error event id in the log.
+[99] is default.
+
 
 .PARAMETER ErrorEventID
-@Event Logo—Í‚ÅError‚É‘Î‚·‚éEvent ID‚ğw’è‚µ‚Ü‚·BƒfƒtƒHƒ‹ƒg‚Í100‚Å‚·B
+
+Specify Error event id in the log.
+[100] is default.
+
 
 .PARAMETER ErrorAsWarning
-@ˆÙíI—¹‚µ‚Ä‚àŒxI—¹‚ÌReturnCode‚ğ•Ô‚µ‚Ü‚·B
+
+Specfy if you want to return WARNING exit code when the script terminate with an Error.
+
 
 .PARAMETER WarningAsNormal
-@ŒxI—¹‚µ‚Ä‚à³íI—¹‚ÌReturnCode‚ğ•Ô‚µ‚Ü‚·B
+
+Specify if you want to return NORMAL exit code when the script terminate with a Warning.
+
 
 .PARAMETER ExecutableUser
-@‚±‚ÌƒvƒƒOƒ‰ƒ€‚ğÀs‰Â”\‚Èƒ†[ƒU‚ğ³‹K•\Œ»‚Åw’è‚µ‚Ü‚·B
-ƒfƒtƒHƒ‹ƒg‚Í[.*]‚Å‘S‚Ä‚Ìƒ†[ƒU‚ªÀs‰Â”\‚Å‚·B@
-‹Lq‚ÍƒVƒ“ƒOƒ‹ƒNƒI[ƒe[ƒVƒ‡ƒ“‚ÅŠ‡‚Á‚Ä‰º‚³‚¢B
-³‹K•\Œ»‚Ì‚½‚ßAƒhƒƒCƒ“‚ÌƒoƒbƒNƒXƒ‰ƒbƒVƒ…‚Í[domain\\.*]‚Ì—l‚ÉƒoƒbƒNƒXƒ‰ƒbƒVƒ…‚ÅƒGƒXƒP[ƒv‚µ‚Ä‰º‚³‚¢B@
+
+Specify the users who are allowed to execute the script in regular expression.
+[.*] is default and all users are allowed to execute.
+Parameter must be quoted with single quote'
+Escape the back slash in the separeter of a domain name.
+example [domain\\.*]
 
 .NOTES
 
@@ -236,16 +329,20 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[String][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,
+[String][parameter(Position = 0)][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,
 
-[String]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
+[String][parameter(Position = 1)]$SQLLogPath = '.\SC_Logs\SQL.log',
 
-[String]$SQLLogPath = '.\SC_Logs\SQL.log',
 [String]$BackUpFlagPath = '.\Lock\BkUpDB.flg',
 
+[String][parameter(Position = 2)]$SQLCommandsPath = '.\SQL\SQLs.ps1',
+
+[String][parameter(Position = 3)]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
 
 
-[String]$SQLCommandsPath = '.\SQL\SQLs.ps1',
+[Switch]$NoChangeToBackUpMode,
+[Switch]$NoStopListener,
+
 
 [String]$ExecUser = 'hogehoge',
 [String]$ExecUserPassword = 'hogehoge',
@@ -253,44 +350,43 @@ Param(
 [Switch]$PasswordAuthorization ,
 
 
-
-[Switch]$NoChangeToBackUpMode,
-[Switch]$NoStopListener,
-
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default = ShiftJIS
-
 #Planed to obsolute
 [Switch]$NoCheckBackUpFlag = $TRUE ,
 #Planed to obsolute
 
 
-[boolean]$Log2EventLog = $TRUE,
-[Switch]$NoLog2EventLog,
-[String]$ProviderName = "Infra",
-[String][ValidateSet("Application")]$EventLogLogName = 'Application',
+[Boolean]$Log2Console = $TRUE ,
+[Switch]$NoLog2Console ,
 
-[boolean]$Log2Console = $TRUE,
-[Switch]$NoLog2Console,
-[boolean]$Log2File = $FALSE,
-[Switch]$NoLog2File,
-[String]$LogPath = $NULL,
-[String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
+[Boolean]$Log2File = $FALSE ,
+[Switch]$NoLog2File ,
 
-[int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
-[int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
-[int][ValidateRange(0,2147483647)]$ErrorReturnCode = 8,
-[int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16,
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
+[ValidateNotNullOrEmpty()]$LogPath ,
 
-[int][ValidateRange(1,65535)]$InfoEventID = 1,
-[int][ValidateRange(1,65535)]$WarningEventID = 10,
-[int][ValidateRange(1,65535)]$SuccessEventID = 73,
-[int][ValidateRange(1,65535)]$InternalErrorEventID = 99,
-[int][ValidateRange(1,65535)]$ErrorEventID = 100,
+[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
 
-[Switch]$ErrorAsWarning,
-[Switch]$WarningAsNormal,
 
-[Regex]$ExecutableUser ='.*'
+[Int][ValidateRange(0,2147483647)]$NormalReturnCode        =  0 ,
+[Int][ValidateRange(0,2147483647)]$WarningReturnCode       =  1 ,
+[Int][ValidateRange(0,2147483647)]$ErrorReturnCode         =  8 ,
+[Int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16 ,
+
+[Int][ValidateRange(1,65535)]$InfoEventID          =   1 ,
+[Int][ValidateRange(1,65535)]$InfoLoopStartEventID =   2 ,
+[Int][ValidateRange(1,65535)]$InfoLoopEndEventID   =   3 ,
+[int][ValidateRange(1,65535)]$StartEventID         =   8 ,
+[int][ValidateRange(1,65535)]$EndEventID           =   9 ,
+[Int][ValidateRange(1,65535)]$WarningEventID       =  10 ,
+[Int][ValidateRange(1,65535)]$SuccessEventID       =  73 ,
+[Int][ValidateRange(1,65535)]$InternalErrorEventID =  99 ,
+[Int][ValidateRange(1,65535)]$ErrorEventID         = 100 ,
+
+[Switch]$ErrorAsWarning ,
+[Switch]$WarningAsNormal ,
+
+[Regex]$ExecutableUser = '.*'
 
 )
 

@@ -91,15 +91,11 @@ Specify dump file name.
 Specify if you want to output log to Windows Event Log.
 [$TRUE] is default.
 
-　Windows Event Logへの出力を制御します。
-デフォルトは$TRUEでEvent Log出力します。
 
 .PARAMETER NoLog2EventLog
 Specify if you want to suppress log to Windows Event Log.
-Specification override -Log2EventLog
+Specification overrides -Log2EventLog
 
-　Event Log出力を抑止します。-Log2EventLog $FALSEと等価です。
-Log2EventLogより優先します。
 
 .PARAMETER ProviderName
 
@@ -107,48 +103,35 @@ Specify provider name of Windows Event Log.
 [Infra] is default.
 
 
-　Windows Event Log出力のプロバイダ名を指定します。
-デフォルトは[Infra]です。
-
 .PARAMETER EventLogLogName
 
 Specify log name of Windows Event Log.
 [Application] is default.
 
-　Windows Event Log出力のログ名を指定します。
-デフォルトは[Application]です。
 
 .PARAMETER Log2Console
 
 Specify if you want to output log to PowerShell console.
 [$TRUE] is default.
 
-　コンソールへのログ出力を制御します。
-デフォルトは$TRUEでコンソール出力します。
 
 .PARAMETER NoLog2Console
 
 Specify if you want to suppress log to PowerShell console.
 Specification overrides -Log2Console
 
-　コンソールログ出力を抑止します。-Log2Console $FALSEと等価です。
-Log2Consoleより優先します。
 
 .PARAMETER Log2File
 
 Specify if you want to output log to text log.
 [$FALSE] is default.
 
-　ログフィルへの出力を制御します。
-デフォルトは$FALSEでログファイル出力しません。
 
 .PARAMETER NoLog2File
 
 Specify if you want to suppress log to PowerShell console.
 Specification overrides -Log2File
 
-　ログファイル出力を抑止します。-Log2File $FALSEと等価です。
-Log2Fileより優先します。
 
 .PARAMETER LogPath
 
@@ -159,33 +142,21 @@ Wild cards are not accepted shch as asterisk* question? bracket[]
 If the path contains bracket[] , specify path literally and do not escape.
 [$NULL] is default.
 
-If the log file dose not exist, make a new file.
-If the log file exists, write log additionally.
+If the log file dose not exist, the script makes a new file.
+If the log file exists, the script writes log additionally.
 
-　ログファイル出力パスを指定します。デフォルトは$NULLです。
-相対、絶対パスで指定可能です。
-相対パス表記は、.から始める表記にして下さい。（例 .\Log\Log.txt , ..\Script\log\log.txt）
-ワイルドカード* ? []は使用できません。
-フォルダ、ファイル名に括弧 [ , ] を含む場合はエスケープせずにそのまま入力してください。
-ファイルが存在しない場合は新規作成します。
-ファイルが既存の場合は追記します。
 
 .PARAMETER LogDateFormat
 
 Specicy time stamp format in the text log.
 [yyyy-MM-dd-HH:mm:ss] is default.
 
-　ログファイル出力に含まれる日時表示フォーマットを指定します。
-デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
 
 .PARAMETER LogFileEncode
 
 Specify the character encode in the log file.
 [Default] is default and it works as ShiftJIS.
 
-
-ログファイルの文字コードを指定します。
-デフォルトはShift-JISです。
 
 .PARAMETER NormalReturnCode
 
@@ -273,13 +244,11 @@ Specify Error event id in the log.
 
 Specfy if you want to return WARNING exit code when the script terminate with an Error.
 
-　異常終了しても警告終了のReturnCodeを返します。
 
 .PARAMETER WarningAsNormal
 
 Specify if you want to return NORMAL exit code when the script terminate with a Warning.
 
-　警告終了しても正常終了のReturnCodeを返します。
 
 .PARAMETER ExecutableUser
 
@@ -288,11 +257,6 @@ Specify the users who are allowed to execute the script in regular expression.
 Parameter must be quoted with single quote'
 Escape the back slash in the separeter of a domain name.
 example [domain\\.*]
-
-　このプログラムを実行可能なユーザを正規表現で指定します。
-デフォルトは[.*]で全てのユーザが実行可能です。　
-記述はシングルクオーテーションで括って下さい。
-正規表現のため、ドメインのバックスラッシュは[domain\\.*]の様にバックスラッシュでエスケープして下さい。　
 
 .NOTES
 
@@ -323,25 +287,24 @@ Param(
 [String][parameter(position = 0)][ValidateNotNullOrEmpty()]$Schema = 'MCFRAME' ,
 [String][parameter(position = 1)][ValidateNotNullOrEmpty()]$DumpDirectoryObject = 'MCFDATA_PUMP_DIR' ,
 
+[String][parameter(position = 2)][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,
 
+[String][parameter(position = 3)]$OracleHomeBinPath = $Env:ORACLE_HOME + '\BIN' ,
+
+[String][parameter(position = 4)]$HostName = $Env:COMPUTERNAME,
+
+[String][parameter(position = 5)][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss' ,
 
 [Switch]$AddtimeStamp ,
 
-[String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss' ,
+[String]$DumpFile = "$HostName_$Schema_PUMP.dmp" ,
+[String]$LogFile  = "$HostName_$Schema_PUMP.log" ,
 
-[String]$HostName = $Env:COMPUTERNAME,
-
-[String][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,
-
-[String]$OracleHomeBinPath = $Env:ORACLE_HOME + '\BIN' ,
 
 [String]$ExecUser = 'foo' ,
 [String]$ExecUserPassword = 'hogehoge' ,
 [Switch]$PasswordAuthorization ,
 
-
-[String]$DumpFile = "$HostName_$Schema_PUMP.dmp" ,
-[String]$LogFile  = "$HostName_$Schema_PUMP.log" ,
 
 
 [Boolean]$Log2EventLog = $TRUE ,

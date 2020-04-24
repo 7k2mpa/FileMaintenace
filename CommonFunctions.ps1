@@ -432,7 +432,7 @@ Process {
         Write-Log -Id $InfoEventID -Type Information -Message "$Name[$($Path)] is valid path format."
    
         } else {
-        Write-Log -Id $ErrorEventID -Type Error -Message "$Name[$($Path)] is invalid path format. The path may contain a drive letter not existed or characters that can not use by NTFS."
+        Write-Log -Id $ErrorEventID -Type Error -Message "$Name[$($Path)] is invalid path format. The path may contain a drive letter not-existed or characters that can not use by NTFS."
         Finalize $ErrorReturnCode
         }
 
