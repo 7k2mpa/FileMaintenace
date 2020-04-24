@@ -426,7 +426,7 @@ Invoke-PostFinalize $ReturnCode
 
 #####################   ‚±‚±‚©‚ç–{‘Ì  ######################
 
-$Version = "2.0.0-RC.6"
+$Version = "2.0.0-RC.7"
 
 $DatumPath = $PSScriptRoot
 
