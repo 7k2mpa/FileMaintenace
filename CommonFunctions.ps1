@@ -219,10 +219,10 @@ Param(
 [Alias("Type")]$ActionType,
 
 [String][parameter(position = 1, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-[Alias("Path" , "FullName")]$ActionFrom ,
+[Alias("Path" , "FullName" , "Source" , "SourcePath")]$ActionFrom ,
 
-[String][parameter(position = 2)][Alias("DestinationPath")]$ActionTo,
-[String][parameter(position = 3)]$ActionError,
+[String][parameter(position = 2)][Alias("DestinationPath" , "Destination")]$ActionTo,
+[String][parameter(position = 3)][Alias("ErrorPath" , "Error")]$ActionError,
 [String][parameter(position = 4)]$FileValue,
 
 $WhatIfFlag = $WhatIfFlag ,

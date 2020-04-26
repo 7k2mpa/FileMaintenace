@@ -350,11 +350,17 @@ The option overrides -Recurse option.
 Recurseパラメータより優先します。
 
 .PARAMETER OverRide
-Specify if you want to override old same name files moved or copied.
+Specify if you want to override same name files in the destination in moving or copying  process.
+If the file in the destination path is equal or newer than the file in the source path, do not override and skip to process with counting up a Warning.
 [terminate with an Error and do not override] is default.
 
-　移動、コピー先に既に同名のファイルが存在しても強制的に上書きします。
-デフォルトでは上書きせずに異常終了します。
+
+.PARAMETER OverRideForce
+Specify if you want to override same name files in the destination in moving or copying  process.
+If the file in the destination path is equal or newer than the file in the source path, force to override with counting up a Warning.
+[terminate with an Error and do not override] is default.
+
+
 
 .PARAMETER Continue
 Specify if you want to skip the process when files exist in -MoveToFolder alredy and to process remains.
@@ -646,7 +652,7 @@ Param(
 [String]
 [parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify the folder to process (ex. D:\Logs)  or Get-Help FileMaintenance.ps1')]
 [ValidateNotNullOrEmpty()]
-[ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName")]$TargetFolder ,
+[ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName" , "SourcePath")]$TargetFolder ,
 
 #[String]$TargetFolder,  #for Validation debug
  
@@ -683,6 +689,8 @@ Param(
 
 
 [Switch]$OverRide ,
+[Switch]$OverRideAsNormal ,
+[Switch]$OverRideForce ,
 [Switch]$Continue ,
 [Switch]$ContinueAsNormal ,
 [Switch]$NoneTargetAsWarning ,
@@ -789,6 +797,8 @@ Param(
 
 [Switch]$ForceEndLoop = $ForceEndLoop ,
 [Switch]$OverRide = $OverRide ,
+[Switch]$OverRideAsNormal = $OverRideAsNormal ,
+[Switch]$OverRideForce = $OverRideForce ,
 [Switch]$Continue = $Continue ,
 [Switch]$ContinueAsNormal = $ContinueAsNormal ,
 [int]$InfoEventID = $InfoEventID ,
@@ -811,16 +821,6 @@ Do {
         Break
         }
 
-    #Case 1
-    IF (($OverRide) -and (Test-Path -LiteralPath $Path -PathType Leaf)) {
-     
-        Write-Log -ID $WarningEventID -Type Warning -Message ("Same name file $($Path) exists already, " +
-            "but specified -OverRide[$OverRide] option, thus override the file.")
-        $Script:OverRideFlag = $TRUE
-        $Script:WarningFlag = $TRUE
-        $noExistFlag = $TRUE
-        Break
-        }
 
     IF (Test-Path -LiteralPath $Path -PathType Leaf) {
         
@@ -830,14 +830,50 @@ Do {
         Write-Log -ID $WarningEventID -Type Warning -Message "Same name folder $($Path) exists already."        
         }
 
+
+    #Case 1
+    IF (($OverRide) -and (Test-Path -LiteralPath $Path -PathType Leaf)) {
+
+Write-Debug  "Desitination LastWriteTime $((Get-Item -LiteralPath $Path).LastWriteTime)"
+Write-Debug  "Source       LastWriteTime $($Target.Object.LastWriteTime)" 
+ 
+        IF (-not($OverRideForce) -and (Get-Item -LiteralPath $Path).LastWriteTime -ge $Target.Object.LastWriteTime ) {
+            
+            Write-Log -ID $WarningEventID -Type Warning -Message "Last write time of [$Path] is equal or newer than [$($Target.Object.FullName)] , thus do no override."
+            $Script:WarningFlag = $TRUE
+            $noExistFlag = $FALSE
+            Break
+            }
+
+        $Script:OverRideFlag = $TRUE
+        $noExistFlag = $TRUE
+
+        IF ($OverRideAsNormal) {
+
+            Write-Log -ID $InfoEventID -Type Information -Message "A same name file exists in the desitination already, but specified -OverRideAsNormal[$($OverRideAsNormal)] option, thus override the file in the desitination [$($Path)] and count a warning event as NORMAL."
+            
+            } else {     
+            Write-Log -ID $WarningEventID -Type Warning -Message "A same name file exists in the desitination already, but specified -OverRide[$($OverRide)] option, thus override the file in the desitination [$($Path)]"
+            $Script:WarningFlag = $TRUE
+            }
+
+        Break
+        }
+
     #Case 2,5
     IF ($Continue) {
-
-        Write-Log -ID $WarningEventID -Type Warning -Message "Specified -Continue[$($Continue)] option, continue to process objects."
-    
-        $Script:WarningFlag = $TRUE
+        
         $Script:ContinueFlag = $TRUE
         $noExistFlag = $FALSE
+
+        IF ($ContinueAsNormal) {
+
+            Write-Log -ID $InfoEventID -Type Information -Message "Specified -ContinueAsNormal[$($ContinueAsNormal)] option, continue to process objects and count a warning event as NORMAL."
+
+            } else {
+            Write-Log -ID $WarningEventID -Type Warning -Message "Specified -Continue[$($Continue)] option, continue to process objects."
+            $Script:WarningFlag = $TRUE
+            }
         Break
         }           
 
@@ -857,12 +893,6 @@ Do {
 }
 
 While ($FALSE)
-
-    IF (($ContinueAsNormal) -and ($WarningFlag)) {
-
-        Write-Log -ID $InfoEventID -Type Information -Message "Specified -ContinueAsNormal[$($ContinueAsNormal)] option, count warning event as NORMAL."
-        $Script:WarningFlag = $FALSE
-        }
 
 Write-Output $noExistFlag
 }
@@ -950,17 +980,17 @@ $parameter = @{
             Depth  = ($object.FullName.Split("\\")).Count
             }
         }
-
-#一部のActionはObjectを特定の順序で処理するため、必要に応じてソートする
-
+<#
+一部のActionはObjectを特定の順序で処理するため、必要に応じてソートする
+KeepFilesCount配列に入れたパス一式を古い順に整列
+DeleteEmptyFolders配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除
+#>
     Switch -Regex ($Action) {
  
-        #KeepFilesCount配列に入れたパス一式を古い順に整列
         '^KeepFilesCount$' {
             Write-Output $objects | Sort-Object -Property Time
             }
 
-        #DeleteEmptyFolders配列に入れたパス一式をパスが深い順に整列。空フォルダが空フォルダに入れ子になっている場合、深い階層から削除する必要がある。
         '^DeleteEmptyFolders$' {
             Write-Output $objects | Sort-Object -Property Depth -Descending  
             }
@@ -1103,6 +1133,8 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 IF ($NoRecurse)        {[Boolean]$Script:Recurse = $FALSE}
 IF ($ContinueAsNormal) {[Switch]$Script:Continue = $TRUE}
+IF ($OverRideAsNormal) {[Switch]$Script:OverRide = $TRUE}
+IF ($OverRideForce)    {[Switch]$Script:OverRide = $TRUE}
 
 #For Backward Compatibility
 
@@ -1321,12 +1353,12 @@ Param(
 
         IF ($OverRide -and ($OverRideCount -gt 0)) {
             Write-Log -ID $InfoEventID -Type Information -Message ("Specified -OverRide[$($OverRide)] option, " +
-                "thus overrided old same name files with new files created in [$($OverRideCount)] times.")
+                "thus overrided files in the desitination with source files in [$($OverRideCount)] times.")
             }
 
         IF (($Continue) -and ($ContinueCount -gt 0)) {
             Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Continue[$($Continue)] option, " +
-                "thus continued to process next objects in [$($ContinueCount)] times even though error occured with the same name file/folders existing already.")
+                "thus continued to process next objects in [$($ContinueCount)] times even though the same name files exist in the desitination.")
             }
     }
 
@@ -1356,11 +1388,13 @@ $Version = "2.0.0-RC.7"
 
 [Boolean]$ForceEndloop  = $FALSE          ;#$FALSEではFinalize , $TRUEではループ内でBreak
 
-#$VerbosePreference = 'Continue'
 #初期設定、パラメータ確認、起動メッセージ出力
 
 . Initialize
 
+$returnCode = $NormalReturnCode
+
+:main DO {
 
 #対象のフォルダまたはファイルを探して配列に入れる
 
@@ -1381,12 +1415,14 @@ $targets = $TargetFolder | Get-Object -FilterType $FilterType
         Write-Log -ID $InfoEventID -Type Information -Message "In -TargetFolder [$($targetFolder)] no [$($FilterType)] exists for processing."
 
         IF ($NoneTargetAsWarning) {
+
             Write-Log -ID $WarningEventID -Type Warning -Message ("Specified -NoneTargetAsWarning option, " +
                 "thus terminiate $($ShellName) with a Warning.")
-            Finalize $WarningReturnCode
+            $returnCode = $WarningReturnCode            
+            Break main           
 
             } else {
-            Finalize $NormalReturnCode
+            Break main
             }
     }
 
@@ -1416,14 +1452,16 @@ IF ($PreAction -contains 'Archive') {
         
         Write-Log -ID $ErrorEventID -Type Error -Message ("File/Folder exists in the path [$($archive.Path)] already, " +
             "thus terminate $($ShellName) with an Error.")
-        Finalize $ErrorReturnCode        
+
+        $returnCode = $ErrorReturnCode        
+        Break main
         }
 }
 
 
 #対象フォルダorファイル群の処理ループ
 
-:ForLoop ForEach ($Target in $targets) {
+:forLoop ForEach ($Target in $targets) {
 <#
 PowershellはGOTO文が存在せず処理分岐ができない。
 そのためDo/Whileを用いて処理途中でエラーが発生した場合の分岐を実装している
@@ -1442,7 +1480,7 @@ Do/Whileはループのため、処理途中でBreakすると、Whileへjumpする。
  Finalize $ErrorReturnCode
 #>
 
-Do {
+:do Do {
 
 [Boolean]$ErrorFlag     = $FALSE
 [Boolean]$WarningFlag   = $FALSE
@@ -1455,30 +1493,29 @@ Do {
 [Boolean]$ForceEndloop  = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
 
 Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start processing [$($FilterType)] $($Target.Object.FullName) ---"
+<#
+移動元のファイルパスから移動先のファイルパスを生成。
+再帰的でなければ、移動先パスは確実に存在するのでスキップ
 
-
-#移動元のファイルパスから移動先のファイルパスを生成。
-#再帰的でなければ、移動先パスは確実に存在するのでスキップ
-
-#Action[(Move|Copy)]以外はファイル移動が無い。移動先パスを確認する必要がないのでスキップ
-#PreAction[Archive]はMoveNewFile[TRUE]でも出力ファイルは1個で階層構造を取らない。よってスキップ
-
+Action[(Move|Copy)]以外はファイル移動が無い。移動先パスを確認する必要がないのでスキップ
+PreAction[Archive]はMoveNewFile[TRUE]でも出力ファイルは1個で階層構造を取らない。よってスキップ
+#>
     IF (($Action -match "^(Move|Copy)$") -or (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive')) ) {
-
-        #ファイルが移動するAction用にファイル移動先の親フォルダパス$MoveToNewFolderを生成する
+<#
+        ファイルが移動するAction用にファイル移動先の親フォルダパス$MoveToNewFolderを生成する
         
-        #C:\TargetFolder                    :TargetFolder
-        #C:\TargetFolder\A\B\C              :TargetFileParentFolder
-        #C:\TargetFolder\A\B\C\target.txt   :TargetFile
-        #D:\MoveToFolder                    :MoveToFolder
-        #D:\MoveToFolder\A\B\C              :MoveToNewFolder
+        C:\TargetFolder                    :TargetFolder
+        C:\TargetFolder\A\B\C              :TargetFileParentFolder
+        C:\TargetFolder\A\B\C\target.txt   :TargetFile
+        D:\MoveToFolder                    :MoveToFolder
+        D:\MoveToFolder\A\B\C              :MoveToNewFolder
 
-        #D:\MoveToFolder\A\B\C\target.txt   :ファイルの移動先パス
+        D:\MoveToFolder\A\B\C\target.txt   :ファイルの移動先パス
 
-        #destinationFolderを作るには \A\B\C\　の部分を取り出して、移動先フォルダMoveToFolderとJoin-Pathする
-        #String.Substringメソッドは文字列から、引数位置から最後までを取り出す
-        #destinationFolderはNoRecurseでもMove|Copyで一律使用するので作成
-
+        destinationFolderを作るには \A\B\C\　の部分を取り出して、移動先フォルダMoveToFolderとJoin-Pathする
+        String.Substringメソッドは文字列から、引数位置から最後までを取り出す
+        destinationFolderはNoRecurseでもMove|Copyで一律使用するので作成
+#>
         $destinationFolder = $MoveToFolder | Join-Path -ChildPath ($Target.Object.DirectoryName).Substring($TargetFolder.Length)
         IF ($Recurse) {
 
@@ -1490,7 +1527,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
                 #$Invoke-Actionが異常終了&-Continue $TRUEだと$ContinueFlag $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
                 IF ($ContinueFlag) {
-                    Break                
+                    Break do                
                     }
             }
         }
@@ -1580,7 +1617,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
             #$Invoke-Actionが異常終了&-Continue $TRUEだと$ContinueFlag $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
             IF ($ContinueFlag) {
-                Break      
+                Break do      
                 }
             $InLoopDeletedFilesCount++
             
@@ -1593,7 +1630,8 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
     #分岐7 $Actionが条件式のどれかに適合しない場合は、プログラムミス
     Default {
         Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal Error at Switch Action section. It may cause a bug in regex."
-        Finalize $InternalErrorReturnCode
+        $returnCode = $InternalErrorReturnCode
+        Break main
         }
     }
 
@@ -1631,7 +1669,8 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
     #分岐4 $Actionが条件式のどれかに適合しない場合は、プログラムミス
     Default {
         Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal error at Switch PostAction section. It may cause a bug in regex."
-        Finalize $InternalErrorReturnCode
+        $returnCode = $InternalErrorReturnCode
+        Break main
         }
     }
 
@@ -1639,6 +1678,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
 #異常終了などはBreakしてファイル処理終端へ抜ける。
 }
+# :do
 While ($FALSE)
 
 
@@ -1660,15 +1700,30 @@ While ($FALSE)
         "Results  Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  " +
         "Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)] ---")
 
-    IF ($ForceFinalize) {    
-        Finalize $ErrorReturnCode
+    IF ($ForceFinalize) {
+        $returnCode = $ErrorReturnCode
+        Break main
         }
 
-#対象群の処理ループ終端
-   
+# :forLoop   
 }
 
 
-#終了メッセージ出力
+}
 
-Finalize $NormalReturnCode
+# :main
+While ($FALSE)
+
+IF ($returnCode -lt $InternalErrorReturnCode) {
+
+    IF (($ErrorCount -gt 0)  -or ($returnCode -ge $ErrorReturnCode)) {
+        
+        $returnCode = $ErrorReturnCode
+
+        } elseIF (($WarningCount -gt 0) -or ($returnCode -ge $WarningReturnCode)) {
+            
+            $returnCode = $WarningReturnCode
+            }
+    }
+
+Finalize -ReturnCode $returnCode
