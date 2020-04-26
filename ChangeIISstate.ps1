@@ -251,6 +251,11 @@ Param(
 [int][parameter(position = 3)][ValidateRange(1,65535)]$RetryTimes = 5 ,
 
 
+[Boolean]$Log2EventLog = $TRUE ,
+[Switch]$NoLog2EventLog ,
+[String]$ProviderName = 'Infra' ,
+[String][ValidateSet("Application")]$EventLogLogName = 'Application' ,
+
 [Boolean]$Log2Console = $TRUE ,
 [Switch]$NoLog2Console ,
 

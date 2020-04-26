@@ -265,6 +265,11 @@ Param(
 [int][Parameter(position = 5)][ValidateRange(1,120)]$MaxRetry      = 90 ,
 
 
+[boolean]$Log2EventLog = $TRUE,
+[Switch]$NoLog2EventLog,
+[String]$ProviderName = 'Infra',
+[String][ValidateSet("Application")]$EventLogLogName = 'Application',
+
 [Boolean]$Log2Console = $TRUE ,
 [Switch]$NoLog2Console ,
 
