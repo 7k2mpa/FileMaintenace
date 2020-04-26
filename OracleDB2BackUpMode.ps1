@@ -518,7 +518,7 @@ Pop-Location
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.0.0-RC.7"
+$Version = "2.0.0-RC.8"
 
 
 
