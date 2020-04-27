@@ -386,11 +386,14 @@ https://github.com/7k2mpa/FileMaintenace
 
 Param(
 
-[parameter(position = 0, mandatory, HelpMessage = '起動対象のpowershellプログラムを指定(ex. .\FileMaintenance.ps1) 全てのHelpはGet-Help Wrapper.ps1')]
-[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*\.ps1$')]$CommandPath ,
+[String]
+[parameter(position = 0, mandatory, HelpMessage = 'Specify path of powershell script to execute(ex. .\FileMaintenance.ps1)  or Get-Help Wrapper.ps1')]
+[ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName")]$CommandPath ,
 
-[parameter(position = 1, mandatory, HelpMessage = 'powershellプログラムに指定するコマンドファイルを指定(ex. .\Command.txt) 全てのHelpはGet-Help Wrapper.ps1')]
-[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommandFile ,
+[String]
+[parameter(position = 1, mandatory, HelpMessage = 'Specify path of command file including arguments(ex. .\Command.txt)  or Get-Help Wrapper.ps1')]
+[ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("CommandFilePath")]$CommandFile ,
+
 
 [parameter(position = 2)][ValidateRange(1,65535)][int]$Span = 10 ,
 [parameter(position = 3)][ValidateRange(1,65535)][int]$UpTo = 1000 ,
@@ -403,7 +406,7 @@ Param(
 
 [Boolean]$Log2EventLog = $TRUE ,
 [Switch]$NoLog2EventLog ,
-[String]$ProviderName = 'Infra' ,
+[String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra' ,
 [String][ValidateSet("Application")]$EventLogLogName = 'Application' ,
 
 [Boolean]$Log2Console = $TRUE ,
@@ -412,10 +415,9 @@ Param(
 [Boolean]$Log2File = $FALSE ,
 [Switch]$NoLog2File ,
 
-[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
-[ValidateNotNullOrEmpty()]$LogPath ,
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath ,
 
-[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
+[String][ValidateNotNullOrEmpty()]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
 
 

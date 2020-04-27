@@ -343,16 +343,16 @@ Param(
 
 [String][parameter(Position = 0)][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,
 
-[String][parameter(Position = 1)]$SQLLogPath = '.\SC_Logs\SQL.log' ,
+[String][parameter(Position = 1)][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$SQLLogPath = '.\SC_Logs\SQL.log' ,
 
-[String][parameter(Position = 2)]$SQLCommandsPath = '.\SQL\SQLs.ps1' ,
+[String][parameter(Position = 2)][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$SQLCommandsPath = '.\SQL\SQLs.ps1' ,
 
-[String][parameter(Position = 3)]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
+[String][parameter(Position = 3)][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$OracleHomeBinPath = $Env:ORACLE_HOME +'\BIN' ,
 
-[String][parameter(Position = 4)]$controlfiledotctlPATH = '.\SC_Logs\file_bk.ctl' ,
-[String][parameter(Position = 5)]$controlfiledotbkPATH  = '.\SC_Logs\controlfile.bk' ,
+[String][parameter(Position = 4)][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$controlfiledotctlPATH = '.\SC_Logs\file_bk.ctl' ,
+[String][parameter(Position = 5)][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$controlfiledotbkPATH  = '.\SC_Logs\controlfile.bk' ,
 
-[String][parameter(Position = 6)]$StartServicePath = '.\ChangeServiceStatus.ps1' ,
+[String][parameter(Position = 6)][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$StartServicePath = '.\ChangeServiceStatus.ps1' ,
 
 
 [int][ValidateRange(1,65535)]$RetrySpanSec = 20 ,
@@ -368,7 +368,7 @@ Param(
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
-[String]$ProviderName = 'Infra',
+[String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra',
 [String][ValidateSet("Application")]$EventLogLogName = 'Application',
 
 [Boolean]$Log2Console = $TRUE ,
@@ -377,10 +377,9 @@ Param(
 [Boolean]$Log2File = $FALSE ,
 [Switch]$NoLog2File ,
 
-[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
-[ValidateNotNullOrEmpty()]$LogPath ,
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath ,
 
-[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
+[String][ValidateNotNullOrEmpty()]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
 
 

@@ -296,12 +296,11 @@ https://github.com/7k2mpa/FileMaintenace
 Param(
 
 [String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify the folder of a flag file placed.(ex. D:\Logs)or Get-Help CheckFlag.ps1')]
-[ValidateNotNullOrEmpty()]
 [ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName")]$FlagFolder ,
 
-[String][parameter(position = 1, mandatory)][ValidateNotNullOrEmpty()][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')]$FlagFile ,
-[String][parameter(position = 2)][ValidateNotNullOrEmpty()][ValidateSet("Exist","NoExist")]$Status = 'NoExist' ,
-[String][parameter(position = 3)][ValidateNotNullOrEmpty()][ValidateSet("Create","Delete")]$PostAction ,
+[String][parameter(position = 1, mandatory)][ValidateNotNullOrEmpty()][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')][Alias("FlagFileName")]$FlagFile ,
+[String][parameter(position = 2)][ValidateSet("Exist","NoExist")]$Status = 'NoExist' ,
+[String][parameter(position = 3)][ValidateSet("Create","Delete")]$PostAction ,
 
 #Planned to obsolute
 [Switch]$CreateFlag ,
@@ -310,7 +309,7 @@ Param(
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
-[String]$ProviderName = 'Infra',
+[String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra',
 [String][ValidateSet("Application")]$EventLogLogName = 'Application',
 
 [boolean]$Log2Console = $TRUE,
@@ -319,8 +318,8 @@ Param(
 [boolean]$Log2File = $FALSE,
 [Switch]$NoLog2File,
 [String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath ,
-#[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\).*')]$LogPath = ..\Log\FileMaintenance.log ,
-[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss',
+
+[String][ValidateNotNullOrEmpty()]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss',
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #DefaultŽw’è‚ÍShift-Jis
 
 [int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,

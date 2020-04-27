@@ -651,23 +651,22 @@ Param(
 
 [String]
 [parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify the folder to process (ex. D:\Logs)  or Get-Help FileMaintenance.ps1')]
-[ValidateNotNullOrEmpty()]
 [ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName" , "SourcePath")]$TargetFolder ,
 
 #[String]$TargetFolder,  #for Validation debug
  
 
-[Array][parameter(position = 1)][ValidateNotNullOrEmpty()]
+[Array][parameter(position = 1)]
 [ValidateSet("none" , "AddTimeStamp" , "Compress", "MoveNewFile" , "Archive" , "7z" , "7zZip")]$PreAction = 'none' ,
 
-[String][parameter(position = 2)][ValidateNotNullOrEmpty()]
+[String][parameter(position = 2)]
 [ValidateSet("none" , "Move", "Copy", "Delete" , "DeleteEmptyFolders" , "NullClear" , "KeepFilesCount")]$Action = 'none' ,
 
-[String][parameter(position = 3)][ValidateNotNullOrEmpty()]
+[String][parameter(position = 3)]
 [ValidateSet("none" , "NullClear" , "Rename")]$PostAction = 'none' ,
 
 
-[String][parameter(position = 4)][ValidateNotNullOrEmpty()]
+[String][parameter(position = 4)]
 [ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("DestinationPath")]$MoveToFolder ,
 
 #[String]$MoveToFolder,  #for Validation debug
@@ -697,8 +696,7 @@ Param(
 
 [String][ValidatePattern('^\.(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CompressedExtString = '.zip',
 
-[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
-[ValidateNotNullOrEmpty()]$7zFolder = 'C:\Program Files\7-Zip' ,
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$7zFolder = 'C:\Program Files\7-Zip' ,
 
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss' ,
 
@@ -713,7 +711,7 @@ Param(
 
 [Boolean]$Log2EventLog = $TRUE ,
 [Switch]$NoLog2EventLog ,
-[String]$ProviderName = 'Infra' ,
+[String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra' ,
 [String][ValidateSet("Application")]$EventLogLogName = 'Application' ,
 
 [Boolean]$Log2Console = $TRUE ,
@@ -722,10 +720,9 @@ Param(
 [Boolean]$Log2File = $FALSE ,
 [Switch]$NoLog2File ,
 
-[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
-[ValidateNotNullOrEmpty()]$LogPath ,
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath ,
 
-[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
+[String][ValidateNotNullOrEmpty()]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
 
 

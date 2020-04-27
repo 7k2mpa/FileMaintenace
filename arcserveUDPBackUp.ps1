@@ -462,9 +462,9 @@ Param(
 [Switch]$AllServers,
 
 
-[String][parameter(position = 3)]$BackupFlagFilePath = '.\Lock\BackUp.flg' ,
+[String][parameter(position = 3)][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$BackupFlagFilePath = '.\Lock\BackUp.flg' ,
 
-[String][parameter(position = 4)]$UDPCLIPath = 'D:\arcserve\Management\PowerCLI\UDPPowerCLI.ps1',
+[String][parameter(position = 4)][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$UDPCLIPath = 'D:\arcserve\Management\PowerCLI\UDPPowerCLI.ps1',
 
 [String][parameter(position = 5)]$ExecUserPasswordFilePath = '.\UDP.psw' ,
 
@@ -485,7 +485,7 @@ Param(
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
-[String]$ProviderName = "Infra",
+[String][ValidateNotNullOrEmpty()]$ProviderName = "Infra",
 [String][ValidateSet("Application")]$EventLogLogName = 'Application',
 
 
@@ -495,10 +495,9 @@ Param(
 [Boolean]$Log2File = $FALSE ,
 [Switch]$NoLog2File ,
 
-[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
-[ValidateNotNullOrEmpty()]$LogPath ,
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath ,
 
-[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
+[String][ValidateNotNullOrEmpty()]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
 
 
@@ -775,13 +774,16 @@ $Version = "2.0.0-RC.8"
         }
 
 
-        IF ($return -ne 0) {
+    IF ($return -ne 0) {
                    
-            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Falied to start backup Server [$($Server)] in the Plan [$($Plan)] Method [$($BackUpJobType)]"
-            Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Error Message [$($errorMessage)]"
-            Finalize $ErrorReturnCode         
-            }
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Falied to start backup Server [$($Server)] in the Plan [$($Plan)] Method [$($BackUpJobType)]"
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Error Message [$($errorMessage)]"
+        $result = $ErrorReturnCode         
 
-Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to start backup Server [$($Server)] in the Plan [$($Plan)] Method [$($BackUpJobType)]"
+        } else {
 
-Finalize $NormalReturnCode
+        Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Successfully complete to start backup Server [$($Server)] in the Plan [$($Plan)] Method [$($BackUpJobType)]"
+        $result = $NormalReturnCode
+        }
+
+Finalize -ReturnCode $result

@@ -221,23 +221,21 @@ Param(
 
 [String]
 [parameter(position = 0, mandatory, HelpMessage = 'Specify path of Trigger File or Get-Help Wrapper.ps1')]
-[ValidateNotNullOrEmpty()]
 [ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName")]$TriggerPath ,
 
 [String]
 [parameter(position = 1, mandatory, HelpMessage = 'Specify path of Data File or Get-Help Wrapper.ps1')]
-[ValidateNotNullOrEmpty()]
 [ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$DataPath ,
 
 [String]
-[parameter(position = 2)][ValidateNotNullOrEmpty()]
+[parameter(position = 2)]
 [ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$CommandFileEncode = 'Default' , #Default works as ShiftJIS
 
 
 
 [Boolean]$Log2EventLog = $TRUE ,
 [Switch]$NoLog2EventLog ,
-[String]$ProviderName = 'Infra' ,
+[String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra' ,
 [String][ValidateSet("Application")]$EventLogLogName = 'Application' ,
 
 [Boolean]$Log2Console = $TRUE ,
@@ -246,10 +244,9 @@ Param(
 [Boolean]$Log2File = $FALSE ,
 [Switch]$NoLog2File ,
 
-[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
-[ValidateNotNullOrEmpty()]$LogPath ,
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath ,
 
-[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
+[String][ValidateNotNullOrEmpty()]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
 
 

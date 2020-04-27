@@ -289,7 +289,7 @@ Param(
 
 [String][parameter(position = 2)][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,
 
-[String][parameter(position = 3)]$OracleHomeBinPath = $Env:ORACLE_HOME + '\BIN' ,
+[String][parameter(position = 3)][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$OracleHomeBinPath = $Env:ORACLE_HOME + '\BIN' ,
 
 [String][parameter(position = 4)]$HostName = $Env:COMPUTERNAME,
 
@@ -309,7 +309,7 @@ Param(
 
 [Boolean]$Log2EventLog = $TRUE ,
 [Switch]$NoLog2EventLog ,
-[String]$ProviderName = 'Infra' ,
+[String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra' ,
 [String][ValidateSet("Application")]$EventLogLogName = 'Application' ,
 
 [Boolean]$Log2Console = $TRUE ,
@@ -318,10 +318,9 @@ Param(
 [Boolean]$Log2File = $FALSE ,
 [Switch]$NoLog2File ,
 
-[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
-[ValidateNotNullOrEmpty()]$LogPath ,
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath ,
 
-[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
+[String][ValidateNotNullOrEmpty()]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
 
 

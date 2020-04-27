@@ -317,7 +317,7 @@ Param(
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
-[String]$ProviderName = 'Infra',
+[String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra',
 [String][ValidateSet("Application")]$EventLogLogName = 'Application',
 
 [Boolean]$Log2Console = $TRUE ,
@@ -326,10 +326,9 @@ Param(
 [Boolean]$Log2File = $FALSE ,
 [Switch]$NoLog2File ,
 
-[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
-[ValidateNotNullOrEmpty()]$LogPath ,
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath ,
 
-[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
+[String][ValidateNotNullOrEmpty()]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
 
 
@@ -583,4 +582,4 @@ Write-Debug (Get-Service | Where-Object {$_.Name -eq $Service}).Status
       Start-Sleep -Seconds $RetrySpanSec
 }
 
-Finalize $result
+Finalize -ReturnCode $result

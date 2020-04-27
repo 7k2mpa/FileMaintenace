@@ -258,8 +258,9 @@ Param(
 
 [String][Parameter(position = 1)][ValidateSet("Request", "GetResult")]$Job = 'GetResult' ,
 
-[String][Parameter(position = 2)]$N2WScliPath = "D:\N2WS" ,
-[String][Parameter(position = 3)]$BackUpLogPath = "..\tmp\" ,
+[String][Parameter(position = 2)][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$N2WScliPath = "D:\N2WS" ,
+
+[String][Parameter(position = 3)][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$BackUpLogPath = "..\tmp\" ,
 
 [int][Parameter(position = 4)][ValidateRange(1,120)]$RetryInterval = 60 ,
 [int][Parameter(position = 5)][ValidateRange(1,120)]$MaxRetry      = 90 ,
@@ -267,7 +268,7 @@ Param(
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
-[String]$ProviderName = 'Infra',
+[String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra',
 [String][ValidateSet("Application")]$EventLogLogName = 'Application',
 
 [Boolean]$Log2Console = $TRUE ,
@@ -276,10 +277,9 @@ Param(
 [Boolean]$Log2File = $FALSE ,
 [Switch]$NoLog2File ,
 
-[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]
-[ValidateNotNullOrEmpty()]$LogPath ,
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath ,
 
-[String]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
+[String][ValidateNotNullOrEmpty()]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
 [String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
 
 
