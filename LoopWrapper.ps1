@@ -524,7 +524,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.0.0-RC.8"
+$Version = "2.0.0-RC.9"
 
 #初期設定、パラメータ確認、起動メッセージ出力
 
