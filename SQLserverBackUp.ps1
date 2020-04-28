@@ -405,7 +405,7 @@ $Version = "2.0.0-RC.9"
         'Full' {
             $parameter = @{
                 BackUpAction = 'Database'
-                Incremental  = $FLASE
+                Incremental  = $FALSE
                 Initialize   = $FALSE    
                 }
             }
