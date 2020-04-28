@@ -3,197 +3,235 @@
 <#
 .SYNOPSIS
 
-This script loads a configuration file including arguments, execute the other script with arguments in every lines.
+This script validates file interface system.
 CommonFunctions.ps1 is required.
-You can process log files in multiple folders with FileMaintenance.ps1
 
-指定したプログラムを設定ファイルに書かれたパラメータを読み込んで、順次呼び出すプログラムです。
-実行にはCommonFunctions.ps1が必要です。
-セットで開発しているFileMaintenance.ps1と併用すると複数のログ処理を一括実行できます。
 
 .DESCRIPTION
 
-This script loads a configuration file including arguments, execute the other script with arguments in every lines.
-The configuration file can be set arbitrarily.
-A line starting with # in the configuration file, it is proccessed as a comment.
-An empty line in the configuration file, it is sikkiped.
+This script validates file interface system.
+
+The file interface system has 2 files, trigger file and data file.
+The trigger file has number in the 1st line. The number is number of the data lines in the data file.
+The data file has text datum.
+
+This script compare the number in the trigger file and number of the data lines in the data file for validating file interface system.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
-設定ファイルから1行づつパラメータを読み込み、指定したプログラムに順次実行させます。
-
-設定ファイルは任意に設定可能です。
-設定ファイルの行頭を#とすると当該行はコメントとして処理されます。
-設定ファイルの空白行はスキップします。
-
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
-
-Sample Configuration file. 
-Save the file as DailyMaintenance.txt, execute with option '-CommandPath [TargetScript.ps1] -CommandFile .\DailyMaintenance.txt'
----
-#delete files older than 14days and end with .log.
--TargetFolder D:\IIS\LOG -RegularExpression '^.*\.log$' -Action Delete -Days 14
-
-#move access log older 7days to Old_Log
--TargetFolder D:\AccessLog -MoveToFolder .\Old_Log -Days 7
----
-
-設定ファイル例です。例えば以下をDailyMaintenance.txtに保存して-CommandFile .\DailyMaintenance.txtと指定して下さい。
-
----
-#14日経過した.logで終わるファイルを削除
--TargetFolder D:\IIS\LOG -RegularExpression '^.*\.log$' -Action Delete -Days 14
-
-#7日経過したアクセスログをOld_Logへ退避
--TargetFolder D:\AccessLog -MoveToFolder .\Old_Log -Days 7
----
-
-
 
 .EXAMPLE
 
-Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt
+.\CheckDataFile.ps1 -TriggerPath .\Trigger.txt -DataPath .\data.txt
 
-Execute .\FileMaintenance.ps1 in the same folder.
-Load the parameter file .\Command.txt and execute .\FileMaintenance with arguments in the parameter file every lines.
+Check existence of the trigger file (Trigger.txt)
+If the trigger file dose not exist, return WarningReturnCode
+If the trigger file exists, try load data file (data.txt) 
+If the data file dose not exist, return InternalErrorReturnCode
 
-このプログラムと同一フォルダに存在するFileMaintenance.ps1を起動します。
-起動する際に渡すパラメータは設定ファイルComman.txtを1行づつ読み込み、順次実行します。
-
-
-.EXAMPLE
-
-Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt -Continue
-
-Execute .\FileMaintenance.ps1 in the same folder.
-Load the parameter file .\Command.txt and execute .\FileMaintenance with arguments in the parameter file every lines.
-If ERROR termination occur in the line, do not terminate Wrapper.ps1 and execute FileMaintenance.ps1 with argument in the next line.
-
-　このプログラムと同一フォルダに存在するFileMaintenance.ps1を起動します。
-起動する際に渡すパラメータは設定ファイルComman.txtを1行づつ読み込み、順次実行します。
-もし、FileMaintenance.ps1を実行した結果が異常終了となった場合は、Wrapper.ps1を異常終了させず、Command.txtの次行を読み込み継続処理をします。
+If the data file exists, count lines in the data file.
+If number of the lines in the data file is equal to the number in the 1st line of trigger file, retuen NormalReturnCode, else return ErrorReturnCode
 
 
+.PARAMETER TriggerPath
 
-.PARAMETER CommandPath
-
-Specify the path of script to execute.
+Specify a trigger files path.
 Specification is required.
-Wild cards are not accepted.
+Can specify relative, absolute or UNC path format.
+Relative path format must be starting with 'dot.'
+Wild cards are not accepted shch as asterisk* question? bracket[]
+If the path contains bracket[] , specify path literally and do not escape.
 
-　起動するプログラムパスを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
-ワイルドカード*は使用できません。
 
-.PARAMETER CommandFile
+.PARAMETER DataPath
 
-Specify the path of command file with arguments.
+Specify a data files path.
 Specification is required.
-Wild cards are not accepted.
+Can specify relative, absolute or UNC path format.
+Relative path format must be starting with 'dot.'
+Wild cards are not accepted shch as asterisk* question? bracket[]
+If the path contains bracket[] , specify path literally and do not escape.
 
-
-　起動するプログラムに渡すコマンドファイルを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
-ワイルドカード*は使用できません。
 
 .PARAMETER CommandFileEncode
 
-Specify encode chracter code in the command file.
+Specify encode chracter code in the Trigger file.
 [Default(ShitJIS)] is default.
-
-　コマンドファイルの文字コードを指定します。
-デフォルトは[Default]でShif-Jisです。
-
-
-.PARAMETER Continue
-
-If you want to execute script with argument next line in the command file ending the script with error.
-[This script terminates with Error] is default.
-
-　起動したプログラムが異常終了しても、コマンドファイルの次行を継続処理します。
-デフォルトではそのまま異常終了します。
 
 
 
 .PARAMETER Log2EventLog
-　Windows Event Logへの出力を制御します。
-デフォルトは$TRUEでEvent Log出力します。
+
+Specify if you want to output log to Windows Event Log.
+[$TRUE] is default.
+
 
 .PARAMETER NoLog2EventLog
-　Event Log出力を抑止します。-Log2EventLog $Falseと等価です。
+
+Specify if you want to suppress log to Windows Event Log.
+Specification overrides -Log2EventLog
+
 
 .PARAMETER ProviderName
-　Windows Event Log出力のプロバイダ名を指定します。デフォルトは[Infra]です。
+
+Specify provider name of Windows Event Log.
+[Infra] is default.
+
 
 .PARAMETER EventLogLogName
-　Windows Event Log出力のログ名をしています。デフォルトは[Application]です。
 
-.PARAMETER Log2Console 
-　コンソールへのログ出力を制御します。
-デフォルトは$TRUEでコンソール出力します。
+Specify log name of Windows Event Log.
+[Application] is default.
+
+
+.PARAMETER Log2Console
+
+Specify if you want to output log to PowerShell console.
+[$TRUE] is default.
+
 
 .PARAMETER NoLog2Console
-　コンソールログ出力を抑止します。-Log2Console $Falseと等価です。
+
+Specify if you want to suppress log to PowerShell console.
+Specification overrides -Log2Console
+
 
 .PARAMETER Log2File
-　ログフィルへの出力を制御します。デフォルトは$Falseでログファイル出力しません。
+
+Specify if you want to output log to text log.
+[$FALSE] is default.
+
 
 .PARAMETER NoLog2File
-　ログファイル出力を抑止します。-Log2File $Falseと等価です。
+
+Specify if you want to suppress log to PowerShell console.
+Specification overrides -Log2File
+
 
 .PARAMETER LogPath
-　ログファイル出力パスを指定します。デフォルトは$NULLです。
-相対、絶対パスで指定可能です。
-相対パス表記は、.から始める表記にして下さい。（例 .\Log\Log.txt , ..\Script\log\log.txt）
-ワイルドカード* ? []は使用できません。
-フォルダ、ファイル名に括弧 [ , ] を含む場合はエスケープせずにそのまま入力してください。
-ファイルが存在しない場合は新規作成します。
-ファイルが既存の場合は追記します。
+
+Specify the path of text log file.
+Can specify relative, absolute or UNC path format.
+Relative path format must be starting with 'dot.'
+Wild cards are not accepted shch as asterisk* question? bracket[]
+If the path contains bracket[] , specify path literally and do not escape.
+[$NULL] is default.
+
+If the log file dose not exist, the script makes a new file.
+If the log file exists, the script writes log additionally.
+
 
 .PARAMETER LogDateFormat
-　ログファイル出力に含まれる日時表示フォーマットを指定します。デフォルトは[yyyy-MM-dd-HH:mm:ss]形式です。
+
+Specicy time stamp format in the text log.
+[yyyy-MM-dd-HH:mm:ss] is default.
+
+
+.PARAMETER LogFileEncode
+
+Specify the character encode in the log file.
+[Default] is default and it works as ShiftJIS.
+
 
 .PARAMETER NormalReturnCode
-　正常終了時のリターンコードを指定します。デフォルトは0です。正常終了=<警告終了=<（内部）異常終了として下さい。
+
+Specify Normal Return code.
+[0] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER WarningReturnCode
-　警告終了時のリターンコードを指定します。デフォルトは1です。正常終了=<警告終了=<（内部）異常終了として下さい。
+
+Specify Warning Return code.
+[1] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER ErrorReturnCode
-　異常終了時のリターンコードを指定します。デフォルトは8です。正常終了=<警告終了=<（内部）異常終了として下さい。
+
+Specify Error Return code.
+[8] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER InternalErrorReturnCode
-　プログラム内部異常終了時のリターンコードを指定します。デフォルトは16です。正常終了=<警告終了=<（内部）異常終了として下さい。
+
+Specify Internal Error Return code.
+[16] is default.
+Must specify NormalReturnCode < WarningReturnCode < ErrorReturnCode < InternalErrorReturnCode
+
 
 .PARAMETER InfoEventID
-　Event Log出力でInformationに対するEvent IDを指定します。デフォルトは1です。
+
+Specify information event id in the log.
+[1] is default.
+
+
+.PARAMETER InfoLoopStartEventID
+
+Specify start loop event id in the log.
+[2] is default.
+
+
+.PARAMETER InfoLoopEndEventID
+
+Specify end loop event id in the log.
+[3] is default.
+
+
+.PARAMETER StartEventID
+
+Specify start script id in the log.
+[8] is default.
+
+
+.PARAMETER EndEventID
+
+Specify end script event id in the log.
+[9] is default.
+
 
 .PARAMETER WarningEventID
-　Event Log出力でWarningに対するEvent IDを指定します。デフォルトは10です。
 
-.PARAMETER SuccessErrorEventID
-　Event Log出力でSuccessに対するEvent IDを指定します。デフォルトは73です。
+Specify Warning event id in the log.
+[10] is default.
+
+
+.PARAMETER SuccessEventID
+
+Specify Successfully complete event id in the log.
+[73] is default.
+
 
 .PARAMETER InternalErrorEventID
-　Event Log出力でInternal Errorに対するEvent IDを指定します。デフォルトは99です。
+
+Specify Internal Error event id in the log.
+[99] is default.
+
 
 .PARAMETER ErrorEventID
-　Event Log出力でErrorに対するEvent IDを指定します。デフォルトは100です。
+
+Specify Error event id in the log.
+[100] is default.
+
 
 .PARAMETER ErrorAsWarning
-　異常終了しても警告終了のReturnCodeを返します。
+
+Specfy if you want to return WARNING exit code when the script terminate with an Error.
+
 
 .PARAMETER WarningAsNormal
-　警告終了しても正常終了のReturnCodeを返します。
+
+Specify if you want to return NORMAL exit code when the script terminate with a Warning.
+
 
 .PARAMETER ExecutableUser
-　このプログラムを実行可能なユーザを正規表現で指定します。
-デフォルトは[.*]で全てのユーザが実行可能です。　
-記述はシングルクオーテーションで括って下さい。
-正規表現のため、ドメインのバックスラッシュは[domain\\.*]の様にバックスラッシュでエスケープして下さい。　
 
+Specify the users who are allowed to execute the script in regular expression.
+[.*] is default and all users are allowed to execute.
+Parameter must be quoted with single quote'
+Escape the back slash in the separeter of a domain name.
+example [domain\\.*]
 .NOTES
 
 Copyright 2020 Masayuki Sudo
