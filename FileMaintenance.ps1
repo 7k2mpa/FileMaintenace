@@ -1499,15 +1499,15 @@ PreAction[Archive]はMoveNewFile[TRUE]でも出力ファイルは1個で階層構造を取らない。
 #>
     IF (($Action -match "^(Move|Copy)$") -or (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive')) ) {
 <#
-        ファイルが移動するAction用にファイル移動先の親フォルダパス$MoveToNewFolderを生成する
+        ファイルが移動するAction用にファイル移動先の親フォルダパス$destinationFolderを生成する
         
         C:\TargetFolder                    :TargetFolder
         C:\TargetFolder\A\B\C              :TargetFileParentFolder
         C:\TargetFolder\A\B\C\target.txt   :TargetFile
         D:\MoveToFolder                    :MoveToFolder
-        D:\MoveToFolder\A\B\C              :MoveToNewFolder
+        D:\MoveToFolder\A\B\C              :destinationFolder
 
-        D:\MoveToFolder\A\B\C\target.txt   :ファイルの移動先パス
+        D:\MoveToFolder\A\B\C\target.txt   :destinationPath
 
         destinationFolderを作るには \A\B\C\　の部分を取り出して、移動先フォルダMoveToFolderとJoin-Pathする
         String.Substringメソッドは文字列から、引数位置から最後までを取り出す
