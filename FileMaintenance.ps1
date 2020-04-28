@@ -56,10 +56,6 @@ Find files in C:\TEST and child folders recuresively.
 All logs are not output at console.
 You would confirm getting files to process. 
 
-C:\TESTˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ğÄ‹A“I‚ÉŒŸõ‚¾‚¯‚µ‚Ü‚·iqƒtƒHƒ‹ƒ_‚à‘ÎÛj
-ì‹Æ‚Ì×‚©‚¢“à—e‚ğƒRƒ“ƒ\[ƒ‹‚É•\¦‚µ‚Ü‚¹‚ñB
-æ‚¸‚Íƒƒ“ƒeƒiƒ“ƒX‘ÎÛ‚Ì‚à‚Ì‚ª•\¦‚³‚ê‚é‚©Šm”F‚µ‚Ä‚İ‚Ä‰º‚³‚¢B
-
 
 .EXAMPLE
 
@@ -67,7 +63,6 @@ FileMaintenace.ps1 -TargetFolder C:\TEST -Action Delete
 
 Delete files in C:\TEST and child folders recuresively.
 
-C:\TESTˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ğÄ‹A“I‚Éíœ‚µ‚Ü‚·iqƒtƒHƒ‹ƒ_‚à‘ÎÛj
 
 .EXAMPLE
 
@@ -75,7 +70,6 @@ FileMaintenace.ps1 -TargetFolder C:\TEST -Action DeleteEmptyFolders
 
 Delete empty folders in C:\TEST and child folders recuresively.
 
-C:\TESTˆÈ‰º‚Ì‹óƒtƒHƒ‹ƒ_‚ğÄ‹A“I‚Éíœ‚µ‚Ü‚·iqƒtƒHƒ‹ƒ_‚à‘ÎÛj
 
 
 .EXAMPLE
@@ -84,19 +78,15 @@ FileMaintenace.ps1 -TargetFolder C:\TEST -Action Delete -noRecurse
 
 Delete files only in C:\TEST non-recuresively.
 
-C:\TESTˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ğ”ñÄ‹A“I‚Éíœ‚µ‚Ü‚·iqƒtƒHƒ‹ƒ_‚Í‘ÎÛŠOj
-
 
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -Action Copy -MoveToFolder C:\TEST1 -Size 10KB -continue
 
 Copy files over than 10KByte to C:\TEST1 recuresively.
-If no child foler in the desitination, make the new folder.
-If same name file be in the destination, skip copying and continue process a next object.
+If no child folder exists in the desitination, make the new folder.
+If same name file exists in the destination, skip copying and continue to process a next object.
 
-C:\TESTˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚Å10KBˆÈã‚Ì‚à‚Ì‚ğÄ‹A“I‚ÉC:\TEST1‚Ö•¡»‚µ‚Ü‚·BˆÚ“®æ‚ÉqƒtƒHƒ‹ƒ_‚ª–³‚¯‚ê‚Îì¬‚µ‚Ü‚·
-ˆÚ“®æ‚É“¯ˆê–¼Ì‚Ìƒtƒ@ƒCƒ‹‚ª‚ ‚Á‚½ê‡‚ÍƒXƒLƒbƒv‚µ‚Äˆ—‚ğŒp‘±‚µ‚Ü‚·
 
 
 .EXAMPLE
@@ -104,12 +94,10 @@ C:\TESTˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚Å10KBˆÈã‚Ì‚à‚Ì‚ğÄ‹A“I‚ÉC:\TEST1‚Ö•¡»‚µ‚Ü‚·BˆÚ“®æ‚Éqƒ
 FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -PreAction Compress,AddTimeStamp -Action NullClear
 
 Find files ending with '.log' and older 10days in C:\TEST recuresively.
-Create new files compressed and added time stamp to file name from files filtered.
+Create new files compressed and added time stamp to file name from files found.
 New files place in the same folder.
-The filtered files dose not be deleted, but are null cleared.
+The files that are found dose not be deleted, but are null cleared.
 
-C:\TESTˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ğÄ‹A“I‚É u.log‚ÅI‚í‚év‚à‚Ì‚Öƒtƒ@ƒCƒ‹–¼‚É“ú•t‚ğ•t‰Á‚µ‚Äˆ³k‚µ‚Ü‚·B
-Œ³ƒtƒ@ƒCƒ‹‚Íc‚è‚Ü‚·‚ªA“à—eÁ‹iƒkƒ‹ƒNƒŠƒAj‚µ‚Ü‚·B
 
 .EXAMPLE
 
@@ -120,9 +108,6 @@ Create new files compressed and move to C:\TEST1
 If same name file exists in the destination, override old one.
 The original files are deleted. 
 
-C:\TESTˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ğÄ‹A“I‚É u.log‚ÅI‚í‚év‚©‚Â10“úˆÈ‘O‚Ì‚à‚Ì‚ğˆ³kŒãC:\TEST1‚ÖˆÚ“®‚µ‚Ü‚·B
-ˆÚ“®æ‚É“¯ˆê–¼Ì‚Ì‚à‚Ì‚ª‚ ‚Á‚½ê‡‚Íã‘‚«‚µ‚Ü‚·B
-Œ³‚Ìƒtƒ@ƒCƒ‹‚Ííœ‚µ‚Ü‚·
 
 
 .EXAMPLE
@@ -131,8 +116,8 @@ FileMaintenace.ps1 -TargetFolder C:\OLD\Log -RegularExpression '^.*\.log$' -Acti
 
 Find files ending with '.log' recuresively.
 -ParentRegularExpresssion option is specified with regular expression, thus path's backslash\ is escaped with backslash\
-Delete them with '\OLD\' in the rest of the path characters next to the -TargetFolder(C:\OLD\Log).
-At the sample blow, 'C:\OLD\Los' is not for -ParentRegularExpression matching.
+Delete them with '\OLD\' in the rest of the path characters next to the -TargetFolder(C:\OLD\Log)'s strings.
+At the sample blow, 'C:\OLD\Los' is not matched for -ParentRegularExpression.
 Thus 'C:\OLD\Log\IIS\Current\Infra.log' , 'C:\OLD\Log\Java\Current\Infra.log' and 'C:\OLD\Log\Infra.log' are not deleted.
 
 C:\OLD\Log\IIS\Current\Infra.log
@@ -142,16 +127,6 @@ C:\OLD\Log\Java\OLD\Infra.log
 C:\OLD\Log\Infra.log
 
 
-C:\OLD\LogˆÈ‰º‚Ìƒtƒ@ƒCƒ‹‚ÅÄ‹A“I‚Éu.log‚ÅI‚í‚év‚à‚Ì‚ğíœ‚µ‚Ü‚·B
-’A‚µAƒtƒ@ƒCƒ‹‚Ìƒtƒ‹ƒpƒX‚©‚çC:\OLD\Log‚ğíœ‚µ‚½ƒpƒX‚Éu\OLD\v‚ªŠÜ‚Ü‚ê‚éƒtƒ@ƒCƒ‹‚¾‚¯‚ª‘ÎÛ‚É‚È‚è‚Ü‚·B³‹K•\Œ»‚Ì‚½‚ßAƒpƒX‚ÉŠÜ‚Ü‚ê‚é\iƒoƒbƒNƒXƒ‰ƒbƒVƒ…j‚ª\iƒoƒbƒNƒXƒ‰ƒbƒVƒ…j‚ÅƒGƒXƒP[ƒv‚³‚ê‚Ä‚¢‚Ü‚·B
-—á‚¦‚ÎˆÈ‰º‚Ìƒtƒ@ƒCƒ‹”z’u‚Å‚ÍC:\OLD\Log‚Ü‚Å‚Íƒ}ƒbƒ`‘ÎÛŠO‚Æ‚È‚èC:\OLD\Log\IIS\Current\Infra.log , C:\OLD\Log\Java\Current\Infra.log , C:\OLD\Log\Infra.log‚Ííœ‚³‚ê‚Ü‚¹‚ñB
-
-C:\OLD\Log\IIS\Current\Infra.log
-C:\OLD\Log\IIS\OLD\Infra.log
-C:\OLD\Log\Java\Current\Infra.log
-C:\OLD\Log\Java\OLD\Infra.log
-C:\OLD\Log\Infra.log
-
  
 .PARAMETER TargetFolder
 Specify a folder of the target files or the folders placed.
@@ -160,14 +135,6 @@ Can specify relative, absolute or UNC path format.
 Relative path format must be starting with 'dot.'
 Wild cards are not accepted shch as asterisk* question? bracket[]
 If the path contains bracket[] , specify path literally and do not escape.
-
-
-ˆ—‘ÎÛ‚Ìƒtƒ@ƒCƒ‹AƒtƒHƒ‹ƒ_‚ªŠi”[‚³‚ê‚Ä‚¢‚éƒtƒHƒ‹ƒ_‚ğw’è‚µ‚Ü‚·B
-w’è‚Í•K{‚Å‚·B
-‘Š‘ÎAâ‘ÎƒpƒX‚Åw’è‰Â”\‚Å‚·B
-‘Š‘ÎƒpƒX•\‹L‚ÍA.‚©‚çn‚ß‚é•\‹L‚É‚µ‚Ä‰º‚³‚¢Bi—á .\Log , ..\Script\logj
-ƒƒCƒ‹ƒhƒJ[ƒh* ? []‚Íg—p‚Å‚«‚Ü‚¹‚ñB
-ƒtƒHƒ‹ƒ_–¼‚ÉŠ‡ŒÊ [ , ] ‚ğŠÜ‚Şê‡‚ÍƒGƒXƒP[ƒv‚¹‚¸‚É‚»‚Ì‚Ü‚Ü“ü—Í‚µ‚Ä‚­‚¾‚³‚¢B
 
 
 .PARAMETER PreAction
@@ -728,7 +695,7 @@ function Test-LeafNotExists {
 
 <#
 .SYNOPSIS
-@w’è‚µ‚½ƒpƒX‚Éƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢–‚ğŠm”F‚·‚é
+ check the path specified that a file or folder dose NOT exist in the path, and return
 
 .INPUT
 @Strings of File Path
@@ -860,15 +827,15 @@ filter ComplexFilter {
 
 <#
 .SYNOPSIS
-@ƒIƒuƒWƒFƒNƒg‚ğ•¡”ğŒ‚ÅƒtƒBƒ‹ƒ^A“K‡‚·‚é‚à‚Ì‚¾‚¯‚ğOUTPUT
+@filter objects with criteria
 
 .DESCRIPTION
-ÅI•ÏX“ú‚ª$Days‚æ‚èŒÃ‚¢
-(ƒtƒ@ƒCƒ‹|ƒtƒHƒ‹ƒ_)–¼‚ª³‹K•\Œ»$RegularExpression‚Éƒ}ƒbƒ`
-ƒtƒ@ƒCƒ‹—e—Ê‚ª $Size‚æ‚è‘å‚«‚¢
+last write date is older than $Days
+(file|folder) name match $RegularExpression
+file size is over than $Size
 C:\TargetFolder                    :TargetFolder
 C:\TargetFolder\A\B\C\target.txt   :TargetObject
-ã‹L‚Ì\A\B\C\•”•ª‚ª³‹K•\Œ»$ParentRegularExpression‚Éƒ}ƒbƒ`
+part of \A\B\C\ match $ParentRegularExpression
 
 .INPUT
 PSobject
@@ -877,7 +844,6 @@ PSobject
 PSobject passed the filter
 
 #>
- 
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
     IF ($_.Name -match $RegularExpression) {
     IF ($_.Length -ge $Size) {
@@ -893,7 +859,7 @@ function Get-Object {
 
 <#
 .SYNOPSIS
-@w’èƒtƒHƒ‹ƒ_‚©‚çƒIƒuƒWƒFƒNƒgŒQiƒtƒ@ƒCƒ‹|ƒtƒHƒ‹ƒ_j‚ğ’Šo
+@find objects(files or folders) in the specified folder
 
 .INPUT
 System.String. Path of the folder to get objects
@@ -936,9 +902,9 @@ $parameter = @{
             }
         }
 <#
-ˆê•”‚ÌAction‚ÍObject‚ğ“Á’è‚Ì‡˜‚Åˆ—‚·‚é‚½‚ßA•K—v‚É‰‚¶‚Äƒ\[ƒg‚·‚é
-KeepFilesCount”z—ñ‚É“ü‚ê‚½ƒpƒXˆê®‚ğŒÃ‚¢‡‚É®—ñ
-DeleteEmptyFolders”z—ñ‚É“ü‚ê‚½ƒpƒXˆê®‚ğƒpƒX‚ª[‚¢‡‚É®—ñB‹óƒtƒHƒ‹ƒ_‚ª‹óƒtƒHƒ‹ƒ_‚É“ü‚êq‚É‚È‚Á‚Ä‚¢‚éê‡A[‚¢ŠK‘w‚©‚çíœ
+some $Action process Object in order, thus sort the objects
+KeepFilesCount: by last write date
+DeleteEmptyFolders: by depth of the file path hierarchy with conting separator in the path for deleteing deepest folder at first
 #>
     Switch -Regex ($Action) {
  
@@ -1098,7 +1064,8 @@ IF ($AddTimeStamp) {$Script:PreAction +='AddTimeStamp'}
 IF ($MoveNewFile)  {$Script:PreAction +='MoveNewFile'}
 IF ($Compress)     {$Script:PreAction +='Compress'}
 
-#ƒpƒ‰ƒ[ƒ^‚ÌŠm”F
+
+#validate parameters
 
 
 #w’èƒtƒHƒ‹ƒ_‚Ì—L–³‚ğŠm”F
@@ -1147,7 +1114,7 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
         $7zFolder | Test-Container -Name '-7zFolder' -IfNoExistFinalize > $NULL
         }
 
-#‘g‚İ‡‚í‚¹‚ª•s³‚Èw’è‚ğŠm”F
+#checking for invalid combinations of options
 
 
     IF (($TargetFolder -eq $MoveToFolder) -and   (($Action -match "(move|copy)") -or ($PreAction -contains 'MoveNewFile'))) {
@@ -1341,9 +1308,9 @@ Param(
 
 $Version = "2.0.0-RC.9"
 
-[Boolean]$ForceEndloop  = $FALSE          ;#$FALSE‚Å‚ÍFinalize , $TRUE‚Å‚Íƒ‹[ƒv“à‚ÅBreak
+[Boolean]$ForceEndloop  = $FALSE          ;#$FALSE for Finalize , $TRUE for Break in the loop
 
-#‰Šúİ’èAƒpƒ‰ƒ[ƒ^Šm”FA‹N“®ƒƒbƒZ[ƒWo—Í
+#initialize, validate parameters, output starting message
 
 . Initialize
 
@@ -1351,7 +1318,7 @@ $returnCode = $NormalReturnCode
 
 :main DO {
 
-#‘ÎÛ‚ÌƒtƒHƒ‹ƒ_‚Ü‚½‚Íƒtƒ@ƒCƒ‹‚ğ’T‚µ‚Ä”z—ñ‚É“ü‚ê‚é
+#find files or folders and put them to the object
 
     IF ($Action -eq "DeleteEmptyFolders") {
 
@@ -1389,7 +1356,8 @@ Write-Debug   ("`r`n" + ($targets.Object.fullname | Out-String))
 
 Write-Verbose ("[$(@($targets).Length)][$($FilterType)(s)] are for processing..." + "`r`n" + ($targets.Object.fullname | Out-String))
 
-#-PreAction Archive‚Í•¡”ƒtƒ@ƒCƒ‹‚ğ1ƒtƒ@ƒCƒ‹‚Éˆ³k‚·‚éB‚æ‚Á‚ÄAƒ‹[ƒv‘O‚Éˆ³kæ‚Ì1ƒtƒ@ƒCƒ‹‚Ìƒtƒ‹ƒpƒX‚ğŠm’è‚µ‚Ä‚¨‚­
+
+#-PreAction Archive processes files to archive to one file, thus before loop create a desitination path of the archive file
 
 IF ($PreAction -contains 'Archive') {
 
@@ -1450,10 +1418,10 @@ Do/While‚Íƒ‹[ƒv‚Ì‚½‚ßAˆ—“r’†‚ÅBreak‚·‚é‚ÆAWhile‚Öjump‚·‚éB
 Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start processing [$($FilterType)] $($Target.Object.FullName) ---"
 
 <#
-To make destinationPath from Target.Object.FullName
-If NoRecurse, desitinationFolder must be, thus skip
+Create a destinationFolder(child folder of the MoveToPath) with Target.Object.FullName
+If NoRecurse, desitinationFolder will be, thus skip
 Without Action[(Move|Copy)] , dose not need to checke existence of destinationPath
-PreAction[Archive] & MoveNewFile[TRUE] dose not need child folder, thus skip
+With PreAction[Archive] & MoveNewFile[TRUE] only MoveToFolder is needed, destinationFolder(s) are not needed, thus skip
 
 C:\TargetFolder                    :TargetFolder
 C:\TargetFolder\A\B\C              :Target.Object.DirectoryName
@@ -1463,11 +1431,11 @@ D:\MoveToFolder                    :MoveToFolder
 D:\MoveToFolder\A\B\C              :destinationFolder
 D:\MoveToFolder\A\B\C\target.txt   :destinationPath
 
-To create destinationFolder, extraction \A\B\C\ from TargetFolder and Join-Path MoveToFolder
-String.Substring method extrace from argument to the end in the string
-If NoRecurese, destinationFolder needs to create in Move or Copy 
+To create a destinationFolder, extract \A\B\C\ from TargetFolder and Join-Path MoveToFolder
+String.Substring method extract from argument to the end in the string
+Even if NoRecurse, destinationFolder is needed in Move or Copy action
 #>
-    IF (($Action -match "^(Move|Copy)$") -or (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive')) ) {
+    IF (($Action -match "^(Move|Copy)$") -or  (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive')) ) {
 
         $destinationFolder = $MoveToFolder | Join-Path -ChildPath ($Target.Object.DirectoryName).Substring($TargetFolder.Length)
 
@@ -1516,7 +1484,7 @@ If NoRecurese, destinationFolder needs to create in Move or Copy
 
     Switch -Regex ($Action) {
 
-    #•ªŠò1 ‰½‚à‚µ‚È‚¢
+    #case1 do nothing
     '^none$' {
         IF ( ($PostAction -eq 'none') -and ($PreAction -contains 'none') ) {
 
@@ -1525,12 +1493,12 @@ If NoRecurese, destinationFolder needs to create in Move or Copy
             }
         }
 
-    #•ªŠò2 íœ
+    #case2 delete
     '^Delete$' {
         Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
         } 
 
-    #•ªŠò3 ˆÚ“® or •¡» @“¯ˆê‚Ìƒtƒ@ƒCƒ‹‚ªiˆÚ“®|•¡»æj‚É‘¶İ‚µ‚È‚¢‚±‚Æ‚ğŠm”F‚µ‚Ä‚©‚çˆ—
+    #case3 move or copy@process after testing existence of the same name file in the destination
     '^(Move|Copy)$' {
         $destinationPath = $destinationFolder | Join-Path -ChildPath ($Target.Object.Name)
 
@@ -1540,7 +1508,7 @@ If NoRecurese, destinationFolder needs to create in Move or Copy
             }
         }
 
-    #•ªŠò4 ‹óƒtƒHƒ‹ƒ_‚ğ”»’è‚µ‚Äíœ
+    #case4 delete empty folder after testing the folder is empty
     '^DeleteEmptyFolders$' {
         Write-Log -ID $InfoEventID -Type Information -Message  "Check the folder $($Target.Object.FullName) is empty."
 
@@ -1554,7 +1522,7 @@ If NoRecurese, destinationFolder needs to create in Move or Copy
             }
         }
 
-    #•ªŠò5 NullClear
+    #case5 clear with null
     '^NullClear$' {
         Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
         }
@@ -1580,7 +1548,7 @@ If NoRecurese, destinationFolder needs to create in Move or Copy
             }
         }
 
-    #•ªŠò7 $Action‚ªğŒ®‚Ì‚Ç‚ê‚©‚É“K‡‚µ‚È‚¢ê‡‚ÍAƒvƒƒOƒ‰ƒ€ƒ~ƒX
+    #case7 $Action dose not match case , it must be internal error
     Default {
         Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal Error at Switch Action section. It may cause a bug in regex."
         $returnCode = $InternalErrorReturnCode
@@ -1593,11 +1561,11 @@ If NoRecurese, destinationFolder needs to create in Move or Copy
 
     Switch -Regex ($PostAction) {
 
-    #•ªŠò1 ‰½‚à‚µ‚È‚¢
+    #case1 do nothing
     '^none$' {            
         }
 
-    #•ªŠò2 Rename RenameŒã‚Ì“¯ˆê–¼Ìƒtƒ@ƒCƒ‹‚ª‘¶İ‚µ‚È‚¢‚±‚Æ‚ğŠm”F‚µ‚Ä‚©‚çˆ—
+    #case2 Rename after testing existence of a file with new renamed name in the path
     '^Rename$' {
         $newFilePath = $Target.Object.DirectoryName |
                         Join-Path -ChildPath (($Target.Object.Name) -replace "$RegularExpression" , "$RenameToRegularExpression") |
@@ -1613,14 +1581,14 @@ If NoRecurese, destinationFolder needs to create in Move or Copy
             }
         }
 
-    #•ªŠò3 NullClear
+    #case3 clear with null 
     '^NullClear$' {
         Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
         }
 
 
-    #•ªŠò4 $Action‚ªğŒ®‚Ì‚Ç‚ê‚©‚É“K‡‚µ‚È‚¢ê‡‚ÍAƒvƒƒOƒ‰ƒ€ƒ~ƒX
-    Default {
+    #case4 $Action dose not match case , it must be internal error
+        Default {
         Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal error at Switch PostAction section. It may cause a bug in regex."
         $returnCode = $InternalErrorReturnCode
         Break main
