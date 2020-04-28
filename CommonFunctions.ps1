@@ -61,34 +61,34 @@ Write-Verbose "CommonFunctions.ps1 Version $CommonFunctionsVersion"
 #誤った値を指定しないように留意してください
 
 
-#[boolean]$Log2EventLog = $TRUE,
-#[Switch]$NoLog2EventLog,
-#[String]$ProviderName = "Infra",
-#[String][ValidateSet("Application")]$EventLogLogName = 'Application',
+#[boolean]$Log2EventLog = $TRUE ,
+#[Switch]$NoLog2EventLog ,
+#[String]$ProviderName = "Infra" ,
+#[String][ValidateSet("Application")]$EventLogLogName = 'Application' ,
 
-#[boolean]$Log2Console = $TRUE,
-#[Switch]$NoLog2Console,
-#[boolean]$Log2File = $FALSE,
-#[Switch]$NoLog2File,
+#[boolean]$Log2Console = $TRUE ,
+#[Switch]$NoLog2Console ,
+#[boolean]$Log2File = $FALSE ,
+#[Switch]$NoLog2File ,
 #[String][ValidatePattern('^(\.+\\|[C-Z]:\\).*')]$LogPath ,
-#[String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss",
-#[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #Default指定はShift-Jis
+#[String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss" ,
+#[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default指定はShift-Jis
 
-#[int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
-#[int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
-#[int][ValidateRange(0,2147483647)]$ErrorReturnCode = 8,
-#[int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16,
+#[int][ValidateRange(0,2147483647)]$NormalReturnCode        =  0 ,
+#[int][ValidateRange(0,2147483647)]$WarningReturnCode       =  1 ,
+#[int][ValidateRange(0,2147483647)]$ErrorReturnCode         =  8 ,
+#[int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16 ,
 
-#[int][ValidateRange(1,65535)]$InfoEventID = 1,
-[int][ValidateRange(1,65535)]$StartEventID = 8
-[int][ValidateRange(1,65535)]$EndEventID = 9
-#[int][ValidateRange(1,65535)]$WarningEventID = 10,
-#[int][ValidateRange(1,65535)]$SuccessEventID = 73,
-#[int][ValidateRange(1,65535)]$InternalErrorEventID = 99,
-#[int][ValidateRange(1,65535)]$ErrorEventID = 100,
+#[int][ValidateRange(1,65535)]$InfoEventID          =   1 ,
+#[int][ValidateRange(1,65535)]$StartEventID         =   8 ,
+#[int][ValidateRange(1,65535)]$EndEventID           =   9 ,
+#[int][ValidateRange(1,65535)]$WarningEventID       =  10 ,
+#[int][ValidateRange(1,65535)]$SuccessEventID       =  73 ,
+#[int][ValidateRange(1,65535)]$InternalErrorEventID =  99 ,
+#[int][ValidateRange(1,65535)]$ErrorEventID         = 100 ,
 
-#[Switch]$ErrorAsWarning,
-#[Switch]$WarningAsNormal,
+#[Switch]$ErrorAsWarning ,
+#[Switch]$WarningAsNormal ,
 
 #[Regex]$ExecutableUser ='.*'
 

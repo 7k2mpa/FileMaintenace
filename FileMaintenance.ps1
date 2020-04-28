@@ -9,11 +9,6 @@ CommonFunctions.ps1 is required.
 You can process files in multiple folders with Wrapper.ps1
 
 
-ログファイル圧縮、削除を始めとした色々な処理をする万能ツールです。
-実行にはCommonFunctions.ps1が必要です。
-セットで開発しているWrapper.ps1と併用すると複数処理を一括実行できます。
-
-
 .DESCRIPTION
 This script finds files and folders that match multiple criteria.
 And process the files and folders found with multiple methods with PreAction, Action and PostAction.
@@ -53,25 +48,6 @@ If you can install 7-Zip for compress or archive, do not need to replace.
 https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows-powershell?view=powershell-7#upgrading-existing-windows-powershell
 
 
-
-対象のフォルダに含まれる、ファイル、フォルダを各種条件でフィルタして選択します。
-フィルタ結果をパラメータに基づき、前処理、主処理、後処理します。
-
-フィルタ結果に対して可能な処理は以下です。
-
--前処理:対象ファイルから別ファイルを生成します。可能な処理は「ファイル名にタイムスタンプ付加」「圧縮」「生成した別ファイルの移動」「複数のファイルを1ファイルにアーカイブ」です。
-併用指定可能です。「生成した別ファイルの移動」を指定しないと対象ファイルと同一フォルダに配置します。
--主処理:対象ファイルを「移動」「複製」「削除」「内容消去（ヌルクリア）」、フォルダを「空フォルダ削除」します。
--後処理:対象ファイルを「内容消去（ヌルクリア）」「名称変更」します。
-
-フィルタは「経過日数」「容量」「正規表現」「対象ファイル、フォルダの親パスに含まれる文字の正規表現」で指定できます。
-
-このプログラム単体では、1度に処理できるのは1フォルダです。複数フォルダを処理したい場合は、Wrapper.ps1を併用してください。
-
-
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
-
-
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -noLog2Console -verbose
@@ -101,6 +77,7 @@ Delete empty folders in C:\TEST and child folders recuresively.
 
 C:\TEST以下の空フォルダを再帰的に削除します（子フォルダも対象）
 
+
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -Action Delete -noRecurse
@@ -108,6 +85,7 @@ FileMaintenace.ps1 -TargetFolder C:\TEST -Action Delete -noRecurse
 Delete files only in C:\TEST non-recuresively.
 
 C:\TEST以下のファイルを非再帰的に削除します（子フォルダは対象外）
+
 
 .EXAMPLE
 
@@ -119,6 +97,7 @@ If same name file be in the destination, skip copying and continue process a nex
 
 C:\TEST以下のファイルで10KB以上のものを再帰的にC:\TEST1へ複製します。移動先に子フォルダが無ければ作成します
 移動先に同一名称のファイルがあった場合はスキップして処理を継続します
+
 
 .EXAMPLE
 
@@ -190,6 +169,7 @@ If the path contains bracket[] , specify path literally and do not escape.
 ワイルドカード* ? []は使用できません。
 フォルダ名に括弧 [ , ] を含む場合はエスケープせずにそのまま入力してください。
 
+
 .PARAMETER PreAction
 
 Specify methods to process files.
@@ -216,6 +196,7 @@ MoveNewFile:-PreActionの新規生成ファイルを-TargetFolderと同一ではなく、-MoveToFo
 7z:Compress,Archiveに使用する圧縮に7z.exeを用います。圧縮方法は7z.exeの標準LZMA2を用います。
 7zZip:Compress,Archiveに使用する圧縮に7z.exeを用います。圧縮方法はZip(Deflate)を用います。
 
+
 .PARAMETER Action
 
 Specify method to process files.
@@ -237,6 +218,7 @@ Copy:ファイルを-MoveToFolderにコピーします。
 DeleteEmptyFolders:空フォルダを削除します。
 KeepFilesCount:指定世代数になるまで、マッチしたファイル群を古い順に削除します。
 NullClear:ファイルの内容削除 NullClearします。
+
 
 .PARAMETER PostAction
 
@@ -263,19 +245,11 @@ Wild cards are not accepted shch as asterisk* question? bracket[]
 If the path contains bracket[] , specify path literally and do not escape.
 
 
-　処理対象のファイルの移動、コピー先フォルダを指定します。
-相対、絶対パスで指定可能です。
-相対パス表記は、.から始める表記にして下さい。（例 .\Log , ..\Script\log）
-ワイルドカード* ? []は使用できません。
-フォルダ名に括弧 [ , ] を含む場合はエスケープせずにそのまま入力してください。
-
 .PARAMETER ArchiveFileName
 
 Specify the file name of the archive file with -PreAction Archive option.
 Specify it without extension.
 Extension strings will be added automatically with archive method.
-
--PreAction Archive指定時のアーカイブファイル名を指定します。
 
 
 .PARAMETER 7zFolder 
@@ -283,15 +257,12 @@ Extension strings will be added automatically with archive method.
 Specify a folder of 7-Zip installed.
 [C:\Program Files\7-Zip] is default.
 
-Compress,Archiveに外部プログラム7z.exeを使用する際に、7-Zipがインストールされているフォルダを指定します。
-デフォルトは[C:\Program Files\7-Zip]です。
 
 .PARAMETER Days
+
 Specify how many days older than today to process files.
 0 day is default and, process all files.
 
-　処理対象のファイル、フォルダを更新経過日数でフィルタします。
-デフォルトは0日で全てのファイルが対象となります。
 
 .PARAMETER Size
 
@@ -336,82 +307,68 @@ https://docs.microsoft.com/ja-jp/dotnet/standard/base-types/substitutions-in-reg
 
 
 .PARAMETER Recurse
+
 Specify to process the files or folders in the path recursively or non-recuresively.
 [$TRUE(recuresively)] is default.
 
-　-TargetFolderの直下の再帰的または非再帰に処理の指定が可能です。
-デフォルトは$TRUEで再帰的処理です。
 
 .PARAMETER NoRecurse
+
 Specify if you want to filter files non-recursively.
 The option overrides -Recurse option.
 
-　-TargetFolderの直下のみを処理対象とします。-Recurse $FALSEと等価です。
-Recurseパラメータより優先します。
 
 .PARAMETER OverRide
+
 Specify if you want to override same name files in the destination in moving or copying  process.
 If the file in the destination path is equal or newer than the file in the source path, do not override and skip to process with counting up a Warning.
 [terminate with an Error and do not override] is default.
 
 
 .PARAMETER OverRideForce
+
 Specify if you want to override same name files in the destination in moving or copying  process.
 If the file in the destination path is equal or newer than the file in the source path, force to override with counting up a Warning.
 [terminate with an Error and do not override] is default.
 
 
-
 .PARAMETER Continue
+
 Specify if you want to skip the process when files exist in -MoveToFolder alredy and to process remains.
 If the script skips the process, processes remains and terminates with a Warning.
 [terminate with an Error immediately and do not skip] is default. 
 
-　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
-スキップすると警告終了します。
-デフォルトではスキップせずに異常終了します。
 
 .PARAMETER ContinueAsNormal
+
 Specify if you do not want to override a files and to want to continue processing and to exit with Normal return code.
 If the script skips to process, exits successfully.
 [terminate with an Error immediately and do not skip] is default. 
-
-　移動、コピー先に既に同名のファイルが存在した場合当該ファイルの処理をスキップします。
--Continueと異なりスキップしても正常終了します。ファイルの差分コピー等で利用してください。
--Continueに優先します。
-デフォルトではスキップせずに異常終了します。
 
 
 .PARAMETER NoneTargetAsWarning
 Specify if you want to terminate with a Warning when no file exists in the folder.
 [exit with Normal when no file exists in the folder] is default.
 
-操作対象のファイル、フォルダが存在しない場合に警告終了します。
-このスイッチを設定しないと存在しない場合は通常終了します。
-
 
 .PARAMETER CompressedExtString
+
 Specify file extention strings in specifing -PreAction Compress option.
 [.zip] is default.
 
-　-PreAction Compress指定時のファイル拡張子を指定できます。
-デフォルトは[.zip]です。
 
 .PARAMETER TimeStampFormat
+
 Specify time stamp format in specifing -PreAction AddTimeStamp option
 [_yyyyMMdd_HHmmss] is default.
 It is deffernt from -LogDateFormat option.
 
 
-　-PreAction AddTimeStamp指定時の書式を指定できます。
-デフォルトは[_yyyyMMdd_HHmmss]です。
-
 .PARAMETER KeepFiles
+
 Specify how many newer files in the folder to keep with -Action KeepFileCount option.
 [1] is default.
 
--Action KeepFilesCount指定時の世代数を指定します。
-デフォルトは1です。
 
 .PARAMETER Compress
 Planed to obsolute.
@@ -453,6 +410,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 
@@ -1490,30 +1448,29 @@ Do/Whileはループのため、処理途中でBreakすると、Whileへjumpする。
 [Boolean]$ForceEndloop  = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
 
 Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start processing [$($FilterType)] $($Target.Object.FullName) ---"
-<#
-移動元のファイルパスから移動先のファイルパスを生成。
-再帰的でなければ、移動先パスは確実に存在するのでスキップ
 
-Action[(Move|Copy)]以外はファイル移動が無い。移動先パスを確認する必要がないのでスキップ
-PreAction[Archive]はMoveNewFile[TRUE]でも出力ファイルは1個で階層構造を取らない。よってスキップ
+<#
+To make destinationPath from Target.Object.FullName
+If NoRecurse, desitinationFolder must be, thus skip
+Without Action[(Move|Copy)] , dose not need to checke existence of destinationPath
+PreAction[Archive] & MoveNewFile[TRUE] dose not need child folder, thus skip
+
+C:\TargetFolder                    :TargetFolder
+C:\TargetFolder\A\B\C              :Target.Object.DirectoryName
+C:\TargetFolder\A\B\C\target.txt   :Target.Object.FullName
+
+D:\MoveToFolder                    :MoveToFolder
+D:\MoveToFolder\A\B\C              :destinationFolder
+D:\MoveToFolder\A\B\C\target.txt   :destinationPath
+
+To create destinationFolder, extraction \A\B\C\ from TargetFolder and Join-Path MoveToFolder
+String.Substring method extrace from argument to the end in the string
+If NoRecurese, destinationFolder needs to create in Move or Copy 
 #>
     IF (($Action -match "^(Move|Copy)$") -or (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive')) ) {
-<#
-        ファイルが移動するAction用にファイル移動先の親フォルダパス$destinationFolderを生成する
-        
-        C:\TargetFolder                    :TargetFolder
-        C:\TargetFolder\A\B\C              :TargetFileParentFolder
-        C:\TargetFolder\A\B\C\target.txt   :TargetFile
-        D:\MoveToFolder                    :MoveToFolder
-        D:\MoveToFolder\A\B\C              :destinationFolder
 
-        D:\MoveToFolder\A\B\C\target.txt   :destinationPath
-
-        destinationFolderを作るには \A\B\C\　の部分を取り出して、移動先フォルダMoveToFolderとJoin-Pathする
-        String.Substringメソッドは文字列から、引数位置から最後までを取り出す
-        destinationFolderはNoRecurseでもMove|Copyで一律使用するので作成
-#>
         $destinationFolder = $MoveToFolder | Join-Path -ChildPath ($Target.Object.DirectoryName).Substring($TargetFolder.Length)
+
         IF ($Recurse) {
 
             IF (-not($destinationFolder | Test-Container -Name 'Desitination folder of the file ')) {
@@ -1596,7 +1553,6 @@ PreAction[Archive]はMoveNewFile[TRUE]でも出力ファイルは1個で階層構造を取らない。
             Write-Log -ID $InfoEventID -Type Information -Message "The folder $($Target.Object.FullName) is not empty." 
             }
         }
-
 
     #分岐5 NullClear
     '^NullClear$' {
