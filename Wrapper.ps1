@@ -557,7 +557,7 @@ $Version = "2.0.0-RC.9"
     #Switch -Regex ($Line)終端
     }
 
-#対象群の処理ループ終端
+# :ForLoop termination
 }
 
 IF ($ErrorCount -gt 0) {

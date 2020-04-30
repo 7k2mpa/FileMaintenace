@@ -307,34 +307,40 @@ Param(
 #Planned to obsolute
 
 
-[boolean]$Log2EventLog = $TRUE,
-[Switch]$NoLog2EventLog,
-[String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra',
-[String][ValidateSet("Application")]$EventLogLogName = 'Application',
+[Boolean]$Log2EventLog = $TRUE ,
+[Switch]$NoLog2EventLog ,
+[String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra' ,
+[String][ValidateSet("Application")]$EventLogLogName = 'Application' ,
 
-[boolean]$Log2Console = $TRUE,
-[Switch]$NoLog2Console,
+[Boolean]$Log2Console = $TRUE ,
+[Switch]$NoLog2Console ,
 
-[boolean]$Log2File = $FALSE,
-[Switch]$NoLog2File,
-[String][ValidatePattern('^(\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath ,
+[Boolean]$Log2File = $FALSE ,
+[Switch]$NoLog2File ,
 
-[String][ValidateNotNullOrEmpty()]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss',
-[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default', #DefaultŽw’è‚ÍShift-Jis
+[String][ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$LogPath ,
 
-[int][ValidateRange(0,2147483647)]$NormalReturnCode = 0,
-[int][ValidateRange(0,2147483647)]$WarningReturnCode = 1,
-[int][ValidateRange(0,2147483647)]$ErrorReturnCode = 8,
-[int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16,
+[String][ValidateNotNullOrEmpty()]$LogDateFormat = 'yyyy-MM-dd-HH:mm:ss' ,
+[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #Default ShiftJIS
 
-[int][ValidateRange(1,65535)]$InfoEventID = 1,
-[int][ValidateRange(1,65535)]$WarningEventID = 10,
-[int][ValidateRange(1,65535)]$SuccessEventID = 73,
-[int][ValidateRange(1,65535)]$InternalErrorEventID = 99,
-[int][ValidateRange(1,65535)]$ErrorEventID = 100,
 
-[Switch]$ErrorAsWarning,
-[Switch]$WarningAsNormal,
+[Int][ValidateRange(0,2147483647)]$NormalReturnCode        =  0 ,
+[Int][ValidateRange(0,2147483647)]$WarningReturnCode       =  1 ,
+[Int][ValidateRange(0,2147483647)]$ErrorReturnCode         =  8 ,
+[Int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16 ,
+
+[Int][ValidateRange(1,65535)]$InfoEventID          =   1 ,
+[Int][ValidateRange(1,65535)]$InfoLoopStartEventID =   2 ,
+[Int][ValidateRange(1,65535)]$InfoLoopEndEventID   =   3 ,
+[int][ValidateRange(1,65535)]$StartEventID         =   8 ,
+[int][ValidateRange(1,65535)]$EndEventID           =   9 ,
+[Int][ValidateRange(1,65535)]$WarningEventID       =  10 ,
+[Int][ValidateRange(1,65535)]$SuccessEventID       =  73 ,
+[Int][ValidateRange(1,65535)]$InternalErrorEventID =  99 ,
+[Int][ValidateRange(1,65535)]$ErrorEventID         = 100 ,
+
+[Switch]$ErrorAsWarning ,
+[Switch]$WarningAsNormal ,
 
 [Regex]$ExecutableUser = '.*'
 
