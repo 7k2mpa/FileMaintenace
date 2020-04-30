@@ -315,7 +315,7 @@ https://github.com/7k2mpa/FileMaintenace
 Param(
 
 [String]
-[parameter(position = 0, mandatory, HelpMessage = 'Specify path of powershell script to execute(ex. .\FileMaintenance.ps1)  or Get-Help Wrapper.ps1')]
+[parameter(position = 0, mandatory, HelpMessage = 'Specify path of PowerShell script to execute(ex. .\FileMaintenance.ps1)  or Get-Help Wrapper.ps1')]
 [ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName")]$CommandPath ,
 
 [String]

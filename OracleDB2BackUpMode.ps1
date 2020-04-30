@@ -652,13 +652,13 @@ Push-Location $OracleHomeBinPath
 
     Switch -Regex ($listenerStatus) { 
 
-        'インスタンスがあります' {
+        '(インスタンスがあります|has \d+ instance\(s\))' {
 
             Write-Log -EventID $InfoEventID -Type Information -Message "Listener is running."
             $needToStopListener = $TRUE
             }
 
-        'リスナーがありません' {
+        '(リスナーがありません|no listener)' {
             Write-Log -EventID $InfoEventID -Type Information -Message "Listener is stopped."
             $needToStopListener = $FALSE
             }   

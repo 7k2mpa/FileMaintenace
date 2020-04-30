@@ -669,8 +669,8 @@ Cases in the destination path....
 2 file exists   with -Continue option ...$FALSE, $ContinueFlag = $TRUE 
 3 file exists   without option ...finalize with $ErrorReturnCode, if $FroceEndLoop=$TRUE then $FALSE, $ForceFinalize=$TRUE
 4 FOLDER exists with -OverRide option ...can not override, thus finalize with $ErrorReturnCode, if $FroceEndLoop=$TRUE then $FALSE, $ForceFinalize=$TRUE
-5 FOLDER exists with -Continue option ...$FALSE
-6 FOLDER exists without option ...finalize $ErrorReturnCode, if $FroceEndLoop=$TRUE then $FALSE, $ForceFinalize=$TRUE
+5 FOLDER exists with -Continue option ...$FALSE, $ContinueFlag = $TRUE 
+6 FOLDER exists without option ...finalize with $ErrorReturnCode, if $FroceEndLoop=$TRUE then $FALSE, $ForceFinalize=$TRUE
 7 nothing exists ...$TRUE
 #>
 

@@ -560,13 +560,13 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
     Switch -Regex ($ListenerStatus) { 
 
-        'インスタンスがあります' {
+        '(インスタンスがあります|has \d+ instance\(s\))' {
 
             Write-Log -EventID $InfoEventID -Type Information -Message "Listener is running."
             $needToStartListener = $FALSE
             }
 
-        'リスナーがありません' {
+        '(リスナーがありません|no listener)' {
             Write-Log -EventID $InfoEventID -Type Information -Message "Listener is stopped."
             $needToStartListener = $TRUE
             }   
