@@ -151,18 +151,6 @@ MoveNewFile:place new files in -MoveNewFolder path.
 7z:Specify to use 7-Zip and make .7z(LZMA2) for compress or archive option.
 7zZip:Specify to use 7-Zip and make .zip(Deflate) for compress or arvhice option.
 
-処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
-PreActionは(Action|PostAction)と異なり複数パラメータを指定できます。
-パラメータはカンマ,で区切って下さい。
-
-None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-WhatIfスイッチを利用して下さい。
-Compress:対象ファイルから圧縮したファイルを新規生成します。
-AddTimeStamp:対象ファイルからファイル名に-TimeStampFormatで定められた書式でタイムスタンプ付加したファイルを新規生成します。
-Archive:対象ファイル群をまとめた1アーカイブファイルを新規生成します。-OverRideを指定すると、既存アーカイブファイルへ対象ファイル群を追加します。アーカイブファイルは-ArchiveFileNameで指定したファイル名です。
-MoveNewFile:-PreActionの新規生成ファイルを-TargetFolderと同一ではなく、-MoveToFolderへ配置します。
-7z:Compress,Archiveに使用する圧縮に7z.exeを用います。圧縮方法は7z.exeの標準LZMA2を用います。
-7zZip:Compress,Archiveに使用する圧縮に7z.exeを用います。圧縮方法はZip(Deflate)を用います。
-
 
 .PARAMETER Action
 
@@ -173,18 +161,8 @@ Move:Move the files found to -MoveNewFolder path.
 Delete:Delete the files.
 Copy:Copy the files found and place in -MoveNewFolder path.
 DeleteEmptyFolders:Delete empty folders.
-KeepFilesCount:Delete old generation files.
+KeepFilesCount:Delete old generation files untill number of files is equal to be specified.
 NullClear:Clear the files found with null.
-
-処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
-
-None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-WhatIfスイッチを利用して下さい。
-Move:ファイルを-MoveToFolderへ移動します。
-Delete:ファイルを削除します。
-Copy:ファイルを-MoveToFolderにコピーします。
-DeleteEmptyFolders:空フォルダを削除します。
-KeepFilesCount:指定世代数になるまで、マッチしたファイル群を古い順に削除します。
-NullClear:ファイルの内容削除 NullClearします。
 
 
 .PARAMETER PostAction
@@ -194,13 +172,6 @@ Specify method to process files.
 None:Do nothing, and is default. If you want to test the action, specify -WhatIf or -Confirm option.
 Rename:Rename the files found with -RenameToRegularExpression
 NullClear:Clear the files with null.
-
-
-処理対象のファイルに対する操作を設定します。以下のパラメータを指定して下さい。
-
-None:何も操作をしません。この設定がデフォルトです。これは誤操作防止のためにあります。動作検証には-WhatIfスイッチを利用して下さい。
-Rename:ファイル名を正規表現-RenameToRegularExpressionで置換します。
-NullClear:ファイルの内容削除 NullClearします。PostActionのため、Actionと併用可能です。例えばファイル複製後、元ファイルを削除する、といった用途に使用して下さい。
 
 
 .PARAMETER MoveToFolder
@@ -236,40 +207,29 @@ Specify how many days older than today to process files.
 Specify size of files to process.
 0 byte is default, and process all files.
 Units of KB,MB,GB are accepted.
+e.g. [-Size 10MB] is equal to [-Size 10*1024^6]
 
-　処理対象のファイルを容量でフィルタします。
-デフォルトは0KBで全てのファイルが対象となります。
-整数表記に加えて、KB,MB,GBの接尾辞が利用可能です。
-例えば-Size 10MBは、自動的に10*1024^6に換算してくれます。
 
 .PARAMETER RegularExpression
 
 Specify regular expression to match processing files.
 '.*' is default, and process all files.
+Argument must be quoted with sigle quote'
+In PowerShell specification, capital and small letter are equal value but, are not (some version?)
 
-　処理対象のファイル、フォルダを正規表現でフィルタします。
-デフォルトは .* で全てが対象となります。
-記述はシングルクオーテーションで括って下さい。
-PowerShellの仕様上、大文字小文字の区別はしない筈ですが、実際には区別されるので注意して下さい。
 
 .PARAMETER ParentRegularExpression
 
 Specify regular expression to match processing path of the files excluding -TargetFolder.
 '.*' is default, and process all files.
+Argument must be quoted with sigle quote'
+In PowerShell specification, capital and small letter are equal value but, are not (some version?)
 
-　処理対象のファイル、フォルダの上位パスから-TargetFolderのパスまでを正規表現でフィルタします。-TargetFolderに含まれるパスはフィルタ対象外です。
-デフォルトは .* で全てが対象となります。
-記述はシングルクオーテーションで括って下さい。
-PowerShellの仕様上、大文字小文字の区別はしない筈ですが、実際には区別されるので注意して下さい。
 
 .PARAMETER RenameToRegularExpression
 
-Specify regular expression for rename rule.
-
-https://docs.microsoft.com/ja-jp/dotnet/standard/base-types/substitutions-in-regular-expressions
-
--PostAction Renameを指定した場合のファイル名正規表現置換規則を指定します。
--RegularExpressionに対する置換パターンを指定します。
+Specify regular expression for rename rule when specify -PostAction Rename.
+Specify rename pattern for -RegularExpression
 https://docs.microsoft.com/ja-jp/dotnet/standard/base-types/substitutions-in-regular-expressions
 
 
@@ -571,11 +531,12 @@ https://github.com/7k2mpa/FileMaintenace
 
 #>
 
+#!!! start of specification !!!#
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = "High")]
 Param(
 
 [String]
-[parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify the folder to process (ex. D:\Logs)  or Get-Help FileMaintenance.ps1')]
+[parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify a folder to process (ex. D:\Logs)  or Get-Help FileMaintenance.ps1')]
 [ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName" , "SourcePath")]$TargetFolder ,
 
 #[String]$TargetFolder,  #for Validation debug
@@ -674,18 +635,17 @@ Param(
 )
 
 ################# CommonFunctions.ps1 Load  #######################
+# If you want to place CommonFunctions.ps1 in differnt path, modify
 
 Try{
-
-    #CommonFunctions.ps1の配置先を変更した場合は、ここを変更。同一フォルダに配置前提
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
-    Catch [Exception]{
+Catch [Exception]{
     Write-Output "Fail to load CommonFunctions.ps1 Please verfy existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
 
-################ specify upper lines ##################
+#!!! end of specification !!!#
 
 
 ################# functions  #######################
@@ -702,13 +662,16 @@ function Test-LeafNotExists {
 
 .OUTPUT
 　Boolean
-1    チェック対象のファイルが存在するが、-OverRideを指定...$TRUE, $OverRideFlag = $TRUE（この指定は-Continueに優先する）なおInvoke-Actionは既にファイルが存在する場合は強制上書き
-2    チェック対象のファイルが存在するが、-Continueを指定...$FALSE, $ContinueFlag = $TRUE 
-3    チェック対象のファイルが存在する...$ErrorReturnCode でFinalize, $FroceEndLoop=$TRUE ならば$FALSE, $ForceFinalize=$TRUE
-4    チェック対象の同一名称のフォルダが存在するが、-OverRideを指定...上書きが出来ないので$ErrorReturnCode でFinalize, $FroceEndLoop=$TRUE ならば$FALSE, $ForceFinalize=$TRUE
-5    チェック対象と同一名称のフォルダが存在するが、-Continueを指定...$FALSE
-6    チェック対象と同一名称のフォルダが存在する...$ErrorReturnCode でFinalize, $FroceEndLoop=$TRUE ならば$FALSE, $ForceFinalize=$TRUE
-7    チェック対象のファイル、フォルダが存在しない...$TRUE
+
+.NOTE
+Cases in the destination path....
+1 file exists   with -OverRide option ...$TRUE, $OverRideFlag = $TRUE(-OverRide prior to -Continue) remind Invoke-Action override file anytime
+2 file exists   with -Continue option ...$FALSE, $ContinueFlag = $TRUE 
+3 file exists   without option ...finalize with $ErrorReturnCode, if $FroceEndLoop=$TRUE then $FALSE, $ForceFinalize=$TRUE
+4 FOLDER exists with -OverRide option ...can not override, thus finalize with $ErrorReturnCode, if $FroceEndLoop=$TRUE then $FALSE, $ForceFinalize=$TRUE
+5 FOLDER exists with -Continue option ...$FALSE
+6 FOLDER exists without option ...finalize $ErrorReturnCode, if $FroceEndLoop=$TRUE then $FALSE, $ForceFinalize=$TRUE
+7 nothing exists ...$TRUE
 #>
 
 [OutputType([Boolean])]
@@ -761,7 +724,7 @@ Write-Debug  "Source       LastWriteTime $($Target.Object.LastWriteTime)"
  
         IF (-not($OverRideForce) -and (Get-Item -LiteralPath $Path).LastWriteTime -ge $Target.Object.LastWriteTime ) {
             
-            Write-Log -ID $WarningEventID -Type Warning -Message "Last write time of [$Path] is equal or newer than [$($Target.Object.FullName)] , thus do no override."
+            Write-Log -ID $WarningEventID -Type Warning -Message "Last write time of [$Path] is equal or newer than [$($Target.Object.FullName)] , thus does no override."
             $Script:WarningFlag = $TRUE
             $noExistFlag = $FALSE
             Break
@@ -772,10 +735,10 @@ Write-Debug  "Source       LastWriteTime $($Target.Object.LastWriteTime)"
 
         IF ($OverRideAsNormal) {
 
-            Write-Log -ID $InfoEventID -Type Information -Message "A same name file exists in the desitination already, but specified -OverRideAsNormal[$($OverRideAsNormal)] option, thus override the file in the desitination [$($Path)] and count a warning event as NORMAL."
+            Write-Log -ID $InfoEventID -Type Information -Message "A same name file exists in the desitination already, but specified -OverRideAsNormal[$($OverRideAsNormal)] option, thus overrides the file in the desitination [$($Path)] and counts a warning event as NORMAL."
             
             } else {     
-            Write-Log -ID $WarningEventID -Type Warning -Message "A same name file exists in the desitination already, but specified -OverRide[$($OverRide)] option, thus override the file in the desitination [$($Path)]"
+            Write-Log -ID $WarningEventID -Type Warning -Message "A same name file exists in the desitination already, but specified -OverRide[$($OverRide)] option, thus overrides the file in the desitination [$($Path)]"
             $Script:WarningFlag = $TRUE
             }
 
@@ -790,17 +753,17 @@ Write-Debug  "Source       LastWriteTime $($Target.Object.LastWriteTime)"
 
         IF ($ContinueAsNormal) {
 
-            Write-Log -ID $InfoEventID -Type Information -Message "Specified -ContinueAsNormal[$($ContinueAsNormal)] option, continue to process objects and count a warning event as NORMAL."
+            Write-Log -ID $InfoEventID -Type Information -Message "Specified -ContinueAsNormal[$($ContinueAsNormal)] option, continues to process objects and count a warning event as NORMAL."
 
             } else {
-            Write-Log -ID $WarningEventID -Type Warning -Message "Specified -Continue[$($Continue)] option, continue to process objects."
+            Write-Log -ID $WarningEventID -Type Warning -Message "Specified -Continue[$($Continue)] option, continues to process objects."
             $Script:WarningFlag = $TRUE
             }
         Break
         }           
 
     #Case 3,4,6
-    Write-Log -ID $ErrorEventID -Type Error -Message "Same name object exists already, thus force to terminate $($ShellName)"
+    Write-Log -ID $ErrorEventID -Type Error -Message "Same name object exists already, thus forces to terminate $($ShellName)"
             
     IF ((-not($ForceEndLoop)) -and (-not($MYINVOCATION.ExpectingInput))) {
 
@@ -1135,7 +1098,7 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 
         Write-Log -Type Error -ID $ErrorEventID -Message ("Secified -PreAction MoveNewFile option, " + 
             "must specify -PreAction Compres or AddTimeStamp or Archive option also. " +
-            "If you move the original files, will specify -Action Move option.")
+            "If you want to move the original files, will specify -Action Move option.")
         Finalize $ErrorReturnCode
         }
 
@@ -1418,7 +1381,7 @@ Do/Whileはループのため、処理途中でBreakすると、Whileへjumpする。
 Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start processing [$($FilterType)] $($Target.Object.FullName) ---"
 
 <#
-Create a destinationFolder(child folder of the MoveToPath) with Target.Object.FullName
+Create a destinationFolder(child folder of the MoveToFolder) with Target.Object.FullName
 If NoRecurse, desitinationFolder will be, thus skip
 Without Action[(Move|Copy)] , dose not need to checke existence of destinationPath
 With PreAction[Archive] & MoveNewFile[TRUE] only MoveToFolder is needed, destinationFolder(s) are not needed, thus skip
@@ -1594,16 +1557,11 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
         Break main
         }
     }
-
-
-
-#異常終了などはBreakしてファイル処理終端へ抜ける。
 }
 # :do
 While ($FALSE)
 
-
-#異常、警告を確認。異常>警告>正常の順位で実行結果数カウントアップ
+#Count up Error > Warning > Normal 
 
     IF ($ErrorFlag) {
         $ErrorCount++
