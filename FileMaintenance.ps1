@@ -1267,7 +1267,7 @@ Param(
 [Int]$InLoopDeletedFilesCount = 0
 
 [String]$DatumPath = $PSScriptRoot
-[Boolean]$WhatIfFlag = (($PSBoundParameters['WhatIf']) -ne $NULL)
+[Boolean]$WhatIfFlag = ($NULL -ne $PSBoundParameters['WhatIf'])
 
 $Version = "2.0.0-RC.9"
 
