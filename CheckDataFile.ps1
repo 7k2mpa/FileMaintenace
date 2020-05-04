@@ -7,6 +7,7 @@ This script validates file interface system.
 CommonFunctions.ps1 is required.
 
 
+
 .DESCRIPTION
 
 This script validates file interface system.
@@ -18,6 +19,7 @@ The data file has text datum.
 This script compare the number in the trigger file and number of the data lines in the data file for validating file interface system.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
+
 
 
 .EXAMPLE

@@ -60,45 +60,34 @@ Specified -WarningAsNormal option and, if the service is started already, termin
 
 
 .PARAMETER Service
-Specify Windows 'Service name'.  'Service name' is diffent from 'Display name'.
+
+Specify Windows 'Service name' to switch status.
+'Service name' is diffent from 'Display name'.
 Sample
 Serivce Name:Spooker
 Display Name:Print Spooler
  
 Specification is required.
 
-　(停止|起動)するサービス名を指定します。
-「サービス名」と（サービスの）「表示名」は異なりますので留意して下さい。
-例えば「表示名:Print Spooler」は「サービス名:Spooler」となっています。
-指定必須です。
 
 .PARAMETER TargetStatus
+
 Specify target status (Stopped|Running) of the service.
 Specification is required.
 
-遷移するサービス状態を指定します。
-(Stopped|Running)どちらかを指定して下さい。
-指定必須です。
 
 .PARAMETER RetrySpanSec
+
 Specify interval to check service status.
-Some services require long time to translate serivce status, specify appropriate value.
+Some services require long time to switch serivce status, specify appropriate value.
 Default is 3seconds.
 
 
-　サービス停止再確認の間隔秒数を指定します。
-サービスによっては数秒必要なものもあるので適切な秒数に設定して下さい。
-デフォルトは3秒です。
-
 .PARAMETER RetryTimes
+
 Specify times to check service status.
-Some services require long time to translate serivce status, specify appropriate value.
+Some services require long time to switch serivce status, specify appropriate value.
 Default is 5times.
-
-　サービス停止再確認の回数を指定します。
-サービスによっては数秒必要なものもあるので適切な回数に設定して下さい。
-デフォルトは5回です。
-
 
 
 .PARAMETER Log2EventLog
@@ -108,6 +97,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 

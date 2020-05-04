@@ -77,26 +77,22 @@ If ERROR termination occur in the line, do not terminate Wrapper.ps1 and execute
 
 .PARAMETER CommandPath
 
-Specify the path of script to execute.
+Specify a path of the script to execute.
 Specification is required.
-Wild cards are not accepted.
-
-　起動するプログラムパスを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
-ワイルドカード*は使用できません。
+Can specify relative, absolute or UNC path format.
+Relative path format must be starting with 'dot.'
+Wild cards are not accepted shch as asterisk* question? bracket[]
+If the path contains bracket[] , specify path literally and do not escape.
 
 .PARAMETER CommandFile
 
-Specify the path of command file with arguments.
+Specify a path of the command file with arguments.
 Specification is required.
-Wild cards are not accepted.
+Can specify relative, absolute or UNC path format.
+Relative path format must be starting with 'dot.'
+Wild cards are not accepted shch as asterisk* question? bracket[]
+If the path contains bracket[] , specify path literally and do not escape.
 
-
-　起動するプログラムに渡すコマンドファイルを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
-ワイルドカード*は使用できません。
 
 .PARAMETER CommandFileEncode
 
@@ -123,6 +119,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 

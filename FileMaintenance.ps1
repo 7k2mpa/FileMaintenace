@@ -109,7 +109,6 @@ If same name file exists in the destination, override old one.
 The original files are deleted. 
 
 
-
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\OLD\Log -RegularExpression '^.*\.log$' -Action Delete -ParentRegularExpression '\\OLD\\'
@@ -129,6 +128,7 @@ C:\OLD\Log\Infra.log
 
  
 .PARAMETER TargetFolder
+
 Specify a folder of the target files or the folders placed.
 Specification is required.
 Can specify relative, absolute or UNC path format.
@@ -655,8 +655,11 @@ function Test-LeafNotExists {
 
 <#
 .SYNOPSIS
- check the path specified that a file or folder dose NOT exist in the path, and return
+ Check the path specified that a file or folder dose NOT exist in the path, and return
 
+.DESCRIPTION
+ Check the path specified that a file or folder dose NOT exist in the path, and return
+ 
 .INPUT
 @Strings of File Path
 

@@ -3,47 +3,60 @@
 
 <#
 .SYNOPSIS
+
 Script to Stop or Start IIS site.
 CommonFunctions.ps1 is required.
 With Wrapper.ps1 start or stop multiple IIS sites.
 
 <Common Parameters> is not supported.
 
+
+
 .DESCRIPTION
+
 Script to Stop or Start IIS site.
 If start(stop) IIS site already started(stopped), will temrminate with WARNING.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
 
+
 .EXAMPLE
+
 ChangeIIState.ps1 -Site SSL -TargetState stopped
 
 Stop IIS site 'SSL'
 
 
 .EXAMPLE
+
 ChangeIIState.ps1 -Site SSL -TargetState started
 
 Start IIS site 'SSL'
 
 
 .PARAMETER Site
+
 Specify IIS site
 
+
 .PARAMETER TargetState
+
 Specify IIS site state 'Started' or 'Stopped' 
 
 
 .PARAMETER RetrySpanSec
-　サービス停止再確認の間隔秒数を指定します。
-サービスによっては数秒必要なものもあるので適切な秒数に設定して下さい。
-デフォルトは3秒です。
+
+Specify interval to check IIS site state.
+Some sites require long time to switch serivce status, specify appropriate value.
+Default is 3seconds.
+
 
 .PARAMETER RetryTimes
-　サービス停止再確認の回数を指定します。
-サービスによっては数秒必要なものもあるので適切な回数に設定して下さい。
-デフォルトは5回です。
+
+Specify times to check IIS site state.
+Some sites require long time to switch serivce status, specify appropriate value.
+Default is 5times.
 
 
 .PARAMETER Log2EventLog
@@ -53,6 +66,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 

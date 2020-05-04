@@ -3,16 +3,9 @@
 <#
 .SYNOPSIS
 This script checkes existence(or non-existence)  of a flag file, and create(or delete) the flag file.
-
 CommonFunctions.ps1 is required.
 
-<Common Parameters> is not supported.
 
-バックアップ中等のフラグファイルを確認、作成するスクリプトです。
-フラグファイルが存在すると警告終了Falseを、存在しないと正常終了Trueを返します。
--CreateFlagを指定するとフラグファイルを生成します。
-
-<Common Parameters>はサポートしていません
 
 .DESCRIPTION
 
@@ -25,12 +18,6 @@ If specify -PostAction option, the script create(or delete) the flag file.
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
 
-バックアップ中等のフラグファイルを確認、作成するスクリプトです。
-フラグファイルが存在すると警告終了Falseを、存在しないと正常終了Trueを返します。
--CreateFlagを指定するとフラグファイルを生成します。
-
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
-
 Sample Path
 
 .\CheckFlag.ps1
@@ -40,6 +27,7 @@ Sample Path
 
 
 .EXAMPLE
+
 .\CheckFlag -FlagFolder ..\Lock -FlagFile BackUp.Flg
 
 Check BackUp.Flg file in the ..\Lock folder.
@@ -48,8 +36,6 @@ If the file dose not exist, the script exit with normal return code.
 
 For backward compatibility, run without specification -Status option, -Status will be 'NoExist' by default.
 
-..\LockフォルダにBackUp.Flgファイルの有無を確認します。
-フラグファイルが存在すると警告終了Falseを、存在しないと正常終了Trueを返します。
 
 
 .EXAMPLE
@@ -63,38 +49,30 @@ If success to delete, the script exit with normal return code.
 If fail to delte, the script exit with error return code.
 
 
-..\LockフォルダにBackUp.Flgファイルの有無を確認します。
-ファイルが存在しないと警告終了Falseを返します。
-ファイルが存在するとBackUp.Flgファイルの削除を試みます。
-ファイル削除に成功すると正常終了Trueを返します。失敗すると異常終了Flaseを返します。
-
-
 
 .PARAMETER FlagFolder
+
 Specify the folder to check existence of flag file.
 Can specify relative, absolute or UNC path format.
 Relative path format must be starting with 'dot.'
 Wild cards are not accepted shch as asterisk* question? bracket[]
 If the path contains bracket[] , specify path literally and do not escape.
 
-フラグファイルを確認、配置するフォルダを指定します。
-相対パス、絶対パスでの指定が可能です。
 
 .PARAMETER FlagFile
+
 Specify the name of the flag file.
 
-フラグファイル名を指定します。
 
 .PARAMETER Status
+
 Specify 'Exist' or 'NoExist' the flag file.
 'NoExist' is by default.
 
-確認する状態を指定します。
 
 .PARAMETER PostAction
-Specify action to the flag file after checking.
 
-ファイル確認後、削除、生成を指定します。
+Specify action to the flag file after checking.
 
 
 .PARAMETER Log2EventLog
@@ -104,6 +82,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 
