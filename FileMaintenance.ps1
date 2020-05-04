@@ -4,12 +4,14 @@
 
 <#
 .SYNOPSIS
+
 This script processes log files or temp files to delete, move, archive, etc.... with multiple methods.
 CommonFunctions.ps1 is required.
 You can process files in multiple folders with Wrapper.ps1
 
 
 .DESCRIPTION
+
 This script finds files and folders that match multiple criteria.
 And process the files and folders found with multiple methods with PreAction, Action and PostAction.
 
@@ -48,6 +50,7 @@ If you can install 7-Zip for compress or archive, do not need to replace.
 https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows-powershell?view=powershell-7#upgrading-existing-windows-powershell
 
 
+
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -noLog2Console -verbose
@@ -71,7 +74,6 @@ FileMaintenace.ps1 -TargetFolder C:\TEST -Action DeleteEmptyFolders
 Delete empty folders in C:\TEST and child folders recuresively.
 
 
-
 .EXAMPLE
 
 FileMaintenace.ps1 -TargetFolder C:\TEST -Action Delete -noRecurse
@@ -86,7 +88,6 @@ FileMaintenace.ps1 -TargetFolder C:\TEST -Action Copy -MoveToFolder C:\TEST1 -Si
 Copy files over than 10KByte to C:\TEST1 recuresively.
 If no child folder exists in the desitination, make the new folder.
 If same name file exists in the destination, skip copying and continue to process a next object.
-
 
 
 .EXAMPLE
@@ -274,6 +275,7 @@ If the script skips to process, exits successfully.
 
 
 .PARAMETER NoneTargetAsWarning
+
 Specify if you want to terminate with a Warning when no file exists in the folder.
 [exit with Normal when no file exists in the folder] is default.
 

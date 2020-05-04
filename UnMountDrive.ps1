@@ -2,45 +2,33 @@
 
 <#
 .SYNOPSIS
+
 This script unmount a network drive.
 CommonFunctions.ps1 is required.
 You can unmount multiple network drives with Wrapper.ps1
 <Common Parameters> is not supported.
 
-マウント済ネットワークドライブをアンマウントするプログラムです。
-実行にはCommonFunctions.ps1が必要です。
-セットで開発しているWrapper.ps1と併用すると複数のドライブを処理できます。
 
-<Common Parameters>はサポートしていません
 
 .DESCRIPTION
 
 This script unmount Network drive.
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
-マウント済ネットワークドライブをアンマウントするプログラムです。
-
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
 
 
 .EXAMPLE
+
 UnMountDrive.ps1 -MountedDrive F:
 
 UnMount SMB share mapped as Drive F:
 
-マウント済ネットワークドライブのF:をアンマウントします。
-
-
 
 
 .PARAMETER MountedDrive
+
 Specify drive letter mapped.
 Specification is required.
-
-アンマウント対象のマウント済ドライブのF:を指定します。
-指定必須です。
-
-
 
 
 .PARAMETER Log2EventLog
@@ -50,6 +38,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 

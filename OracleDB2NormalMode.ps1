@@ -2,29 +2,20 @@
 
 <#
 .SYNOPSIS
+
 This script siwtch to Normal mode(Ending Backup Mode) Oracle Database after finishing backup software.
 CommonFunctions.ps1 , SQLs.ps1 are required.
 
 <Common Parameters> is not supported.
 
 
-Oracle Databaseをバックアップ後に通常モードへ切替するスクリプトです。
-
-<Common Parameters>はサポートしていません
 
 .DESCRIPTION
+
 This script siwtch to Normal mode(Ending Backup Mode) Oracle Database after finishing backup software.
 The script loads SQLs.ps1, place SQLs.ps1 previously.
 OracleDB2BackUpMode.ps1 is offered also, you may use it with this script.
 If Windows Oracle service or Listener service is stopped, start them automatically.
-
-Oracle Databaseをバックアップするには、予めデータベースの停止、またはバックアップモードへ切替が必要です。
-従来はデータベースの停止(Shutdown Immediate)で実装する例が大半ですが、停止はセッションが存在すると停止しない等で障害となる例もあります。
-そのため本スクリプトはOracle Databaseを停止するのではなく、表領域をバックアップモードへ切替してバックアップを開始する運用を前提として作成しています。
-
-セットで使用するSQLs.PS1を読み込み、実行します。予め配置してください。
-対になるバックアップモードから通常モードへ切替するスクリプトを用意しておりますので、セットで運用してください。
-
 
 Sample Path setting
 
@@ -36,6 +27,7 @@ Sample Path setting
 ..\Log\SQL.LOG
 
 
+
 .EXAMPLE
 
 .\OracleDB2NormalMode
@@ -43,10 +35,6 @@ Sample Path setting
 Switch all tables of Oracle SID specified at Windows enviroment variable to Normal Mode.
 Authentification to connecting to Oracle is used OS authentification with OS user running the script.
 If Windows Oracle service or Listener service, start them automatically.
-
-Windows環境変数Oracle_SIDに設定された全ての表領域を通常モードへ切替します。
-Oracle Databaseの認証はOS認証を用います。このスクリプトが実行されるOSユーザで認証します。
-Oracleサービス、Listenerが停止していた場合は起動します。
 
 
 .\OracleDBNormalMode -OracleSID MCDB -ExecUser FOO -ExecUserPassword BAR -PasswordAuthorization
@@ -57,16 +45,11 @@ Oracle user is used 'FOO', Oracle user password is used 'BAR'
 If Windows Oracle service or Listener service, start them automatically.
 
 
-Oracle SID MCDBのOracle Databaseの全ての表領域を通常モードへ切替します。
-OracleDatabaseの認証はパスワード認証を用いています。ユーザID FOO、パスワード BARでログイン認証します。
-
-
 
 .PARAMETER OracleSID
+
 Specify Oracle_SID.
 Should set '$Env:ORACLE_SID' by default.
-
-対象のOracleSIDを指定します。
 
 
 .PARAMETER OracleService
@@ -77,71 +60,63 @@ RMAN Logを削除する対象のOracleSIDを指定します。
 
 
 .PARAMETER OracleHomeBinPath
+
 Specify Oracle 'BIN' path in the child path Oracle home. 
 Should set "$Env:ORACLE_HOME +'\BIN'" by default.
 
-Oracle Home配下のBINフォルダまでのパスを指定します。
-通常は標準設定である$Env:ORACLE_HOME +'\BIN'（Powershellでの表記）で良いのですが、OSで環境変数%ORACLE_HOME%が未設定環境では当該を設定してください。
 
 .PARAMETER StartServicePath
-Specify path of StartService.ps1
+
+Specify path of ChangeServiceStatus.ps1
 Specification is required.
 Can specify relative or absolute path format.
 
-StartService.ps1のパスを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
-
+ 
 .PARAMETER SQLLogPath
+
 Specify path of SQL log file.
 If the file dose not exist, create a new file.
 Can specify relative or absolute path format.
-                                                                                        
+
+
 .PARAMETER SQLCommandsPath
+
 Specify path of SQLs.ps1
 Specification is required.
 Can specify relative or absolute path format.
 
-予め用意した、実行するSQL文群を記述したps1ファイルのパスを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
-
 
 .PARAMETER ControlFileDotCtlPATH
+
 Specify to export controle file path ending with .ctl
 Specification is required.
 Can specify relative or absolute path format.
 
-.CTL形式のコントロールファイルを出力するパスを指定します。
 
 .PARAMETER ControlFileDotBkPATH
+
 Specify to export controle file path ending with .bk
 Specification is required.
 Can specify relative or absolute path format.
 
-.BK形式のコントロールファイルを出力するパスを指定します。
 
 .PARAMETER PasswordAuthorization
+
 Specify authentification with password authorization.
 Should use OS authentification.
+Should use for test only.
 
-パスワード認証を指定します。
-OS認証が使えない時に使用する事を推奨します。
 
 .PARAMETER ExecUser
+
 Specify Oracle User to connect. 
 Should use OS authentification.
 
-パスワード認証時のユーザを設定します。
-OS認証が使えない時に使用する事を推奨します。
 
 .PARAMETER ExecUserPassword
+
 Specify Oracle user Password to connect. 
 Should use OS authentification.
-
-パスワード認証時のユーザパスワードを設定します。
-OS認証が使えない時に使用する事を推奨します。
-
 
 
 .PARAMETER Log2EventLog
@@ -151,6 +126,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 

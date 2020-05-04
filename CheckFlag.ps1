@@ -2,6 +2,7 @@
 
 <#
 .SYNOPSIS
+
 This script checkes existence(or non-existence)  of a flag file, and create(or delete) the flag file.
 CommonFunctions.ps1 is required.
 
@@ -37,8 +38,8 @@ If the file dose not exist, the script exit with normal return code.
 For backward compatibility, run without specification -Status option, -Status will be 'NoExist' by default.
 
 
-
 .EXAMPLE
+
 .\CheckFlag -FlagFolder ..\Lock -FlagFile BackUp.Flg -Status Exist -PostAction Delete
 
 Check BackUp.Flg file in the ..\Lock folder.

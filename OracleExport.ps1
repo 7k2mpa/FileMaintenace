@@ -8,17 +8,16 @@ This script export Oracle data with Data Pump.
 CommonFunctions.ps1 is required.
 
 
+
 .DESCRIPTION
+
 This script export Oracle data with Data Pump.
 CommonFunctions.ps1 is required.
-
-
 
 Sample path setting
 
 .\OracleExport.ps1
 .\CommonFunctions.ps1
-
 
 
 
@@ -29,17 +28,21 @@ Export data of Schema MCFRAME with Oracle Data Pump.
 Specify export destination path with Oracle Directory Object named MCDATA_PUMP_DIR 
 
 
+
 .PARAMETER Schema
+
 Specify shcema to export.
 Specification is required.
 
 
 .PARAMETER DumpDirectoryObject
+
 Specify Oracle Directory Object for exporting.
 Specification is required.
 
 
 .PARAMETER AddtimeStamp
+
 Specify if you want to add time stamp to file name.
 Time stamp strings are added between filename and extension.
 
@@ -47,43 +50,48 @@ Sample:host_schema_PUMP_yyyyMMdd_HHmmss.dmp
 
 
 .PARAMETER TimeStampFormat
+
 Specify time stamp format
 [_yyyyMMdd_HHmmss] is default
 
 
 .PARAMETER OracleSID
+
 Specify Oracle_SID for deleting RMAN log.
 Should set '$Env:ORACLE_SID' by default.
 
 .PARAMETER OracleHomeBinPath
+
 Specify Oracle 'BIN' path in the child path Oracle home. 
 Should set "$Env:ORACLE_HOME +'\BIN'" by default.
 
 
-
-
 .PARAMETER PasswordAuthorization
+
 Specify authentification with password authorization.
 Should use OS authentification.
-
+Should use for test only.
 
 .PARAMETER ExecUser
+
 Specify Oracle User to connect. 
 Should use OS authentification.
 
 
 .PARAMETER ExecUserPassword
+
 Specify Oracle user Password to connect. 
 Should use OS authentification.
 
 
 .PARAMETER DumpFile
+
 Specify dump file name.
 [$HostName_$Schema_PUMP.dmp] is default.
 
 .PARAMETER LogFile
-[HostName_$Schema_PUMP.log] is default.
 
+[HostName_$Schema_PUMP.log] is default.
 
 
 .PARAMETER Log2EventLog
@@ -93,6 +101,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 

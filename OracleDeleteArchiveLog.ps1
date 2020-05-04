@@ -2,6 +2,7 @@
 
 <#
 .SYNOPSIS
+
 This script deletes Oracle Achive logs older than specified days.
 Archive log files are deleted in Oracle RMAN records only and you need to delete log files in the file system with OS's delete command.
 CommonFunctions.ps1 , DeleteArachiveLog.rman are required.
@@ -9,13 +10,9 @@ CommonFunctions.ps1 , DeleteArachiveLog.rman are required.
 <Common Parameters> is not supported.
 
 
-指定日以前のOracle Archive Logを削除するツールです。
-Oracleの仕様上、Oracleから古いArchive Logは認識されなくなりますが、ファイルシステム上のファイルは削除されません。
-別途、OSコマンドやFileMaintenance.ps1でファイルを削除してください。 
-
-<Common Parameters>はサポートしていません
 
 .DESCRIPTION 
+
 This script deletes Oracle Achive logs older than specified days.
 The script loads DeleteArchivelog.rman, place DeleteArchivelog.rman previously.
 You can specify how old days to delte with arugument.
@@ -25,20 +22,13 @@ If you connect another target, set $env:ORACLE_SID before start the script.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
-
-指定日以前のOracle Archive Logを削除するツールです。
-セットで使用するDeleteArchivelog.rmanを読み込み、実行します。予め配置してください。
-実行の際に、何日前を削除するか、引数で指定が可能です。
-
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
-
-
-File Path sample
+Sample Path setting
 
 .\OracleDeleteArchiveLog.ps1
 .\CommonFunctions.ps1
 ..\SQL\DeleteArchiveLog.rman
 ..\Log\RMAN.LOG
+
 
 
 .EXAMPLE
@@ -57,15 +47,6 @@ $ORACLE_HOME\network\admin\sqlnet.ora
 SQLNET.AUTHENTICATION_SERVICES = (NTS)
 
 
-予め設定済OracleSIDのインスタンスの7日以前のarchive logを削除します。
-RMAN実行結果のログは本スクリプト配置から見て、相対パスの..\Log\Rman.logに出力します。
-Rman.logが存在しない場合はファイルを新規作成します。
-RMAN実行時の認証はOS認証となり、このスクリプトを実行しているユーザがスクリプト実行ユーザとなります。
-当該実行ユーザに対してOracle Administration Assistant for Windowsを使って、管理者権限を付与しておいて下さい。
-$ORACLE_HOME\network\admin\sqlnet.ora ファイルに以下の記述が必要です。
-SQLNET.AUTHENTICATION_SERVICES = (NTS)
-
-
 .EXAMPLE
 
 OracleDeleteArchiveLog.ps1 -OracleSID MCFRAME -OracleRmanLogPath ..\Log\RMAN.log -Days 7 -PaswordAuthorization -ExecUser foo -ExecUserPassword bar
@@ -77,19 +58,11 @@ Authentification for connecting is with plain text user 'foo' and password 'bar'
 Recommend OS authentification for security.
 
 
-Oracleサービス名MCFRAME（OS上のサービス名OracleMCFRAME）のインスタンスの7日以前のarchive logを削除します。
-RMAN実行結果のログは本スクリプト配置から見て、相対パスの..\Log\Rman.logに出力します。
-Rman.logが存在しない場合はファイルを新規作成します。
-RMAN実行時の認証はパスワード認証となり、-ExecUser、-ExecUserPasswordで指定されたユーザfoo、パスワードbarでOracleへ接続します。
-セキュリティの観点から極力OS認証を利用される事を推奨します。
-
-
 
 .PARAMETER OracleSID
+
 Specify Oracle_SID for deleting RMAN log.
 Should set '$Env:ORACLE_SID' by default.
-
-RMAN Logを削除する対象のOracleSIDを指定します。
 
 
 .PARAMETER OracleService
@@ -100,60 +73,45 @@ RMAN Logを削除する対象のOracleSIDを指定します。
 
 
 .PARAMETER OracleHomeBinPath
+
 Specify Oracle 'BIN' path in the child path Oracle home. 
 Should set "$Env:ORACLE_HOME +'\BIN'" by default.
 
-Oracle Home配下のBINフォルダまでのパスを指定します。
-通常は標準設定である$Env:ORACLE_HOME +'\BIN'（Powershellでの表記）で良いのですが、OSで環境変数%ORACLE_HOME%が未設定環境では当該を設定してください。
-
 
 .PARAMETER ExecRMANPath
+
 Specify path of DeleteArchiveLog.rman
 Can specify relative or absolute path format.
 
-実行するRMANファイルのパスを指定します。
-相対パス、絶対パスでの指定が可能です。
-
 
 .PARAMETER OracleRmanLogPath
+
 Specify path of RMAN log file.
 If the file dose not exist, create a new file.
 Can specify relative or absolute path format.
 
 
-RMAN実行時のログ出力先ファイルパスを指定します。
-ログ出力先ファイルが存在しない場合は新規作成します。
-相対パス、絶対パスでの指定が可能です。
-
-
 .PARAMETER Days
-Specify days to delete.
 
-削除対象にするRMANの経過日数を指定します。
+Specify days to delete.
 
 
 .PARAMETER PasswordAuthorization
+
 Specify authentification with password authorization.
 Should use OS authentification.
-
-パスワード認証を指定します。
-OS認証が使えない時に使用する事を推奨します。
+Should use for test only.
 
 .PARAMETER ExecUser
+
 Specify Oracle User to connect. 
 Should use OS authentification.
 
-パスワード認証時のユーザを設定します。
-OS認証が使えない時に使用する事を推奨します。
 
 .PARAMETER ExecUserPassword
+
 Specify Oracle user Password to connect. 
 Should use OS authentification.
-
-パスワード認証時のユーザパスワードを設定します。
-OS認証が使えない時に使用する事を推奨します。
-
-
 
 
 .PARAMETER Log2EventLog
@@ -163,6 +121,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 

@@ -7,9 +7,7 @@ This script loads a configuration file including arguments, execute the other sc
 CommonFunctions.ps1 is required.
 You can process log files in multiple folders with FileMaintenance.ps1
 
-指定したプログラムを設定ファイルに書かれたパラメータを読み込んで、順次呼び出すプログラムです。
-実行にはCommonFunctions.ps1が必要です。
-セットで開発しているFileMaintenance.ps1と併用すると複数のログ処理を一括実行できます。
+
 
 .DESCRIPTION
 
@@ -20,14 +18,6 @@ An empty line in the configuration file, it is sikkiped.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
-設定ファイルから1行づつパラメータを読み込み、指定したプログラムに順次実行させます。
-
-設定ファイルは任意に設定可能です。
-設定ファイルの行頭を#とすると当該行はコメントとして処理されます。
-設定ファイルの空白行はスキップします。
-
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
-
 Sample Configuration file. 
 Save the file as DailyMaintenance.txt, execute with option '-CommandPath [TargetScript.ps1] -CommandFile .\DailyMaintenance.txt'
 ---
@@ -35,16 +25,6 @@ Save the file as DailyMaintenance.txt, execute with option '-CommandPath [Target
 -TargetFolder D:\IIS\LOG -RegularExpression '^.*\.log$' -Action Delete -Days 14
 
 #move access log older 7days to Old_Log
--TargetFolder D:\AccessLog -MoveToFolder .\Old_Log -Days 7
----
-
-設定ファイル例です。例えば以下をDailyMaintenance.txtに保存して-CommandFile .\DailyMaintenance.txtと指定して下さい。
-
----
-#14日経過した.logで終わるファイルを削除
--TargetFolder D:\IIS\LOG -RegularExpression '^.*\.log$' -Action Delete -Days 14
-
-#7日経過したアクセスログをOld_Logへ退避
 -TargetFolder D:\AccessLog -MoveToFolder .\Old_Log -Days 7
 ---
 
@@ -57,9 +37,6 @@ Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt
 Execute .\FileMaintenance.ps1 in the same folder.
 Load the parameter file .\Command.txt and execute .\FileMaintenance with arguments in the parameter file every lines.
 
-このプログラムと同一フォルダに存在するFileMaintenance.ps1を起動します。
-起動する際に渡すパラメータは設定ファイルComman.txtを1行づつ読み込み、順次実行します。
-
 
 .EXAMPLE
 
@@ -68,10 +45,6 @@ Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt -Conti
 Execute .\FileMaintenance.ps1 in the same folder.
 Load the parameter file .\Command.txt and execute .\FileMaintenance with arguments in the parameter file every lines.
 If ERROR termination occur in the line, do not terminate Wrapper.ps1 and execute FileMaintenance.ps1 with argument in the next line.
-
-　このプログラムと同一フォルダに存在するFileMaintenance.ps1を起動します。
-起動する際に渡すパラメータは設定ファイルComman.txtを1行づつ読み込み、順次実行します。
-もし、FileMaintenance.ps1を実行した結果が異常終了となった場合は、Wrapper.ps1を異常終了させず、Command.txtの次行を読み込み継続処理をします。
 
 
 
@@ -99,17 +72,11 @@ If the path contains bracket[] , specify path literally and do not escape.
 Specify encode chracter code in the command file.
 [Default(ShitJIS)] is default.
 
-　コマンドファイルの文字コードを指定します。
-デフォルトは[Default]でShif-Jisです。
-
 
 .PARAMETER Continue
 
 If you want to execute script with argument next line in the command file ending the script with error.
 [This script terminates with Error] is default.
-
-　起動したプログラムが異常終了しても、コマンドファイルの次行を継続処理します。
-デフォルトではそのまま異常終了します。
 
 
 .PARAMETER Log2EventLog

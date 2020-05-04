@@ -2,14 +2,20 @@
 
 <#
 .SYNOPSIS
+
 This script control N2WS backup job with python CLI.
 CommonFunctions.ps1 is required.
 
+
+
 .DESCRIPTION
+
 This script control N2WS backup job with python CLI.
 CommonFunctions.ps1 is required.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
+
+
 
 .EXAMPLE
 
@@ -62,6 +68,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 

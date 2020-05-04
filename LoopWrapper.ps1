@@ -2,19 +2,13 @@
 
 <#
 .SYNOPSIS
+
 This script execute the program specified with arguments in the specified config file.
 Untill Ending with Normal, execute specified times every specified seconds.  
 
 CommonFunctions.ps1 is requied.
 
-指定したプログラムを設定ファイルに書かれたパラメータを読み込んで実行します。
-正常終了に遷移するまで、指定秒数間隔で指定回数実行します。
 
-
-実行にはCommonFunctions.ps1が必要です。
-
-
-<Common Parameters>はサポートしていません
 
 .DESCRIPTION
 
@@ -43,31 +37,6 @@ Execute this script with argument -CommandPath .\CheckFlag.ps1 -CommandFile .\Lo
 ---
 
 
-指定したプログラムを設定ファイルに書かれたパラメータを読み込んで実行します。
-正常終了に遷移するまで、指定秒数間隔で指定回数実行します。
-指定したプログラムが正常終了した場合、本プログラムは正常終了します。
-指定したプログラムが警告終了した場合、本プログラムは指定秒数間隔で指定回数指定したプログラムを再実行します。
-指定回数を超過した場合は警告終了します。
-
-指定したプログラムが異常終了した場合、本プログラムは異常終了します。
-
-
-設定ファイルは任意に設定可能です。
-設定ファイルの1行目のみを指定したプログラムに渡して実行します。
-
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
-
-
-
-設定ファイル例です。
-例えば以下をLoopWrapperCommand.txtに保存します。
-これを-CommandPath .\CheckFlag.ps1 -CommandFile .\LoopWrapperCommand.txtを引数として本プログラムを実行しますｌ
-
----　
--CheckFolder .\Lock -CheckFile BkupDB.flg
----
-
-
 
 .EXAMPLE
 
@@ -86,20 +55,6 @@ After specified times, this script end as Warning.
 If CheckFlag.ps1 ends with error, this script ends with error.
 
 
-　このプログラムと同一フォルダに存在するCheckFlag.ps1を起動します。
-起動する際に渡すパラメータは設定ファイルComman.txtの1行目です。
-
-CheckFlag.ps1が正常終了すると、本プログラムは正常終了します。
-
-CheckFlag.ps1が警告終了すると、本プログラムは指定秒数間隔で指定回数CheckFlag.ps1を再実行します。
-CheckFlag.ps1はフラグファイルが存在しないと正常終了、存在すると警告終了します。
-この設定では、フラグファイルが削除されるまで本プログラムは指定回数ループ継続します。
-指定回数を超過した場合は警告終了します。
-
-
-CheckFlag.ps1が異常終了すると、本プログラムは異常終了します。
-
-
 .EXAMPLE
 
 LoopWrapper.ps1 -CommandPath .\CheckFlag.ps1 -CommandFile .\Command.txt -Span 60 -UpTo 120
@@ -116,52 +71,30 @@ After specified times, this script end with warning.
 
 If CheckFlag.ps1 ends with error, this script ends with error.
 
-　このプログラムと同一フォルダに存在するCheckFlag.ps1を起動します。
-起動する際に渡すパラメータは設定ファイルComman.txtの1行目です。
-
-CheckFlag.ps1が正常終了すると、本プログラムは正常終了します。
-
-CheckFlag.ps1が警告終了すると、本プログラムは指定秒数間隔で指定回数CheckFlag.ps1を再実行します。
-60秒間隔で120回試行します。
-
-CheckFlag.ps1はフラグファイルが存在しないと正常終了、存在すると警告終了します。
-この設定では、フラグファイルが削除されるまで本プログラムは指定回数ループ継続します。
-
-指定回数を超過した場合は警告終了します。
-
-
-CheckFlag.ps1が異常終了すると、本プログラムは異常終了します。
-
 
 
 .PARAMETER CommandPath
 
 Specify the path of script to execute.
-Specification is required.
-Wild cards are not accepted.
-　起動するプログラムパスを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
-ワイルドカード*は使用できません。
+Can specify relative, absolute or UNC path format.
+Relative path format must be starting with 'dot.'
+Wild cards are not accepted shch as asterisk* question? bracket[]
+If the path contains bracket[] , specify path literally and do not escape.
+
 
 .PARAMETER CommandFile
 
 Specify the path of command file with arguments.
-Specification is required.
-Wild cards are not accepted.
+Can specify relative, absolute or UNC path format.
+Relative path format must be starting with 'dot.'
+Wild cards are not accepted shch as asterisk* question? bracket[]
+If the path contains bracket[] , specify path literally and do not escape.
 
-　起動するプログラムに渡すコマンドファイルを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
-ワイルドカード*は使用できません。
 
 .PARAMETER CommandFileEncode
 
 Specify encode chracter code in the command file.
 [Default(ShitJIS)] is default.
-
-　コマンドファイルの文字コードを指定します。
-デフォルトは[Default]でShif-Jisです。
 
 
 .PARAMETER Span
@@ -170,24 +103,16 @@ Specify how log waiting for retry the script execution in seconds.
 [10 secnods] is default
 
 
-再実行時の間隔を秒数で指定します。
-デフォルトは10秒です。
-
 .PARAMETER UpTo
 
 Specify how many times to execute the script.
 [1000times] is default.
 
-再実行の試行回数を指定します。
-デフォルトは1000回です。
 
 .PARAMETER Continue
 
 If you want to execute script again with argument 1st line in the command file ending the script with error.
 [This script ends with error] is default.
-
-起動したプログラムが異常終了してもループ処理を継続します。
-
 
 
 .PARAMETER Log2EventLog
@@ -197,6 +122,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 

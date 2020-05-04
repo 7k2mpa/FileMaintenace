@@ -2,33 +2,26 @@
 
 <#
 .SYNOPSIS
+
 This script mount a network drive.
 CommonFunctions.ps1 is required.
 You can mount multiple network drives with Wrapper.ps1
 <Common Parameters> is not supported.
 
-ネットワークドライブをマウントするプログラムです。
-実行にはCommonFunctions.ps1が必要です。
-セットで開発しているWrapper.ps1と併用すると複数のドライブを処理できます。
 
-<Common Parameters>はサポートしていません
 
 .DESCRIPTION
 
 This script mount Network drive.
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
-ネットワークドライブをマウントするプログラムです。
-
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
 
 
 .EXAMPLE
+
 MountDrive.ps1 -UNCPath \\FileServer\share -MountDrive F:
 
 Mount UNC path \\FileServer\share SMB share and map to Drive F:
-
-\\FileServer\shareをドライブのF:としてマウントします。
 
 
 .PARAMETER TargetPath
@@ -36,17 +29,11 @@ Mount UNC path \\FileServer\share SMB share and map to Drive F:
 Specify UNC Path for mount.
 Specification is required.
 
-マウント対象ネットワークドライブのUNCパスを指定します。
-指定必須です。
 
 .PARAMETER MountedDrive
 
 Specify drive letter for mapping.
 Specification is required.
-
-マウント先のドライブレター指定します。
-指定必須です。
-
 
 
 .PARAMETER Log2EventLog
@@ -56,6 +43,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 

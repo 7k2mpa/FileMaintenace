@@ -2,29 +2,21 @@
 
 <#
 .SYNOPSIS
-This script siwtch to Back Up mode Oracle Database before starting backup software .
+
+This script siwtches Oracle Database to Back Up mode before starting backup software .
 CommonFunctions.ps1 , SQLs.ps1 , ChangeServiceStatus.ps1 are required.
 
 <Common Parameters> is not supported.
 
-Oracle Database‚ğƒoƒbƒNƒAƒbƒv‘O‚ÉƒoƒbƒNƒAƒbƒvƒ‚[ƒh‚ÖØ‘Ö‚·‚éƒXƒNƒŠƒvƒg‚Å‚·B
 
-<Common Parameters>‚ÍƒTƒ|[ƒg‚µ‚Ä‚¢‚Ü‚¹‚ñ
 
 .DESCRIPTION
-This script siwtch to Backup mode Oracle Database before starting backup software.
+
+This script siwtches Oracle Database to Backup mode before starting backup software.
 The script loads SQLs.ps1, place SQLs.ps1 previously.
 OracleDB2NormalMode.ps1 is offered also, you may use it with this script.
 
-Oracle Database‚ğƒoƒbƒNƒAƒbƒv‚·‚é‚É‚ÍA—\‚ßƒf[ƒ^ƒx[ƒX‚Ì’â~A‚Ü‚½‚ÍƒoƒbƒNƒAƒbƒvƒ‚[ƒh‚ÖØ‘Ö‚ª•K—v‚Å‚·B
-]—ˆ‚Íƒf[ƒ^ƒx[ƒX‚Ì’â~(Shutdown Immediate)‚ÅÀ‘•‚·‚é—á‚ª‘å”¼‚Å‚·‚ªA’â~‚ÍƒZƒbƒVƒ‡ƒ“‚ª‘¶İ‚·‚é‚Æ’â~‚µ‚È‚¢“™‚ÅáŠQ‚Æ‚È‚é—á‚à‚ ‚è‚Ü‚·B
-‚»‚Ì‚½‚ß–{ƒXƒNƒŠƒvƒg‚ÍOracle Database‚ğ’â~‚·‚é‚Ì‚Å‚Í‚È‚­A•\—Ìˆæ‚ğƒoƒbƒNƒAƒbƒvƒ‚[ƒh‚ÖØ‘Ö‚µ‚ÄƒoƒbƒNƒAƒbƒv‚ğŠJn‚·‚é‰^—p‚ğ‘O’ñ‚Æ‚µ‚Äì¬‚µ‚Ä‚¢‚Ü‚·B
-
-ƒZƒbƒg‚Åg—p‚·‚éSQLs.PS1‚ğ“Ç‚İ‚İAÀs‚µ‚Ü‚·B—\‚ß”z’u‚µ‚Ä‚­‚¾‚³‚¢B
-‘Î‚É‚È‚éƒoƒbƒNƒAƒbƒvƒ‚[ƒh‚©‚ç’Êíƒ‚[ƒh‚ÖØ‘Ö‚·‚éƒXƒNƒŠƒvƒg‚ğ—pˆÓ‚µ‚Ä‚¨‚è‚Ü‚·‚Ì‚ÅAƒZƒbƒg‚Å‰^—p‚µ‚Ä‚­‚¾‚³‚¢B
-
-
-”z’u—á
+sample path setting
 
 .\OracleDB2NormalMode.ps1
 .\OracleDB2BackUpMode.ps1
@@ -32,6 +24,7 @@ Oracle Database‚ğƒoƒbƒNƒAƒbƒv‚·‚é‚É‚ÍA—\‚ßƒf[ƒ^ƒx[ƒX‚Ì’â~A‚Ü‚½‚ÍƒoƒbƒNƒAƒbƒ
 .\CommonFunctions.ps1
 ..\SQL\SQLs.PS1
 ..\Log\SQL.LOG
+
 
 
 .EXAMPLE
@@ -44,10 +37,8 @@ If the flag file exists, terminate as ERROR.
 Authentification to connecting to Oracle is used OS authentification with OS user running the script.
 At last stop Listener.
 
-WindowsƒT[ƒrƒX–¼OracleServiceMCDBAƒCƒ“ƒXƒ^ƒ“ƒX–¼MCDB‚ÌOracle Database‚Ì‘S‚Ä‚Ì•\—Ìˆæ‚ğƒoƒbƒNƒAƒbƒvƒ‚[ƒh‚ÖØ‘Ö‚µ‚Ü‚·B
-Oracle Database‚Ì”FØ‚ÍOS”FØ‚ğ—p‚¢‚Ü‚·B‚±‚ÌƒXƒNƒŠƒvƒg‚ªÀs‚³‚ê‚éOSƒ†[ƒU‚Å”FØ‚µ‚Ü‚·B
-ƒoƒbƒNƒAƒbƒv’†ƒtƒ‰ƒO..\Flag\BackUp.FLG‚Ì‘¶İ‚ğŠm”F‚µA‘¶İ‚µ‚½ê‡‚ÍƒoƒbƒNƒAƒbƒv’†‚Æ”»’è‚µ‚ÄˆÙíI—¹‚µ‚Ü‚·B
-Ø‘ÖŒã‚ÉListener‚ğ’â~‚µ‚Ü‚·B
+
+.EXAMPLE
 
 .\OracleDB2BackUpMode -oracleSerivce MCDB -BackUpFlagPath ..\Flag\BackUp.FLG -NoStopListener -ExecUser FOO -ExecUserPassword BAR -PasswordAuthorization
 
@@ -56,17 +47,12 @@ Authentification to connecting to Oracle is used password authentification.
 Oracle user is used 'FOO', Oracle user password is used 'BAR'
 The script dose not stop Listener.
 
-WindowsƒT[ƒrƒX–¼OracleServiceMCDBAƒCƒ“ƒXƒ^ƒ“ƒX–¼MCDB‚ÌOracle Database‚Ì‘S‚Ä‚Ì•\—Ìˆæ‚ğƒoƒbƒNƒAƒbƒvƒ‚[ƒh‚ÖØ‘Ö‚µ‚Ü‚·B
-OracleDatabase‚Ì”FØ‚ÍƒpƒXƒ[ƒh”FØ‚ğ—p‚¢‚Ä‚¢‚Ü‚·Bƒ†[ƒUID BackUpUpserAƒpƒXƒ[ƒh FOOBAR‚ÅƒƒOƒCƒ“”FØ‚µ‚Ü‚·B
-ƒoƒbƒNƒAƒbƒv’†ƒtƒ‰ƒO..\Flag\BackUp.FLG‚Ì‘¶İ‚ğŠm”F‚µA‘¶İ‚µ‚½ê‡‚ÍƒoƒbƒNƒAƒbƒv’†‚Æ”»’è‚µ‚ÄˆÙíI—¹‚µ‚Ü‚·B
-Ø‘ÖŒã‚ÉListener‚Í’â~‚µ‚Ü‚¹‚ñB
 
 
 .PARAMETER OracleSID
+
 Specify Oracle_SID.
 Should set '$Env:ORACLE_SID' by default.
-
-‘ÎÛ‚ÌOracleSID‚ğw’è‚µ‚Ü‚·B
 
 
 .PARAMETER OracleService
@@ -77,60 +63,59 @@ RMAN Log‚ğíœ‚·‚é‘ÎÛ‚ÌOracleSID‚ğw’è‚µ‚Ü‚·B
 
 
 .PARAMETER OracleHomeBinPath
+
 Specify Oracle 'BIN' path in the child path Oracle home. 
 Should set "$Env:ORACLE_HOME +'\BIN'" by default.
 
-Oracle Home”z‰º‚ÌBINƒtƒHƒ‹ƒ_‚Ü‚Å‚ÌƒpƒX‚ğw’è‚µ‚Ü‚·B
-’Êí‚Í•W€İ’è‚Å‚ ‚é$Env:ORACLE_HOME +'\BIN'iPowershell‚Å‚Ì•\‹Lj‚Å—Ç‚¢‚Ì‚Å‚·‚ªAOS‚ÅŠÂ‹«•Ï”%ORACLE_HOME%‚ª–¢İ’èŠÂ‹«‚Å‚Í“–ŠY‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢B
 
 .PARAMETER SQLLogPath
+
 Specify path of SQL log file.
 If the file dose not exist, create a new file.
 Can specify relative or absolute path format.
 
 .PARAMETER SQLCommandsPath
-—\‚ß—pˆÓ‚µ‚½AÀs‚·‚éSQL•¶ŒQ‚ğ‹Lq‚µ‚½ps1ƒtƒ@ƒCƒ‹‚ÌƒpƒX‚ğw’è‚µ‚Ü‚·B
-w’è‚Í•K{‚Å‚·B
-‘Š‘ÎAâ‘ÎƒpƒX‚Åw’è‰Â”\‚Å‚·B
+
+Specify path of SQLs.ps1.
+Specification is required.
+Can specify relative or absolute path format.
+
 
 .PARAMETER BackUpFlagPath
+planed to be obsolute
 ƒoƒbƒNƒAƒbƒv’†‚ğ¦‚·ƒtƒ‰ƒOƒtƒ@ƒCƒ‹‚ÌƒpƒX‚ğw’è‚µ‚Ü‚·B
 w’è‚Í•K{‚Å‚·B
 ‘Š‘ÎAâ‘ÎƒpƒX‚Åw’è‰Â”\‚Å‚·B
 
 
 .PARAMETER PasswordAuthorization
+
 Specify authentification with password authorization.
 Should use OS authentification.
+Should use for test only.
 
-ƒpƒXƒ[ƒh”FØ‚ğw’è‚µ‚Ü‚·B
-OS”FØ‚ªg‚¦‚È‚¢‚Ég—p‚·‚é–‚ğ„§‚µ‚Ü‚·B
 
 .PARAMETER ExecUser
+
 Specify Oracle User to connect. 
 Should use OS authentification.
 
-ƒpƒXƒ[ƒh”FØ‚Ìƒ†[ƒU‚ğİ’è‚µ‚Ü‚·B
-OS”FØ‚ªg‚¦‚È‚¢‚Ég—p‚·‚é–‚ğ„§‚µ‚Ü‚·B
 
 .PARAMETER ExecUserPassword
+
 Specify Oracle user Password to connect. 
 Should use OS authentification.
 
-ƒpƒXƒ[ƒh”FØ‚Ìƒ†[ƒUƒpƒXƒ[ƒh‚ğİ’è‚µ‚Ü‚·B
-OS”FØ‚ªg‚¦‚È‚¢‚Ég—p‚·‚é–‚ğ„§‚µ‚Ü‚·B
-
 
 .PARAMETER NoChangeToBackUpMode
-ƒoƒbƒNƒAƒbƒvƒ‚[ƒh‚Ö‚ÌØ‘Ö•s—v‚ğw’è‚µ‚Ü‚·B
-ƒoƒbƒNƒAƒbƒvƒ\ƒtƒgƒEƒGƒA‚É‚æ‚Á‚Ä‚ÍAƒoƒbƒNƒAƒbƒvƒ\ƒtƒgƒEƒGƒA‚ªOracle‚ğƒoƒbƒNƒAƒbƒvƒ‚[ƒh‚ÖØ‘Ö‚µ‚Ü‚·B
-‚»‚Ìê‡‚Í“–ƒXƒCƒbƒ`‚ğOn‚É‚µ‚Ä‰º‚³‚¢B
+
+Specify if you do not want to switch to BackUp Mode.
+Some backup software use Oracle VSS when starting backup, thus you do not need to switch to BackUp Mode.
+
 
 .PARAMETER NoStopListener
-ƒŠƒXƒi[’â~•s—v‚ğw’è‚µ‚Ü‚·B
-‹Æ–±’f–Ê‚ª•K—v‚Èê‡AƒoƒbƒNƒAƒbƒv‘O‚ÉƒŠƒXƒi[‚ğ’â~‚µ‚Ü‚·‚ªA‹Æ–±’f–Ê‚ª•s—vor–³’â~‚Æ‚·‚éê‡‚Í“–ƒXƒCƒbƒ`‚ğOn‚É‚µ‚Ä‰º‚³‚¢B
 
-
+Specify if you do not want to stop listener.
 
 
 .PARAMETER Log2EventLog
@@ -140,6 +125,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 
