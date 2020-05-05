@@ -23,6 +23,7 @@ N2WSbackup.ps1 -PolicyName SERVER1_policy -Job Request
 
 Request to start backup policy name [SERVER1_policy]
 
+
 .EXAMPLE
 
 N2WSbackup.ps1 -PolicyName SERVER1_policy -Job GetResult
@@ -35,30 +36,36 @@ Get result of latest backup job backup of policy name [SERVER1_policy]
 Sepcify the policy name in N2WS backup policies.
 Specification is required.
 
+
 .PARAMETER Job
 
-Specify job type [Request] to start new backup job or [GetResult] the result of latest backup job.
+Specify job type [Request] to start new backup job or [GetResult] of latest backup job.
 [GetResult] is default.
+
 
 .PARAMETER RetryInterval
 
 Specify checking interval the result of the job in seconds.
 [60] seconds is default.
 
+
 .PARAMETER MaxRetry
 
 Specify how many times to check the result of the job.
 [90] times is default.
+
 
 .PARAMETER N2WScliPath
 
 Specify the path of the N2WS CLI folder path.
 Relative or absolute path format is allowed.
 
+
 .PARAMETER BackUpLogPath 
 
 Specify the path of the folder of temporaly backup log files saved.
 Relative or absolute path format is allowed.
+
 
 
 .PARAMETER Log2EventLog

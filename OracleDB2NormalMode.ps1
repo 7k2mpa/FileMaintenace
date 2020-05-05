@@ -119,6 +119,7 @@ Specify Oracle user Password to connect.
 Should use OS authentification.
 
 
+
 .PARAMETER Log2EventLog
 
 Specify if you want to output log to Windows Event Log.

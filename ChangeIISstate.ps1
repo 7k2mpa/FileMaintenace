@@ -4,7 +4,7 @@
 <#
 .SYNOPSIS
 
-Script to Stop or Start IIS site.
+Script switch IIS site state to Stop or Start.
 CommonFunctions.ps1 is required.
 With Wrapper.ps1 start or stop multiple IIS sites.
 
@@ -14,8 +14,8 @@ With Wrapper.ps1 start or stop multiple IIS sites.
 
 .DESCRIPTION
 
-Script to Stop or Start IIS site.
-If start(stop) IIS site already started(stopped), will temrminate with WARNING.
+Script switch IIS site state to Stop or Start.
+If IIS site state is started(stopped) already, will temrminate with a WARNING.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
@@ -37,7 +37,7 @@ Start IIS site 'SSL'
 
 .PARAMETER Site
 
-Specify IIS site
+Specify IIS site to switch state.
 
 
 .PARAMETER TargetState
@@ -57,6 +57,7 @@ Default is 3seconds.
 Specify times to check IIS site state.
 Some sites require long time to switch serivce status, specify appropriate value.
 Default is 5times.
+
 
 
 .PARAMETER Log2EventLog

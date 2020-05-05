@@ -73,7 +73,8 @@ Specify 'Exist' or 'NoExist' the flag file.
 
 .PARAMETER PostAction
 
-Specify action to the flag file after checking.
+Specify action to [Delete] or [create] a flag file after checking.
+
 
 
 .PARAMETER Log2EventLog

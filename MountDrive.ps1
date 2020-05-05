@@ -30,10 +30,11 @@ Specify UNC Path for mount.
 Specification is required.
 
 
-.PARAMETER MountedDrive
+.PARAMETER MountDrive
 
 Specify drive letter for mapping.
 Specification is required.
+
 
 
 .PARAMETER Log2EventLog

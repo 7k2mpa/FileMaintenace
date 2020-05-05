@@ -3,32 +3,25 @@
 
 <#
 .SYNOPSIS
+
 This scipt start or stop Windows Service specified.
 CommonFunctions.ps1 is required.
 You can process multiple Windows services with Wrapper.ps1
 <Common Parameters> is not supported.
 
 
-指定したサービスを起動,停止するプログラムです。
-実行にはCommonFunctions.ps1が必要です。
-セットで開発しているFileMaintenance.ps1と併用すると複数のサービスを一括起動,停止できます。
-
-<Common Parameters>はサポートしていません
 
 .DESCRIPTION
+
 This scipt start or stop Windows Service specified.
 If start(stop) Windows serivce already started(stopped), will temrminate as WARNING.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
 
-指定したサービスを起動,停止するプログラムです。
-(停止|起動)済サービスを(停止|起動)指定すると警告終了します。
-
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
-
 
 .EXAMPLE
+
 ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Stopped -RetrySpanSec 5 -RetryTimes 5
 
 Stop Windows serivice(Service Name:Spooler, Print Spooler)
@@ -36,14 +29,10 @@ If it dose not stop immediately, retry 5times every 5seconds.
 
 If the service is stoped already, terminate as WARNING.
 
-サービス名:Spooler（表示名はPrint Spooler）を停止します。
-直ぐに停止しない場合は、5秒間隔で最大5回試行します。
-
-停止済サービスを停止しようとした場合は、警告終了します。
-
 
 
 .EXAMPLE
+
 ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Running -RetrySpanSec 5 -RetryTimes 5 -WarningAsNormal
 
 Start Windows serivice(Service Name:Spooler, Display Name:Print Spooler)
@@ -52,17 +41,12 @@ If it dose not start immediately, retry 5times every 5seconds.
 Specified -WarningAsNormal option and, if the service is started already, terminate as NORMAL.
 
 
-サービス名:Spooler（表示名はPrint Spooler）を起動します。
-直ぐに起動しない場合は、5秒間隔で最大5回試行します。
-
-起動済サービスを停止しようとした場合は、正常終了します。
-
-
 
 .PARAMETER Service
 
 Specify Windows 'Service name' to switch status.
 'Service name' is diffent from 'Display name'.
+
 Sample
 Serivce Name:Spooker
 Display Name:Print Spooler
@@ -88,6 +72,7 @@ Default is 3seconds.
 Specify times to check service status.
 Some services require long time to switch serivce status, specify appropriate value.
 Default is 5times.
+
 
 
 .PARAMETER Log2EventLog

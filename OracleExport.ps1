@@ -72,6 +72,7 @@ Specify authentification with password authorization.
 Should use OS authentification.
 Should use for test only.
 
+
 .PARAMETER ExecUser
 
 Specify Oracle User to connect. 
@@ -89,9 +90,11 @@ Should use OS authentification.
 Specify dump file name.
 [$HostName_$Schema_PUMP.dmp] is default.
 
+
 .PARAMETER LogFile
 
 [HostName_$Schema_PUMP.log] is default.
+
 
 
 .PARAMETER Log2EventLog

@@ -35,6 +35,7 @@ If the data file exists, count lines in the data file.
 If number of the lines in the data file is equal to the number in the 1st line of trigger file, retuen NormalReturnCode, else return ErrorReturnCode
 
 
+
 .PARAMETER TriggerPath
 
 Specify a trigger files path.

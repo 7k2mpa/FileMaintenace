@@ -118,6 +118,7 @@ Some backup software use Oracle VSS when starting backup, thus you do not need t
 Specify if you do not want to stop listener.
 
 
+
 .PARAMETER Log2EventLog
 
 Specify if you want to output log to Windows Event Log.

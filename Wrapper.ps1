@@ -57,6 +57,7 @@ Relative path format must be starting with 'dot.'
 Wild cards are not accepted shch as asterisk* question? bracket[]
 If the path contains bracket[] , specify path literally and do not escape.
 
+
 .PARAMETER CommandFile
 
 Specify a path of the command file with arguments.
@@ -77,6 +78,7 @@ Specify encode chracter code in the command file.
 
 If you want to execute script with argument next line in the command file ending the script with error.
 [This script terminates with Error] is default.
+
 
 
 .PARAMETER Log2EventLog
