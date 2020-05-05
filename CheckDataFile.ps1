@@ -16,7 +16,7 @@ The file interface system has 2 files, trigger file and data file.
 The trigger file has number in the 1st line. The number is number of the data lines in the data file.
 The data file has text datum.
 
-This script compare the number in the trigger file and number of the data lines in the data file for validating file interface system.
+This script compares the number in the trigger file and number of the data lines in the data file for validating file interface system.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
