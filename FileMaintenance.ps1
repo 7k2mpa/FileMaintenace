@@ -23,7 +23,7 @@ Methods [Add time stamp to file name][Compress][Archive to 1file][Move the file 
 Without specification -MoveNewFile option, place the file created in the same folder of the original file.
 
 -Action:
-Process files found to [Move][Copy][Delete][NullClear][KeepFilesCount] , folders filtered to [DeleteEmptyFolders]
+Process files found to [Move][Copy][Delete][NullClear][KeepFilesCount] , folders found to [DeleteEmptyFolders]
 
 -PostAction:
 Process files found to [NullClear][Rename]
@@ -43,7 +43,7 @@ This script can use cmdlet Compress-Archive for '-PreAction compress or archive 
 
 But cmdlet Compress-Archive can not handle wild card characters bracket[] for desitination path corectly, you should install 7-Zip. This script can use 7-Zip for compress or archive also.
 
-If you want to specify '-PreAction compress or archive' option in FileMaintenance.ps1 without installing 7-Zip, install WMF 5.0 or later, and place '#Requires -Version 5.0' insted of '#Requires -Version 3.0'
+If you want to specify '-PreAction compress or archive' option in FileMaintenance.ps1 without installing 7-Zip, install WMF 5.0 or later, and place '#Requires -Version 5.0' instead of '#Requires -Version 3.0'
 
 If you can install 7-Zip for compress or archive, do not need to replace.
 
@@ -242,7 +242,7 @@ Specify to process the files or folders in the path recursively or non-recuresiv
 
 .PARAMETER NoRecurse
 
-Specify if you want to filter files non-recursively.
+Specify if you want to find files non-recursively.
 The option overrides -Recurse option.
 
 
@@ -251,6 +251,12 @@ The option overrides -Recurse option.
 Specify if you want to override same name files in the destination in moving or copying  process.
 If the file in the destination path is equal or newer than the file in the source path, do not override and skip to process with counting up a Warning.
 [terminate with an Error and do not override] is default.
+
+
+.PARAMETER OverRideAsNormal
+
+Specify if you want to exit with Normal return code when override same name files in the destination in moving or copying  process.
+[terminate with a Warning when override] is default.
 
 
 .PARAMETER OverRideForce
@@ -262,7 +268,7 @@ If the file in the destination path is equal or newer than the file in the sourc
 
 .PARAMETER Continue
 
-Specify if you want to skip the process when files exist in -MoveToFolder alredy and to process remains.
+Specify if you want to skip the process when files exist in -MoveToFolder alredy in moving or copying  process and to process remains.
 If the script skips the process, processes remains and terminates with a Warning.
 [terminate with an Error immediately and do not skip] is default. 
 

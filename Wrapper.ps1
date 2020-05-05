@@ -3,7 +3,7 @@
 <#
 .SYNOPSIS
 
-This script loads a configuration file including arguments, execute the other script with arguments in every lines.
+This script loads a configuration file including arguments, execute the other script with the arguments in every lines.
 CommonFunctions.ps1 is required.
 You can process log files in multiple folders with FileMaintenance.ps1
 
@@ -11,7 +11,7 @@ You can process log files in multiple folders with FileMaintenance.ps1
 
 .DESCRIPTION
 
-This script loads a configuration file including arguments, execute the other script with arguments in every lines.
+This script loads a configuration file including arguments, execute the other script with the arguments in every lines.
 The configuration file can be set arbitrarily.
 A line starting with # in the configuration file, it is proccessed as a comment.
 An empty line in the configuration file, it is sikkiped.
@@ -44,7 +44,7 @@ Wrapper.ps1 -CommandPath .\FileMaintenance.ps1 -CommandFile .\Command.txt -Conti
 
 Execute .\FileMaintenance.ps1 in the same folder.
 Load the parameter file .\Command.txt and execute .\FileMaintenance with arguments in the parameter file every lines.
-If ERROR termination occur in the line, do not terminate Wrapper.ps1 and execute FileMaintenance.ps1 with argument in the next line.
+If an ERROR termination occur in the line, do not terminate Wrapper.ps1 and execute FileMaintenance.ps1 with the argument in a next line.
 
 
 

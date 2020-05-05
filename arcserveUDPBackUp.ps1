@@ -2,15 +2,14 @@
 
 <#
 .SYNOPSIS
+
 This script start arcserve UDP backup job with arcserve UDP CLI.
 CommonFunctions.ps1 is required.
 
-arcserveUDP ver.6以降で実装されたCLI経由でバックアップジョブを起動するプログラムです。
-実行にはCommonFunctions.ps1が必要です。
 
-<Common Parameters>はサポートしていません
 
 .DESCRIPTION
+
 This script start arcserve UDP backup job with arcserve UDP CLI.
 CommonFunctions.ps1 is required.
 Can specify full or incremental backup.
@@ -31,30 +30,6 @@ D:\script\infra\Log\backup.flg
 D:\script\infra\UDP.psw
 
 
-arcserveUDP CLI経由でバックアップジョブを起動するプログラムです。
-バックアップはフルバックアップ、差分バックアップを選択できます。
-認証はパスワード平文、パスワードファイル、両方をサポートしています。
-パスワードファイルを用いる場合、実行ユーザはパスワードを作成したユーザと同一にする必要があります。これはWindowsOSの仕様です。
-例えば設定ファイルで$ExecUserを'arcserve'とし、プログラムを実行しているユーザが異なる場合はパスワードファイルを'arcserve'ユーザで作成しても認証する事は出来ません。
-ジョブスケジューラ等で実行する時のユーザを'arcserve'として実行して下さい。
-
-このプログラムとバックアップコンソールサーバとは同一または異なるホスト、両方をサポートしています。
-バックアップコンソールをCPUコア数の多いバックアップサーバに搭載した場合、大量のジョブスケジューラライセンスが必要ですが、異なるホストに当プログラムを配置する事でライセンスを節約可能です。
-
-ログ出力先は[Windows EventLog][コンソール][ログファイル]が選択可能です。それぞれ出力、抑止が指定できます。
-
-ファイル配置例
-
-D:\script\infra\arcserveUDPBackUp.ps1
-D:\script\infra\Log\backup.flg
-D:\script\infra\UDP.psw
-
-
-
-
----
-
-
 
 .EXAMPLE
 
@@ -62,7 +37,6 @@ arcserveUDPBackUp.ps1 -Plan SSDB -Server SVDB01 -BackUpJobType Incr
 
 Start incremental backup targeting server [SVDB] in the plan [SSDB] 
 
-arcserveUDPのバックアッププラン[SSDB]に含まれる、サーバ[SVDB01]を差分バックアップ起動します。
 
 .EXAMPLE
 
@@ -71,12 +45,8 @@ arcserveUDPBackUp.ps1 -Plan SSDB -AllServers -BackUpJobType Full -UDPConsoleServ
 Start full backup targeting all servers in the plan [SSDB]
 and specify arcserve UDP console BKUPSV01.corp.local 
 
-arcserveUDPのバックアッププラン[SSDB]に含まれる、全てのサーバをフルバックアップ起動します。
-arcserveUDPのコンソールサーバはBKUPSV01.corp.localを指定します。
 
 .EXAMPLE
-
-
 
 arcserveUDPBackUp.ps1 -Plan SSDB -Server SVDB02 -BackUpJobType Incr -AuthorizationType PlainText -ExecUser = 'arcserve' -ExecUserDomain = 'INTRA' -ExecUserPassword = 'hogehoge'
 
@@ -84,11 +54,6 @@ Start incremental backup targeting server[SVDB02] in the plan [SSDB]
 with plain password.
 Specify execution backup domain user [INTRA\arcserve] password [hogehoge]
 You can specify other user from running the script, but you shoud not use plain pssword for security reason.
-
-arcserveUDPのバックアッププラン[SSDB]に含まれる、サーバ[SVDB02]を差分バックアップ起動します。
-認証方式は平文パスワードとします。
-バックアップコンソールサーバの管理ユーザはドメインユーザINTRA\arcserve、パスワードはhogehogeを指定します。
-認証方式を平文パスワードとした場合、このプログラムを実行しているユーザと異なるユーザを指定する事が出来ます。
 
 
 .EXAMPLE
@@ -102,58 +67,39 @@ Password file name is set with the user name automatically.
 '_[username]' is added to the filename to load.
 If you specify '.\UDP.psw' and execution user is 'Domain\arcserve' , this script load the password file '.\UDP_arcserve.psw'
 
-arcserveUDPのバックアッププラン[SSDB]に含まれる、全てのサーバをフルバックアップ起動します。
-認証方式はジョブ実行ユーザとパスワードファイルとします。ジョブ実行ユーザでバックアップコンソールサーバにログオンします。
-この時のパスワードは予めジョブ実行ユーザのパスワードファイルを作成しておく必要があります。
-パスワードファイルは指定したファイル名UDP.pswを自動変換します。
-このプログラムを実行するユーザがDomain\arcserveの時には、ファイル名本体にアンダースコア'_'に続いてユーザ名[arcserve]を自動的に付加したファイル名UDP_arcserve.pswを読み込み、パスワードファイルとして使用します。
 
 
 .PARAMETER Plan
-Specify the plan in arcserve UDP.
+
+Specify a plan in arcserve UDP.
 Specification is required.
 Wild card dose not be accepted.
 
-arcserveUDPに登録してあるプラン名を指定します。
-指定は必須です。
-
-ワイルドカード*は使用できません。
 
 .PARAMETER Server
+
 Specify one server name in the -Plan option.
 Can not specify a server name not in the plan.
 Wild card dose not be accepted.
 
-arcserveUDPに登録してあるプランに含まれるサーバ名を1台分指定します。
-プランに含まれないサーバは指定できません。
-ワイルドカード*は使用できません。
 
 .PARAMETER AllServers
-If you want specify all servers in the plan.
 
-arcserveUDPに登録してあるプランに含まれるサーバ全てをバックアップ対象にします。
+If you want to specify all servers in the plan.
+
 
 .PARAMETER BackUpJobType
+
 Specify back up type.
 Full:Full BackUp
 Incr:Incremental BackUp
 
-対象のバックアップ方式をしています。
-
-Full:フルバックアップ
-Incr:増分バックアップ
-
-
-
 
 .PARAMETER BackupFlagFilePath
+
 Specify lock file path of back up status.
 This script generete and save flag file with plan name and server name added.
 If specify -AllServers option, file name be with 'All'
-
-バックアップ中を示すバックアップファイルの保存先パスを指定します。
-ファイル名.拡張子で指定しますが、ファイル名に自動的に_Plan名_バックアップ対象サーバ名を付加したファイル名で保存します。
-AllServersを指定した場合、バックアップサーバ名はAllとなります。
 
 
 .PARAMETER PROTOCOL
@@ -162,26 +108,17 @@ Specify protocol to logon to arcserve UDP console server.
 http or https are allowed.
 [http] is default.
 
-arcserveUDPコンソールサーバにログオンする時のプロトコルを指定します。
-http / httpsを指定してください。
-デフォルトはhttpです。
 
 .PARAMETER UDPConsolePort
 
 Specify port number to logon to arcserve UDP console server.
 [8015] is default.
 
-arcserveUDPコンソールサーバにログオンする時の通信ポート番号を指定します。
-デフォルトは8015です。
-
 
 .PARAMETER UDPCLIPath
 
 Specify arcserve UDP CLI folder path.
 Relative or absolute path format is allowed.
-
-arcserveUDP CLIが配置されたパスを指定します。
-相対、絶対パスで指定可能です。
 
 
 .PARAMETER AuthorizationType
@@ -192,11 +129,6 @@ JobExecUserAndPasswordFile:script execution user / password file(user name is ad
 FixedPasswordFile:fixed user / password file
 PlanText:fixed user / plain password string
 
-arcserveUDPコンソールサーバにログオンする認証方式を指定します。
-
-JobExecUserAndPasswordFile:本プログラムを実行しているユーザ / 本プログラムを実行しているユーザ名を含むパスワードファイル
-FixedPasswordFile:指定したユーザ / 指定したパスワードファイル
-PlanText:指定したユーザ / 平文パスワード
 
 .PARAMETER ExecUser
 
@@ -204,11 +136,6 @@ Specify OS user to logon to the arcserve UDP console in authorization type Plain
 If domain user runs the script, you specify user name without domain name.
 
 Sample:FooDOMAIN\BarUSER , specify -ExecUser BarUSER
-
-認証方式をPlainText , FixedPasswordFileとした時のarcserveUDPコンソールサーバログオンのOSユーザ名を指定します。
-ドメインユーザの場合、ドメイン部分を除去したものを指定してください。
-
-例:FooDOMAIN\BarUSERであれば、BarUSER
 
 
 .PARAMETER ExecUserDomain
@@ -218,19 +145,14 @@ Specify OS user's domain to logon to the arcserve UDP console in authorization t
 Sample:FooDOMAIN\BarUSER , specify -ExecDomain FooDOMAIN
 
 
-認証方式をPlainText , FixedPasswordFileとした時のarcserveUDPコンソールサーバログオンOSユーザのドメイン名を指定します。
-
-例:FooDOMAIN\BarUSERであれば、FooDOMAIN
-
 .PARAMETER ExecUserPassword
-認証方式をPlainTextとした時のarcserveUDPコンソールサーバログオンOSユーザのパスワードを平文で指定します。
+
+Specify OS user's password in plain text to logon to the arcserve UDP console in authorization type PlainText or FixedPasswordFile.
 
 
 .PARAMETER FixedPasswordFilePath
+
 Specify password file path in authorization style [FixedPasswordFile] to logon to the arcserve UDP console.
-
-認証方式をFixedPasswordFileとした時のarcserveUDPコンソールサーバログオンOSユーザのパスワードファイルを指定します。
-
 
 
 .PARAMETER ExecUserPasswordFilePath
@@ -242,19 +164,10 @@ password file '.UDP_BarUSER.psw' will be loaded automatically.
 
 _ and script running user name is inserted to the path specificated.
 
-認証方式をJobExecUserAndPasswordFileとした時のarcserveUDPコンソールサーバログオンOSユーザのパスワードファイルパスを指定します。
-
-例:'.\UDP.psw' , 本プログラムを実行しているユーザがFooDOMAIN\BarUSER
-'.UDP_BarUSER.psw'がパスワードファイルとして指定されます。
-アンダースコア_以降の部分は実行しているユーザ名が自動的に挿入されます。
-
 
 .PARAMETER UDPConsoleServerName
 
 Specify arcserve UDP console server's host name or IP address.
-
-arcserveUDPコンソールサーバのホスト名、IPアドレスを指定します。
-
 
 
 .PARAMETER Log2EventLog
@@ -264,6 +177,7 @@ Specify if you want to output log to Windows Event Log.
 
 
 .PARAMETER NoLog2EventLog
+
 Specify if you want to suppress log to Windows Event Log.
 Specification overrides -Log2EventLog
 
