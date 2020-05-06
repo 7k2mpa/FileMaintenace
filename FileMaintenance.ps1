@@ -14,13 +14,13 @@ You can process files in multiple folders with Wrapper.ps1
 .DESCRIPTION
 
 This script finds files and folders that match multiple criteria.
-And process the files and folders found with multiple methods with PreAction, Action and PostAction.
+And processes the files and folders found with multiple methods with PreAction, Action and PostAction.
 
 Methods are
 
 -PreAction:
 Create new files from files found.
-Methods [Add time stamp to file name][Compress][Archive to 1file][Move the file created to new location] are offered and can be used together.
+Methods [Add Time Stamp (to file name)][Compress][Archive (to 1file)][Move (the) New File (created to new location)] are offered and can be used together.
 Without specification -MoveNewFile option, place the file created in the same folder of the original file.
 
 -Action:
@@ -87,18 +87,18 @@ Delete files only in C:\TEST non-recuresively.
 FileMaintenace.ps1 -TargetFolder C:\TEST -Action Copy -MoveToFolder C:\TEST1 -Size 10KB -continue
 
 Copy files over than 10KByte to C:\TEST1 recuresively.
-If no child folder exists in the desitination, make the new folder.
-If same name file exists in the destination, skip copying and continue to process a next object.
+If no child folder exists in the desitination, make a new folder.
+If a same name file exists in the destination, skip copying and continue to process a next object.
 
 
 .EXAMPLE
 
-FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -PreAction Compress,AddTimeStamp -Action NullClear
+FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -PreAction Compress,AddTimeStamp -Action NullClear -Days 10
 
 Find files ending with '.log' and older 10days in C:\TEST recuresively.
 Create new files compressed and added time stamp to file name from files found.
 New files place in the same folder.
-The files that are found dose not be deleted, but are null cleared.
+The files that are found dose not be deleted, but are cleared with null.
 
 
 .EXAMPLE
@@ -107,7 +107,7 @@ FileMaintenace.ps1 -TargetFolder C:\TEST -RegularExpression '^.*\.log$' -PreActi
 
 Find files ending with '.log' and older 10days in C:\TEST recuresively.
 Create new files compressed and move to C:\TEST1
-If same name file exists in the destination, override old one.
+If a same name file exists in the destination, override old one.
 The original files are deleted. 
 
 
@@ -201,13 +201,13 @@ Specify a folder of 7-Zip installed.
 .PARAMETER Days
 
 Specify how many days older than today to process files.
-0 day is default and, process all files.
+[0] day is default and, process all files.
 
 
 .PARAMETER Size
 
 Specify size of files to process.
-0 byte is default, and process all files.
+[0] byte is default, and process all files.
 Units of KB,MB,GB are accepted.
 e.g. [-Size 10MB] is equal to [-Size 10*1024^6]
 
@@ -215,7 +215,7 @@ e.g. [-Size 10MB] is equal to [-Size 10*1024^6]
 .PARAMETER RegularExpression
 
 Specify regular expression to match processing files.
-'.*' is default, and process all files.
+['.*'] is default, and process all files.
 Argument must be quoted with sigle quote'
 In PowerShell specification, capital and small letter are equal value but, are not (some version?)
 
@@ -223,7 +223,7 @@ In PowerShell specification, capital and small letter are equal value but, are n
 .PARAMETER ParentRegularExpression
 
 Specify regular expression to match processing path of the files excluding -TargetFolder.
-'.*' is default, and process all files.
+['.*'] is default, and process all files.
 Argument must be quoted with sigle quote'
 In PowerShell specification, capital and small letter are equal value but, are not (some version?)
 
@@ -251,40 +251,40 @@ The option overrides -Recurse option.
 
 Specify if you want to override same name files in the destination in moving or copying  process.
 If the file in the destination path is equal or newer than the file in the source path, do not override and skip to process with counting up a Warning.
-[terminate with an Error and do not override] is default.
+[$FALSE (terminate with an Error and do not override)] is default.
 
 
 .PARAMETER OverRideAsNormal
 
 Specify if you want to exit with Normal return code when override same name files in the destination in moving or copying  process.
-[terminate with a Warning when override] is default.
+[$FALSE (terminate with a Warning when override)] is default.
 
 
 .PARAMETER OverRideForce
 
 Specify if you want to override same name files in the destination in moving or copying  process.
 If the file in the destination path is equal or newer than the file in the source path, force to override with counting up a Warning.
-[terminate with an Error and do not override] is default.
+[$FALSE (terminate with an Error and do not override)] is default.
 
 
 .PARAMETER Continue
 
 Specify if you want to skip the process when files exist in -MoveToFolder alredy in moving or copying  process and to process remains.
 If the script skips the process, processes remains and terminates with a Warning.
-[terminate with an Error immediately and do not skip] is default. 
+[$FALSE (terminate with an Error immediately and do not skip)] is default. 
 
 
 .PARAMETER ContinueAsNormal
 
 Specify if you do not want to override a files and to want to continue processing and to exit with Normal return code.
 If the script skips to process, exits successfully.
-[terminate with an Error immediately and do not skip] is default. 
+[$FALSE (terminate with an Error immediately and do not skip)] is default. 
 
 
 .PARAMETER NoneTargetAsWarning
 
 Specify if you want to terminate with a Warning when no file exists in the folder.
-[exit with Normal when no file exists in the folder] is default.
+[$FALSE (exit with Normal when no file exists in the folder)] is default.
 
 
 .PARAMETER CompressedExtString
