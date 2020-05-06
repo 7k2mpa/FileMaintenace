@@ -4,7 +4,7 @@
 <#
 .SYNOPSIS
 
-This scipt start or stop Windows Service specified.
+This scipt starts or stops Windows Service specified.
 CommonFunctions.ps1 is required.
 You can process multiple Windows services with Wrapper.ps1
 <Common Parameters> is not supported.
@@ -13,7 +13,7 @@ You can process multiple Windows services with Wrapper.ps1
 
 .DESCRIPTION
 
-This scipt start or stop Windows Service specified.
+This scipt starts or stops Windows Service specified.
 If start(stop) Windows serivce already started(stopped), will temrminate as WARNING.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
@@ -64,14 +64,14 @@ Specification is required.
 
 Specify interval to check service status.
 Some services require long time to switch serivce status, specify appropriate value.
-Default is 3seconds.
+Default is [3]seconds.
 
 
 .PARAMETER RetryTimes
 
 Specify times to check service status.
 Some services require long time to switch serivce status, specify appropriate value.
-Default is 5times.
+Default is [5]times.
 
 
 
@@ -247,6 +247,9 @@ Specify the users who are allowed to execute the script in regular expression.
 Parameter must be quoted with single quote'
 Escape the back slash in the separeter of a domain name.
 example [domain\\.*]
+
+
+
 .NOTES
 
 Copyright 2020 Masayuki Sudo
@@ -266,9 +269,17 @@ limitations under the License.
 
 MICROSOFT LIMITED PUBLIC LICENSE version 1.1
 
+
+
 .LINK
 
 https://github.com/7k2mpa/FileMaintenace
+
+
+
+.OUTPUTS
+
+System.Int. Return Code.
 
 #>
 

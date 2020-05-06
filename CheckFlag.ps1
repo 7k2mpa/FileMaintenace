@@ -251,6 +251,7 @@ Escape the back slash in the separeter of a domain name.
 example [domain\\.*]
 
 
+
 .NOTES
 
 Copyright 2020 Masayuki Sudo
@@ -267,9 +268,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+
+
 .LINK
 
 https://github.com/7k2mpa/FileMaintenace
+
+
+
+.OUTPUTS
+
+System.Int. Return Code.
 
 #>
 

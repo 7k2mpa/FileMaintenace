@@ -3,14 +3,14 @@
 <#
 .SYNOPSIS
 
-This script control N2WS backup job with python CLI.
+This script controls N2WS backup job with python CLI.
 CommonFunctions.ps1 is required.
 
 
 
 .DESCRIPTION
 
-This script control N2WS backup job with python CLI.
+This script controls N2WS backup job with python CLI.
 CommonFunctions.ps1 is required.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
@@ -33,7 +33,7 @@ Get result of latest backup job backup of policy name [SERVER1_policy]
 
 .PARAMETER PolicyName
 
-Sepcify the policy name in N2WS backup policies.
+Sepcify a policy name in N2WS backup policies.
 Specification is required.
 
 
@@ -243,8 +243,6 @@ example [domain\\.*]
 
 .NOTES
 
-
-
 Copyright 2020 Masayuki Sudo
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -259,10 +257,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+
+
 .LINK
 
 https://github.com/7k2mpa/FileMaintenace
 
+
+
+.OUTPUTS
+
+System.Int. Return Code.
 #>
 
 [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="High")]

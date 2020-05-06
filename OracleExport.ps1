@@ -4,14 +4,14 @@
 <#
 .SYNOPSIS
 
-This script export Oracle data with Data Pump.
+This script exports Oracle data with Data Pump.
 CommonFunctions.ps1 is required.
 
 
 
 .DESCRIPTION
 
-This script export Oracle data with Data Pump.
+This script exports Oracle data with Data Pump.
 CommonFunctions.ps1 is required.
 
 Sample path setting
@@ -31,7 +31,7 @@ Specify export destination path with Oracle Directory Object named MCDATA_PUMP_D
 
 .PARAMETER Schema
 
-Specify shcema to export.
+Specify a shcema to export.
 Specification is required.
 
 
@@ -270,8 +270,9 @@ Parameter must be quoted with single quote'
 Escape the back slash in the separeter of a domain name.
 example [domain\\.*]
 
-.NOTES
 
+
+.NOTES
 
 Copyright 2020 Masayuki Sudo
 
@@ -287,10 +288,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+
+
 .LINK
 
 https://github.com/7k2mpa/FileMaintenace
 
+
+
+.OUTPUTS
+
+System.Int. Return Code.
 #>
 
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = "High")]

@@ -3,7 +3,7 @@
 <#
 .SYNOPSIS
 
-This script start arcserve UDP backup job with arcserve UDP CLI.
+This script starts arcserve UDP backup job with arcserve UDP CLI.
 CommonFunctions.ps1 is required.
 
 
@@ -19,7 +19,7 @@ It is a future of Windows.
 
 If you specify -ExecUser arcserve and start script with another user, can not authorization with password file of 'arcserve' user.
 
-This script support the location of arcserve backup console server both in the same host or in the other.
+This scripts support the location of arcserve backup console server both in the same host or in the other.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually.  
 
@@ -85,7 +85,7 @@ Wild card dose not be accepted.
 
 .PARAMETER AllServers
 
-If you want to specify all servers in the plan.
+If you want to specify all servers in the -Plan option.
 
 
 .PARAMETER BackUpJobType
@@ -98,7 +98,7 @@ Incr:Incremental BackUp
 .PARAMETER BackupFlagFilePath
 
 Specify lock file path of back up status.
-This script generete and save flag file with plan name and server name added.
+This script generetes and saves flag file with plan name and server name added.
 If specify -AllServers option, file name be with 'All'
 
 
@@ -162,12 +162,13 @@ Specify password file path in authorization style [JobExecUserAndPasswordFile] t
 Sample:'.\UDP.psw' , script running user FooDOMAIN\BarUSER
 password file '.UDP_BarUSER.psw' will be loaded automatically.
 
-_ and script running user name is inserted to the path specificated.
+_ and script running user name are inserted to the path specificated.
 
 
 .PARAMETER UDPConsoleServerName
 
 Specify arcserve UDP console server's host name or IP address.
+
 
 
 .PARAMETER Log2EventLog
@@ -343,6 +344,8 @@ Parameter must be quoted with single quote'
 Escape the back slash in the separeter of a domain name.
 example [domain\\.*]
 
+
+
 .NOTES
 
 Copyright 2020 Masayuki Sudo
@@ -359,9 +362,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+
+
 .LINK
 
 https://github.com/7k2mpa/FileMaintenace
+
+
+
+.OUTPUTS
+
+System.Int. Return Code.
 
 #>
 

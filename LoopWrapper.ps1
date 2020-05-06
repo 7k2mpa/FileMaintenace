@@ -3,8 +3,8 @@
 <#
 .SYNOPSIS
 
-This script execute the program specified with arguments in the specified config file.
-Untill Ending with Normal, execute specified times every specified seconds.  
+This script executes the program specified with arguments in the specified config file.
+Untill Ending with Normal, executes specified times every specified seconds.  
 
 CommonFunctions.ps1 is requied.
 
@@ -12,8 +12,8 @@ CommonFunctions.ps1 is requied.
 
 .DESCRIPTION
 
-This script execute the program specified with arguments in the specified config file.
-Untill Ending with Normal, execute specified times every specified seconds.  
+This script executes the program specified with arguments in the specified config file.
+Untill Ending with Normal, executes specified times every specified seconds.  
 
 If the program exit with Normal return code, this script exit with Normal return code.
 
@@ -100,7 +100,7 @@ Specify encode chracter code in the command file.
 .PARAMETER Span
 
 Specify how log waiting for retry the script execution in seconds.
-[10 secnods] is default
+[10]secnods is default
 
 
 .PARAMETER UpTo
@@ -289,6 +289,8 @@ Parameter must be quoted with single quote'
 Escape the back slash in the separeter of a domain name.
 example [domain\\.*]
 
+
+
 .NOTES
 
 Copyright 2020 Masayuki Sudo
@@ -305,10 +307,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+
+
 .LINK
 
 https://github.com/7k2mpa/FileMaintenace
 
+
+
+.OUTPUTS
+
+System.Int. Return Code.
 #>
 
 Param(

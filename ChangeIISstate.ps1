@@ -4,7 +4,7 @@
 <#
 .SYNOPSIS
 
-Script switch IIS site state to Stop or Start.
+This script switches an IIS site state to Stop or Start.
 CommonFunctions.ps1 is required.
 With Wrapper.ps1 start or stop multiple IIS sites.
 
@@ -14,7 +14,7 @@ With Wrapper.ps1 start or stop multiple IIS sites.
 
 .DESCRIPTION
 
-Script switch IIS site state to Stop or Start.
+This script switches an IIS site state to Stop or Start.
 If IIS site state is started(stopped) already, will temrminate with a WARNING.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
@@ -37,26 +37,26 @@ Start IIS site 'SSL'
 
 .PARAMETER Site
 
-Specify IIS site to switch state.
+Specify an IIS site to switch state.
 
 
 .PARAMETER TargetState
 
-Specify IIS site state 'Started' or 'Stopped' 
+Specify IIS site state [Started] or [Stopped] 
 
 
 .PARAMETER RetrySpanSec
 
 Specify interval to check IIS site state.
 Some sites require long time to switch serivce status, specify appropriate value.
-Default is 3seconds.
+Default is [3]seconds.
 
 
 .PARAMETER RetryTimes
 
 Specify times to check IIS site state.
 Some sites require long time to switch serivce status, specify appropriate value.
-Default is 5times.
+Default is [5]times.
 
 
 
@@ -234,6 +234,7 @@ Escape the back slash in the separeter of a domain name.
 example [domain\\.*]
 @
 
+
 .NOTES
 
 Copyright 2020 Masayuki Sudo
@@ -250,9 +251,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+
+
 .LINK
 
 https://github.com/7k2mpa/FileMaintenace
+
+
+
+.OUTPUTS
+
+System.Int. Return Code.
 
 #>
 

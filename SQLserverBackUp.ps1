@@ -246,6 +246,11 @@ limitations under the License.
 
 https://github.com/7k2mpa/FileMaintenace
 
+
+
+.OUTPUTS
+
+System.Int. Return Code.
 #>
 
 

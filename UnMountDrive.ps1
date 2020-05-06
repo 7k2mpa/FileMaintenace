@@ -3,7 +3,7 @@
 <#
 .SYNOPSIS
 
-This script unmount a network drive.
+This script unmounts a network drive.
 CommonFunctions.ps1 is required.
 You can unmount multiple network drives with Wrapper.ps1
 <Common Parameters> is not supported.
@@ -12,7 +12,7 @@ You can unmount multiple network drives with Wrapper.ps1
 
 .DESCRIPTION
 
-This script unmount Network drive.
+This script unmounts Network drive.
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
 
 
@@ -27,7 +27,7 @@ UnMount SMB share mapped as Drive F:
 
 .PARAMETER MountedDrive
 
-Specify drive letter mapped.
+Specify a drive letter mapped already.
 Specification is required.
 
 
@@ -205,6 +205,8 @@ Parameter must be quoted with single quote'
 Escape the back slash in the separeter of a domain name.
 example [domain\\.*]
 
+
+
 .NOTES
 
 Copyright 2020 Masayuki Sudo
@@ -221,10 +223,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
+
+
 .LINK
 
 https://github.com/7k2mpa/FileMaintenace
 
+
+
+.OUTPUTS
+
+System.Int. Return Code.
 #>
 
 
