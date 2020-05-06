@@ -62,18 +62,18 @@ If the path contains bracket[] , specify path literally and do not escape.
 
 .PARAMETER FlagFile
 
-Specify the name of the flag file.
+Specify name of the flag file.
 
 
 .PARAMETER Status
 
-Specify 'Exist' or 'NoExist' the flag file.
-'NoExist' is by default.
+Specify [Exist]ence or [NoExist]ence of the flag file.
+[NoExist] is by default.
 
 
 .PARAMETER PostAction
 
-Specify action to [Delete] or [create] a flag file after checking.
+Specify action to [Delete] or [Create] a flag file after checking.
 
 
 

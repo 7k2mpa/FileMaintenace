@@ -13,7 +13,7 @@ CommonFunctions.ps1 is required.
 This script validates file interface system.
 
 The file interface system has 2 files, trigger file and data file.
-The trigger file has number in the 1st line. The number is number of the data lines in the data file.
+A trigger file has number in the 1st line. A number is number of the data lines in the data file.
 The data file has text datum.
 
 This script compares the number in the trigger file and number of the data lines in the data file for validating file interface system.
@@ -28,10 +28,10 @@ Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supr
 
 Check existence of the trigger file (Trigger.txt)
 If the trigger file dose not exist, return WarningReturnCode
-If the trigger file exists, try load data file (data.txt) 
+If the trigger file exists, try load a data file (data.txt) 
 If the data file dose not exist, return InternalErrorReturnCode
 
-If the data file exists, count lines in the data file.
+If a data file exists, count lines in the data file.
 If number of the lines in the data file is equal to the number in the 1st line of trigger file, retuen NormalReturnCode, else return ErrorReturnCode
 
 

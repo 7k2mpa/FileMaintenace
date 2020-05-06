@@ -58,12 +58,12 @@ Specify time stamp format
 .PARAMETER OracleSID
 
 Specify Oracle_SID for deleting RMAN log.
-Should set '$Env:ORACLE_SID' by default.
+Should set [$Env:ORACLE_SID] by default.
 
 .PARAMETER OracleHomeBinPath
 
 Specify Oracle 'BIN' path in the child path Oracle home. 
-Should set "$Env:ORACLE_HOME +'\BIN'" by default.
+Should set [$Env:ORACLE_HOME +'\BIN'] by default.
 
 
 .PARAMETER PasswordAuthorization

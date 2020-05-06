@@ -3,7 +3,7 @@
 <#
 .SYNOPSIS
 
-This script siwtches Oracle Database to Back Up mode before starting backup software .
+This script switches Oracle Database to Back Up mode before starting backup software .
 CommonFunctions.ps1 , SQLs.ps1 , ChangeServiceStatus.ps1 are required.
 
 <Common Parameters> is not supported.
@@ -12,7 +12,7 @@ CommonFunctions.ps1 , SQLs.ps1 , ChangeServiceStatus.ps1 are required.
 
 .DESCRIPTION
 
-This script siwtches Oracle Database to Backup mode before starting backup software.
+This script switches Oracle Database to Backup mode before starting backup software.
 The script loads SQLs.ps1, place SQLs.ps1 previously.
 OracleDB2NormalMode.ps1 is offered also, you may use it with this script.
 
@@ -52,7 +52,7 @@ The script dose not stop Listener.
 .PARAMETER OracleSID
 
 Specify Oracle_SID.
-Should set '$Env:ORACLE_SID' by default.
+Should set [$Env:ORACLE_SID] by default.
 
 
 .PARAMETER OracleService
@@ -65,7 +65,7 @@ RMAN LogÇçÌèúÇ∑ÇÈëŒè€ÇÃOracleSIDÇéwíËÇµÇ‹Ç∑ÅB
 .PARAMETER OracleHomeBinPath
 
 Specify Oracle 'BIN' path in the child path Oracle home. 
-Should set "$Env:ORACLE_HOME +'\BIN'" by default.
+Should set [$Env:ORACLE_HOME +'\BIN'] by default.
 
 
 .PARAMETER SQLLogPath

@@ -4,7 +4,7 @@
 <#
 .SYNOPSIS
 
-This scipt starts or stops Windows Service specified.
+This script starts or stops Windows Service specified.
 CommonFunctions.ps1 is required.
 You can process multiple Windows services with Wrapper.ps1
 <Common Parameters> is not supported.
@@ -13,7 +13,7 @@ You can process multiple Windows services with Wrapper.ps1
 
 .DESCRIPTION
 
-This scipt starts or stops Windows Service specified.
+This script starts or stops Windows Service specified.
 If start(stop) Windows serivce already started(stopped), will temrminate as WARNING.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
@@ -24,7 +24,7 @@ Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supr
 
 ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Stopped -RetrySpanSec 5 -RetryTimes 5
 
-Stop Windows serivice(Service Name:Spooler, Print Spooler)
+Stop Windows service(Service Name:Spooler, Print Spooler)
 If it dose not stop immediately, retry 5times every 5seconds.
 
 If the service is stoped already, terminate as WARNING.
@@ -35,7 +35,7 @@ If the service is stoped already, terminate as WARNING.
 
 ChangeServiceStatus.ps1 -Service Spooler -TargetStatus Running -RetrySpanSec 5 -RetryTimes 5 -WarningAsNormal
 
-Start Windows serivice(Service Name:Spooler, Display Name:Print Spooler)
+Start Windows service(Service Name:Spooler, Display Name:Print Spooler)
 If it dose not start immediately, retry 5times every 5seconds.
 
 Specified -WarningAsNormal option and, if the service is started already, terminate as NORMAL.

@@ -20,7 +20,7 @@ Methods are
 
 -PreAction:
 Create new files from files found.
-Methods [Add Time Stamp (to file name)][Compress][Archive (to 1file)][Move (the) New File (created to new location)] are offered and can be used together.
+Methods [AddTimeStamp (to file name)][Compress][Archive (to 1file)][Move (the) NewFile (created to new location)] are offered and can be used together.
 Without specification -MoveNewFile option, place the file created in the same folder of the original file.
 
 -Action:

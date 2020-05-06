@@ -3,7 +3,7 @@
 <#
 .SYNOPSIS
 
-This script siwtches to Normal mode(Ending Backup Mode) Oracle Database after finishing backup software.
+This script switches to Normal mode(Ending Backup Mode) Oracle Database after finishing backup software.
 CommonFunctions.ps1 , SQLs.ps1 are required.
 
 <Common Parameters> is not supported.
@@ -12,7 +12,7 @@ CommonFunctions.ps1 , SQLs.ps1 are required.
 
 .DESCRIPTION
 
-This script siwtches to Normal mode(Ending Backup Mode) Oracle Database after finishing backup software.
+This script switches to Normal mode(Ending Backup Mode) Oracle Database after finishing backup software.
 The script loads SQLs.ps1, place SQLs.ps1 previously.
 OracleDB2BackUpMode.ps1 is offered also, you may use it with this script.
 If Windows Oracle service or Listener service is stopped, start them automatically.
