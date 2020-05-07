@@ -1288,7 +1288,7 @@ Param(
 [String]$DatumPath = $PSScriptRoot
 [Boolean]$WhatIfFlag = ($NULL -ne $PSBoundParameters['WhatIf'])
 
-$Version = "2.0.0-RC.9"
+$Version = "2.0.0"
 
 [Boolean]$ForceEndloop  = $FALSE          ;#$FALSE for Finalize , $TRUE for Break in the loop
 
