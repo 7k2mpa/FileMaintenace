@@ -49,7 +49,7 @@ If Windows Oracle service or Listener service, start them automatically.
 .PARAMETER OracleSID
 
 Specify Oracle_SID.
-Should set '$Env:ORACLE_SID' by default.
+Should set [$Env:ORACLE_SID] by default.
 
 
 .PARAMETER OracleService
@@ -62,7 +62,7 @@ RMAN LogÇçÌèúÇ∑ÇÈëŒè€ÇÃOracleSIDÇéwíËÇµÇ‹Ç∑ÅB
 .PARAMETER OracleHomeBinPath
 
 Specify Oracle 'BIN' path in the child path Oracle home. 
-Should set "$Env:ORACLE_HOME +'\BIN'" by default.
+Should set [$Env:ORACLE_HOME +'\BIN'] by default.
 
 
 .PARAMETER StartServicePath
@@ -400,7 +400,7 @@ Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
     Catch [Exception] {
-    Write-Output "Fail to load CommonFunctions.ps1 Please verfy existence of CommonFunctions.ps1 in the same folder."
+    Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
 
