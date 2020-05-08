@@ -42,7 +42,7 @@ If you run the scripts on Windows Server 2008 or 2008R2, must install latest WMF
 
 This script can use cmdlet Compress-Archive for '-PreAction compress or archive option'. 
 
-But cmdlet Compress-Archive can not handle wild card characters bracket[] for desitination path corectly, you should install 7-Zip. This script can use 7-Zip for compress or archive also.
+But cmdlet Compress-Archive can not handle wild card characters bracket[] for destination path corectly, you should install 7-Zip. This script can use 7-Zip for compress or archive also.
 
 If you want to specify '-PreAction compress or archive' option in FileMaintenance.ps1 without installing 7-Zip, install WMF 5.0 or later, and place '#Requires -Version 5.0' instead of '#Requires -Version 3.0'
 
@@ -87,7 +87,7 @@ Delete files only in C:\TEST non-recuresively.
 FileMaintenace.ps1 -TargetFolder C:\TEST -Action Copy -MoveToFolder C:\TEST1 -Size 10KB -continue
 
 Copy files over than 10KByte to C:\TEST1 recuresively.
-If no child folder exists in the desitination, make a new folder.
+If no child folder exists in the destination, make a new folder.
 If a same name file exists in the destination, skip copying and continue to process a next object.
 
 
@@ -178,7 +178,7 @@ NullClear:Clear the files with null.
 
 .PARAMETER MoveToFolder
 
-Specify a desitination folder of the files found moved to.
+Specify a destination folder of the files found moved to.
 Can specify relative, absolute or UNC path format.
 Relative path format must be starting with 'dot.'
 Wild cards are not accepted shch as asterisk* question? bracket[]
@@ -754,10 +754,10 @@ Write-Debug  "Source      LastWriteTime $($Target.Object.LastWriteTime)"
 
         IF ($OverRideAsNormal) {
 
-            Write-Log -ID $InfoEventID -Type Information -Message "A same name file exists in the desitination already, but specified -OverRideAsNormal[$($OverRideAsNormal)] option, thus overrides the file in the desitination [$($Path)] and counts a warning event as NORMAL."
+            Write-Log -ID $InfoEventID -Type Information -Message "A same name file exists in the destination already, but specified -OverRideAsNormal[$($OverRideAsNormal)] option, thus overrides the file in the destination [$($Path)] and counts a warning event as NORMAL."
             
             } else {     
-            Write-Log -ID $WarningEventID -Type Warning -Message "A same name file exists in the desitination already, but specified -OverRide[$($OverRide)] option, thus overrides the file in the desitination [$($Path)]"
+            Write-Log -ID $WarningEventID -Type Warning -Message "A same name file exists in the destination already, but specified -OverRide[$($OverRide)] option, thus overrides the file in the destination [$($Path)]"
             $Script:WarningFlag = $TRUE
             }
 
@@ -1257,12 +1257,12 @@ Param(
 
         IF ($OverRide -and ($OverRideCount -gt 0)) {
             Write-Log -ID $InfoEventID -Type Information -Message ("Specified -OverRide[$($OverRide)] option, " +
-                "thus overrided files in the desitination with source files in [$($OverRideCount)] times.")
+                "thus overrided files in the destination with source files in [$($OverRideCount)] times.")
             }
 
         IF (($Continue) -and ($ContinueCount -gt 0)) {
             Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Continue[$($Continue)] option, " +
-                "thus continued to process next objects in [$($ContinueCount)] times even though the same name files exist in the desitination.")
+                "thus continued to process next objects in [$($ContinueCount)] times even though the same name files exist in the destination.")
             }
     }
 
@@ -1339,7 +1339,7 @@ Write-Debug   ("`r`n" + ($targets.Object.fullname | Out-String))
 Write-Verbose ("[$(@($targets).Length)][$($FilterType)(s)] are for processing..." + "`r`n" + ($targets.Object.fullname | Out-String))
 
 
-#-PreAction Archive processes files to archive to one file, thus before loop create a desitination path of the archive file
+#-PreAction Archive processes files to archive to one file, thus before loop create a destination path of the archive file
 
 IF ($PreAction -contains 'Archive') {
 
@@ -1401,7 +1401,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 
 <#
 Create a destinationFolder(child folder of the MoveToFolder) with Target.Object.FullName
-If NoRecurse, desitinationFolder will be, thus skip
+If NoRecurse, destinationFolder will be, thus skip
 Without Action[(Move|Copy)] , dose not need to checke existence of destinationPath
 With PreAction[Archive] & MoveNewFile[TRUE] only MoveToFolder is needed, destinationFolder(s) are not needed, thus skip
 
@@ -1423,7 +1423,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
         IF ($Recurse) {
 
-            IF (-not($destinationFolder | Test-Container -Name 'Desitination folder of the file ')) {
+            IF (-not($destinationFolder | Test-Container -Name 'destination folder of the file ')) {
 
                 Write-Log -ID $InfoEventID -Type Information -Message "Create a new folder $($destinationFolder)"
 

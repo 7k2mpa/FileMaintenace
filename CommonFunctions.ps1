@@ -13,7 +13,7 @@ Place this script in the same directory of FileMaintenance.ps1.
 
 This script can use cmdlet Compress-Archive.
 
-But cmdlet Compress-Archive can not handle wild card characters bracket[] for desitination path corectly, you should install 7-Zip. This script can use 7-Zip for compress or archive also.
+But cmdlet Compress-Archive can not handle wild card characters bracket[] for destination path corectly, you should install 7-Zip. This script can use 7-Zip for compress or archive also.
 
 If you want to use '-PreAction compress or archive' option in FileMaintenance.ps1 without installing 7-Zip, install WMF 5.0 or later, and place '#Requires -Version 5.0' insted of '#Requires -Version 3.0'
 
@@ -239,7 +239,7 @@ begin {
         Finalize $InternalErrorReturnCode
         }
 
-    IF ($ActionType -match '^(Copy|AddTimeStamp|Rename|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$' ) {
+    IF ($ActionType -match '^(Move|Copy|AddTimeStamp|Rename|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$' ) {
         $addMessage = " to [$($ActionTo)]"
         }
 }
