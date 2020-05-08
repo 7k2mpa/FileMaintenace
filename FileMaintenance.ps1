@@ -738,8 +738,8 @@ Do {
     #Case 1
     IF (($OverRide) -and (Test-Path -LiteralPath $Path -PathType Leaf)) {
 
-Write-Debug  "Desitination LastWriteTime $((Get-Item -LiteralPath $Path).LastWriteTime)"
-Write-Debug  "Source       LastWriteTime $($Target.Object.LastWriteTime)" 
+Write-Debug  "Destination LastWriteTime $((Get-Item -LiteralPath $Path).LastWriteTime)"
+Write-Debug  "Source      LastWriteTime $($Target.Object.LastWriteTime)" 
  
         IF (-not($OverRideForce) -and (Get-Item -LiteralPath $Path).LastWriteTime -ge $Target.Object.LastWriteTime ) {
             
@@ -1368,7 +1368,7 @@ IF ($PreAction -contains 'Archive') {
 
 :forLoop ForEach ($Target in $targets) {
 <#
-PowershellはGOTO文が存在せず処理分岐ができない。
+PowerShellはGOTO文が存在せず処理分岐ができない。
 そのためDo/Whileを用いて処理途中でエラーが発生した場合の分岐を実装している
 
 Do/While()は最後に評価が行われるループ。最後の評価がFalseとなるとループを終了する。ここでWhile($FALSE)としてあるので、
