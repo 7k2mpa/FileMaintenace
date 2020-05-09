@@ -720,7 +720,7 @@ Do {
     #Case 7
     IF (-not(Test-Path -LiteralPath $Path)) {
 
-        Write-Log -ID $InfoEventID -Type Information -Message "File $($Path) dose not exist."
+        Write-Log -ID $InfoEventID -Type Information -Message "File [$($Path)] dose not exist."
         $noExistFlag = $TRUE
         Break
         }
@@ -728,18 +728,18 @@ Do {
 
     IF (Test-Path -LiteralPath $Path -PathType Leaf) {
         
-        Write-Log -ID $WarningEventID -Type Warning -Message "Same name file $($Path) exists already."
+        Write-Log -ID $WarningEventID -Type Warning -Message "Same name file [$($Path)] exists already."
         
         } else {
-        Write-Log -ID $WarningEventID -Type Warning -Message "Same name folder $($Path) exists already."        
+        Write-Log -ID $WarningEventID -Type Warning -Message "Same name folder [$($Path)] exists already."        
         }
 
 
     #Case 1
     IF (($OverRide) -and (Test-Path -LiteralPath $Path -PathType Leaf)) {
 
-Write-Debug  "Destination LastWriteTime $((Get-Item -LiteralPath $Path).LastWriteTime)"
-Write-Debug  "Source      LastWriteTime $($Target.Object.LastWriteTime)" 
+Write-Verbose  "Destination LastWriteTime[$((Get-Item -LiteralPath $Path).LastWriteTime)] Size[$((Get-Item -LiteralPath $Path).Length)]"
+Write-Verbose  "Source      LastWriteTime[$($Target.Object.LastWriteTime)] Size[$($Target.Object.Length)]" 
  
         IF (-not($OverRideForce) -and (Get-Item -LiteralPath $Path).LastWriteTime -ge $Target.Object.LastWriteTime ) {
             
