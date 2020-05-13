@@ -443,7 +443,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.0.1"
+$Version = "2.0.2"
 
 [String]$computer = "localhost" 
 [String]$class = "win32_service" 

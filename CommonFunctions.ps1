@@ -47,7 +47,7 @@ https://github.com/7k2mpa/FileMaintenace
 [CmdletBinding()]
 Param(
 )
-$Script:CommonFunctionsVersion = "2.0.1"
+$Script:CommonFunctionsVersion = "2.0.2"
 Write-Verbose "CommonFunctions.ps1 Version $CommonFunctionsVersion"
 
 #ƒƒO“™‚Ì•Ï”‚ğˆêŠ‡İ’è‚µ‚½‚¢ê‡‚ÍˆÈ‰º‚ğ—˜—p‚µ‚Ä‰º‚³‚¢B
