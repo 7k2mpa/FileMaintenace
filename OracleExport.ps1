@@ -317,8 +317,8 @@ Param(
 
 [Switch]$AddtimeStamp ,
 
-[String]$DumpFile = "$HostName_$Schema_PUMP.dmp" ,
-[String]$LogFile  = "$HostName_$Schema_PUMP.log" ,
+[String]$DumpFile = $HostName + "_" + $Schema + "_PUMP.dmp" ,
+[String]$LogFile  = $HostName + "_" + $Schema + "_PUMP.log" ,
 
 
 [String]$ExecUser = 'foo' ,
