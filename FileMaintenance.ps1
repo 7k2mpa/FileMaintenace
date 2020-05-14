@@ -1402,7 +1402,7 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 <#
 Create a destinationFolder(child folder of the MoveToFolder) with Target.Object.FullName
 If NoRecurse, destinationFolder will be, thus skip
-Without Action[(Move|Copy)] , dose not need to checke existence of destinationPath
+Without Action[(Move|Copy)] , dose not need to check existence of destinationPath
 With PreAction[Archive] & MoveNewFile[TRUE] only MoveToFolder is needed, destinationFolder(s) are not needed, thus skip
 
 C:\TargetFolder                    :TargetFolder
