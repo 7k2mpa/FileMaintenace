@@ -421,21 +421,20 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
 
-#パラメータの確認
+#Validate Parameters
 
-#OracleBINフォルダの指定、存在確認
+#Validate Oracle BIN
 
-    $OracleHomeBinPath = $OracleHomeBinPath | ConvertTo-AbsolutePath -Name  '-oracleHomeBinPath'
+$OracleHomeBinPath = $OracleHomeBinPath | 
+                        ConvertTo-AbsolutePath -Name  '-oracleHomeBinPath' |
+                        Test-Container -Name '-oracleHomeBinPath' -IfNoExistFinalize -PassThrough
 
-    $OracleHomeBinPath | Test-Container -Name '-oracleHomeBinPath' -IfNoExistFinalize > $NULL
 
-
-#BackUpFlagフォルダの指定、存在確認
-
+#Validate BackUpFlag Folder
 
     IF (-not($NoCheckBackUpFlag)) {
 
-        $BackUpFlagPath = $BackUpFlagPath | ConvertTo-AbsolutePath -ObjectName  '-BackUpFlagPath'
+        $BackUpFlagPath = $BackUpFlagPath | ConvertTo-AbsolutePath -Name  '-BackUpFlagPath'
 
         $BackUpFlagPath | Split-Path -Parent | Test-Container -Name 'Parent Folder of -BackUpFlagPath' -IfNoExistFinalize > $NULL
         }
@@ -443,17 +442,16 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 #SQLLogファイルの指定、存在、書き込み権限確認
 
-    $SQLLogPath = $SQLLogPath | ConvertTo-AbsolutePath -ObjectName '-SQLLogPath'
+    $SQLLogPath = $SQLLogPath | ConvertTo-AbsolutePath -Name '-SQLLogPath'
 
     $SQLLogPath | Test-LogPath -Name '-SQLLogPath' > $NULL
 
 
-#SQLコマンド群の指定、存在確認、Load
+#Validate SQL command File
 
-    $SQLCommandsPath = $SQLCommandsPath | ConvertTo-AbsolutePath -ObjectName '-SQLCommandPath'
-
-    $SQLCommandsPath | Test-Leaf -Name '-SQLCommandsPath' -IfNoExistFinalize > $NULL
-
+$SQLCommandsPath = $SQLCommandsPath |
+                    ConvertTo-AbsolutePath -Name '-SQLCommandPath' |
+                    Test-Leaf -Name '-SQLCommandsPath' -IfNoExistFinalize -PassThrough
 
     Try {
 
@@ -493,7 +491,7 @@ Write-Log -EventID $InfoEventID -Type Information -Message "To start to switch O
 function Finalize {
 
 Param(
-[parameter(mandatory=$TRUE)][int]$ReturnCode
+[parameter(position = 0, mandatory)][int]$ReturnCode
 )
 
 Pop-Location
