@@ -119,6 +119,7 @@ Param(
 [String]$LogFileEncode = $LogFileEncode
 )
 begin {
+    $logFormattedDate = (Get-Date).ToString($LogDateFormat)    
 }
 process {
     IF (($Log2EventLog -or $ForceConsoleEventLog) -and -not($ForceConsole) ) {
@@ -135,8 +136,7 @@ process {
 
 
     IF ($Log2File -and -not($ForceConsole -or $ForceConsoleEventLog )) {
-
-        $logFormattedDate = (Get-Date).ToString($LogDateFormat)
+       
         $logWrite = $logFormattedDate + " " + $ShellName + " " + $EventType.PadRight(14) + "EventID " + ([String]$EventID).PadLeft(6) + "  " + $EventMessage
         Write-Output $logWrite | Out-File -FilePath $LogPath -Append -Encoding $LogFileEncode
         }   
@@ -654,6 +654,89 @@ end {
 }
 
 
+function Test-PathEx {
+
+    [OutputType([Boolean])]
+    [CmdletBinding()]
+
+    Param(
+    [String][parameter(position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path ,
+    [String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name ,
+    [String][parameter(position = 2)][ValidateSet("Leaf" , "Container", "NotNullOrEmpty")]$Type ,
+
+    [Switch]$IfFalseFinalize ,
+    [Switch]$NoMessage ,
+    [Switch]$Passthrough
+    )
+
+    begin {
+    }
+    process {
+    
+        Switch -Regex ($Type) {
+
+            'Leaf' {
+                $result = Test-Path -LiteralPath $Path -PathType Leaf
+                $message = 'exist'
+                $postmessage = '.'
+            }
+
+            'Container' {
+                $result = Test-Path -LiteralPath $Path -PathType Container
+                $message = 'exist'
+                $postmessage = '.' 
+            }
+
+            'NotNullOrEmpty' {
+                $result = -not([String]::IsNullOrEmpty($Path))
+                $message = 'include'
+                $postmessage = ' data.' 
+            }
+        }
+
+
+        IF (($result) -and (-not($NoMessage))) {
+                
+            Write-Log -ID $InfoEventID -Type Information -Message ("$($Name)[$($Path)] $($message)s" + $($postmessage))
+
+        } elseIF (-not($result) -and (-not($NoMessage))) {
+
+            Write-Log -ID $InfoEventID -Type Information -Message ("$($Name)[$($Path)] dose not $($message)" + $($postmessage))
+        } 
+
+
+        IF ((-not($result)) -and ($IfFalseFinalize)) {
+            
+            IF (-not($NoMessage)) {
+
+                Write-Log -ID $ErrorEventID -Type Error -Message "$($Name) is required."
+
+            } 
+        
+            Finalize $ErrorReturnCode
+        }
+    
+
+        IF (($Passthrough) -and $result) {
+
+            Write-Output $Path
+
+        } elseIF (($Passthrough) -and (-not($result))) {
+
+            Write-Output $NULL
+
+        } else {
+
+            Write-Output $result
+
+        }
+    }
+    end {
+    }
+}
+
+    
+
 function Test-PathNullOrEmpty {
 
 [OutputType([Boolean])]
@@ -787,17 +870,20 @@ Param(
 
 [String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path,
 [String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name,
-[String]$FileValue = $NULL
+[String][parameter(position = 2)]$FileValue = $NULL ,
 
+[Switch][parameter(position = 3)]$PassThrough
 )
 begin {
     $logFormattedDate = (Get-Date).ToString($LogDateFormat)
 }
 process {
- 
+
+:do DO {    
     IF (-not($Path | Split-Path -Parent)) {
         Write-Log -Id $ErrorEventID -Type Error -Message "$($Name)[$($Path)] is invalid specification."   
-        Finalize $ErrorReturnCode
+        $result = $ErrorReturnCode
+        Break
         }
 
     #ログ出力先ファイルの親フォルダが存在しなければ異常終了
@@ -808,7 +894,8 @@ process {
 
     IF (Test-Path -LiteralPath $Path -PathType Container) {
         Write-Log -Id $ErrorEventID -Type Error -Message "Same name folder $($Path) exists already."        
-        Finalize $ErrorReturnCode
+        $result = $ErrorReturnCode
+        Break
         }
 
 
@@ -825,12 +912,27 @@ process {
         Catch [Exception]{
             Write-Log -Type Error -Id $ErrorEventID -Message  "Failed to write to $($Name) [$($Path)]"
             Write-Log -Id $ErrorEventID -Type Error -Message "Execution error message : $Error[0]"
-            Finalize $ErrorReturnCode
+            $result = $ErrorReturnCode
+            Break
             }
      
      } else {
             Invoke-Action -ActionType MakeNewFileWithValue -ActionFrom $Path -ActionError $Path -FileValue $FileValue
             }
+}
+# :do
+While ($FALSE)
+
+IF ($result -eq $ErrorReturnCode) {
+    Finalize $result
+
+    } elseIF ($PassThrough) {
+
+        Write-Host $Path
+        } else {
+
+        Write-Host $NULL    
+        }
 }
 end {
 }

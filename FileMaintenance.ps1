@@ -1056,8 +1056,8 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 
 $TargetFolder = $TargetFolder |
                     ConvertTo-AbsolutePath -Name '-TargetFolder' | 
-                    Test-Container -Name '-TargetFolder' -IfNoExistFinalize -PassThrough
-
+#                    Test-Container -Name '-TargetFolder' -IfNoExistFinalize -PassThrough
+                    Test-PathEx -Type Container -Name '-TargetFolder' -IfFalseFinalize -PassThrough
 
 #移動先フォルダの要不要と有無を確認
 
@@ -1065,9 +1065,10 @@ $TargetFolder = $TargetFolder |
 
         $MoveToFolder = $MoveToFolder |
                             ConvertTo-AbsolutePath -Name '-MoveToFolder' |    
-                            Test-Container -Name '-MoveToFolder' -IfNoExistFinalize -PassThrough
-       
-    } elseIF (-not($MoveToFolder | Test-PathNullOrEmpty)) {
+#                            Test-Container -Name '-MoveToFolder' -IfNoExistFinalize -PassThrough
+                            Test-PathEx -Type Container -Name '-MoveToFolder' -IfFalseFinalize -PassThrough
+                            
+    } elseIF (-not([String]::IsNullOrEmpty($MoveToFolder))) {
     
         Write-Log -ID $ErrorEventID -Type Error -Message "Specified -Action [$($Action)] option, must not specifiy -MoveToFolder option."
         Finalize $ErrorReturnCode
@@ -1078,8 +1079,9 @@ $TargetFolder = $TargetFolder |
 
     IF ($PreAction -contains 'Archive') {
 
-        $ArchiveFileName | Test-PathNullOrEmpty -Name '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL
-        
+#        $ArchiveFileName | Test-PathNullOrEmpty -Name '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL
+        $ArchiveFileName | Test-PathEx -Type NotNullOrEmpty -Name '-ArchiveFileName' -IfFlaseFinalize > $NULL
+
         IF ($ArchiveFileName -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
             Write-Log -Type Error -ID $ErrorEventID -Message "-ArchiveFileName may contain characters that can not use by NTFS."
@@ -1094,8 +1096,8 @@ $TargetFolder = $TargetFolder |
 
         $7zFolder = $7zFolder |
                         ConvertTo-AbsolutePath -Name '-7zFolder' |
-                        Test-Container -Name '-7zFolder' -IfNoExistFinalize -PassThrough
-        }
+                        Test-PathEx -Type Container -Name '-7zFolder' -IfNoExistFinalize -PassThrough
+    }
 
 #checking for invalid combinations of options
 
@@ -1183,21 +1185,25 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
             "size is over["+($Size / 1KB)+"]KB")
 
 #PreAction
-        $message = $(IF ($PreAction -notcontains 'none'       ) {"Process files found "}) +
-                   $(IF ($PreAction -contains    'MoveNewFile') {"to move to [$($MoveToFolder)] "}) +
+        IF ($PreAction -notcontains 'none') {    
 
-                   $(IF ($PreAction -match        "^(Compress|Archive)$") {
+            $message = "Process files found " +
+
+                    $(IF ($PreAction -contains    'MoveNewFile') {"moving new files created to [$($MoveToFolder)] "}) +
+
+                    $(IF ($PreAction -match        "^(Compress|Archive)$") {
                 
-                      $(IF     ($PreAction -contains '7z'   ) {"with compress method [7z] "}            
-                        elseIF ($PreAction -contains '7zZIP') {"with compress method [7zZip] "}
-                        else                                  {"with compress method [Powershell cmdlet Compress-Archive] "}
-                      )}) +
+                        $(IF     ($PreAction -contains '7z'   ) {"with compress method [7z] "}            
+                        elseIF   ($PreAction -contains '7zZIP') {"with compress method [7zZip] "}
+                        else                                    {"with compress method [Powershell cmdlet Compress-Archive] "}
+                    )}) +
                     
-                   ("recursively [$($Recurse)] PreAction(Add time stamp to filename[" + [Boolean]($PreAction -contains 'AddTimeStamp') + "] | " + 
+                    ("recursively [$($Recurse)] PreAction (Add time stamp to filename[" + [Boolean]($PreAction -contains 'AddTimeStamp') + "] | " + 
                        "Compress[" + [Boolean]($PreAction -contains 'Compress') + "] | Archive to 1file[" + [Boolean]($PreAction -contains 'Archive') + "] )")
 
         Write-Log -ID $InfoEventID -Type Information -Message $message
-        
+        }
+
 #Action
         IF ($Action -ne 'none') {
 
