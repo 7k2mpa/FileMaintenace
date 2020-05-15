@@ -47,7 +47,7 @@ https://github.com/7k2mpa/FileMaintenace
 [CmdletBinding()]
 Param(
 )
-$Script:CommonFunctionsVersion = "2.0.2"
+$Script:CommonFunctionsVersion = "2.0.1"
 Write-Verbose "CommonFunctions.ps1 Version $CommonFunctionsVersion"
 
 #ÉçÉOìôÇÃïœêîÇàÍäáê›íËÇµÇΩÇ¢èÍçáÇÕà»â∫ÇóòópÇµÇƒâ∫Ç≥Ç¢ÅB
@@ -660,10 +660,11 @@ function Test-PathNullOrEmpty {
 [CmdletBinding()]
 Param(
 [String][parameter(position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path ,
-[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name,
+[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name ,
 
-[Switch]$IfNullOrEmptyFinalize,
-[Switch]$NoMessage
+[Switch]$IfNullOrEmptyFinalize ,
+[Switch]$NoMessage ,
+[Switch]$Passthrough
 )
 begin {
 }
@@ -682,6 +683,8 @@ process {
         } else {
         Write-Output $FALSE 
         }
+
+
 }
 end {
 }
@@ -696,7 +699,8 @@ Param(
 [String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path,
 [String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name,
 
-[Switch]$IfNoExistFinalize
+[Switch][parameter(position = 2)]$IfNoExistFinalize ,
+[Switch][parameter(position = 3)]$PassThrough
 )
 begin {
 }
@@ -705,17 +709,26 @@ process {
     IF (Test-Path -LiteralPath $Path -PathType Container) {
 
         Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] exists."
-        Write-Output $TRUE
+        $result = $TRUE
 
         } else {
         Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] dose not exist."
-        Write-Output $FALSE
+        $result = $FALSE
+        $Path = $NULL
             
         IF($IfNoExistFinalize){
             Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
             Finalize $ErrorReturnCode
             }
     }
+    
+    IF ($PassThrough) {
+
+        Write-Output $Path
+
+        } else {
+        Write-Output $result
+        }
 }
 end {
 }
@@ -730,7 +743,8 @@ Param(
 [String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path,
 [String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name,
 
-[Switch]$IfNoExistFinalize
+[Switch][parameter(position = 2)]$IfNoExistFinalize ,
+[Switch][parameter(position = 3)]$PassThrough
 )
 begin {
 }
@@ -739,18 +753,27 @@ process {
     IF (Test-Path -LiteralPath $Path -PathType Leaf) {
 
         Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] exists."
-        Write-Output $TRUE
+        $result = $TRUE
 
         } else {
 
         Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] dose not exist."
-        Write-Output $FALSE
+        $result = $FALSE
+        $Path = $NULL
             
         IF($IfNoExistFinalize){
             Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
             Finalize $ErrorReturnCode
             }
     }
+
+    IF ($PassThrough) {
+
+        Write-Output $Path
+
+        } else {
+        Write-Output $result
+        }
 }
 end {
 }

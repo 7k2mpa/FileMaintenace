@@ -713,7 +713,7 @@ Param(
 begin {
 }
 process {
-Write-Log -ID $InfoEventID -Type Information -Message "Check existence of $($Path)"
+Write-Log -ID $InfoEventID -Type Information -Message "Check existence of [$($Path)]"
 
 Do {
 
@@ -743,7 +743,7 @@ Write-Verbose  "Source      LastWriteTime[$($Target.Object.LastWriteTime)] Size[
  
         IF (-not($OverRideForce) -and (Get-Item -LiteralPath $Path).LastWriteTime -ge $Target.Object.LastWriteTime ) {
             
-            Write-Log -ID $WarningEventID -Type Warning -Message "Last write time of [$Path] is equal or newer than [$($Target.Object.FullName)] , thus does no override."
+            Write-Log -ID $WarningEventID -Type Warning -Message "Last write time of [$($Path)] is equal or newer than [$($Target.Object.FullName)] , thus does no override."
             $Script:WarningFlag = $TRUE
             $noExistFlag = $FALSE
             Break
@@ -754,10 +754,12 @@ Write-Verbose  "Source      LastWriteTime[$($Target.Object.LastWriteTime)] Size[
 
         IF ($OverRideAsNormal) {
 
-            Write-Log -ID $InfoEventID -Type Information -Message "A same name file exists in the destination already, but specified -OverRideAsNormal[$($OverRideAsNormal)] option, thus overrides the file in the destination [$($Path)] and counts a warning event as NORMAL."
+            Write-Log -ID $InfoEventID -Type Information -Message ("A same name file exists in the destination already, but specified -OverRideAsNormal[$($OverRideAsNormal)] option, " +
+                "thus overrides the file in the destination [$($Path)] and counts a warning event as NORMAL.")
             
             } else {     
-            Write-Log -ID $WarningEventID -Type Warning -Message "A same name file exists in the destination already, but specified -OverRide[$($OverRide)] option, thus overrides the file in the destination [$($Path)]"
+            Write-Log -ID $WarningEventID -Type Warning -Message ("A same name file exists in the destination already, but specified -OverRide[$($OverRide)] option, " +
+                "thus overrides the file in the destination [$($Path)]")
             $Script:WarningFlag = $TRUE
             }
 
@@ -854,7 +856,7 @@ PSObject
 [CmdletBinding()]
 Param(
 [String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("TargetFolder" , "FullName")]$Path ,
-[String][parameter(position = 1, mandatory)][ValidateSet("File" , "Folder")]$FilterType ,
+[String][parameter(position = 1, mandatory)][ValidateSet("File" , "Folder")]$filterType ,
 
 [Switch]$Recurse = $Recurse ,
 [String]$Action = $Action
@@ -868,8 +870,8 @@ $parameter = @{
     LiteralPath = $Path
     Recurse     = $Recurse
     Include     = '*'    
-    File        = ($FilterType -eq 'File')
-    Directory   = ($FilterType -eq 'Folder')
+    File        = ($filterType -eq 'File')
+    Directory   = ($filterType -eq 'Folder')
 }
     $candidateObjects = Get-ChildItem @parameter
 
@@ -1051,20 +1053,19 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 
 
 #指定フォルダの有無を確認
-#Test-Container functionは$TRUE,$FALSEが戻値なので$NULLへ捨てる。捨てないとコンソール出力される
 
-    $TargetFolder = $TargetFolder | ConvertTo-AbsolutePath -Name '-TargetFolder'
-
-    $TargetFolder | Test-Container -Name '-TargetFolder' -IfNoExistFinalize > $NULL
+    $TargetFolder = $TargetFolder | ConvertTo-AbsolutePath -Name '-TargetFolder' |
+     
+            Test-Container -Name '-TargetFolder' -IfNoExistFinalize -PassThrough
 
 
 #移動先フォルダの要不要と有無を確認
 
     IF (($Action -match "^(Move|Copy)$") -or ($PreAction -contains 'MoveNewFile')) {    
 
-        $MoveToFolder = $MoveToFolder | ConvertTo-AbsolutePath -Name '-MoveToFolder'
+        $MoveToFolder = $MoveToFolder | ConvertTo-AbsolutePath -Name '-MoveToFolder' |
     
-        $MoveToFolder | Test-Container -Name '-MoveToFolder' -IfNoExistFinalize > $NULL
+            Test-Container -Name '-MoveToFolder' -IfNoExistFinalize -PassThrough
        
     } elseIF (-not($MoveToFolder | Test-PathNullOrEmpty)) {
     
@@ -1091,9 +1092,9 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 
     IF ($PreAction -match "^(7z|7zZip)$") {    
 
-        $7zFolder = $7zFolder | ConvertTo-AbsolutePath -Name '-7zFolder'
+        $7zFolder = $7zFolder | ConvertTo-AbsolutePath -Name '-7zFolder' |
 
-        $7zFolder | Test-Container -Name '-7zFolder' -IfNoExistFinalize > $NULL
+            Test-Container -Name '-7zFolder' -IfNoExistFinalize -PassThrough
         }
 
 #checking for invalid combinations of options
@@ -1181,45 +1182,39 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
             "parent path match to regular expression [$($ParentRegularExpression)], " +
             "size is over["+($Size / 1KB)+"]KB")
 
-        IF ($PreAction -notcontains 'none') {
+#PreAction
+        $message = $(IF ($PreAction -notcontains 'none'       ) {"Process files found "}) +
+                   $(IF ($PreAction -contains    'MoveNewFile') {"to move to [$($MoveToFolder)] "}) +
 
-            $message = "Process files found "
-            IF ($PreAction -contains 'MoveNewFile') { $message += "to move to [$($MoveToFolder)] "}
-
-            IF ($PreAction -match "^(Compress|Archive)$") {
+                   $(IF ($PreAction -match        "^(Compress|Archive)$") {
                 
-                #$PreActionは配列なのでSwitchで処理すると複数回実行されるので、IFで処理
-                IF ($PreAction -contains '7z') {
-                        $message += "with compress method [7z] "            
-                        } elseIF ($PreAction -contains '7zZIP') {
-                            $message += "with compress method [7zZip] "
-                            } else {
-                                $message += "with compress method [Powershell cmdlet Compress-Archive] "
-                                }                          
-            }
-            
-            $message += ("recursively [$($Recurse)] PreAction(Add time stamp to filename["+[Boolean]($PreAction -contains 'AddTimeStamp')+"] | " + 
-                        "Compress["+[Boolean]($PreAction -contains 'Compress')+"] | Archive to 1file["+[Boolean]($PreAction -contains 'Archive')+"] )")
+                      $(IF     ($PreAction -contains '7z'   ) {"with compress method [7z] "}            
+                        elseIF ($PreAction -contains '7zZIP') {"with compress method [7zZip] "}
+                        else                                  {"with compress method [Powershell cmdlet Compress-Archive] "}
+                      )}) +
+                    
+                   ("recursively [$($Recurse)] PreAction(Add time stamp to filename[" + [Boolean]($PreAction -contains 'AddTimeStamp') + "] | " + 
+                       "Compress[" + [Boolean]($PreAction -contains 'Compress') + "] | Archive to 1file[" + [Boolean]($PreAction -contains 'Archive') + "] )")
 
-            Write-Log -ID $InfoEventID -Type Information -Message $message
-            }
-
-
+        Write-Log -ID $InfoEventID -Type Information -Message $message
+        
+#Action
         IF ($Action -ne 'none') {
 
-            $message = "Process files found "
-            IF ($Action -eq 'KeepFilesCount') { $message += "[keep file generation only($($KeepFiles))] "}
-            IF ($Action -match '^(Copy|Move)$') { $message += "moving to[$($MoveToFolder)] "}
-            $message += "recursively[$($Recurse)] Action[$($Action)]"
+            $message = "Process files found " +
+                       $(IF ($Action -eq    'KeepFilesCount') {"[keep file generation only($($KeepFiles))] "}) +
+                       $(IF ($Action -match '^(Copy|Move)$')  {"moving to[$($MoveToFolder)] "}) +
+                       "recursively[$($Recurse)] Action[$($Action)]"
 
             Write-Log -ID $InfoEventID -Type Information -Message $message
             }
 
+#PostAction
         IF ($PostAction -ne 'none') {
 
-            $message = "Process files found"
-            IF ($PostAction -eq 'Rename') { $message += "rename with rule[$($RenameToRegularExpression)] "}
-            $message += "recursively[$($Recurse)] PostAction[$($PostAction)]"
+            $message = "Process files found" +
+                       $(IF ($PostAction -eq 'Rename') { "rename with rule[$($RenameToRegularExpression)] "}) +
+                       "recursively[$($Recurse)] PostAction[$($PostAction)]"
 
             Write-Log -ID $InfoEventID -Type Information -Message $message
             }
@@ -1288,7 +1283,7 @@ Param(
 [String]$DatumPath = $PSScriptRoot
 [Boolean]$WhatIfFlag = ($NULL -ne $PSBoundParameters['WhatIf'])
 
-$Version = "2.0.2"
+$Version = "2.0.1"
 
 [Boolean]$ForceEndloop  = $FALSE          ;#$FALSE for Finalize , $TRUE for Break in the loop
 
@@ -1302,21 +1297,19 @@ $returnCode = $NormalReturnCode
 
 #find files or folders and put them to the object
 
-    IF ($Action -eq "DeleteEmptyFolders") {
 
-        $FilterType = "Folder"
+$filterType = $(IF ($Action -eq "DeleteEmptyFolders") {"Folder"} 
 
-        } else {
-        $FilterType = "File"
-        }
+                else {"File"})
+
 
 $targets = @()
 
-$targets = $TargetFolder | Get-Object -FilterType $FilterType
+$targets = $TargetFolder | Get-Object -FilterType $filterType
 
     IF ($NULL -eq $targets) {
 
-        Write-Log -ID $InfoEventID -Type Information -Message "In -TargetFolder [$($targetFolder)] no [$($FilterType)] exists for processing."
+        Write-Log -ID $InfoEventID -Type Information -Message "In -TargetFolder [$($targetFolder)] no [$($filterType)] exists for processing."
 
         IF ($NoneTargetAsWarning) {
 
@@ -1330,26 +1323,23 @@ $targets = $TargetFolder | Get-Object -FilterType $FilterType
             }
     }
 
-Write-Log -ID $InfoEventID -Type Information -Message "[$(@($targets).Length)] [$($FilterType)(s)] exist for processing."
+Write-Log -ID $InfoEventID -Type Information -Message "[$(@($targets).Length)] [$($filterType)(s)] exist for processing."
 
-Write-Debug   "[$(@($targets).Length)][$($FilterType)(s)] are for processing..."
+Write-Debug   "[$(@($targets).Length)][$($filterType)(s)] are for processing..."
 
 Write-Debug   ("`r`n" + ($targets.Object.fullname | Out-String))
 
-Write-Verbose ("[$(@($targets).Length)][$($FilterType)(s)] are for processing..." + "`r`n" + ($targets.Object.fullname | Out-String))
+Write-Verbose ("[$(@($targets).Length)][$($filterType)(s)] are for processing..." + "`r`n" + ($targets.Object.fullname | Out-String))
 
 
 #-PreAction Archive processes files to archive to one file, thus before loop create a destination path of the archive file
 
 IF ($PreAction -contains 'Archive') {
 
-    IF ($PreAction -contains 'MoveNewFile') {        
+    $destination = $(IF ($PreAction -contains 'MoveNewFile') {$MoveToFolder}
+        
+                    else {$TargetFolder})
 
-        $destination = $MoveToFolder
-
-        } else {
-        $destination = $TargetFolder
-        }
 
     $archive = $ArchiveFileName | ConvertTo-PreActionPath -DestinationPath $destination
  
@@ -1397,12 +1387,12 @@ Do/Whileはループのため、処理途中でBreakすると、Whileへjumpする。
 
 [Boolean]$ForceEndloop  = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
 
-Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start processing [$($FilterType)] $($Target.Object.FullName) ---"
+Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start processing [$($filterType)] $($Target.Object.FullName) ---"
 
 <#
 Create a destinationFolder(child folder of the MoveToFolder) with Target.Object.FullName
 If NoRecurse, destinationFolder will be, thus skip
-Without Action[(Move|Copy)] , dose not need to check existence of destinationPath
+Without Action[(Move|Copy)] , dose not need to checke existence of destinationPath
 With PreAction[Archive] & MoveNewFile[TRUE] only MoveToFolder is needed, destinationFolder(s) are not needed, thus skip
 
 C:\TargetFolder                    :TargetFolder
@@ -1441,13 +1431,10 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
     IF (($PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')) {
 
-        IF ($PreAction -contains 'MoveNewFile') {        
+        $destination = $(IF ($PreAction -contains 'MoveNewFile') {$destinationFolder}
 
-            $destination = $destinationFolder
+                        else {$Target.Object.DirectoryName})
 
-            } else {
-            $destination = $Target.Object.DirectoryName
-            }
 
         $archive = $Target.Object.FullName | ConvertTo-PreActionPath -DestinationPath $destination
 
@@ -1594,7 +1581,7 @@ While ($FALSE)
         $ContinueCount++
         }
          
-    Write-Log -ID $InfoLoopEndEventID -Type Information -Message ("--- End processing [$($FilterType)] $($Target.Object.FullName)  " + 
+    Write-Log -ID $InfoLoopEndEventID -Type Information -Message ("--- End processing [$($filterType)] $($Target.Object.FullName)  " + 
         "Results  Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  " +
         "Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)] ---")
 
