@@ -399,13 +399,13 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
 
-#パラメータの確認
+#Validate Parameters
 
-#指定フォルダの有無を確認
+#Validate Oracle Home BIN
 
-    $OracleHomeBinPath = $OracleHomeBinPath | ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath'
-
-    $OracleHomeBinPath | Test-Container -Name '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
+$OracleHomeBinPath = $OracleHomeBinPath |
+                        ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath' |
+                        Test-Container -Name '-OracleHomeBinPath' -IfNoExistFinalize -PassThrough
     
 
 #対象のOracleがサービス起動しているか確認
@@ -435,7 +435,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to e
 function Finalize {
 
 Param(
-[parameter(mandatory=$TRUE)][int]$ReturnCode
+[parameter(position = 0, mandatory)][int]$ReturnCode
 )
 
 Pop-Location

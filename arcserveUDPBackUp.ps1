@@ -483,7 +483,8 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
 
-#パラメータの確認
+#Validate parameters
+
 
     IF (-not($AllServers)) {
 
@@ -498,8 +499,6 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
         }
 
     $UDPConsoleServerName | Test-Hostname -ObjectName 'arcserveUDP Console Server -UDPConsoleServerName' -IfInvalidFinalize > $NULL
-
-#[String][ValidateSet("JobExecUserAndPasswordFile","FixedPasswordFile" , "PlanText")]$AuthorizationType = 'JobExecUserAndPasswordFile' ,
 
 
     IF ($AuthorizationType -match '^(FixedPasswordFile|PlainText)$' ) {
@@ -525,9 +524,9 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
     IF ($AuthorizationType -match '^FixedPasswordFile$' ) {
 
-        $FixedPasswordFilePath  = $FixedPasswordFilePath | ConvertTo-AbsolutePath -Name '-FixedPasswordFilePath'
-
-        $FixedPasswordFilePath | Test-Leaf -Name '-FixedPasswordFilePath' -IfNoExistFinalize > $NULL
+        $FixedPasswordFilePath  = $FixedPasswordFilePath |
+                                    ConvertTo-AbsolutePath -Name '-FixedPasswordFilePath' |
+                                    Test-Leaf -Name '-FixedPasswordFilePath' -IfNoExistFinalize -PassThrough
         }
 
     IF ($AuthorizationType -match '^JobExecUserAndPasswordFile$' ) {
@@ -543,12 +542,11 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
     $BackupFlagFilePath | Split-Path -Parent | Test-Container -Name 'Parent Folder of -BackupFlagFilePath' -IfNoExistFinalize > $NULL
 
 
-#arcserveUDP CLIの有無を確認
+#Validate arcserveUDP CLI
     
-
-    $UDPCLIPath = $UDPCLIPath | ConvertTo-AbsolutePath -Name 'arcserve -UDPCLIPath '
-
-    $UDPCLIPath | Test-Leaf -Name 'arcserve -UDPCLIPath ' -IfNoExistFinalize > $NULL
+    $UDPCLIPath = $UDPCLIPath |
+                    ConvertTo-AbsolutePath -Name 'arcserve -UDPCLIPath ' |
+                    Test-Leaf -Name 'arcserve -UDPCLIPath ' -IfNoExistFinalize -PassThrough
 
 
 
@@ -565,7 +563,9 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to e
 function Finalize {
 
 Param(
-[parameter(mandatory=$true)][int]$ReturnCode
+[parameter(position = 0, mandatory)][int]$ReturnCode ,
+
+[String]$BackupFlagFilePath = $BackupFlagFilePath
 )
 
     Pop-Location
@@ -599,7 +599,7 @@ $Version = "2.0.2"
 
 #Create Invoke Command Strings
 
-    $command = '.\"' + (Split-Path $UDPCLIPath -Leaf ) + '"'
+    $command = '.\"' + (Split-Path $UDPCLIPath -Leaf ) + '"' 
 
     $command += " -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
 
@@ -634,10 +634,12 @@ $Version = "2.0.2"
         $fileNameWithOutExtention = [System.IO.Path]::GetFileNameWithoutExtension((Split-Path -Path $ExecUserPasswordFilePath -Leaf))
 
         $ExecUserPasswordFileName = $fileNameWithOutExtention + "_" + $doUser + $extension
-        
-        $ExecUserPasswordFilePath = $ExecUserPasswordFilePath | Split-Path -Parent | Join-Path -ChildPath $ExecUserPasswordFileName
 
-        $ExecUserPasswordFilePath | Test-Leaf -Name '-ExecUserPasswordFilePath' -IfNoExistFinalize > $NULL
+        
+        $ExecUserPasswordFilePath = $ExecUserPasswordFilePath |
+                                        Split-Path -Parent |
+                                        Join-Path -ChildPath $ExecUserPasswordFileName |
+                                        Test-Leaf -Name '-ExecUserPasswordFilePath' -IfNoExistFinalize -PassThrough
 
         $command += " -UDPConsoleUserName `'$doUser`' -UDPConsoleDomainName `'$doDomain`' -UDPConsolePasswordFile `'$ExecUserPasswordFilePath`' "
         }

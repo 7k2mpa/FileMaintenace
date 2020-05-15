@@ -421,28 +421,28 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
 
-#パラメータの確認
+#Validate Parameters
 
-#OracleBINフォルダの指定、存在確認
+#Validate Oracle BIN
 
-    $OracleHomeBinPath = $OracleHomeBinPath | ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath'
-
-    $OracleHomeBinPath | Test-Container -Name '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
-
-
-#SQLLogファイルの指定、存在、書き込み権限確認
-
-    $SQLLogPath = $SQLLogPath | ConvertTo-AbsolutePath -ObjectName '-SQLLogPath'
-
-    $SQLLogPath | Test-LogPath -Name '-SQLLogPath' > $NULL
+$OracleHomeBinPath = $OracleHomeBinPath |
+                        ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath' |
+                        Test-Container -Name '-OracleHomeBinPath' -IfNoExistFinalize -PassThrough
 
 
-#SQLコマンド群の指定、存在確認、Load
+#Validate SQL Log File
 
-    $SQLCommandsPath = $SQLCommandsPath | ConvertTo-AbsolutePath -ObjectName '-SQLCommandPath'
+$SQLLogPath = $SQLLogPath |
+                ConvertTo-AbsolutePath -ObjectName '-SQLLogPath'
 
-    $SQLCommandsPath | Test-Leaf -Name '-SQLCommandsPath' -IfNoExistFinalize > $NULL
+$SQLLogPath | Test-LogPath -Name '-SQLLogPath' > $NULL
 
+
+#Validate SQL command File
+
+$SQLCommandsPath = $SQLCommandsPath |
+                        ConvertTo-AbsolutePath -Name '-SQLCommandPath' |
+                        Test-Leaf -Name '-SQLCommandsPath' -IfNoExistFinalize -PassThrough
 
     Try {
         . $SQLCommandsPath
@@ -456,11 +456,11 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
     Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to load SQLs Version $($SQLsVersion) in -SQLCommandsPath"
 
 
-#Oracleサービス起動用のStartService.ps1の存在確認
+#Validate StartService script path for Starting Oracle service
 
-    $StartServicePath = $StartServicePath | ConvertTo-AbsolutePath -Name '-StartServicePath'
-
-    $StartServicePath | Test-Leaf -Name '-StartServicePath' -IfNoExistFinalize > $NULL
+$StartServicePath = $StartServicePath |
+                        ConvertTo-AbsolutePath -Name '-StartServicePath' |
+                        Test-Leaf -Name '-StartServicePath' -IfNoExistFinalize -PassThrough
 
 
 
@@ -498,7 +498,7 @@ Write-Log -EventID $InfoEventID -Type Information -Message "To start to switch O
 function Finalize {
 
 Param(
-[parameter(mandatory=$TRUE)][int]$ReturnCode
+[parameter(position = 0, mandatory)][int]$ReturnCode
 )
 
 Pop-Location

@@ -417,26 +417,29 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
 
-#パラメータの確認
+#Validate Parameters
 
-#OracleBINフォルダの指定、存在確認
+#Validate Oracle BIN
 
-    $OracleHomeBinPath = $OracleHomeBinPath | ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath'
-
-    $OracleHomeBinPath | Test-Container -Name '-OracleHomeBinPath' -IfNoExistFinalize > $NULL
-
-#OracleRmanLogファイルの指定、存在、書き込み権限確認
-
-    $OracleRMANLogPath = $OracleRMANLogPath | ConvertTo-AbsolutePath -Name '-OracleRmanLogPath'
-
-    $OracleRMANLogPath | Test-LogPath -Name '-OracleRMANLLogPath' > $NULL
+$OracleHomeBinPath = $OracleHomeBinPath |
+                        ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath' |
+                        Test-Container -Name '-OracleHomeBinPath' -IfNoExistFinalize -PassThrough
 
 
-#実行するRMANファイルの存在確認
+#Validate Oracle RMAN Log File
+
+$OracleRMANLogPath = $OracleRMANLogPath |
+                        ConvertTo-AbsolutePath -Name '-OracleRmanLogPath' |
+                        Test-LogPath -Name '-OracleRMANLLogPath' -PassThrough
+
+
+
+#Validate Oracle RMAN command File
    
-    $ExecRmanPath = $ExecRmanPath  | ConvertTo-AbsolutePath -Name '-ExecRmanPath'
+$ExecRmanPath = $ExecRmanPath
+                    ConvertTo-AbsolutePath -Name '-ExecRmanPath' |
+                    Test-Leaf -Name '-ExecRmanPath' -IfNoExistFinalize -PassThrough
 
-    $ExecRmanPath | Test-Leaf -Name '-ExecRmanPath' -IfNoExistFinalize > $NULL
 
 
 #対象のOracleがサービス起動しているか確認
@@ -466,7 +469,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to d
 function Finalize {
 
 Param(
-[parameter(mandatory=$true)][int]$ReturnCode
+[parameter(position = 0, mandatory)][int]$ReturnCode
 )
 
 Pop-Location
