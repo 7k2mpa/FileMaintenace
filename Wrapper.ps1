@@ -376,26 +376,24 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
 
-#パラメータの確認
+#validate parameters
 
 
-#コマンドの有無を確認
+#validate executing command's path
+
+$CommandPath = $CommandPath |
+                ConvertTo-AbsolutePath -ObjectName '-CommandPath' | 
+                Test-Leaf -Name '-CommandPath' -IfNoExistFinalize -PassThrough
 
 
-    $CommandPath = $CommandPath | ConvertTo-AbsolutePath -ObjectName ' -CommandPath'
+#validate command file path
 
-    $CommandPath | Test-Leaf -Name '-CommandPath' -IfNoExistFinalize > $NULL
-
-#コマンドファイルの有無を確認
-    
-
-    $CommandFile = $CommandFile | ConvertTo-AbsolutePath -ObjectName '-CommandFile'
-
-    $CommandFile | Test-Leaf -Name '-CommandFile' -IfNoExistFinalize > $NULL
+$CommandFile = $CommandFile |
+                ConvertTo-AbsolutePath -ObjectName '-CommandFile' | 
+                Test-Leaf -Name '-CommandFile' -IfNoExistFinalize -PassThrough
 
 
-#処理開始メッセージ出力
-
+#Output starting message
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
@@ -406,7 +404,12 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to e
 function Finalize {
 
 Param(
-[parameter(mandatory)][int]$ReturnCode
+[parameter(position = 0, mandatory)][int]$ReturnCode ,
+
+[int]$NormalCount = $NormalCount ,
+[int]$WarningCount = $WarningCount ,
+[int]$ErrorCount = $ErrorCount ,
+[Boolean]$Continue = $Continue
 )
 
     IF (-not(($NormalCount -eq 0) -and ($WarningCount -eq 0) -and ($ErrorCount -eq 0))) {
@@ -462,17 +465,17 @@ $Version = "2.0.2"
 
     Switch -Regex ($line) {
 
-        #分岐1 行頭#でコメント
+        #Case 1 comment
         '^#.*$' {
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Comment[$($line)]"
             }
 
-        #分岐2 空白
+        #Case 2 empty line
         '^$' {
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Empty Line"
             }
 
-        #分岐3 コマンド実行
+        #Case 3 execute command
         default {
 
             Try{        
@@ -490,11 +493,10 @@ $Version = "2.0.2"
 
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execution Result is [$($LASTEXITCODE)] at line [$($i+1)/$($lines.Count)] in -CommandFile [$($CommandFile)]"
                     
-
-            #終了コードで分岐
+#Check result of execution
             Switch ($LASTEXITCODE) {
 
-                #条件1 異常終了
+                #Case 1 Error
                 {$_ -ge $ErrorReturnCode} {
  
                     $ErrorCount++
@@ -509,15 +511,15 @@ $Version = "2.0.2"
                         }
                     }
                     
-                #条件2 警告終了
+                #Case 2 Warning
                 {$_ -ge $WarningReturnCode} {
                             
                     $WarningCount++
                     Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "A WARNING termination occurred at line [$($i+1)/$($lines.Count)] in -CommandFile [$($CommandFile)] Will execute next line." 
                     Break        
                     }
-                        
-                #条件3 正常終了
+                
+                #Case 3 Normal
                 Default {
 
                     $NormalCount++
@@ -525,10 +527,10 @@ $Version = "2.0.2"
                     }
             }
                       
-        # 分岐3 コマンド実行 default終端 
+        #Termination Case 3 execute command(default) 
         }
 
-    #Switch -Regex ($Line)終端
+    #Termination Switch -Regex ($Line)
     }
 
 # :ForLoop termination

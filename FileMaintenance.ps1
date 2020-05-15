@@ -1054,18 +1054,18 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 
 #指定フォルダの有無を確認
 
-    $TargetFolder = $TargetFolder | ConvertTo-AbsolutePath -Name '-TargetFolder' |
-     
-            Test-Container -Name '-TargetFolder' -IfNoExistFinalize -PassThrough
+$TargetFolder = $TargetFolder |
+                    ConvertTo-AbsolutePath -Name '-TargetFolder' | 
+                    Test-Container -Name '-TargetFolder' -IfNoExistFinalize -PassThrough
 
 
 #移動先フォルダの要不要と有無を確認
 
     IF (($Action -match "^(Move|Copy)$") -or ($PreAction -contains 'MoveNewFile')) {    
 
-        $MoveToFolder = $MoveToFolder | ConvertTo-AbsolutePath -Name '-MoveToFolder' |
-    
-            Test-Container -Name '-MoveToFolder' -IfNoExistFinalize -PassThrough
+        $MoveToFolder = $MoveToFolder |
+                            ConvertTo-AbsolutePath -Name '-MoveToFolder' |    
+                            Test-Container -Name '-MoveToFolder' -IfNoExistFinalize -PassThrough
        
     } elseIF (-not($MoveToFolder | Test-PathNullOrEmpty)) {
     
@@ -1092,9 +1092,9 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 
     IF ($PreAction -match "^(7z|7zZip)$") {    
 
-        $7zFolder = $7zFolder | ConvertTo-AbsolutePath -Name '-7zFolder' |
-
-            Test-Container -Name '-7zFolder' -IfNoExistFinalize -PassThrough
+        $7zFolder = $7zFolder |
+                        ConvertTo-AbsolutePath -Name '-7zFolder' |
+                        Test-Container -Name '-7zFolder' -IfNoExistFinalize -PassThrough
         }
 
 #checking for invalid combinations of options
@@ -1240,8 +1240,16 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
 
 function Finalize {
 
-Param(
-[parameter(mandatory)][Int]$ReturnCode
+Param(    
+[parameter(position = 0, mandatory)][int]$ReturnCode ,
+
+[int]$NormalCount = $NormalCount ,
+[int]$WarningCount = $WarningCount ,
+[int]$ErrorCount = $ErrorCount ,
+[boolean]$OverRide = $OverRide ,
+[int]$OverRideCount = $OverRideCount ,
+[boolean]$Continue = $Continue ,
+[int]$ContinueCount = $ContinueCount
 )
     $ForceFinalize = $FALSE
  

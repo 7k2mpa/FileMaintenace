@@ -377,19 +377,17 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
             } 
 
 
-#パラメータの確認
+#Validate parameters
 
 
-#フラグフォルダの有無を確認
+#Validate Flag Folder
+
+$FlagFolder = $FlagFolder |
+                ConvertTo-AbsolutePath -ObjectName '-FlagFolder' |
+                Test-Container -Name '-FlagFolder' -IfNoExistFinalize -PassThrough
 
 
-    $FlagFolder = $FlagFolder | ConvertTo-AbsolutePath -ObjectName  '-FlagFolder'
-
-    $FlagFolder | Test-Container -Name '-FlagFolder' -IfNoExistFinalize > $NULL
-
-
-#フラグファイル名のValidation
-
+#Validate Flag Filename
 
     IF ($FlagFile -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
@@ -420,7 +418,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Starting t
 function Finalize {
 
 Param(
-[parameter(mandatory)][int]$ReturnCode
+[parameter(position = 0, mandatory)][int]$ReturnCode
 )
 
  Invoke-PostFinalize $ReturnCode
@@ -509,4 +507,4 @@ Switch -Regex ($PostAction) {
 
 #終了メッセージ出力
 
-Finalize $NormalReturnCode
+Finalize -ReturnCode $NormalReturnCode

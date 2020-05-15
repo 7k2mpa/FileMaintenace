@@ -577,16 +577,16 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
 
-#パラメータの確認
+#Validate parameters
 
-    $N2WScliPath = $N2WScliPath | ConvertTo-AbsolutePath -Name '-N2WScliPath'
+$N2WScliPath = $N2WScliPath |
+                    ConvertTo-AbsolutePath -Name '-N2WScliPath' |
+                    Test-Container -Name '-N2WScliPath' -IfNoExistFinalize -PassThrough
 
-    $N2WScliPath | Test-Container -Name '-N2WScliPath' -IfNoExistFinalize > $NULL
-
-
-    $BackUpLogPath = $BackUpLogPath | ConvertTo-AbsolutePath -Name '-BackUpLogPath'
-
-    $BackUpLogPath | Test-Container -Name '-BackUpLogPath' -IfNoExistFinalize > $NULL
+                    
+$BackUpLogPath = $BackUpLogPath |
+                    ConvertTo-AbsolutePath -Name '-BackUpLogPath' |
+                    Test-Container -Name '-BackUpLogPath' -IfNoExistFinalize -PassThrough
 
     
     IF ($NULL -eq (Get-Command Python.exe -ErrorAction SilentlyContinue).path) {
