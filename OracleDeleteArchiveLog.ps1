@@ -423,7 +423,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 $OracleHomeBinPath = $OracleHomeBinPath |
                         ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath' |
-                        Test-Container -Name '-OracleHomeBinPath' -IfNoExistFinalize -PassThrough
+                        Test-PathEx -Type Container -Name '-OracleHomeBinPath' -IfNoExistFinalize -PassThrough
 
 
 #Validate Oracle RMAN Log File
@@ -438,7 +438,7 @@ $OracleRMANLogPath = $OracleRMANLogPath |
    
 $ExecRmanPath = $ExecRmanPath
                     ConvertTo-AbsolutePath -Name '-ExecRmanPath' |
-                    Test-Leaf -Name '-ExecRmanPath' -IfNoExistFinalize -PassThrough
+                    Test-PathEx -Type Leaf -Name '-ExecRmanPath' -IfNoExistFinalize -PassThrough
 
 
 
@@ -448,10 +448,10 @@ $ExecRmanPath = $ExecRmanPath
 
     IF (-not($targetWindowsOracleService | Test-ServiceStatus -Status Running)) {
 
-        Write-Log -EventType Error -EventID $ErrorEventID -EventMessage "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
+        Write-Log -EventID $ErrorEventID -Type Error -Message "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
         Finalize $ErrorReturnCode
         } else {
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Windows Service [$($targetWindowsOracleService)] is running."
+        Write-Log -EventID $InfoEventID -Type Information -Message "Windows Service [$($targetWindowsOracleService)] is running."
         }
      
 
@@ -460,9 +460,9 @@ $ExecRmanPath = $ExecRmanPath
 #処理開始メッセージ出力
 
 
-Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
+Write-Log -EventID $InfoEventID -Type Information -Message "All parameters are valid."
 
-Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to delete Oracle archive logs older than $($Days)days."
+Write-Log -EventID $InfoEventID -Type Information -Message "Start to delete Oracle archive logs older than $($Days)days."
 
 }
 
@@ -493,24 +493,22 @@ $Version = "2.0.2"
     IF ($PasswordAuthorization) {
 
         $rmanLog = RMAN.exe target $ExecUser/$ExecUserPassword@$OracleSID CMDFILE "$ExecRMANPath" $Days
-        Write-Output $rmanLog | Out-File -FilePath $OracleRMANLogPath -Append  -Encoding $LogFileEncode
  
         } else {
         $rmanLog = RMAN.exe target / CMDFILE "$ExecRMANPath" $Days
-        Write-Output $rmanLog | Out-File -FilePath $OracleRMANLogPath -Append  -Encoding $LogFileEncode
         }
 
+    Write-Output $rmanLog | Out-File -FilePath $OracleRMANLogPath -Append -Encoding $LogFileEncode
 
     IF ($LASTEXITCODE -ne 0) {
 
-        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to delete Oracle archive logs older than $($Days)days."
+        Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to delete Oracle archive logs older than $($Days)days."
+        $result = $ErrorReturnCode
 
-        Finalize $ErrorReturnCode
+        } else {
+        Write-Log -EventID $InfoEventID -Type Information -Message "Successfully completed to delete Oracle archive logs older than $($Days)days."
+        Write-Log -EventID $InfoEventID -Type Information -Message "!!REMIND they were deleted in Oracle RMAN records and you need to delete log files in the file system with OS's delete command!!"
+        $result = $NormalReturnCode         
         }
 
-
-Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Successfully completed to delete Oracle archive logs older than $($Days)days."
-Write-Log -EventID $InfoEventID -EventType Information -EventMessage "!!REMIND they were deleted in Oracle RMAN records and you need to delete log files in the file system with OS's delete command!!"
- 
-
-Finalize $NormalReturnCode
+Finalize -ReturnCode $result

@@ -302,10 +302,10 @@ Param(
 [Switch]$Continue ,
 
 
-[boolean]$Log2EventLog = $TRUE,
-[Switch]$NoLog2EventLog,
-[String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra',
-[String][ValidateSet("Application")]$EventLogLogName = 'Application',
+[boolean]$Log2EventLog = $TRUE ,
+[Switch]$NoLog2EventLog ,
+[String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra' ,
+[String][ValidateSet("Application")]$EventLogLogName = 'Application' ,
 
 [Boolean]$Log2Console = $TRUE ,
 [Switch]$NoLog2Console ,
@@ -383,14 +383,14 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 $CommandPath = $CommandPath |
                 ConvertTo-AbsolutePath -ObjectName '-CommandPath' | 
-                Test-Leaf -Name '-CommandPath' -IfNoExistFinalize -PassThrough
+                Test-PathEx -Type Leaf -Name '-CommandPath' -IfNoExistFinalize -PassThrough
 
 
 #validate command file path
 
 $CommandFile = $CommandFile |
                 ConvertTo-AbsolutePath -ObjectName '-CommandFile' | 
-                Test-Leaf -Name '-CommandFile' -IfNoExistFinalize -PassThrough
+                Test-PathEx -Type Leaf -Name '-CommandFile' -IfNoExistFinalize -PassThrough
 
 
 #Output starting message

@@ -384,7 +384,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 $FlagFolder = $FlagFolder |
                 ConvertTo-AbsolutePath -ObjectName '-FlagFolder' |
-                Test-Container -Name '-FlagFolder' -IfNoExistFinalize -PassThrough
+                Test-PathEx -Type Container -Name '-FlagFolder' -IfNoExistFinalize -PassThrough
 
 
 #Validate Flag Filename
@@ -446,7 +446,7 @@ Switch -Regex ($Status) {
 
     '^NoExist$' {
 
-        IF (-not($flagPath | Test-Leaf -Name 'Flag file') -and -not($flagPath | Test-Container -Name 'Same name folder')) {
+        IF (-not($flagPath | Test-PathEx -Type Leaf -Name 'Flag file') -and -not($flagPath | Test-PathEx -Type Container -Name 'Same name folder')) {
 
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] dose not exist and terminates as NORMAL." 
 

@@ -508,7 +508,7 @@ Param (
 begin {
 }
 process {
-    $BackUpTempPath | Test-Leaf -Name 'BackUp log file ' -IfNoExistFinalize >$NULL	
+    $BackUpTempPath | Test-PathEx -Type Leaf -Name 'BackUp log file ' -IfNoExistFinalize >$NULL	
 
     $id = Get-Content -Path $BackUpTempPath | ConvertFrom-Json
 
@@ -581,12 +581,12 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 $N2WScliPath = $N2WScliPath |
                     ConvertTo-AbsolutePath -Name '-N2WScliPath' |
-                    Test-Container -Name '-N2WScliPath' -IfNoExistFinalize -PassThrough
+                    Test-PathEx -Type Container -Name '-N2WScliPath' -IfNoExistFinalize -PassThrough
 
                     
 $BackUpLogPath = $BackUpLogPath |
                     ConvertTo-AbsolutePath -Name '-BackUpLogPath' |
-                    Test-Container -Name '-BackUpLogPath' -IfNoExistFinalize -PassThrough
+                    Test-PathEx -Type Container -Name '-BackUpLogPath' -IfNoExistFinalize -PassThrough
 
     
     IF ($NULL -eq (Get-Command Python.exe -ErrorAction SilentlyContinue).path) {
@@ -621,7 +621,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to [
 function Finalize {
 
 Param(
-[parameter(mandatory)][int]$ReturnCode
+[parameter(position = 0, mandatory)][int]$ReturnCode
 )
 
 
@@ -674,4 +674,4 @@ Switch -Regex ($Job) {
         }    
 }
 
-Finalize $status
+Finalize -ReturnCode $status

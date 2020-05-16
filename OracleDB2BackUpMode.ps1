@@ -427,7 +427,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 $OracleHomeBinPath = $OracleHomeBinPath | 
                         ConvertTo-AbsolutePath -Name  '-oracleHomeBinPath' |
-                        Test-Container -Name '-oracleHomeBinPath' -IfNoExistFinalize -PassThrough
+                        Test-PathEx -Type Container -Name '-oracleHomeBinPath' -IfNoExistFinalize -PassThrough
 
 
 #Validate BackUpFlag Folder
@@ -436,7 +436,7 @@ $OracleHomeBinPath = $OracleHomeBinPath |
 
         $BackUpFlagPath = $BackUpFlagPath | ConvertTo-AbsolutePath -Name  '-BackUpFlagPath'
 
-        $BackUpFlagPath | Split-Path -Parent | Test-Container -Name 'Parent Folder of -BackUpFlagPath' -IfNoExistFinalize > $NULL
+        $BackUpFlagPath | Split-Path -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -BackUpFlagPath' -IfNoExistFinalize > $NULL
         }
 
 
@@ -451,7 +451,7 @@ $OracleHomeBinPath = $OracleHomeBinPath |
 
 $SQLCommandsPath = $SQLCommandsPath |
                     ConvertTo-AbsolutePath -Name '-SQLCommandPath' |
-                    Test-Leaf -Name '-SQLCommandsPath' -IfNoExistFinalize -PassThrough
+                    Test-PathEx -Type Leaf -Name '-SQLCommandsPath' -IfNoExistFinalize -PassThrough
 
     Try {
 
@@ -503,10 +503,6 @@ Pop-Location
 
 #####################   ‚±‚±‚©‚ç–{‘Ì  ######################
 
-
-[boolean]$ErrorFlag = $FALSE
-[boolean]$WarningFlag = $FALSE
-[boolean]$ContinueFlag = $FALSE
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
@@ -692,4 +688,4 @@ Push-Location $OracleHomeBinPath
     }
 
 
-Finalize $NormalReturnCode
+Finalize -ReturnCode $NormalReturnCode

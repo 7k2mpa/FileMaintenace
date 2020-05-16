@@ -369,7 +369,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to m
 function Finalize {
 
 Param(
-[parameter(mandatory)][int]$ReturnCode
+[parameter(position = 0, mandatory)][int]$ReturnCode
 )
 
 

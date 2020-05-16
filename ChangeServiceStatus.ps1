@@ -429,7 +429,7 @@ Write-Log -Id $InfoEventID -Type Information -Message "Starting to switch Servic
 function Finalize {
 
 Param(
-[parameter(mandatory)][int]$ReturnCode
+[parameter(position = 0, mandatory)][int]$ReturnCode
 )
 
 

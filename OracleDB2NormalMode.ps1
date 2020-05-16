@@ -427,7 +427,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 $OracleHomeBinPath = $OracleHomeBinPath |
                         ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath' |
-                        Test-Container -Name '-OracleHomeBinPath' -IfNoExistFinalize -PassThrough
+                        Test-PathEx -Type Container -Name '-OracleHomeBinPath' -IfNoExistFinalize -PassThrough
 
 
 #Validate SQL Log File
@@ -442,7 +442,7 @@ $SQLLogPath | Test-LogPath -Name '-SQLLogPath' > $NULL
 
 $SQLCommandsPath = $SQLCommandsPath |
                         ConvertTo-AbsolutePath -Name '-SQLCommandPath' |
-                        Test-Leaf -Name '-SQLCommandsPath' -IfNoExistFinalize -PassThrough
+                        Test-PathEx -Type Leaf -Name '-SQLCommandsPath' -IfNoExistFinalize -PassThrough
 
     Try {
         . $SQLCommandsPath
@@ -460,7 +460,7 @@ $SQLCommandsPath = $SQLCommandsPath |
 
 $StartServicePath = $StartServicePath |
                         ConvertTo-AbsolutePath -Name '-StartServicePath' |
-                        Test-Leaf -Name '-StartServicePath' -IfNoExistFinalize -PassThrough
+                        Test-PathEx -Type Leaf -Name '-StartServicePath' -IfNoExistFinalize -PassThrough
 
 
 
@@ -479,11 +479,11 @@ $StartServicePath = $StartServicePath |
 
     $controlfiledotctlPATH = $controlfiledotctlPATH | ConvertTo-AbsolutePath -Name '-controlfiledotctlPATH '
 
-    $ControlfiledotctlPATH | Split-Path -Parent | Test-Container -Name 'Parent Folder of -controlfiledotctlPATH' -IfNoExistFinalize > $NULL
+    $ControlfiledotctlPATH | Split-Path -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -controlfiledotctlPATH' -IfNoExistFinalize > $NULL
 
     $controlfiledotbkPATH = $controlfiledotbkPATH | ConvertTo-AbsolutePath -Name '-controlfiledotbkPATH '
 
-    $ControlfiledotbkPATH | Split-Path  -Parent | Test-Container -Name 'Parent Folder of -controlfiledotbkPATH' -IfNoExistFinalize > $NULL
+    $ControlfiledotbkPATH | Split-Path  -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -controlfiledotbkPATH' -IfNoExistFinalize > $NULL
 
 
 
@@ -509,9 +509,6 @@ Pop-Location
 }
 
 #####################   ‚±‚±‚©‚ç–{‘Ì  ######################
-
-[boolean]$ErrorFlag = $FALSE
-[boolean]$WarningFlag = $FALSE
 
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
@@ -707,7 +704,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
         Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to export Oracle Control Files."
 
         } else {         
-        Write-Log -EventID $WarningEventID -Type Warning -Message "Failed to export Oracle Control Files"
+        Write-Log -EventID $WarningEventID -Type Warning -Message "Failed to export Oracle Control Files."
         $WarningCount ++
         }
 
@@ -726,4 +723,4 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
         }
 
 
-Finalize $NormalReturnCode
+Finalize -ReturnCode $NormalReturnCode

@@ -526,7 +526,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
         $FixedPasswordFilePath  = $FixedPasswordFilePath |
                                     ConvertTo-AbsolutePath -Name '-FixedPasswordFilePath' |
-                                    Test-Leaf -Name '-FixedPasswordFilePath' -IfNoExistFinalize -PassThrough
+                                    Test-PathEx -Type Leaf -Name '-FixedPasswordFilePath' -IfNoExistFinalize -PassThrough
         }
 
     IF ($AuthorizationType -match '^JobExecUserAndPasswordFile$' ) {
@@ -546,7 +546,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
     
     $UDPCLIPath = $UDPCLIPath |
                     ConvertTo-AbsolutePath -Name 'arcserve -UDPCLIPath ' |
-                    Test-Leaf -Name 'arcserve -UDPCLIPath ' -IfNoExistFinalize -PassThrough
+                    Test-PathEx -Type Leaf -Name 'arcserve -UDPCLIPath ' -IfNoExistFinalize -PassThrough
 
 
 
@@ -570,7 +570,7 @@ Param(
 
     Pop-Location
 
-    IF ($BackupFlagFilePath | Test-Leaf -Name 'BackUp Flag') {
+    IF ($BackupFlagFilePath | Test-PathEx -Type Leaf -Name 'BackUp Flag') {
         Invoke-Action -ActionType Delete -ActionFrom  $BackupFlagFilePath -ActionError "BackUp Flag [$($BackupFlagFilePath)]"
         }
 
@@ -639,7 +639,7 @@ $Version = "2.0.2"
         $ExecUserPasswordFilePath = $ExecUserPasswordFilePath |
                                         Split-Path -Parent |
                                         Join-Path -ChildPath $ExecUserPasswordFileName |
-                                        Test-Leaf -Name '-ExecUserPasswordFilePath' -IfNoExistFinalize -PassThrough
+                                        Test-PathEx -Type Leaf -Name '-ExecUserPasswordFilePath' -IfNoExistFinalize -PassThrough
 
         $command += " -UDPConsoleUserName `'$doUser`' -UDPConsoleDomainName `'$doDomain`' -UDPConsolePasswordFile `'$ExecUserPasswordFilePath`' "
         }

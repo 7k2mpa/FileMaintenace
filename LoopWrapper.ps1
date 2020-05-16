@@ -417,19 +417,18 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 #パラメータの確認
 
 
-#コマンドの有無を確認
+#validate executing command's path
 
+$CommandPath = $CommandPath |
+                ConvertTo-AbsolutePath -ObjectName '-CommandPath' | 
+                Test-PathEx -Type Leaf -Name '-CommandPath' -IfNoExistFinalize -PassThrough
 
-    $CommandPath = $CommandPath | ConvertTo-AbsolutePath -ObjectName '-CommandPath'
+                
+#validate command file path
 
-    $CommandPath | Test-Leaf -Name '-CommandPath' -IfNoExistFinalize > $NULL
-
-#コマンドファイルの有無を確認
-    
-
-    $CommandFile = $CommandFile | ConvertTo-AbsolutePath -ObjectName '-CommandFile'
-
-    $CommandFile | Test-Leaf -Name '-CommandFile' -IfNoExistFinalize > $NULL
+$CommandFile = $CommandFile |
+                ConvertTo-AbsolutePath -ObjectName '-CommandFile' | 
+                Test-PathEx -Type Leaf -Name '-CommandFile' -IfNoExistFinalize -PassThrough
 
 
 #処理開始メッセージ出力
@@ -444,7 +443,7 @@ Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to e
 function Finalize {
 
 Param(
-[parameter(mandatory)][int]$ReturnCode
+[parameter(position = 0, mandatory)][int]$ReturnCode
 )
 
 

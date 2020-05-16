@@ -888,7 +888,7 @@ process {
 
     #ログ出力先ファイルの親フォルダが存在しなければ異常終了
 
-    $Path | Split-Path -Parent | Test-Container -ObjectName $Name -IfNoExistFinalize > $NULL
+    $Path | Split-Path -Parent | Test-PathEx -Type Container -ObjectName $Name -IfNoExistFinalize > $NULL
 
     #ログ出力先（予定）ファイルと同一名称のフォルダが存在していれば異常終了
 
