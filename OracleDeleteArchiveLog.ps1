@@ -423,7 +423,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 $OracleHomeBinPath = $OracleHomeBinPath |
                         ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath' |
-                        Test-PathEx -Type Container -Name '-OracleHomeBinPath' -IfFlaseFinalize -PassThrough
+                        Test-PathEx -Type Container -Name '-OracleHomeBinPath' -IfFalseFinalize -PassThrough
 
 
 #Validate Oracle RMAN Log File
