@@ -427,7 +427,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 $OracleHomeBinPath = $OracleHomeBinPath | 
                         ConvertTo-AbsolutePath -Name  '-oracleHomeBinPath' |
-                        Test-PathEx -Type Container -Name '-oracleHomeBinPath' -IfNoExistFinalize -PassThrough
+                        Test-PathEx -Type Container -Name '-oracleHomeBinPath' -IfFalseFinalize -PassThrough
 
 
 #Validate BackUpFlag Folder
@@ -436,7 +436,7 @@ $OracleHomeBinPath = $OracleHomeBinPath |
 
         $BackUpFlagPath = $BackUpFlagPath | ConvertTo-AbsolutePath -Name  '-BackUpFlagPath'
 
-        $BackUpFlagPath | Split-Path -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -BackUpFlagPath' -IfNoExistFinalize > $NULL
+        $BackUpFlagPath | Split-Path -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -BackUpFlagPath' -IfFalseFinalize > $NULL
         }
 
 
@@ -451,7 +451,7 @@ $OracleHomeBinPath = $OracleHomeBinPath |
 
 $SQLCommandsPath = $SQLCommandsPath |
                     ConvertTo-AbsolutePath -Name '-SQLCommandPath' |
-                    Test-PathEx -Type Leaf -Name '-SQLCommandsPath' -IfNoExistFinalize -PassThrough
+                    Test-PathEx -Type Leaf -Name '-SQLCommandsPath' -IfFalseFinalize -PassThrough
 
     Try {
 

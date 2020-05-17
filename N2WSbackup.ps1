@@ -508,7 +508,7 @@ Param (
 begin {
 }
 process {
-    $BackUpTempPath | Test-PathEx -Type Leaf -Name 'BackUp log file ' -IfNoExistFinalize >$NULL	
+    $BackUpTempPath | Test-PathEx -Type Leaf -Name 'BackUp log file ' -IfFalseFinalize >$NULL	
 
     $id = Get-Content -Path $BackUpTempPath | ConvertFrom-Json
 
@@ -581,12 +581,12 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 $N2WScliPath = $N2WScliPath |
                     ConvertTo-AbsolutePath -Name '-N2WScliPath' |
-                    Test-PathEx -Type Container -Name '-N2WScliPath' -IfNoExistFinalize -PassThrough
+                    Test-PathEx -Type Container -Name '-N2WScliPath' -IfFalseFinalize -PassThrough
 
                     
 $BackUpLogPath = $BackUpLogPath |
                     ConvertTo-AbsolutePath -Name '-BackUpLogPath' |
-                    Test-PathEx -Type Container -Name '-BackUpLogPath' -IfNoExistFinalize -PassThrough
+                    Test-PathEx -Type Container -Name '-BackUpLogPath' -IfFalseFinalize -PassThrough
 
     
     IF ($NULL -eq (Get-Command Python.exe -ErrorAction SilentlyContinue).path) {

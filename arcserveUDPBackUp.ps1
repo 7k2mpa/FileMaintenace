@@ -526,7 +526,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
         $FixedPasswordFilePath  = $FixedPasswordFilePath |
                                     ConvertTo-AbsolutePath -Name '-FixedPasswordFilePath' |
-                                    Test-PathEx -Type Leaf -Name '-FixedPasswordFilePath' -IfNoExistFinalize -PassThrough
+                                    Test-PathEx -Type Leaf -Name '-FixedPasswordFilePath' -IfFalseFinalize -PassThrough
         }
 
     IF ($AuthorizationType -match '^JobExecUserAndPasswordFile$' ) {
@@ -546,7 +546,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
     
     $UDPCLIPath = $UDPCLIPath |
                     ConvertTo-AbsolutePath -Name 'arcserve -UDPCLIPath ' |
-                    Test-PathEx -Type Leaf -Name 'arcserve -UDPCLIPath ' -IfNoExistFinalize -PassThrough
+                    Test-PathEx -Type Leaf -Name 'arcserve -UDPCLIPath ' -IfFalseFinalize -PassThrough
 
 
 
@@ -639,7 +639,7 @@ $Version = "2.0.2"
         $ExecUserPasswordFilePath = $ExecUserPasswordFilePath |
                                         Split-Path -Parent |
                                         Join-Path -ChildPath $ExecUserPasswordFileName |
-                                        Test-PathEx -Type Leaf -Name '-ExecUserPasswordFilePath' -IfNoExistFinalize -PassThrough
+                                        Test-PathEx -Type Leaf -Name '-ExecUserPasswordFilePath' -IfFalseFinalize -PassThrough
 
         $command += " -UDPConsoleUserName `'$doUser`' -UDPConsoleDomainName `'$doDomain`' -UDPConsolePasswordFile `'$ExecUserPasswordFilePath`' "
         }

@@ -427,7 +427,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 $OracleHomeBinPath = $OracleHomeBinPath |
                         ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath' |
-                        Test-PathEx -Type Container -Name '-OracleHomeBinPath' -IfNoExistFinalize -PassThrough
+                        Test-PathEx -Type Container -Name '-OracleHomeBinPath' -IfFalseFinalize -PassThrough
 
 
 #Validate SQL Log File
@@ -442,7 +442,7 @@ $SQLLogPath | Test-LogPath -Name '-SQLLogPath' > $NULL
 
 $SQLCommandsPath = $SQLCommandsPath |
                         ConvertTo-AbsolutePath -Name '-SQLCommandPath' |
-                        Test-PathEx -Type Leaf -Name '-SQLCommandsPath' -IfNoExistFinalize -PassThrough
+                        Test-PathEx -Type Leaf -Name '-SQLCommandsPath' -IfFalseFinalize -PassThrough
 
     Try {
         . $SQLCommandsPath
@@ -460,7 +460,7 @@ $SQLCommandsPath = $SQLCommandsPath |
 
 $StartServicePath = $StartServicePath |
                         ConvertTo-AbsolutePath -Name '-StartServicePath' |
-                        Test-PathEx -Type Leaf -Name '-StartServicePath' -IfNoExistFinalize -PassThrough
+                        Test-PathEx -Type Leaf -Name '-StartServicePath' -IfFalseFinalize -PassThrough
 
 
 
@@ -479,11 +479,11 @@ $StartServicePath = $StartServicePath |
 
     $controlfiledotctlPATH = $controlfiledotctlPATH | ConvertTo-AbsolutePath -Name '-controlfiledotctlPATH '
 
-    $ControlfiledotctlPATH | Split-Path -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -controlfiledotctlPATH' -IfNoExistFinalize > $NULL
+    $ControlfiledotctlPATH | Split-Path -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -controlfiledotctlPATH' -IfFalseFinalize > $NULL
 
     $controlfiledotbkPATH = $controlfiledotbkPATH | ConvertTo-AbsolutePath -Name '-controlfiledotbkPATH '
 
-    $ControlfiledotbkPATH | Split-Path  -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -controlfiledotbkPATH' -IfNoExistFinalize > $NULL
+    $ControlfiledotbkPATH | Split-Path  -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -controlfiledotbkPATH' -IfFalseFinalize > $NULL
 
 
 

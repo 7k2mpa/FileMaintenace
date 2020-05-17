@@ -405,7 +405,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 $OracleHomeBinPath = $OracleHomeBinPath |
                         ConvertTo-AbsolutePath -Name  '-OracleHomeBinPath' |
-                        Test-PathEx -Type Container -Name '-OracleHomeBinPath' -IfNoExistFinalize -PassThrough
+                        Test-PathEx -Type Container -Name '-OracleHomeBinPath' -IfFalseFinalize -PassThrough
     
 
 #対象のOracleがサービス起動しているか確認

@@ -1080,7 +1080,7 @@ $TargetFolder = $TargetFolder |
     IF ($PreAction -contains 'Archive') {
 
 #        $ArchiveFileName | Test-PathNullOrEmpty -Name '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL
-        $ArchiveFileName | Test-PathEx -Type NotNullOrEmpty -Name '-ArchiveFileName' -IfFlaseFinalize > $NULL
+        $ArchiveFileName | Test-PathEx -Type NotNullOrEmpty -Name '-ArchiveFileName' -IfFalseFinalize > $NULL
 
         IF ($ArchiveFileName -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
     
@@ -1096,7 +1096,7 @@ $TargetFolder = $TargetFolder |
 
         $7zFolder = $7zFolder |
                         ConvertTo-AbsolutePath -Name '-7zFolder' |
-                        Test-PathEx -Type Container -Name '-7zFolder' -IfNoExistFinalize -PassThrough
+                        Test-PathEx -Type Container -Name '-7zFolder' -IfFalseFinalize -PassThrough
     }
 
 #checking for invalid combinations of options

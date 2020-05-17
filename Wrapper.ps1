@@ -383,14 +383,14 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 $CommandPath = $CommandPath |
                 ConvertTo-AbsolutePath -ObjectName '-CommandPath' | 
-                Test-PathEx -Type Leaf -Name '-CommandPath' -IfNoExistFinalize -PassThrough
+                Test-PathEx -Type Leaf -Name '-CommandPath' -IfFalseFinalize -PassThrough
 
 
 #validate command file path
 
 $CommandFile = $CommandFile |
                 ConvertTo-AbsolutePath -ObjectName '-CommandFile' | 
-                Test-PathEx -Type Leaf -Name '-CommandFile' -IfNoExistFinalize -PassThrough
+                Test-PathEx -Type Leaf -Name '-CommandFile' -IfFalseFinalize -PassThrough
 
 
 #Output starting message

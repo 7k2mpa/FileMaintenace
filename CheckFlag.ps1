@@ -384,7 +384,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
 $FlagFolder = $FlagFolder |
                 ConvertTo-AbsolutePath -ObjectName '-FlagFolder' |
-                Test-PathEx -Type Container -Name '-FlagFolder' -IfNoExistFinalize -PassThrough
+                Test-PathEx -Type Container -Name '-FlagFolder' -IfFalseFinalize -PassThrough
 
 
 #Validate Flag Filename
