@@ -422,7 +422,7 @@ begin {
 }
 Process {
 
-    $Path | Test-PathNullOrEmpty -Name $Name -IfNullOrEmptyFinalize > $NULL
+    $Path | Test-PathEx -Type NotNullOrEmpty -Name $Name -IfFalseFinalize > $NULL
     
     #Windowsではパス区切に/も使用できる。しかしながら、処理を簡単にするため\に統一する
 
@@ -678,11 +678,11 @@ Return $FALSE or $PATH for true.
 Specify a path for test.
 
 .NAME
-Specify a name string in the logs.
+Specify name string in the logs.
 
 .TYPE
 Specify type of testing path.
-With -Type Log, checking log file write permission and make a new log file when the log file dose not exist.
+With -Type Log, test log file write permission or make a new log file when the log file dose not exist.
 
 With -NotNullOrEmpty option, return $TRUE or $PATH for $PATH value is not $NULL or empty.
 
@@ -739,7 +739,7 @@ String
             }
 
             'Log' {
-                $result = -not([Boolean](Test-LogPath -Path $Path -Name $Name -GetResult))
+                $result = Test-LogPath -Path $Path -Name $Name -GetResult
                 $NoMessage = $TRUE
             }
         }
@@ -980,9 +980,17 @@ $result = $ErrorReturnCode
 While ($FALSE)
 
 IF ($GetResult) {
-    Write-Output $result
-    Return
-    }
+    IF ($result -eq $NormalReturnCode) {
+
+        Write-Output $TRUE
+        Return
+
+    } else {
+
+        Write-Output $FALSE
+        Return
+    }    
+}
 
 IF ($result -eq $ErrorReturnCode) {
     Finalize $result
