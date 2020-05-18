@@ -344,9 +344,14 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 
 #パラメータの確認
 
-    $BackUpFile = $BackUpFile | ConvertTo-AbsolutePath -Name '-BackUpFile'
+$BackUpFile = $BackUpFile | ConvertTo-AbsolutePath -Name '-BackUpFile'
 
-    $BackUpFile | Test-Container -Name '-BackUpFile' -IfNoExistFinalize > $NULL
+IF (Test-PathEx -Type Leaf -Path $BackUpFile) {
+
+    Write-Log -EventID $ErrorEventID -Type Error -Message "BackUp file [$($BackUpFile)] exists already and terminates as ERROR."
+    Finalize $ErrorReturnCode    
+}
+
 
 
 #処理開始メッセージ出力

@@ -458,7 +458,7 @@ Switch -Regex ($Status) {
 
     '^Exist$' {
     
-        IF ($flagPath | Test-Leaf -Name 'Flag file') {
+        IF ($flagPath | Test-PathEx -Type Leaf -Name 'Flag file') {
 
             Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Flag file [$($flagPath)] exists and terminates as NORMAL."    
 

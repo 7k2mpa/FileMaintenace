@@ -674,13 +674,13 @@ $Version = "2.0.2"
 
 
 
-    IF ($BackupFlagFilePath | Test-Leaf -Name 'Back up flag') {
+    IF ($BackupFlagFilePath | Test-PathEx -Type Leaf -Name 'Back up flag') {
 
         Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Back Up is running. Stop for avoiding overlap."
         Finalize $ErrorReturnCode
         }
 
-    Test-LogPath -CheckPath $BackupFlagFilePath -ObjectName 'Folder of backup flag'
+    Test-PathEx -Type Log -Path $BackupFlagFilePath -Name 'Folder of backup flag'
 
 #Invoke PowerCLI command
 

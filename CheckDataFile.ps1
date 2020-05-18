@@ -363,7 +363,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
     $TriggerPath = $TriggerPath | ConvertTo-AbsolutePath -Name '-TriggerPath'
 
-    IF (-not($TriggerPath | Test-Leaf -Name '-TriggerPath')) {
+    IF (-not($TriggerPath | Test-PathEx -Type Leaf -Name '-TriggerPath')) {
 
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Trigger file dose not exist, thus terminate with a Warning."
         Finalize -ReturnCode $WarningReturnCode    
@@ -371,7 +371,7 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
     $DataPath = $DataPath | ConvertTo-AbsolutePath -Name '-DataPath'
 
-    IF (-not($DataPath | Test-Leaf -Name '-DataPath')) {
+    IF (-not($DataPath | Test-PathEx -Type Leaf -Name '-DataPath')) {
 
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Although the data file dose not exist, the trigger file exists, thus terminate with an InternalError."
         Finalize -ReturnCode $InternalErrorReturnCode

@@ -530,7 +530,7 @@ Push-Location $OracleHomeBinPath
         Write-Log -EventID $InfoEventID -Type Information -Message "Specified -NoCheckBackUpFlag option, thus skip to check status with backup flag."
         
         
-        } elseIF (Test-Leaf -CheckPath $BackUpFlagPath -ObjectName 'Backup Flag') {
+        } elseIF (Test-PathEx -Type Leaf -Path $BackUpFlagPath -Name 'Backup Flag') {
 
             Write-Log -EventID $ErrorEventID -Type Error -Message "Running Back Up now. Can not start duplicate execution."
             Finalize $ErrorReturnCode

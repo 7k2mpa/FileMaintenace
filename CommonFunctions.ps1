@@ -705,7 +705,7 @@ String
     [CmdletBinding()]
 
     Param(
-    [String][parameter(position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path ,
+    [String][parameter(position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName" , "LiteralPath")]$Path ,
     [String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name ,
     [String][parameter(position = 2)][ValidateSet("Leaf", "Container", "NotNullOrEmpty", "Log")]$Type ,
 
