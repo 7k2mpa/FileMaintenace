@@ -203,7 +203,7 @@ function Test-LogFilePath {
 
         $ForceConsoleEventLog = $TRUE    
 
-        $LogPath | ConvertTo-AbsolutePath -Name '-LogPath' | Test-LogPath -ObjectName '-LogPath' > $NULL
+        $LogPath | ConvertTo-AbsolutePath -Name '-LogPath' | Test-PathEx -Type Log -Name '-LogPath' -IfFalseFinalize > $NULL
     
         $ForceConsoleEventLog = $FALSE
         }
@@ -655,6 +655,51 @@ end {
 
 
 function Test-PathEx {
+<#
+.SYNOPSIS
+Extended Test-Path function
+
+.DESCRIPTION
+Testing path of Leaf, Container, Not Null or Empty, Log File.
+This function output logs with Write-Log function in CommonFunctions.ps1
+Return 3type value.
+
+Without option (default)
+$TRUE for existence or $FALSE for non-existence.
+
+With -PassThrough option
+$PATH for exisntence(true) or $NULL for non-existence(false)
+
+With -IfFalseFinalize option
+Exit the function and execute Finalize function in the script if the result is false.
+Return $FALSE or $PATH for true.
+
+.PATH
+Specify a path for test.
+
+.NAME
+Specify a name string in the logs.
+
+.TYPE
+Specify type of testing path.
+With -Type Log, checking log file write permission and make a new log file when the log file dose not exist.
+
+With -NotNullOrEmpty option, return $TRUE or $PATH for $PATH value is not $NULL or empty.
+
+.IFFALSEFINALIZE
+Specify if you want to force exit and execute Finalize function when the script get false.
+
+.NOMESSAGE
+Specify if you want to supress outputting logs.
+
+.PASSTHROUGH
+Specify if you want to get value $PATH when the result of the path is true. 
+
+.OUTPUT
+Boolean
+String
+
+#>
 
     [OutputType([Boolean])]
     [CmdletBinding()]
