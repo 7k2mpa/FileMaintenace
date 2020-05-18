@@ -1056,7 +1056,6 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 
 $TargetFolder = $TargetFolder |
                     ConvertTo-AbsolutePath -Name '-TargetFolder' | 
-#                    Test-Container -Name '-TargetFolder' -IfNoExistFinalize -PassThrough
                     Test-PathEx -Type Container -Name '-TargetFolder' -IfFalseFinalize -PassThrough
 
 #移動先フォルダの要不要と有無を確認
@@ -1065,7 +1064,6 @@ $TargetFolder = $TargetFolder |
 
         $MoveToFolder = $MoveToFolder |
                             ConvertTo-AbsolutePath -Name '-MoveToFolder' |    
-#                            Test-Container -Name '-MoveToFolder' -IfNoExistFinalize -PassThrough
                             Test-PathEx -Type Container -Name '-MoveToFolder' -IfFalseFinalize -PassThrough
                             
     } elseIF (-not([String]::IsNullOrEmpty($MoveToFolder))) {
@@ -1079,7 +1077,6 @@ $TargetFolder = $TargetFolder |
 
     IF ($PreAction -contains 'Archive') {
 
-#        $ArchiveFileName | Test-PathNullOrEmpty -Name '-ArchiveFileName' -IfNullOrEmptyFinalize > $NULL
         $ArchiveFileName | Test-PathEx -Type NotNullOrEmpty -Name '-ArchiveFileName' -IfFalseFinalize > $NULL
 
         IF ($ArchiveFileName -match '(\\|\/|:|\?|`"|<|>|\||\*)') {
