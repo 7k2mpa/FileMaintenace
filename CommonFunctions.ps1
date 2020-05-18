@@ -662,7 +662,7 @@ function Test-PathEx {
     Param(
     [String][parameter(position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path ,
     [String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name ,
-    [String][parameter(position = 2)][ValidateSet("Leaf" , "Container", "NotNullOrEmpty")]$Type ,
+    [String][parameter(position = 2)][ValidateSet("Leaf", "Container", "NotNullOrEmpty", "Log")]$Type ,
 
     [Switch]$IfFalseFinalize ,
     [Switch]$NoMessage ,
@@ -692,6 +692,11 @@ function Test-PathEx {
                 $message = 'include'
                 $postmessage = ' data.' 
             }
+
+            'Log' {
+                $result = -not([Boolean](Test-LogPath -Path $Path -Name $Name -GetResult))
+                $NoMessage = $TRUE
+            }
         }
 
 
@@ -712,7 +717,7 @@ function Test-PathEx {
                 Write-Log -ID $ErrorEventID -Type Error -Message "$($Name) is required."
 
             } 
-        
+
             Finalize $ErrorReturnCode
         }
     
@@ -872,29 +877,34 @@ Param(
 [String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name,
 [String][parameter(position = 2)]$FileValue = $NULL ,
 
-[Switch][parameter(position = 3)]$PassThrough
+[Switch][parameter(position = 3)]$PassThrough ,
+[Switch][parameter(position = 4)]$GetResult
 )
 begin {
     $logFormattedDate = (Get-Date).ToString($LogDateFormat)
 }
 process {
 
+$result = $ErrorReturnCode
+
 :do DO {    
     IF (-not($Path | Split-Path -Parent)) {
         Write-Log -Id $ErrorEventID -Type Error -Message "$($Name)[$($Path)] is invalid specification."   
-        $result = $ErrorReturnCode
         Break
         }
 
     #ログ出力先ファイルの親フォルダが存在しなければ異常終了
 
-    $Path | Split-Path -Parent | Test-PathEx -Type Container -ObjectName $Name -IfFalseFinalize > $NULL
+    IF (-not($Path | Split-Path -Parent | Test-PathEx -Type Container -Name $Name)) {
+    
+        Break
+        }
+
 
     #ログ出力先（予定）ファイルと同一名称のフォルダが存在していれば異常終了
 
     IF (Test-Path -LiteralPath $Path -PathType Container) {
         Write-Log -Id $ErrorEventID -Type Error -Message "Same name folder $($Path) exists already."        
-        $result = $ErrorReturnCode
         Break
         }
 
@@ -902,36 +912,42 @@ process {
     IF (Test-Path -LiteralPath $Path -PathType Leaf) {
 
         Write-Log -Id $InfoEventID -Type Information -Message "Check write permission of $($Name) [$($Path)]"
-        $logWrite = $logFormattedDate+" "+$ShellName+" Write Permission Check"
+        $logWrite = $logFormattedDate + " " + $ShellName + " Write Permission Check"
         
 
         Try {
             Write-Output $logWrite | Out-File -FilePath $Path -Append -Encoding $LogFileEncode -ErrorAction Stop
-            Write-Log -Id $InfoEventID -Type Information -Message "Successfully complete to write to $($Name) [$($Path)]"
+            Write-Log -Id $SuccessEventID -Type Success -Message "Successfully complete to write to $($Name) [$($Path)]"
+            $result = $NormalReturnCode
             }
         Catch [Exception]{
             Write-Log -Type Error -Id $ErrorEventID -Message  "Failed to write to $($Name) [$($Path)]"
             Write-Log -Id $ErrorEventID -Type Error -Message "Execution error message : $Error[0]"
-            $result = $ErrorReturnCode
             Break
             }
      
      } else {
             Invoke-Action -ActionType MakeNewFileWithValue -ActionFrom $Path -ActionError $Path -FileValue $FileValue
+            $result = $NormalReturnCode
             }
 }
 # :do
 While ($FALSE)
+
+IF ($GetResult) {
+    Write-Output $result
+    Return
+    }
 
 IF ($result -eq $ErrorReturnCode) {
     Finalize $result
 
     } elseIF ($PassThrough) {
 
-        Write-Host $Path
+        Write-Output $Path
         } else {
 
-        Write-Host $NULL    
+        Write-Output $NULL    
         }
 }
 end {

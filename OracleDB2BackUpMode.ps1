@@ -440,11 +440,11 @@ $OracleHomeBinPath = $OracleHomeBinPath |
         }
 
 
-#SQLLogファイルの指定、存在、書き込み権限確認
+#Validate SQL Log File
 
-    $SQLLogPath = $SQLLogPath | ConvertTo-AbsolutePath -Name '-SQLLogPath'
-
-    $SQLLogPath | Test-LogPath -Name '-SQLLogPath' > $NULL
+$SQLLogPath = $SQLLogPath |
+                ConvertTo-AbsolutePath -ObjectName '-SQLLogPath' |
+                Test-PathEx -Type Log -Name '-SQLLogPath' -IfFalseFinalize -Passthrough
 
 
 #Validate SQL command File

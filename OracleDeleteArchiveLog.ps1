@@ -430,13 +430,12 @@ $OracleHomeBinPath = $OracleHomeBinPath |
 
 $OracleRMANLogPath = $OracleRMANLogPath |
                         ConvertTo-AbsolutePath -Name '-OracleRmanLogPath' |
-                        Test-LogPath -Name '-OracleRMANLLogPath' -PassThrough
-
+                        Test-PathEx -Type Log -Name '-OracleRMANLogPath' -IfFalseFinalize -PassThrough
 
 
 #Validate Oracle RMAN command File
    
-$ExecRmanPath = $ExecRmanPath
+$ExecRmanPath = $ExecRmanPath |
                     ConvertTo-AbsolutePath -Name '-ExecRmanPath' |
                     Test-PathEx -Type Leaf -Name '-ExecRmanPath' -IfFalseFinalize -PassThrough
 
@@ -474,7 +473,7 @@ Param(
 
 Pop-Location
 
- Invoke-PostFinalize $ReturnCode
+Invoke-PostFinalize $ReturnCode
 }
 
 #####################   ‚±‚±‚©‚ç–{‘Ì  ######################

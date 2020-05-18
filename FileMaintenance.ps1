@@ -1218,7 +1218,7 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
 #PostAction
         IF ($PostAction -ne 'none') {
 
-            $message = "Process files found" +
+            $message = "Process files found " +
                        $(IF ($PostAction -eq 'Rename') { "rename with rule[$($RenameToRegularExpression)] "}) +
                        "recursively[$($Recurse)] PostAction[$($PostAction)]"
 
@@ -1571,7 +1571,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
 
     #case4 $Action dose not match case , it must be internal error
-        Default {
+    Default {
         Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal error at Switch PostAction section. It may cause a bug in regex."
         $returnCode = $InternalErrorReturnCode
         Break main

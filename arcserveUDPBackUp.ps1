@@ -533,13 +533,13 @@ $ShellName = $PSCommandPath | Split-Path -Leaf
 
         $ExecUserPasswordFilePath  = $ExecUserPasswordFilePath | ConvertTo-AbsolutePath -Name '-ExecUserPasswordFilePath'
     
-        $ExecUserPasswordFilePath | Split-Path -Parent | Test-Container -Name 'Parent Folder of -ExecUserPasswordFilePath' -IfNoExistFinalize > $NULL
+        $ExecUserPasswordFilePath | Split-Path -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -ExecUserPasswordFilePath' -IfFalseFinalize > $NULL
 
         }
 
     $BackupFlagFilePath  = $BackupFlagFilePath | ConvertTo-AbsolutePath -Name '-BackupFlagFilePath'
     
-    $BackupFlagFilePath | Split-Path -Parent | Test-Container -Name 'Parent Folder of -BackupFlagFilePath' -IfNoExistFinalize > $NULL
+    $BackupFlagFilePath | Split-Path -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -BackupFlagFilePath' -IfFalseFinalize > $NULL
 
 
 #Validate arcserveUDP CLI

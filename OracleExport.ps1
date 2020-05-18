@@ -304,7 +304,7 @@ System.Int. Return Code.
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = "High")]
 Param(
 
-[String][parameter(position = 0)][ValidateNotNullOrEmpty()]$Schema = 'MCFRAME' ,
+[String][parameter(position = 0)][ValidateNotNullOrEmpty()]$Schema = 'MCF' ,
 [String][parameter(position = 1)][ValidateNotNullOrEmpty()]$DumpDirectoryObject = 'MCFDATA_PUMP_DIR' ,
 
 [String][parameter(position = 2)][Alias("OracleService")]$OracleSID = $Env:ORACLE_SID ,

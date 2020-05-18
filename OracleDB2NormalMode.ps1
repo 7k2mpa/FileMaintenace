@@ -1,4 +1,4 @@
-#Requires -Version 3.0
+    #Requires -Version 3.0
 
 <#
 .SYNOPSIS
@@ -433,9 +433,8 @@ $OracleHomeBinPath = $OracleHomeBinPath |
 #Validate SQL Log File
 
 $SQLLogPath = $SQLLogPath |
-                ConvertTo-AbsolutePath -ObjectName '-SQLLogPath'
-
-$SQLLogPath | Test-LogPath -Name '-SQLLogPath' > $NULL
+                ConvertTo-AbsolutePath -ObjectName '-SQLLogPath' |
+                Test-PathEx -Type Log -Name '-SQLLogPath' -IfFalseFinalize -Passthrough
 
 
 #Validate SQL command File
