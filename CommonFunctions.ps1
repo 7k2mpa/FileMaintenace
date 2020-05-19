@@ -422,9 +422,12 @@ begin {
 }
 Process {
 
-    $Path | Test-PathEx -Type NotNullOrEmpty -Name $Name -IfFalseFinalize > $NULL
-    
-    #Windowsではパス区切に/も使用できる。しかしながら、処理を簡単にするため\に統一する
+    IF ([String]::IsNullOrEmpty($Path)) {
+        Write-Log -ID $ErrorEventID -Type Error -Message "$($Name) is null or empty. Specification is required."    
+        Finalize $ErrorReturnCode    
+        }          
+
+#Windows file system allows slash / for path separater. But for processing convert / to \
 
     $Path = $Path.Replace('/','\')
 
@@ -722,20 +725,14 @@ String
 
             'Leaf' {
                 $result = Test-Path -LiteralPath $Path -PathType Leaf
-                $message = 'exist'
-                $postmessage = '.'
             }
 
             'Container' {
                 $result = Test-Path -LiteralPath $Path -PathType Container
-                $message = 'exist'
-                $postmessage = '.' 
             }
 
             'NotNullOrEmpty' {
                 $result = -not([String]::IsNullOrEmpty($Path))
-                $message = 'include'
-                $postmessage = ' data.' 
             }
 
             'Log' {
@@ -746,13 +743,28 @@ String
 
 
         IF (($result) -and (-not($NoMessage))) {
-                
-            Write-Log -ID $InfoEventID -Type Information -Message ("$($Name)[$($Path)] $($message)s" + $($postmessage))
+
+            IF ($Type -eq 'NotNullOrEmpty') {
+
+                Write-Log -ID $InfoEventID -Type Information -Message "$($Name) is specified [$($Path)]"                
+
+                } else {
+
+                Write-Log -ID $InfoEventID -Type Information -Message "$($Name)[$($Path)] exists."
+                }
 
         } elseIF (-not($result) -and (-not($NoMessage))) {
 
-            Write-Log -ID $InfoEventID -Type Information -Message ("$($Name)[$($Path)] dose not $($message)" + $($postmessage))
+            IF ($Type -eq 'NotNullOrEmpty') {
+
+                Write-Log -ID $InfoEventID -Type Information -Message "$($Name) is not specified."                
+
+                } else {
+
+                Write-Log -ID $InfoEventID -Type Information -Message "$($Name)[$($Path)] dose not exist."
+                }
         } 
+
 
 
         IF ((-not($result)) -and ($IfFalseFinalize)) {

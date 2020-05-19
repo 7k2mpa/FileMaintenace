@@ -257,14 +257,14 @@ System.Int. Return Code.
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = "High")]
 Param(
 
-[String][parameter(position=0)]
+[String][parameter(position=0, mandatory)]
 [ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("LiteralPath")]$BackUpFile ,
 
-[String][parameter(position=1)][ValidateNotNullOrEmpty()]$ServerInstance ,
+[String][parameter(position=1, mandatory)][ValidateNotNullOrEmpty()]$ServerInstance ,
 
-[String][parameter(position=2)][ValidateNotNullOrEmpty()]$DBname ,
+[String][parameter(position=2, mandatory)][ValidateNotNullOrEmpty()]$DBname ,
 
-[String][parameter(position=3)][ValidateSet("Full", "Diff" , "Trun")]$Type,
+[String][parameter(position=3, mandatory)][ValidateSet("Full", "Diff" , "Trun")]$Type,
 
 
 [Boolean]$Log2EventLog = $TRUE ,
@@ -341,17 +341,17 @@ $ShellName = Split-Path -Path $PSCommandPath -Leaf
 #ここまで完了すれば業務的なロジックのみを確認すれば良い
 
 
+#Validate parameters
 
-#パラメータの確認
+#check backup file already exists
 
 $BackUpFile = $BackUpFile | ConvertTo-AbsolutePath -Name '-BackUpFile'
 
-IF (Test-PathEx -Type Leaf -Path $BackUpFile) {
+IF (Test-PathEx -Type Leaf -Path $BackUpFile -Name 'BackUp file') {
 
-    Write-Log -EventID $ErrorEventID -Type Error -Message "BackUp file [$($BackUpFile)] exists already and terminates as ERROR."
+    Write-Log -EventID $ErrorEventID -Type Error -Message "BackUp file[$($BackUpFile)] exists already and terminates as ERROR."
     Finalize $ErrorReturnCode    
 }
-
 
 
 #処理開始メッセージ出力
