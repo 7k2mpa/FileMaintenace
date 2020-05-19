@@ -431,6 +431,9 @@ Process {
 
     $Path = $Path.Replace('/','\')
 
+
+#Path validation Test-Path -isvalid can not validate path including colon: , thus test with other method.
+
     IF (Test-Path -LiteralPath $Path -IsValid) {
         Write-Log -Id $InfoEventID -Type Information -Message "$Name[$($Path)] is valid path format."
    
@@ -439,8 +442,25 @@ Process {
         Finalize $ErrorReturnCode
         }
 
+    IF (($Path | Split-Path -noQualifier) -match '(\/|:|\?|`"|<|>|\||\*)') {
+    
+        Write-Log -Type Error -Id $ErrorEventID -Message "$Name may contain characters that can not use by NTFS  such as BackSlash/ Colon: Question? DoubleQuote`" less or greater than<> astarisk* pipe| "
+        Finalize $ErrorReturnCode
+        }
 
-    Switch -Regex ($Path) {
+        
+#Test if Windows reserved words in the path
+
+    IF ($Path -match '\\(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])(\\|$|\..*$)') {
+
+        Write-Log -Type Error -Id $ErrorEventID -Message "$Name may contain the Windows reserved words such as (AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
+        Finalize $ErrorReturnCode
+        } 
+
+
+#Normalization path. If the path contains consecutive separator\ , they will be single with [System.IO.Path]::GetFullPath()
+
+        Switch -Regex ($Path) {
 
         "^\.+\\.*" {
        
@@ -476,7 +496,6 @@ Process {
             }
     }
 
-#パスに\\が連続すると処理が複雑になるので、使わせない[System.IO.Path]::GetFullPath()で処理される
 
     #パスがフォルダで末尾に\が存在した場合は削除する。末尾の\有無で結果は一緒なのだが、統一しないと文字列数が異なるためパス文字列切り出しが誤動作する。
 
@@ -485,24 +504,7 @@ Process {
         Write-Log -Id $InfoEventID -Type Information -Message "Windows path format allows the end of path with a path separator '\' , due to processing limitation, remove it."
         $Path = $Path.Substring(0, $Path.Length -1)
         }
-
-
-    #TEST-Path -isvalidはコロン:の含まれているPathを正しく判定しないので個別に判定
-
-    IF (($Path | Split-Path -noQualifier) -match '(\/|:|\?|`"|<|>|\||\*)') {
-    
-        Write-Log -Type Error -Id $ErrorEventID -Message "$Name may contain characters that can not use by NTFS  such as BackSlash/ Colon: Question? DoubleQuote`" less or greater than<> astarisk* pipe| "
-        Finalize $ErrorReturnCode
-        }
-
-
-    #Windows予約語がパスに含まれているか判定
-
-    IF ($Path -match '\\(AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])(\\|$|\..*$)') {
-
-        Write-Log -Type Error -Id $ErrorEventID -Message "$Name may contain the Windows reserved words such as (AUX|CON|NUL|PRN|CLOCK\$|COM[0-9]|LPT[0-9])"
-        Finalize $ErrorReturnCode
-        }        
+       
 
     Write-Output $Path
 }
@@ -543,19 +545,19 @@ function Test-ServiceExist {
 
 <#
 .SYNOPSIS
- Check existence of specified Windows Service
+Check existence of specified Windows Service
 
 .PARAMETER ServiceName
- 確認するWindows Serviceを指定してください。
+Specify Windows service to test.
 
 .PARAMETER NoMessage
- ログ出力を抑止します。
+Specify if you want to supress log message.
 
  .INPUT
- System.String
+System.String
 
  .OUTPUT
- Boolean
+Boolean
 
 #>
 
@@ -593,16 +595,36 @@ end {
 
 function Test-ServiceStatus {
 <#
-#サービス状態確認
-#引数$Healthで状態(Running|Stopped)を指定してください。戻り値は指定状態で$TRUEまたは非指定状態$FALSE
-#サービス起動、停止しても状態推移には時間が掛かります。このfunctionは一定時間$Span、一定回数$UpTo、状態確認を繰り返します
-#起動が遅いサービスは$Spanを大きくしてください
+.SYNOPSIS
+Get service status if the service is running or stopped.
+
+.DESCRIPTION
+Specify service status and compare the status and specification one.
+If the status is equal to specfication one, return $TRUE, not return $FALSE
+Some service needs long time to switch status, you can specify interval and times to get status in this function.
+If you test service to need long time to switch, you should spedify -Span option to large number.
+
+.SERVICENAME
+Specify name of service you want to get status.
+
+.STATUS
+Specify status of the service for testing.
+
+.SPAN
+Specify interval of testing service in seconds.
+
+.UPTO
+Specify how many times to retry for testing.
+
+.OUTPUT
+Boolean
+
 #>
 [OutputType([Boolean])]
 [CmdletBinding()]
 Param(
 [String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("Name")]$ServiceName ,
-[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][ValidateSet("Running", "Stopped")][Alias("Status")]$Health = 'Running' ,
+[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][ValidateSet("Running", "Stopped")][Alias("Health")]$Status = 'Running' ,
 
 [int][ValidateRange(0,2147483647)][Alias("RetrySpanSec")]$Span = 3 ,
 [int][ValidateRange(0,2147483647)][Alias("RetryTimes")]$UpTo = 10
@@ -611,7 +633,7 @@ begin {
 }
 process {
 
-$status = $FALSE
+$result = $FALSE
 
     For ( $i = 0 ; $i -le $UpTo; $i++ ) {
         # サービス存在確認
@@ -622,9 +644,9 @@ $status = $FALSE
         # サービス状態判定
         $service = Get-Service | Where-Object {$_.Name -eq $ServiceName}
 
-        IF ($service.Status -eq $Health) {
+        IF ($service.Status -eq $Status) {
             Write-Log -Id $InfoEventID -Type Information -Message "Service [$($ServiceName)] exists and status is [$($service.Status)]"
-            $status = $TRUE
+            $result = $TRUE
             Break     
             
             } elseIF (($Span -eq 0) -and ($UpTo -le 1)) {
@@ -638,7 +660,7 @@ $status = $FALSE
 
         IF ($i -ge $UpTo) {
             Write-Log -Id $InfoEventID -Type Information -Message ("Service [$($ServiceName)] exists and status is [$($Service.Status)] now. " +
-                "The specified waiting times has elapsed but the service has not switched to status [$($Health)]")
+                "The specified waiting times has elapsed but the service has not switched to status [$($Status)]")
             Break
             }
 
@@ -646,11 +668,11 @@ $status = $FALSE
         # 指定間隔(秒)待機
 
         Write-Log -Id $InfoEventID -Type Information -Message ("Service [$($ServiceName)] exists and status is [$($Service.Status)] , " +
-            "is not [$($Health)] Wait for $($Span)seconds. Retry [" + ($i+1) + "/$UpTo]")
+            "is not [$($Status)] Wait for $($Span)seconds. Retry [" + ($i+1) + "/$UpTo]")
         Start-Sleep -Seconds $Span        
     }
 
-Write-Output $status
+Write-Output $result
 }
 end {
 }
