@@ -753,6 +753,7 @@ String
     )
 
     begin {
+        Push-Location (Get-Location -PSProvider FileSystem)
     }
     process {
     
@@ -829,6 +830,7 @@ String
         }
     }
     end {
+        Pop-Location
     }
 }
 
