@@ -387,26 +387,39 @@ function ConvertTo-AbsolutePath {
 
 <#
 .SYNOPSIS
- 相対パスから絶対パスへ変換
+Validate, Normalize and Convert to absolute path format.
 
 .DESCRIPTION
- このfunctionは検査対象パスがNull , emptyの場合、異常終了します。確認が必要なパスのみを検査して下さい。
- * ?等のNTFSに使用できない文字がパスに含まれている場合は異常終了します
- []のPowershellでワイルドカードとして扱われる文字は、ワイルドカードとして扱いません。LiteralPathとしてそのまま処理します
- なおInvoke-Actionはワイルドカード[]を扱いません。LiteralPathとしてそのまま処理します
+This function validates, nomamalize path input, and convert to absolute format.
 
-.PARAMETER CheckPath
- 相対パスまたは絶対パスを指定してください。
- 相対パスは.\ または ..\から始めて下さい。
+The validation includes null, empty, drive letter, Windows reserved words, wild cards asterisk* and question?
+The nomalization includes replacing separator slash/ with back slash\ , consentive separator such as \\ , delete \ placed in ending directory path.
 
-.PARAMETER ObjectName
- ログに出力するCheckPathの説明文を指定してください。
+Relative, absolute, UNC path format are coverted to absolute path format.
 
- .INPUT
- System.String
+If fail to validation, the fuction call function Finalize.
 
- .OUTPUT
- System.String
+Characters bracket[] in PowerShell will be processed as wild cards.
+But in the function path input is processed literally, characters bracket[] in the path must not be escaped. 
+
+F.Y.I. function Invoke-Action processes path input literally also.
+
+
+.PARAMETER PATH
+Specify path to convert.
+The path must be in relative, absolute, UNC path format.
+In relative path format, the parameter start with .\ or ..\
+
+
+.PARAMETER NAME
+Specify description of the path.
+It will be output in logs.
+
+.INPUT
+System.String
+
+.OUTPUT
+System.String
 
 #>
 
@@ -553,10 +566,10 @@ Specify Windows service to test.
 .PARAMETER NoMessage
 Specify if you want to supress log message.
 
- .INPUT
+.INPUT
 System.String
 
- .OUTPUT
+.OUTPUT
 Boolean
 
 #>
