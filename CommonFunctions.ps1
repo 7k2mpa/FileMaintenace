@@ -97,7 +97,23 @@ Write-Verbose "CommonFunctions.ps1 Version $CommonFunctionsVersion"
 function Write-Log {
 <#
 .SYNOPSIS
- Output Log to Windows Event Log , Console and File
+Output Log to Windows Event Log, Console and File.
+
+.DESCRIPTION
+Output Log to Windows Event Log, Console and File.
+
+This function can run on PowerShell .Net only, can not run on PowerShell Core.
+If you want to run the scripts on PowerShell core, specify -NoLog2EventLog option.
+
+.PARAMETER EVENTID
+Specify event id.
+
+.PARAMETER EVENTTYPE
+Specify event type.
+It is applied to Windows Event Log Level.
+
+.PARAMETER EVENTMESSAGE
+Specify message to output logs.
 
 #>
 [CmdletBinding()]
@@ -510,7 +526,7 @@ Process {
     }
 
 
-    #パスがフォルダで末尾に\が存在した場合は削除する。末尾の\有無で結果は一緒なのだが、統一しないと文字列数が異なるためパス文字列切り出しが誤動作する。
+#If the path ends with separte character \ , delete the ending character.
 
     IF ($Path.EndsWith('\')) {
     
@@ -609,24 +625,24 @@ end {
 function Test-ServiceStatus {
 <#
 .SYNOPSIS
-Get service status if the service is running or stopped.
+Get service status in which running or stopped.
 
 .DESCRIPTION
-Specify service status and compare the status and specification one.
+Specify service status and compare the status and -Status parameter option specified.
 If the status is equal to specfication one, return $TRUE, not return $FALSE
 Some service needs long time to switch status, you can specify interval and times to get status in this function.
 If you test service to need long time to switch, you should spedify -Span option to large number.
 
-.SERVICENAME
+.PARAMETER SERVICENAME
 Specify name of service you want to get status.
 
-.STATUS
+.PARAMETER STATUS
 Specify status of the service for testing.
 
-.SPAN
+.PARAMETER SPAN
 Specify interval of testing service in seconds.
 
-.UPTO
+.PARAMETER UPTO
 Specify how many times to retry for testing.
 
 .OUTPUT
@@ -712,25 +728,25 @@ With -IfFalseFinalize option
 Exit the function and execute Finalize function in the script if the result is false.
 Return $FALSE or $PATH for true.
 
-.PATH
+.PARAMETER PATH
 Specify a path for test.
 
-.NAME
+.PARAMETER NAME
 Specify name string in the logs.
 
-.TYPE
+.PARAMETER TYPE
 Specify type of testing path.
 With -Type Log, test log file write permission or make a new log file when the log file dose not exist.
 
 With -NotNullOrEmpty option, return $TRUE or $PATH for $PATH value is not $NULL or empty.
 
-.IFFALSEFINALIZE
+.PARAMETER IFFALSEFINALIZE
 Specify if you want to force exit and execute Finalize function when the script get false.
 
-.NOMESSAGE
+.PARAMETER NOMESSAGE
 Specify if you want to supress outputting logs.
 
-.PASSTHROUGH
+.PARAMETER PASSTHROUGH
 Specify if you want to get value $PATH when the result of the path is true. 
 
 .OUTPUT
@@ -753,7 +769,7 @@ String
     )
 
     begin {
-        Push-Location (Get-Location -PSProvider FileSystem)
+#       Push-Location (Get-Location -PSProvider FileSystem)
     }
     process {
     
@@ -830,7 +846,7 @@ String
         }
     }
     end {
-        Pop-Location
+#       Pop-Location
     }
 }
 
