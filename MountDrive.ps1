@@ -248,7 +248,7 @@ Param(
 [String][validatePattern("^\\\\[a-zA-Z0-9\.\-_]{1,}(\\[a-zA-Z0-9\-_]{1,}){1,}[\$]{0,1}")]$TargetPath ,   
 
 [parameter(position = 1, mandatory, HelpMessage = 'Specify Drive Letter (ex. F:)  or Get-Help MountDrive.ps1')]
-[String][ValidatePattern("^[d-zD-Z]:$")]$MountDrive ,
+[String][ValidatePattern("^[d-zD-Z]:$")][Alias("Drive")]$MountDrive ,
 
 #[String][validatePattern("^\\\\\w+\\\w+")]$TargetPath = "\\hogehost\hogehoge" ,                                                                          
 #[String][ValidatePattern("^[d-z]:$")]$MountDrive= 'F:' ,

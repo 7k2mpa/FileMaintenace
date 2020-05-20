@@ -240,7 +240,7 @@ System.Int. Return Code.
 Param(
 
 [parameter(position = 0, mandatory, HelpMessage = 'Specify Drive Letter (ex. F:) or Get-Help UnMountDrive.ps1')]
-[String][ValidatePattern('^[d-zD-Z]:$')]$MountedDrive ,
+[String][ValidatePattern('^[d-zD-Z]:$')][Alias("Drive")]$MountedDrive ,
 
 #[String][ValidatePattern('^[d-z]:$')]$MountedDrive="F:" ,
 
