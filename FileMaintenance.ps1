@@ -1055,7 +1055,7 @@ IF ($Compress)     {$Script:PreAction +='Compress'}
 #指定フォルダの有無を確認
 
 $TargetFolder = $TargetFolder |
-                    ConvertTo-AbsolutePath -Name '-TargetFolder' | 
+                    ConvertTo-AbsolutePath -Name '-TargetFolder' |
                     Test-PathEx -Type Container -Name '-TargetFolder' -IfFalseFinalize -PassThrough
 
 #移動先フォルダの要不要と有無を確認

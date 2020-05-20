@@ -485,8 +485,8 @@ Process {
 
             Write-Log -Id $InfoEventID -Type Information -Message "$Name[$($Path)] is UNC path format."
             
-            $Path = $Path | ForEach-Object {[System.IO.Path]::GetFullPath($_)}            
-            
+            $Path = $Path | ForEach-Object {[System.IO.Path]::GetFullPath($_)}          
+           
             }
 
         Default {
