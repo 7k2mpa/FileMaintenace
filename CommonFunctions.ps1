@@ -850,7 +850,7 @@ String
     }
 }
 
-    
+    <#
 
 function Test-PathNullOrEmpty {
 
@@ -976,7 +976,7 @@ process {
 end {
 }
 }
-
+#>
 
 function Test-LogPath {
 [OutputType([boolean])]

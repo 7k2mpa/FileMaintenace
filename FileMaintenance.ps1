@@ -1424,7 +1424,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
         IF ($Recurse) {
 
-            IF (-not($destinationFolder | Test-Container -Name 'destination folder of the file ')) {
+            IF (-not($destinationFolder | Test-PathEx -Type Container -Name 'destination folder of the file ')) {
 
                 Write-Log -ID $InfoEventID -Type Information -Message "Create a new folder $($destinationFolder)"
 

@@ -680,7 +680,7 @@ $Version = "2.0.2"
         Finalize $ErrorReturnCode
         }
 
-    Test-PathEx -Type Log -Path $BackupFlagFilePath -Name 'Folder of backup flag'
+    Test-PathEx -Type Log -Path $BackupFlagFilePath -Name 'Folder of backup flag' -IfFalseFinalize
 
 #Invoke PowerCLI command
 
