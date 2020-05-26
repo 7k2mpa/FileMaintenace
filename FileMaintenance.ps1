@@ -509,7 +509,7 @@ Specify if you want to return NORMAL exit code when the script terminate with a 
 Specify the users who are allowed to execute the script in regular expression.
 [.*] is default and all users are allowed to execute.
 Parameter must be quoted with single quote'
-Escape the back slash in the separeter of a domain name.
+Escape the back slash in the separetor of a domain name.
 example [domain\\.*]
 
 
@@ -671,10 +671,10 @@ function Test-LeafNotExists {
 
 <#
 .SYNOPSIS
- Check the path specified that a file or folder dose NOT exist in the path, and return
+ Check the path specified that a file or folder dose NOT exist in the path.
 
 .DESCRIPTION
- Check the path specified that a file or folder dose NOT exist in the path, and return
+ Check the path specified that a file or folder dose NOT exist in the path, and return $TRUE or $FALSE
  
 .INPUT
 　Strings of File Path
@@ -888,7 +888,7 @@ $parameter = @{
 <#
 some $Action process Object in order, thus sort the objects
 KeepFilesCount: by last write date
-DeleteEmptyFolders: by depth of the file path hierarchy with conting separator in the path for deleteing deepest folder at first
+DeleteEmptyFolders: by depth of the file path hierarchy with counting separator in the path for deleteing deepest folder at first
 #>
     Switch -Regex ($Action) {
  
@@ -915,7 +915,27 @@ function ConvertTo-PreActionPath {
 
 <#
 .SYNOPSIS
-ConvertTo new path with extention .zip or adding time stamp
+Convert to new path with extention .zip or adding time stamp.
+
+
+
+.DESCRIPTION
+Find convert type in the -PreAction option.
+-PreAction Compress, Archive, 7z, 7zZip, AddTimeStamp are supported.
+
+Convert to new path with extention .zip or adding time stamp with the convert type.
+
+
+
+.PARAMETER PATH
+Specify a path input.
+
+
+.PARAMETER DESTINATIONPATH
+Specify a desitination path.
+Even if you do not specify -PreAction MoveNewFile, you need specify the desitination path.
+
+
 
 .INPUT
 System.String. Path of the file
@@ -944,8 +964,8 @@ begin {
 process {
     IF (($PreAction -match '^(Compress|Archive)$')) {
 
-        #$PreActionは配列である。それをSwitch処理すると1要素づつループする。
-        #'Compress'等は一旦Defaultに落ちるが、'7z' or '7zZip'があれば$ActionTypeは上書きされる
+#Switch find all elements in [Array]$PreAction
+#Find an element  '7z' or '7zZip' in the array till finding one. 
 
         Switch -Regex ($PreAction) {    
         
