@@ -22,6 +22,7 @@ If you can install 7-Zip for compress or archive, do not need to replace.
 You can get the version of this script with '.\CommonFunctions.ps1 -verbose'.
 
 
+
 .NOTES
 
 Copyright 2020 Masayuki Sudo
@@ -37,6 +38,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+
 
 .LINK
 
@@ -1200,7 +1203,7 @@ begin {
     $scriptExecUser = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name
     $logFormattedDate = (Get-Date).ToString($LogDateFormat)
 
-#Powershellではヒアドキュメントの改行はLFとして処理される
+#PowerShellではヒアドキュメントの改行はLFとして処理される
 #しかしながら、他のOracleからの出力はLF&CRのため、Windowsメモ帳で開くと改行コードが混在して正しく処理されない
 #よって、明示的にCRを追加してSQLLogで改行コードが混在しないようにする
 #Sakura Editor等では改行コード混在も正しく処理される

@@ -35,9 +35,9 @@ Finding criteria are [(Older than)-Days][-Size][-RegularExpression][-Parent(Path
 This script processes only 1 folder at once.
 If you process multiple folders, can do with Wrapper.ps1
 
-Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
+Output log to [Windows Event Log] or [Console] or [Text Log] and specify to suppress or to output individually. 
 
-This scrpit requires Powershell 3.0 or later.
+This scrpit requires PowerShell 3.0 or later.
 If you run the scripts on Windows Server 2008 or 2008R2, must install latest WMF.
 
 This script can use cmdlet Compress-Archive for '-PreAction compress or archive option'. 
@@ -48,7 +48,7 @@ If you want to specify '-PreAction compress or archive' option in FileMaintenanc
 
 If you can install 7-Zip for compress or archive, do not need to replace.
 
-https://docs.microsoft.com/ja-jp/powershell/scripting/install/installing-windows-powershell?view=powershell-7#upgrading-existing-windows-powershell
+https://docs.microsoft.com/ja-jp/PowerShell/scripting/install/installing-windows-PowerShell?view=PowerShell-7#upgrading-existing-windows-PowerShell
 
 
 
@@ -661,7 +661,7 @@ Catch [Exception]{
     Exit 1
     }
 
-#!!! end of specification !!!#
+#!!! end of defenition !!!
 
 
 ################# functions  #######################
@@ -928,11 +928,11 @@ Convert to new path with extention .zip or adding time stamp with the convert ty
 
 
 .PARAMETER PATH
-Specify a path input.
+Specify a file path to convert.
 
 
 .PARAMETER DESTINATIONPATH
-Specify a desitination path.
+Specify a desitination folder path.
 Even if you do not specify -PreAction MoveNewFile, you need specify the desitination path.
 
 
@@ -1044,17 +1044,20 @@ function Initialize {
 
 $ShellName = $PSCommandPath | Split-Path -Leaf
 
-#イベントソース未設定時の処理
-#ログファイル出力先確認
-#ReturnCode確認
-#実行ユーザ確認
-#プログラム起動メッセージ
-
+<#
+PreInitialization for basic logging functions
+Already egistered Event Source in Windows Event Log?
+Log File output path
+Validate Return Codes
+Validate Execution user
+Output Script Starting messages
+#>
 . Invoke-PreInitialize
 
-#ここまで完了すれば業務的なロジックのみを確認すれば良い
 
-#Switch処理
+#If passed PreInitilization, validate only business logics.
+
+#Process Switch options
 
 IF ($NoRecurse)        {[Boolean]$Script:Recurse = $FALSE}
 IF ($ContinueAsNormal) {[Switch]$Script:Continue = $TRUE}
@@ -1069,16 +1072,17 @@ IF ($MoveNewFile)  {$Script:PreAction +='MoveNewFile'}
 IF ($Compress)     {$Script:PreAction +='Compress'}
 
 
-#validate parameters
+#Start validating parameters
 
 
-#指定フォルダの有無を確認
+#Validate -TargetFolder
 
 $TargetFolder = $TargetFolder |
                     ConvertTo-AbsolutePath -Name '-TargetFolder' |
                     Test-PathEx -Type Container -Name '-TargetFolder' -IfFalseFinalize -PassThrough
 
-#移動先フォルダの要不要と有無を確認
+
+#Validate -MoveToFolder
 
     IF (($Action -match "^(Move|Copy)$") -or ($PreAction -contains 'MoveNewFile')) {    
 
@@ -1093,7 +1097,7 @@ $TargetFolder = $TargetFolder |
         }
 
 
-#ArchiveFileNameの要不要と有無、Validation
+#Validate -ArchiveFileName
 
     IF ($PreAction -contains 'Archive') {
 
@@ -1107,7 +1111,7 @@ $TargetFolder = $TargetFolder |
         }
 
 
-#7zフォルダの要不要と有無を確認
+#Validate -7zFolder
 
     IF ($PreAction -match "^(7z|7zZip)$") {    
 
@@ -1116,8 +1120,8 @@ $TargetFolder = $TargetFolder |
                         Test-PathEx -Type Container -Name '-7zFolder' -IfFalseFinalize -PassThrough
     }
 
-#checking for invalid combinations of options
 
+#Validate combinations of the options
 
     IF (($TargetFolder -eq $MoveToFolder) -and   (($Action -match "(move|copy)") -or ($PreAction -contains 'MoveNewFile'))) {
     
@@ -1183,9 +1187,7 @@ $TargetFolder = $TargetFolder |
         }
 
 
-
 #Output starting messages
-
 
 Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid."
 
@@ -1212,7 +1214,7 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
                 
                         $(IF     ($PreAction -contains '7z'   ) {"with compress method [7z] "}            
                         elseIF   ($PreAction -contains '7zZIP') {"with compress method [7zZip] "}
-                        else                                    {"with compress method [Powershell cmdlet Compress-Archive] "}
+                        else                                    {"with compress method [PowerShell cmdlet Compress-Archive] "}
                     )}) +
                     
                     ("recursively [$($Recurse)] PreAction (Add time stamp to filename[" + [Boolean]($PreAction -contains 'AddTimeStamp') + "] | " + 
@@ -1328,7 +1330,6 @@ $returnCode = $NormalReturnCode
 
 #find files or folders and put them to the object
 
-
 $filterType = $(IF ($Action -eq "DeleteEmptyFolders") {"Folder"} 
 
                 else {"File"})
@@ -1384,8 +1385,7 @@ IF ($PreAction -contains 'Archive') {
         }
 }
 
-
-#対象フォルダorファイル群の処理ループ
+#Start loop to process objects(Files or Folders)
 
 :forLoop ForEach ($Target in $targets) {
 <#

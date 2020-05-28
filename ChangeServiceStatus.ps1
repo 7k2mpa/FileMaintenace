@@ -16,7 +16,7 @@ You can process multiple Windows services with Wrapper.ps1
 This script starts or stops Windows Service specified.
 If start(stop) Windows serivce already started(stopped), will temrminate as WARNING.
 
-Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
+Output log to [Windows Event Log] or [Console] or [Text Log] and specify to suppress or to output individually. 
 
 
 
@@ -342,38 +342,39 @@ Param(
 )
 
 ################# CommonFunctions.ps1 Load  #######################
+# If you want to place CommonFunctions.ps1 in differnt path, modify
 
 Try{
-
-    #CommonFunctions.ps1の配置先を変更した場合は、ここを変更。同一フォルダに配置前提
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
-    Catch [Exception] {
+Catch [Exception]{
     Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
 
+#!!! end of defenition !!!
 
-################ 設定が必要なのはここまで ##################
 
-################# 共通部品、関数  #######################
+################# functions  #######################
 
 function Initialize {
 
 $ShellName = $PSCommandPath | Split-Path -Leaf
 
-#イベントソース未設定時の処理
-#ログファイル出力先確認
-#ReturnCode確認
-#実行ユーザ確認
-#プログラム起動メッセージ
-
+<#
+PreInitialization for basic logging functions
+Already egistered Event Source in Windows Event Log?
+Log File output path
+Validate Return Codes
+Validate Execution user
+Output Script Starting messages
+#>
 . Invoke-PreInitialize
 
-#ここまで完了すれば業務的なロジックのみを確認すれば良い
 
+#If passed PreInitilization, validate only business logics.
 
-#パラメータの確認
+#validate parameters
 
 
     IF (-not($Service | Test-ServiceExist -NoMessage)) {
@@ -474,7 +475,7 @@ $Version = "2.1.0-beta.1"
 #以下のコードはMSのサンプルを参考
 #MICROSOFT LIMITED PUBLIC LICENSE version 1.1
 #https://gallery.technet.microsoft.com/scriptcenter/aa73bb75-38a6-4bd4-b72e-a6aede76d6ad
-#https://devblogs.microsoft.com/scripting/hey-scripting-guy-how-can-i-use-windows-powershell-to-stop-services/
+#https://devblogs.microsoft.com/scripting/hey-scripting-guy-how-can-i-use-windows-PowerShell-to-stop-services/
 
 $result = $ErrorReturnCode
 

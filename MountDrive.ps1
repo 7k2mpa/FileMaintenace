@@ -13,7 +13,7 @@ You can mount multiple network drives with Wrapper.ps1
 .DESCRIPTION
 
 This script mounts Network drive.
-Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
+Output log to [Windows Event Log] or [Console] or [Text Log] and specify to suppress or to output individually. 
 
 
 

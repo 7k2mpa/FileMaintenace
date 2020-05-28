@@ -25,7 +25,7 @@ If the program exit with Error return code, this script exit with Error return c
 The configuration file can be set arbitrarily.
 1st line of the configuration file is used to execute the program.
 
-Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supress or to output individually. 
+Output log to [Windows Event Log] or [Console] or [Text Log] and specify to suppress or to output individually. 
 
 
 Sample Configuration file.
@@ -323,7 +323,7 @@ System.Int. Return Code.
 Param(
 
 [String]
-[parameter(position = 0, mandatory, HelpMessage = 'Specify path of powershell script to execute(ex. .\FileMaintenance.ps1)  or Get-Help Wrapper.ps1')]
+[parameter(position = 0, mandatory, HelpMessage = 'Specify path of PowerShell script to execute(ex. .\FileMaintenance.ps1)  or Get-Help Wrapper.ps1')]
 [ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName")]$CommandPath ,
 
 [String]
