@@ -445,16 +445,18 @@ Pop-Location
 Invoke-PostFinalize $ReturnCode
 }
 
-#####################   ここから本体  ######################
+
+#####################  main  ######################
 
 $Version = "2.1.0-beta.1"
 
 $DatumPath = $PSScriptRoot
 
 
-#初期設定、パラメータ確認、起動メッセージ出力
+#initialize, validate parameters, output starting message
 
 . Initialize
+
 
     IF ($AddTimeStamp) {
 

@@ -364,7 +364,7 @@ Param(
 }
 
 
-#####################   ここから本体  ######################
+#####################  main  ######################
 
 $DatumPath = $PSScriptRoot
 
@@ -372,9 +372,10 @@ $Version = "2.1.0-beta.1"
 
 $psDrive = $MountedDrive.Replace(":","") 
 
-#初期設定、パラメータ確認、起動メッセージ出力
+#initialize, validate parameters, output starting message
 
 . Initialize
+
 
 Try{
 

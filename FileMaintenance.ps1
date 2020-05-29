@@ -1320,9 +1320,11 @@ $Version = "2.1.0-beta.1"
 
 [Boolean]$ForceEndloop  = $FALSE          ;#$FALSE for Finalize , $TRUE for Break in the loop
 
+
 #initialize, validate parameters, output starting message
 
 . Initialize
+
 
 $returnCode = $NormalReturnCode
 
