@@ -483,8 +483,6 @@ Output Script Starting messages
 
 #validate parameters
 
-
-
     IF (-not($AllServers)) {
 
         IF ([String]::IsNullOrEmpty($Server)) {
@@ -507,7 +505,8 @@ Output Script Starting messages
 
         }
 
-#UDPConsoleの存在を確認
+
+#Test UDPConsole
 
     IF (Test-Connection -ComputerName $UDPConsoleServerName -Quiet) {
     
@@ -519,7 +518,7 @@ Output Script Starting messages
         }
 
 
-#Password Fileの有無を確認
+#Test Password File
 
     IF ($AuthorizationType -match '^FixedPasswordFile$' ) {
 
@@ -548,9 +547,7 @@ Output Script Starting messages
                     Test-PathEx -Type Leaf -Name 'arcserve -UDPCLIPath ' -IfFalseFinalize -PassThrough
 
 
-
-#処理開始メッセージ出力
-
+#output starting messages
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 

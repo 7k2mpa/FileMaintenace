@@ -372,12 +372,9 @@ Output Script Starting messages
         Write-Log -EventID $WarningEventID -EventType Warning -EventMessage "Site [$($Site)] state is already [$($TargetState)]."
         Finalize $WarningReturnCode
         }
-        
 
 
-
-#処理開始メッセージ出力
-
+#output starting messages
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
@@ -476,7 +473,7 @@ $result = $ErrorReturnCode
         Break
         }
 
-    #チェック回数の上限に達していない場合は、指定秒待機
+#If checking times is not over specified times, wait for specified seconds
 
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage ("Site [$($Site)] exists and site state did not change to [$($TargetState)] " +
         "Wait for $($RetrySpanSec) seconds. Retry [" + ($i+1) + "/$RetryTimes]")

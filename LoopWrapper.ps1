@@ -430,8 +430,7 @@ $CommandFile = $CommandFile |
                 Test-PathEx -Type Leaf -Name '-CommandFile' -IfFalseFinalize -PassThrough
 
 
-#処理開始メッセージ出力
-
+#output starting messages
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
@@ -444,8 +443,6 @@ function Finalize {
 Param(
 [parameter(position = 0, mandatory)][int]$ReturnCode
 )
-
-
 
 
  Invoke-PostFinalize $ReturnCode

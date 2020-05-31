@@ -459,7 +459,7 @@ Start-Sleep -Seconds $RetryInterval
             
 Write-Verbose $return
 
-            # 対象のバックアップポリシーが実行中又は実行完了となったら終了
+#If BackUp policy is switched to In Progress or Successful, end
 
         IF (($return.status -match "(In Progress|Backup(| Partially) Successful)")) {
 
@@ -609,8 +609,7 @@ $BackUpLogPath = $BackUpLogPath |
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Policy [$($PolicyName)] exists."
 
 
-#処理開始メッセージ出力
-
+#output starting messages
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 

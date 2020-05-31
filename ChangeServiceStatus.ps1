@@ -415,10 +415,7 @@ Output Script Starting messages
         }
         
 
-
-
-#処理開始メッセージ出力
-
+#output starting messages
 
 Write-Log -Id $InfoEventID -Type Information -Message "All parameters are valid."
 
@@ -473,7 +470,7 @@ $Version = "2.1.0-beta.1"
  }
 
 
-#以下のコードはMSのサンプルを参考
+#these code comes from Microsoft sample
 #MICROSOFT LIMITED PUBLIC LICENSE version 1.1
 #https://gallery.technet.microsoft.com/scriptcenter/aa73bb75-38a6-4bd4-b72e-a6aede76d6ad
 #https://devblogs.microsoft.com/scripting/hey-scripting-guy-how-can-i-use-windows-PowerShell-to-stop-services/
@@ -482,7 +479,7 @@ $result = $ErrorReturnCode
 
 :ForLoop For ( $i = 0 ; $i -le $RetryTimes ; $i++ ) {
 
-    # サービス存在確認
+#Test service existence
     IF (-not($Service | Test-ServiceExist)) {
         Break
         }
@@ -563,7 +560,7 @@ Write-Debug (Get-Service | Where-Object {$_.Name -eq $Service}).Status
         Break
         }
 
-      #チェック回数の上限に達していない場合は、指定秒待機
+#If checking times is not over specified times, wait for specified seconds
 
       Write-Log -Id $InfoEventID -Type Information -Message ("Serivce [$($Service)] exists and service status dose not switch to [$($TargetStatus)] " +
         "Wait for $($RetrySpanSec) seconds. Retry [" + ($i+1) + "/$RetryTimes]")

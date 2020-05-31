@@ -330,7 +330,7 @@ Output Script Starting messages
 #validate parameters
 
 
-#ドライブが既にマウントされているか
+#Test the drivve is mounted alreday?
 
     $driveLetters = (Get-WmiObject Win32_LogicalDisk).DeviceID
 
@@ -344,9 +344,7 @@ Output Script Starting messages
         }
 
 
-
-#UNCパスが存在するか
-
+#Validate UNC path
 
     IF (Test-Path -LiteralPath FileSystem::$TargetPath) {
         
@@ -358,8 +356,7 @@ Output Script Starting messages
         }
 
 
-#処理開始メッセージ出力
-
+#output starting messages
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 

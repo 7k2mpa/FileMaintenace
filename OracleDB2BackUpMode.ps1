@@ -471,7 +471,7 @@ $SQLCommandsPath = $SQLCommandsPath |
     Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to load SQLs Version $($SQLsVersion) in -SQLCommandsPath"
 
 
-#Oracle起動確認
+#Test Oracle service in starting
 
     $targetWindowsOracleService = "OracleService" + $OracleSID
 
@@ -485,7 +485,7 @@ $SQLCommandsPath = $SQLCommandsPath |
         }
 
 
-#処理開始メッセージ出力
+#output starting messages
 
 Write-Log -EventID $InfoEventID -Type Information -Message "All parameters are valid."
 
@@ -543,7 +543,7 @@ Push-Location $OracleHomeBinPath
 #planed to be obsolute バックアップ実行中かを確認
     
 
-#セッション情報を出力
+#Export DB session information
 
     Write-Log -EventID $InfoEventID -Type Information -Message "Export Session Info."
 
@@ -559,7 +559,7 @@ Push-Location $OracleHomeBinPath
         }
 
 
-#Redo Log強制書き出し
+#Output Redo Log
 
   Write-Log -EventID $InfoEventID -Type Information -Message "Export Redo Log."
 
@@ -575,7 +575,7 @@ Push-Location $OracleHomeBinPath
         }
 
 
-#BackUp/Normal Modeどちらかを確認
+#get status in which BackUp/Normal Mode
 
     Write-Log -EventID $InfoEventID -Type Information -Message "Check Database running status in which mode"
 
@@ -613,7 +613,7 @@ Push-Location $OracleHomeBinPath
 
 
 
-#Back Up Modeへ切替
+#Switch to Back Up Mode
 
     IF ($NoChangeToBackUpMode) {
 
@@ -635,8 +635,7 @@ Push-Location $OracleHomeBinPath
     }
 
 
-
-#Listner停止
+#Stop Listner
 
     $returnMessage = LSNRCTL.exe status  2>&1
 

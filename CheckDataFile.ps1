@@ -376,8 +376,8 @@ Output Script Starting messages
         Finalize -ReturnCode $InternalErrorReturnCode
         }
 
-#処理開始メッセージ出力
 
+#output starting messages
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 

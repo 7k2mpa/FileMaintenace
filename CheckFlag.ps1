@@ -404,9 +404,7 @@ $FlagFolder = $FlagFolder |
         }
 
 
-
-#処理開始メッセージ出力
-
+#output starting messages
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid"
 
@@ -505,6 +503,5 @@ Switch -Regex ($PostAction) {
             }
 }
 
-#終了メッセージ出力
 
 Finalize -ReturnCode $NormalReturnCode

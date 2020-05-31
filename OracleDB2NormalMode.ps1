@@ -467,8 +467,7 @@ $StartServicePath = $StartServicePath |
                         Test-PathEx -Type Leaf -Name '-StartServicePath' -IfFalseFinalize -PassThrough
 
 
-
-#Oracleサービス存在確認
+#Test existence Oracle service
 
     $targetWindowsOracleService = "OracleService" + $OracleSID
 
@@ -478,8 +477,8 @@ $StartServicePath = $StartServicePath |
         Finalize $ErrorReturnCode
         }
 
-#ControlFile出力先pathの存在確認
 
+#Validate output path of ControlFile
 
     $controlfiledotctlPATH = $controlfiledotctlPATH | ConvertTo-AbsolutePath -Name '-controlfiledotctlPATH '
 
@@ -491,7 +490,7 @@ $StartServicePath = $StartServicePath |
 
 
 
-#処理開始メッセージ出力
+#output starting messages
 
 Write-Log -EventID $InfoEventID -Type Information -Message "All parameters are valid."
 
@@ -536,7 +535,7 @@ $Version = "2.1.0-beta.1"
 Push-Location $OracleHomeBinPath
 
 
-#リスナー起動状態を確認、必要に応じて起動
+#Get status of listener and start listener
 
 $returnMessage = LSNRCTL.exe status  2>&1
 
@@ -582,8 +581,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
     }
 
 
-#Windowsサービス起動状態を確認、必要に応じて起動    
-
+#Test Oracle Windows serivce, and start   
 
     IF (Test-ServiceStatus -ServiceName $targetWindowsOracleService -Health Running -Span 0 -UpTo 1) {
         Write-Log -EventID $InfoEventID -Type Information -Message "Windows Service [$($targetWindowsOracleService)] is already running."
@@ -610,7 +608,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
         }
 
 
-#DBインスタンス状態確認
+#Get status of DB instance
 
     $invokeResult = Invoke-SQL -SQLCommand $DBStatus -SQLName 'DB Status Check' -SQLLogPath $SQLLogPath
 
@@ -651,7 +649,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
 
 
-#BackUp/Normal Modeどちらかを確認
+#Get status in which BackUp/Normal Mode
 
     Write-Log -EventID $InfoEventID -Type Information -Message "Check Back Up Mode"
 
@@ -694,9 +692,9 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
  }
 
 
-#コントロールファイル書き出し
+#Export control file
 
-#SQL.ps1の置換変数表示になっている対象部分を置換
+#replace the paths in SQL.ps1
 
     $DBExportControlFile = $DBExportControlFile.Replace('&controlfiledotctlPATH' , $controlfiledotctlPATH)
     $DBExportControlFile = $DBExportControlFile.Replace('&controlfiledotbkPATH'  , $controlfiledotbkPATH)
@@ -713,7 +711,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
         }
 
 
-#Redo Log 強制書き出し
+#export Redo Log
 
     $invokeResult = Invoke-SQL -SQLCommand $ExportRedoLog  -SQLName 'ExportRedoLog'  -SQLLogPath $SQLLogPath 
 
