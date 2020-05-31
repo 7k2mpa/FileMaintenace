@@ -320,7 +320,7 @@ Output Script Starting messages
 #validate parameters
 
 
-#ドライブが既にマウントされているか
+#Test drive mounted already
 
     $driveLetters = (Get-WmiObject Win32_LogicalDisk).DeviceID
 
@@ -341,13 +341,12 @@ Output Script Starting messages
         Finalize $ErrorReturnCode
         }
 
-#処理開始メッセージ出力
 
+#output starting messages
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Start to unmount drive ${MountedDrive}"
-
 
 }
 

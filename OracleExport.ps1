@@ -410,7 +410,7 @@ $OracleHomeBinPath = $OracleHomeBinPath |
                         Test-PathEx -Type Container -Name '-OracleHomeBinPath' -IfFalseFinalize -PassThrough
     
 
-#対象のOracleがサービス起動しているか確認
+#Test Oracle service starting
 
     $targetWindowsOracleService = "OracleService" + $OracleSID
 
@@ -423,10 +423,7 @@ $OracleHomeBinPath = $OracleHomeBinPath |
         }
      
 
-     
-
-#処理開始メッセージ出力
-
+#output starting messages
 
 Write-Log -EventID $InfoEventID -EventType Information -EventMessage "All parameters are valid."
 

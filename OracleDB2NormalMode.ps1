@@ -489,7 +489,6 @@ $StartServicePath = $StartServicePath |
     $ControlfiledotbkPATH | Split-Path  -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -controlfiledotbkPATH' -IfFalseFinalize > $NULL
 
 
-
 #output starting messages
 
 Write-Log -EventID $InfoEventID -Type Information -Message "All parameters are valid."

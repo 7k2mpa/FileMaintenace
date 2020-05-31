@@ -439,8 +439,7 @@ $ExecRmanPath = $ExecRmanPath |
                     Test-PathEx -Type Leaf -Name '-ExecRmanPath' -IfFalseFinalize -PassThrough
 
 
-
-#対象のOracleがサービス起動しているか確認
+#Test Oracle service starting
 
     $targetWindowsOracleService = "OracleService"+$OracleSID
 
@@ -451,12 +450,9 @@ $ExecRmanPath = $ExecRmanPath |
         } else {
         Write-Log -EventID $InfoEventID -Type Information -Message "Windows Service [$($targetWindowsOracleService)] is running."
         }
-     
 
 
-
-#処理開始メッセージ出力
-
+#output starting messages
 
 Write-Log -EventID $InfoEventID -Type Information -Message "All parameters are valid."
 
