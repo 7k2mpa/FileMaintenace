@@ -1391,21 +1391,23 @@ IF ($PreAction -contains 'Archive') {
 
 :forLoop ForEach ($Target in $targets) {
 <#
-PowerShellはGOTO文が存在せず処理分岐ができない。
-そのためDo/Whileを用いて処理途中でエラーが発生した場合の分岐を実装している
+'Goto' state dose not exist in PowerShell, thus no conditional branch in the program.
+Thus use Do/While() state for branch action when errors occure in loop section.
 
-Do/While()は最後に評価が行われるループ。最後の評価がFalseとなるとループを終了する。ここでWhile($FALSE)としてあるので、
-Do/Whileの間は1回だけ実行される。
-Do/Whileはループのため、処理途中でBreakすると、Whileへjumpする。
+Do/While() loop state evaluating in the end of the loop. In switching to false in evalutating at While(), end the loop.
+If set 'While($FALSE)' , Do-While() loop process once.
+If 'Break' in the loop, jump to 'While($FALSE)'
 
-ファイル群処理ループ中のエラー（例えば、ファイルをDelete試行したが、権限が無くて削除できない等）で想定される処理、指定方法は以下である。
+Cases of actions when errors occure in the loop (such as 'Invoke Action Delete but dose not have permission, thus fail to delete)
 
-1.While以降の処理終了メッセージ出力へJumpして、次のファイルを処理継続
- Break , $ForceEndloog = $TRUE , $ForceFinalize = $FALSE 
-2.While以降の処理終了メッセージ出力へJumpして、次のファイルは処理せずにFinalizeへ進む（処理打ち切り）
- Break , $ForceEndloog = $TRUE , $ForceFinalize = $TRUE
-3.処理終了メッセージ出力しない。Finalizeへ進む（処理打ち切り）
- Finalize $ErrorReturnCode
+Case1 Jump to 'While()' and output the result, and process a next file.
+    Break , $ForceEndloog = $TRUE , $ForceFinalize = $FALSE
+
+Case2 Jump to 'While()' and output the result, and Finalize for termination
+    Break , $ForceEndloog = $TRUE , $ForceFinalize = $TRUE
+
+Case3 Jump to Finalize for temination (dose not output the result)
+    Finalize $ErrorReturnCode
 #>
 
 :do Do {
@@ -1415,10 +1417,10 @@ Do/Whileはループのため、処理途中でBreakすると、Whileへjumpする。
 [Boolean]$NormalFlag    = $FALSE
 [Boolean]$OverRideFlag  = $FALSE
 [Boolean]$ContinueFlag  = $FALSE
-[Boolean]$ForceFinalize = $FALSE          ;#$TRUEが戻ったらオブジェクト処理ループを強制終了
-[Int]$InLoopOverRideCount = 0    ;#$OverRideCountは処理全体のOverRide回数。$InLoopOverRideCountは1処理ループ内でのOverRide回数。1オブジェクトで複数回OverRideがあり得るため
+[Boolean]$ForceFinalize = $FALSE  ;#If this flag is $TRUE, force terminate at end of the loop when error occures. This flag may set $FALSE in CommonFunctions.ps1
+[Int]$InLoopOverRideCount = 0     ;#$OverRideCount means counter of all over the process. $InLoopOverRideCount means counter of the process in the only one object. (over ride may occure at one object a few times)
 
-[Boolean]$ForceEndloop  = $TRUE   ;#このループ内で異常終了する時はループ終端へBreakして、処理結果を表示する。直ぐにFinalizeしない
+[Boolean]$ForceEndloop  = $TRUE   ;#$FALSE for Finalize , $TRUE for Break in the loop  If an error occures in the loop, Jump to the end of the loop and output the result of the process
 
 Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start processing [$($filterType)] $($Target.Object.FullName) ---"
 
@@ -1452,7 +1454,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
                 Invoke-Action -Type MakeNewFolder -ActionFrom $destinationFolder -ActionError $destinationFolder
 
-                #$Invoke-Actionが異常終了&-Continue $TRUEだと$ContinueFlag $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
+#error occure in $Invoke-Action &-Continue $TRUE, $ContinueFlag switch to $TRUE. In the condtion, jump to the next object.
                 IF ($ContinueFlag) {
                     Break do                
                     }
@@ -1538,7 +1540,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
             Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
 
-            #$Invoke-Actionが異常終了&-Continue $TRUEだと$ContinueFlag $TRUEになるので、その場合は後続処理はしないで次のObject処理に進む
+#error occure in $Invoke-Action &-Continue $TRUE, $ContinueFlag switch to $TRUE. In the condtion, jump to the next object.
             IF ($ContinueFlag) {
                 Break do      
                 }
@@ -1597,8 +1599,10 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
         }
     }
 }
-# :do
-While ($FALSE)
+
+
+While ($FALSE) ;#end of :Do
+
 
 #Count up Error > Warning > Normal 
 
@@ -1623,14 +1627,11 @@ While ($FALSE)
         Break main
         }
 
-# :forLoop   
-}
-
+} ;#end of :forLoop
 
 }
 
-# :main
-While ($FALSE)
+While ($FALSE) ;#end of :main
 
 IF ($returnCode -lt $InternalErrorReturnCode) {
 

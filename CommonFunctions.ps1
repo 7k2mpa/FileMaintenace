@@ -602,7 +602,7 @@ Param(
 begin {
 }
 process {
-# サービス状態取得
+
 
     $service = Get-Service | Where-Object {$_.Name -eq $ServiceName}
 
@@ -668,12 +668,16 @@ process {
 $result = $FALSE
 
     For ( $i = 0 ; $i -le $UpTo; $i++ ) {
-        # サービス存在確認
+
+#Test existence of the Windows service
+
         IF (-not($ServiceName | Test-ServiceExist -NoMessage)) {
             Break
             }
 
-        # サービス状態判定
+
+#Test status of the Windows service
+
         $service = Get-Service | Where-Object {$_.Name -eq $ServiceName}
 
         IF ($service.Status -eq $Status) {
@@ -688,7 +692,7 @@ $result = $FALSE
                 }
 
 
-        # サービスは指定状態へ遷移しなかった
+#The service dose not swith to specified status.
 
         IF ($i -ge $UpTo) {
             Write-Log -Id $InfoEventID -Type Information -Message ("Service [$($ServiceName)] exists and status is [$($Service.Status)] now. " +
@@ -697,7 +701,7 @@ $result = $FALSE
             }
 
 
-        # 指定間隔(秒)待機
+#Wait for specified seconds.
 
         Write-Log -Id $InfoEventID -Type Information -Message ("Service [$($ServiceName)] exists and status is [$($Service.Status)] , " +
             "is not [$($Status)] Wait for $($Span)seconds. Retry [" + ($i+1) + "/$UpTo]")
@@ -853,133 +857,6 @@ String
     }
 }
 
-    <#
-
-function Test-PathNullOrEmpty {
-
-[OutputType([Boolean])]
-[CmdletBinding()]
-Param(
-[String][parameter(position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path ,
-[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name ,
-
-[Switch]$IfNullOrEmptyFinalize ,
-[Switch]$NoMessage ,
-[Switch]$Passthrough
-)
-begin {
-}
-process {
-
-    IF ([String]::IsNullOrEmpty($Path)) {
-
-        Write-Output $TRUE
-
-        IF ($IfNullOrEmptyFinalize) {
-           
-           Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
-           Finalize $ErrorReturnCode
-           }                
-
-        } else {
-        Write-Output $FALSE 
-        }
-
-
-}
-end {
-}
-}
-
-
-function Test-Container {
-
-[OutputType([Boolean])]
-[CmdletBinding()]
-Param(
-[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path,
-[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name,
-
-[Switch][parameter(position = 2)]$IfNoExistFinalize ,
-[Switch][parameter(position = 3)]$PassThrough
-)
-begin {
-}
-process {
-
-    IF (Test-Path -LiteralPath $Path -PathType Container) {
-
-        Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] exists."
-        $result = $TRUE
-
-        } else {
-        Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] dose not exist."
-        $result = $FALSE
-        $Path = $NULL
-            
-        IF($IfNoExistFinalize){
-            Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
-            Finalize $ErrorReturnCode
-            }
-    }
-    
-    IF ($PassThrough) {
-
-        Write-Output $Path
-
-        } else {
-        Write-Output $result
-        }
-}
-end {
-}
-}
-
-
-function Test-Leaf {
-
-[OutputType([Boolean])]
-[CmdletBinding()]
-Param(
-[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("CheckPath" , "FullName")]$Path,
-[String][parameter(position = 1, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("ObjectName")]$Name,
-
-[Switch][parameter(position = 2)]$IfNoExistFinalize ,
-[Switch][parameter(position = 3)]$PassThrough
-)
-begin {
-}
-process {
-
-    IF (Test-Path -LiteralPath $Path -PathType Leaf) {
-
-        Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] exists."
-        $result = $TRUE
-
-        } else {
-
-        Write-Log -Id $InfoEventID -Type Information -Message "$($Name)[$($Path)] dose not exist."
-        $result = $FALSE
-        $Path = $NULL
-            
-        IF($IfNoExistFinalize){
-            Write-Log -Id $ErrorEventID -Type Error -Message "$($Name) is required."
-            Finalize $ErrorReturnCode
-            }
-    }
-
-    IF ($PassThrough) {
-
-        Write-Output $Path
-
-        } else {
-        Write-Output $result
-        }
-}
-end {
-}
-}
-#>
 
 function Test-LogPath {
 [OutputType([boolean])]
@@ -1413,6 +1290,8 @@ process {
 }
 end {
 }
+
+
 }
 
 

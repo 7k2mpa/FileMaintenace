@@ -527,15 +527,12 @@ $Version = "2.1.0-beta.1"
                     Write-Log -EventID $SuccessEventID -EventType Success -EventMessage "Completed successfully at line [$($i+1)/$($lines.Count)] in -CommandFile [$($CommandFile)]"
                     }
             }
-                      
-        #Termination Case 3 execute command(default) 
-        }
 
-    #Termination Switch -Regex ($Line)
-    }
+        }  ;#Termination Case 3 execute command(default) 
 
-# :ForLoop termination
-}
+    }  ;#Termination Switch -Regex ($Line)
+
+} ;# :ForLoop termination
 
 IF ($ErrorCount -gt 0) {
     $result = $ErrorReturnCode
