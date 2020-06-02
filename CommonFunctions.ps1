@@ -11,7 +11,7 @@ This script is used with FileMaintenance.ps1 and others.
 This script is used with FileMaintenance.ps1 and others.
 Place this script in the same directory of FileMaintenance.ps1.
 
-This script can use cmdlet Compress-Archive.
+This script uses cmdlet Compress-Archive in Invoke-Action function for compression.
 
 But cmdlet Compress-Archive can not handle wild card characters bracket[] for destination path corectly, you should install 7-Zip. This script can use 7-Zip for compress or archive also.
 
@@ -22,7 +22,7 @@ If you can install 7-Zip for compress or archive, do not need to replace.
 You can get the version of this script with '.\CommonFunctions.ps1 -verbose'.
 
 
-Use blow 'param' section definitions commented for setting variables of log path and etc.
+Use commented definitions blow 'Param()' section  for setting variables of log path and etc.
 You can specify parameters colletively in CommonFunctions.ps1
 
 Specification priority is
@@ -30,7 +30,7 @@ Specification priority is
 
 HIGH
 
- blow param section in CommonFunctions.ps1
+ definitions blow Param() section in CommonFunctions.ps1
  arguments of the script
  param section in the scipt
 
