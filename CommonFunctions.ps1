@@ -22,6 +22,25 @@ If you can install 7-Zip for compress or archive, do not need to replace.
 You can get the version of this script with '.\CommonFunctions.ps1 -verbose'.
 
 
+Use blow 'param' section definitions commented for setting variables of log path and etc.
+You can specify parameters colletively in CommonFunctions.ps1
+
+Specification priority is
+
+
+HIGH
+
+ blow param section in CommonFunctions.ps1
+ arguments of the script
+ param section in the scipt
+
+LOW
+
+
+The scripts have validation functions, but spcification in param section dose not validate.
+Remind that dose not specify invalid parameter in param section.
+
+
 
 .NOTES
 
@@ -52,17 +71,6 @@ Param(
 )
 $Script:CommonFunctionsVersion = "2.1.0-beta.1"
 Write-Verbose "CommonFunctions.ps1 Version $CommonFunctionsVersion"
-
-#ログ等の変数を一括設定したい場合は以下を利用して下さい。
-#
-#各プログラムのParam変数設定、コマンドの引数、CommonFunctions.ps1の変数設定
-#上記の順序で、後者の設定が優先されます。
-#
-#$LogPath等はこちらで設定する方が楽かも
-#
-#入力値は極力validationしていますが、Paramセクションで明示的に指定する場合はvalidationされません
-#誤った値を指定しないように留意してください
-
 
 #[boolean]$Log2EventLog = $TRUE ,
 #[Switch]$NoLog2EventLog ,
@@ -168,8 +176,12 @@ end {
 function Test-ReturnCode {
 <#
 .SYNOPSIS
-ReturnCode大小関係確認
-$ErrorReturnCode = 0設定等を考慮して異常時はExit 1で抜ける
+Validate magnitude relation of the return codes in parameter section.
+
+.DESCRIPTION
+Validate magnitude relation of the return codes in parameter section.
+
+If might be $ErrorReturnCode = 0 , terminate with Exit 1 when an error occure.
 #>
     IF (-not(($InternalErrorReturnCode -ge $WarningReturnCode) -and ($ErrorReturnCode -ge $WarningReturnCode) -and ($WarningReturnCode -ge $NormalReturnCode))) {
 
@@ -183,8 +195,13 @@ $ErrorReturnCode = 0設定等を考慮して異常時はExit 1で抜ける
 function Test-EventLogSource {
 <#
 .SYNOPSIS
-イベントソース未設定時の処理
-この確認が終わるまではログ出力可能か確定しないのでコンソール出力を強制
+Test existence of the event source in Windows Event Log.
+
+.DESCRIPTION
+Test existence of the event source in Windows Event Log.
+
+Regist the new event source if the event source dose not exist.
+If might not be able to output event log in sepcified event source, thus force to output log in the console.
 #>
     IF ($Log2EventLog) {
 
@@ -192,7 +209,8 @@ function Test-EventLogSource {
 
         Try {
             IF (-not([System.Diagnostics.Eventlog]::SourceExists($ProviderName) ) ) {
-            #新規イベントソースを設定
+
+#Register a new event source
            
                 New-EventLog -LogName $EventLogLogName -Source $ProviderName  -ErrorAction Stop
                 $ForceConsoleEventLog = $TRUE    
@@ -215,8 +233,12 @@ function Test-EventLogSource {
 function Test-LogFilePath {
 <#
 .SYNOPSIS
-ログファイル出力先確認
-この確認が終わるまではログ出力可能か確定しないのでEventLogとコンソール出力を強制
+Test output path of log file.
+
+.DESCRIPTION
+Test output path of log file.
+
+If might not be able to output log file, thus force to output log in the event log and console.
 #>
     IF ($Log2File) {
 
@@ -883,7 +905,7 @@ $result = $ErrorReturnCode
         Break
         }
 
-    #ログ出力先ファイルの親フォルダが存在しなければ異常終了
+#Not exist the parent folder of the log output path
 
     IF (-not($Path | Split-Path -Parent | Test-PathEx -Type Container -Name $Name)) {
     
@@ -891,7 +913,7 @@ $result = $ErrorReturnCode
         }
 
 
-    #ログ出力先（予定）ファイルと同一名称のフォルダが存在していれば異常終了
+#Test same name folder of the log output path.
 
     IF (Test-Path -LiteralPath $Path -PathType Container) {
         Write-Log -Id $ErrorEventID -Type Error -Message "Same name folder $($Path) exists already."        
@@ -921,8 +943,8 @@ $result = $ErrorReturnCode
             $result = $NormalReturnCode
             }
 }
-# :do
-While ($FALSE)
+
+While ($FALSE)  ;# :do
 
 IF ($GetResult) {
     IF ($result -eq $NormalReturnCode) {
@@ -976,25 +998,25 @@ $ERROR.clear()
 $ForceConsole = $FALSE
 $ForceConsoleEventLog = $FALSE
 
-#ReturnCode確認
+#Validate ReturnCode
 
 . Test-ReturnCode
 
 
-#イベントソース未設定時の処理
+#Test existence of event source
 
 . Test-EventLogSource
 
 
-#ログファイル出力先確認
+#Test output path of the log file
 
 . Test-LogFilePath
 
 
 
-#ここはfunctionなので変数はfunction内でのものとなる。スクリプト全体に反映するにはスコープを明示的に$Script:変数名とする
+#remind variable's scope. These variables are used in script (not in this function only!) for set scope, use $Script:variable's name
 
-#ログ抑止フラグ処理
+#process -NoLog switches
 
 IF ($NoLog2EventLog) {[boolean]$Script:Log2EventLog = $FALSE}
 IF ($NoLog2Console)  {[boolean]$Script:Log2Console  = $FALSE}
