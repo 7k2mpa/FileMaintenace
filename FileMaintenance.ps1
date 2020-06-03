@@ -30,7 +30,7 @@ Process files found to [Move][Copy][Delete][NullClear][KeepFilesCount] , folders
 Process files found to [NullClear][Rename]
 
 
-Finding criteria are [(Older than)-Days][-Size][-RegularExpression][-Parent(Path)RegularExpression]
+Finding criteria are [(Older than)-Days][-Size][-(FileName)RegularExpression][-Parent(Path)RegularExpression]
 
 This script processes only 1 folder at once.
 If you process multiple folders, can do with Wrapper.ps1
@@ -1531,7 +1531,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
         Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
         }
 
-    #•ªŠò6 KeepFilesCount
+    #case6 KeepFilesCount
     '^KeepFilesCount$' {
         IF ((@($targets).Length - $InLoopDeletedFilesCount) -gt $KeepFiles) {
 
