@@ -517,7 +517,7 @@ Pop-Location
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.1.0-beta.1"
+$Version = "2.1.0-beta.2"
 
 
 #initialize, validate parameters, output starting message
