@@ -268,7 +268,7 @@ System.Int. Return Code.
 
 Param(
 
-[String][parameter(position = 0, mandatory, HelpMessage = 'Enter IIS site name. To view all help , Get-Help ChangeIISstate.ps1')]$Site ,
+[String][parameter(position = 0, mandatory, HelpMessage = 'Enter IIS site name. To view all help, Get-Help ChangeIISstate.ps1')]$Site ,
 
 [String][parameter(position = 1)][ValidateSet("Started", "Stopped")][Alias("State")]$TargetState = 'Stopped' ,
 

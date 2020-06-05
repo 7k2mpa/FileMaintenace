@@ -1227,7 +1227,7 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
         IF ($Action -ne 'none') {
 
             $message = "Process files found " +
-                       $(IF ($Action -eq    'KeepFilesCount') {"[keep file generation only($($KeepFiles))] "}) +
+                       $(IF ($Action -eq    'KeepFilesCount') {"to keep file generation only[$($KeepFiles)] "}) +
                        $(IF ($Action -match '^(Copy|Move)$')  {"moving to[$($MoveToFolder)] "}) +
                        "recursively[$($Recurse)] Action[$($Action)]"
 

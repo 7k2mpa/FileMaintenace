@@ -286,7 +286,7 @@ System.Int. Return Code.
 [CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
 Param(
 
-[parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Enter Service name (ex. spooler) To View all help , Get-Help ChangeServiceStatus.ps1')]
+[parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Enter Service name (ex. spooler) To View all help, Get-Help ChangeServiceStatus.ps1')]
 [String][Alias("Name")]$Service ,
 
 [parameter(position = 1, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
