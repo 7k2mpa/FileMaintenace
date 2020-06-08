@@ -319,6 +319,7 @@ https://github.com/7k2mpa/FileMaintenace
 System.Int. Return Code.
 #>
 
+#!!! start of definition !!!#
 Param(
 
 [int]
@@ -394,7 +395,7 @@ Catch [Exception]{
     Exit 1
     }
 
-#!!! end of defenition !!!
+#!!! end of definition !!!
 
 
 ################# functions  #######################

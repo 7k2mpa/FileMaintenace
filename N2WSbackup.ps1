@@ -270,10 +270,11 @@ https://github.com/7k2mpa/FileMaintenace
 System.Int. Return Code.
 #>
 
+#!!! start of definition !!!#
 [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="High")]
 Param(
 
-[String][Parameter(position = 0, mandatory, HelpMessage = 'Enter policy name in N2WS console. To View all help , Get-Help N2WSBackUp.ps1')]$PolicyName ,   
+[String][Parameter(position = 0, mandatory, HelpMessage = 'Enter policy name in N2WS console. To View all help, Get-Help N2WSBackUp.ps1')]$PolicyName ,   
 
 [String][Parameter(position = 1)][ValidateSet("Request", "GetResult")]$Job = 'GetResult' ,
 
@@ -336,7 +337,7 @@ Catch [Exception]{
     Exit 1
     }
 
-#!!! end of defenition !!!
+#!!! end of definition !!!
 
 
 ################# functions #######################

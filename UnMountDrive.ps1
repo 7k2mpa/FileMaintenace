@@ -236,7 +236,7 @@ https://github.com/7k2mpa/FileMaintenace
 System.Int. Return Code.
 #>
 
-
+#!!! start of definition !!!#
 Param(
 
 [parameter(position = 0, mandatory, HelpMessage = 'Specify Drive Letter (ex. F:) or Get-Help UnMountDrive.ps1')]
@@ -295,7 +295,7 @@ Catch [Exception]{
     Exit 1
     }
 
-#!!! end of defenition !!!
+#!!! end of definition !!!
 
 
 ################# functions  #######################

@@ -283,6 +283,7 @@ System.Int. Return Code.
 
 #>
 
+#!!! start of definition !!!#
 [CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
 Param(
 
@@ -352,7 +353,7 @@ Catch [Exception]{
     Exit 1
     }
 
-#!!! end of defenition !!!
+#!!! end of definition !!!
 
 
 ################# functions  #######################

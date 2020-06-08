@@ -267,6 +267,7 @@ https://github.com/7k2mpa/FileMaintenace
 System.Int. Return Code.
 #>
 
+#!!! start of definition !!!#
 [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact="High")]
 Param(
 
@@ -336,7 +337,7 @@ Catch [Exception]{
     Exit 1
     }
 
-#!!! end of defenition !!!
+#!!! end of definition !!!
 
 
 ################# functions  #######################

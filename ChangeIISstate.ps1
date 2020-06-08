@@ -265,7 +265,7 @@ System.Int. Return Code.
 
 #>
 
-
+#!!! start of definition !!!#
 Param(
 
 [String][parameter(position = 0, mandatory, HelpMessage = 'Enter IIS site name. To view all help, Get-Help ChangeIISstate.ps1')]$Site ,
@@ -327,7 +327,7 @@ Catch [Exception]{
     Exit 1
     }
 
-#!!! end of defenition !!!
+#!!! end of definition !!!
 
 
 ################# functions  #######################
@@ -469,7 +469,7 @@ $result = $ErrorReturnCode
             }  
     
     IF ($i -ge $RetryTimes) {
-        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting specified times , site [$($Site)] state did not switch to [$($TargetState)]"
+        Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Although waiting specified times, site [$($Site)] state did not switch to [$($TargetState)]"
         Break
         }
 

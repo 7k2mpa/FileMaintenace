@@ -376,9 +376,10 @@ System.Int. Return Code.
 
 #>
 
+#!!! start of definition !!!#
 Param(
 
-[String][parameter(position = 0, mandatory, HelpMessage = 'Enter plan name in arcserveUDP console To View all help , Get-Help arcserveUDPBackUp.ps1')]$Plan ,
+[String][parameter(position = 0, mandatory, HelpMessage = 'Enter plan name in arcserveUDP console. To View all help, Get-Help arcserveUDPBackUp.ps1')]$Plan ,
 
 [String][parameter(position = 1)][ValidateSet("Full", "Incr")]$BackUpJobType = 'Incr',
 
@@ -459,7 +460,7 @@ Catch [Exception]{
     Exit 1
     }
 
-#!!! end of defenition !!!
+#!!! end of definition !!!
 
 
 ################# functions  #######################

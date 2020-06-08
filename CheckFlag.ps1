@@ -282,10 +282,11 @@ System.Int. Return Code.
 
 #>
 
+#!!! start of definition !!!#
 [CmdletBinding(SupportsShouldProcess=$true,ConfirmImpact="High")]
 Param(
 
-[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify the folder of a flag file placed.(ex. D:\lock)or Get-Help CheckFlag.ps1')]
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify the folder of a flag file placed.(ex. D:\lock) Get-Help CheckFlag.ps1')]
 [ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName")]$FlagFolder ,
 
 [String][parameter(position = 1, mandatory)][ValidateNotNullOrEmpty()][ValidatePattern ('^(?!.*(\/|:|\?|`"|<|>|\||\*|\\).*$)')][Alias("FlagFileName")]$FlagFile ,
@@ -347,7 +348,7 @@ Catch [Exception]{
     Exit 1
     }
 
-#!!! end of defenition !!!
+#!!! end of definition !!!
 
 
 ################# functions  #######################
