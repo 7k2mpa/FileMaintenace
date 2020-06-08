@@ -873,13 +873,12 @@ $parameter = @{
     File        = ($filterType -eq 'File')
     Directory   = ($filterType -eq 'Folder')
 }
-    $candidateObjects = Get-ChildItem @parameter
 
     $objects = @()
 
-    ForEach ($object in ($candidateObjects | ComplexFilter)) {
+    $objects = ForEach ($object in (Get-ChildItem @parameter | ComplexFilter)) {
 
-        $objects += New-Object PSObject -Property @{
+        [PSCustomObject]@{
             Object = $object
             Time   = $object.LastWriteTime
             Depth  = ($object.FullName.Split("\\")).Count
@@ -1013,13 +1012,9 @@ process {
         $archive.Path = $DestinationPath |
             Join-Path -ChildPath (($Path | Split-Path -Leaf | ConvertTo-FileNameAddTimeStamp -TimeStampFormat $TimeStampFormat) + $extension)
 
-        IF ($PreAction -match '^(Compress|Archive)$') {
-
-            $archive.Type += "AndAddTimeStamp"
-           
-            } else {
-            $archive.Type += "AddTimeStamp"        
-            }
+        $archive.Type += $(IF ($PreAction -match '^(Compress|Archive)$') {"AndAddTimeStamp"} 
+        
+                            else {"AddTimeStamp"})
 
         } else {        
         $archive.Path = $DestinationPath | Join-Path -ChildPath (($Path | Split-Path -Leaf) + $extension)        
@@ -1552,7 +1547,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
             }
         }
 
-    #case7 $Action dose not match case , it must be internal error
+    #case7 $Action dose not match case, it must be internal error
     Default {
         Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal Error at Switch Action section. It may cause a bug in regex."
         $returnCode = $InternalErrorReturnCode
