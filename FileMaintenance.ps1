@@ -547,7 +547,7 @@ https://github.com/7k2mpa/FileMaintenace
 System.Int. Return Code.
 #>
 
-#!!! start of specification !!!#
+#!!! start of definition !!!#
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = "High")]
 Param(
 
@@ -661,7 +661,7 @@ Catch [Exception]{
     Exit 1
     }
 
-#!!! end of defenition !!!
+#!!! end of definition !!!
 
 
 ################# functions  #######################
@@ -1549,7 +1549,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
     #case7 $Action dose not match case, it must be internal error
     Default {
-        Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal Error at Switch Action section. It may cause a bug in regex."
+        Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal Error at Switch Action section. A bug in regex may cause it."
         $returnCode = $InternalErrorReturnCode
         Break main
         }
@@ -1586,9 +1586,9 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
         }
 
 
-    #case4 $Action dose not match case , it must be internal error
+    #case4 $Action dose not match case, it must be internal error
     Default {
-        Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal error at Switch PostAction section. It may cause a bug in regex."
+        Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal error at Switch PostAction section. A bug in regex may cause it."
         $returnCode = $InternalErrorReturnCode
         Break main
         }
