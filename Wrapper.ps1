@@ -535,12 +535,8 @@ $Version = "2.1.0-beta.2"
 
 } ;# :ForLoop termination
 
-IF ($ErrorCount -gt 0) {
-    $result = $ErrorReturnCode
-    } elseIF ($WarningCount -gt 0) {
-        $result = $WarningReturnCode
-        } else {
-            $result = $NormalReturnCode
-            }
+$result = $(IF      ($ErrorCount -gt 0)     {$ErrorReturnCode}
+            elseIF  ($WarningCount -gt 0)   {$WarningReturnCode}
+            else                            {$NormalReturnCode})
 
 Finalize -ReturnCode $result

@@ -28,11 +28,11 @@
 #If the path includes bracket[], specify the path literally. Bracket[] dose not work as wild cards.
 #It is not necessary to escape with backquote`
 
-Do not use
+#Do not use
 
 -TargetFolder .\TESET\`[LOG`]
 
-Do
+#Do
 
 -TargetFolder .\TEST\[LOG]
 
