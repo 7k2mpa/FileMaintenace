@@ -1417,7 +1417,7 @@ Case3 Jump to Finalize for temination (dose not output the result)
 
 [Boolean]$ForceEndloop  = $TRUE   ;#$FALSE for Finalize , $TRUE for Break in the loop  If an error occures in the loop, Jump to the end of the loop and output the result of the process
 
-Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start processing [$($filterType)] $($Target.Object.FullName) ---"
+Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start processing [$($filterType)] [$($Target.Object.FullName)] ---"
 
 <#
 Create a destinationFolder(child folder of the MoveToFolder) with Target.Object.FullName
@@ -1509,15 +1509,15 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
     #case4 delete empty folder after testing the folder is empty
     '^DeleteEmptyFolders$' {
-        Write-Log -ID $InfoEventID -Type Information -Message  "Check the folder $($Target.Object.FullName) is empty."
+        Write-Log -ID $InfoEventID -Type Information -Message  "Check the folder [$($Target.Object.FullName)] is empty."
 
         IF ($Target.Object.GetFileSystemInfos().Count -eq 0) {
 
-            Write-Log -ID $InfoEventID -Type Information -Message  "The folder $($Target.Object.FullName) is empty."
+            Write-Log -ID $InfoEventID -Type Information -Message  "The folder [$($Target.Object.FullName)] is empty."
             Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
 
             } else {
-            Write-Log -ID $InfoEventID -Type Information -Message "The folder $($Target.Object.FullName) is not empty." 
+            Write-Log -ID $InfoEventID -Type Information -Message "The folder [$($Target.Object.FullName) is not empty." 
             }
         }
 
@@ -1613,7 +1613,7 @@ While ($FALSE) ;#end of :Do
         $ContinueCount++
         }
          
-    Write-Log -ID $InfoLoopEndEventID -Type Information -Message ("--- End processing [$($filterType)] $($Target.Object.FullName)  " + 
+    Write-Log -ID $InfoLoopEndEventID -Type Information -Message ("--- End processing [$($filterType)] [$($Target.Object.FullName)]  " + 
         "Results  Normal[$($NormalFlag)] Warning[$($WarningFlag)] Error[$($ErrorFlag)]  " +
         "Continue[$($ContinueFlag)]  OverRide[$($InLoopOverRideCount)] ---")
 
