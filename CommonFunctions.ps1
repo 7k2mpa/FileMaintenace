@@ -69,7 +69,7 @@ https://github.com/7k2mpa/FileMaintenace
 [CmdletBinding()]
 Param(
 )
-$Script:CommonFunctionsVersion = "2.1.0-beta.2"
+$Script:CommonFunctionsVersion = "2.1.0"
 Write-Verbose "CommonFunctions.ps1 Version $CommonFunctionsVersion"
 
 #[boolean]$Log2EventLog = $TRUE ,
