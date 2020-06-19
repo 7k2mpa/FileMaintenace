@@ -6,7 +6,7 @@ rem Before calling MSGPRINT.bat, set variable MYSELF_NAME
 rem with the script's name which calls MSGPRINT.bat
 rem
 rem Usage
-rem call MSGPRINT [message to output] [INFORMATION|WARNING|ERROR] [ID 1-1000]
+rem call MSGPRINT [message to output] [INFORMATION|WARNING|ERROR] [id(1-1000)]
 rem
 rem sample ID number
 rem INFORMATION	1
