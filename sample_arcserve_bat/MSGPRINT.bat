@@ -1,7 +1,7 @@
 @echo off
 
 rem ========================================================
-rem メッセージ出力
+rem message output bat script
 rem バッチを実行しているコンピュータのWindows Event Logを出力
 rem 変数MYSELF_NAMEは呼び出し元で実行バッチ名を取得して、実行バッチ名を入力しておく
 rem call MSGPRINT [出力するメッセージ] [INFORMATION|WARNING|ERROR] [ID 1-1000までの範囲]
