@@ -8,7 +8,7 @@ rem
 rem Usage
 rem call MSGPRINT [message to output] [INFORMATION|WARNING|ERROR] [id(1-1000)]
 rem
-rem sample ID number
+rem Sample ID number
 rem INFORMATION	1
 rem WARNING 10
 rem ERROR 100
