@@ -1,26 +1,24 @@
 @echo off
 
 rem ========================================================
-rem message output bat script
-rem Write Windows Event Log
-rem Before calling MSGPRINT.bat,set variable MYSELF_NAME 
-rem with the script's name which is calling MSGPRINT.bat
+rem This scprit writes Windows Event Log
+rem Before calling MSGPRINT.bat, set variable MYSELF_NAME 
+rem with the script's name which calls MSGPRINT.bat
 rem
 rem Usage
 rem call MSGPRINT [message to output] [INFORMATION|WARNING|ERROR] [ID 1-1000]
+rem
 rem sample ID number
 rem INFORMATION	1
 rem WARNING 10
 rem ERROR 100
 rem ========================================================
 
-rem checking the number of the arguments
+rem validate the number of the arguments
+
 set argc=0
 
 for %%a in ( %* ) do set /a argc=argc+1
-
-
-rem validate the number of the arguments
 
 if not %argc% == 3 (
 	eventcreate /L Application /T WARNING /SO Infra /D "[%MYSELF_NAME%]invalid numbers of arguments" /ID 99
