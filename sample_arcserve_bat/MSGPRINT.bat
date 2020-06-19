@@ -2,22 +2,27 @@
 
 rem ========================================================
 rem message output bat script
-rem バッチを実行しているコンピュータのWindows Event Logを出力
-rem 変数MYSELF_NAMEは呼び出し元で実行バッチ名を取得して、実行バッチ名を入力しておく
-rem call MSGPRINT [出力するメッセージ] [INFORMATION|WARNING|ERROR] [ID 1-1000までの範囲]
-rem IDの目安
+rem Write Windows Event Log
+rem Before calling MSGPRINT.bat,set variable MYSELF_NAME 
+rem with the script's name which is calling MSGPRINT.bat
+rem
+rem Usage
+rem call MSGPRINT [message to output] [INFORMATION|WARNING|ERROR] [ID 1-1000]
+rem sample ID number
 rem INFORMATION	1
 rem WARNING 10
 rem ERROR 100
 rem ========================================================
 
-rem 引数確認
+rem checking the number of the arguments
 set argc=0
 
 for %%a in ( %* ) do set /a argc=argc+1
 
+
+rem validate the number of the arguments
+
 if not %argc% == 3 (
-rem 引数個数違い
 	eventcreate /L Application /T WARNING /SO Infra /D "[%MYSELF_NAME%]invalid numbers of arguments" /ID 99
   	exit /b 1
 	)
