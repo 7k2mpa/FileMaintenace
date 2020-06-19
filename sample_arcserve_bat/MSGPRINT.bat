@@ -1,7 +1,7 @@
 @echo off
 
 rem ========================================================
-rem This scprit writes Windows Event Log
+rem This scprit writes Windows Event Log.
 rem Before calling MSGPRINT.bat, set variable MYSELF_NAME 
 rem with the script's name which calls MSGPRINT.bat
 rem
