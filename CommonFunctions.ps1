@@ -219,7 +219,7 @@ If might not be able to output event log in sepcified event source, thus force t
         }
         Catch [Exception] {
         Write-Log -EventId $ErrorEventID -Type Error -Message ("Failed to regist new source event because no source $($ProviderName) exists in event log, " +
-            "must have administrator privilage for registing a new source. Start PowerShell with administrator privilage and start the script.")
+            "must have administrator privilage for registring a new source. Start PowerShell with administrator privilage and run the script again.")
         Write-Log -EventId $ErrorEventID -Type Error -Message "Execution Error Message : $Error[0]"
         Exit $ErrorReturnCode
         }
