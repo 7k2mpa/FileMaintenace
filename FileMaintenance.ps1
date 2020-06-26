@@ -1575,7 +1575,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
             Invoke-Action -Type Rename -ActionFrom $Target.Object.FullName -ActionTo $newFilePath -ActionError $Target.Object.FullName
     
             } else {
-            Write-Log -ID $InfoEventID -Type Information -Message  ("A file [$($newFilePath)] already exists same as attempting rename, " +
+            Write-Log -ID $InfoEventID -Type Information -Message  ("A file [$($newFilePath)] already exists as attempting rename, " +
                 "thus do not rename [$($Target.Object.FullName)]")
             }
         }
