@@ -786,7 +786,7 @@ Write-Verbose  "Source      LastWriteTime[$($Target.Object.LastWriteTime)] Size[
     #Case 3,4,6
     Write-Log -ID $ErrorEventID -Type Error -Message "Same name object exists already, thus forces to terminate $($ShellName)"
             
-    IF ((-not($ForceEndLoop)) -and (-not($MYINVOCATION.ExpectingInput))) {
+    IF ((-not($ForceEndLoop)) -and (-not($MYINVOCATION.ExpectingInput))) {  ;# $MYInvocation.ExpectingInput = $TRUE means, script run in the pipeline
 
         Finalize $ErrorReturnCode
 
@@ -1488,7 +1488,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
         IF ( ($PostAction -eq 'none') -and ($PreAction -contains 'none') ) {
 
             Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Action [$($Action)] option, " +
-                "thus do not process $($Target.Object.FullName)")
+                "thus do not process [$($Target.Object.FullName)]")
             }
         }
 
@@ -1547,7 +1547,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
             }
         }
 
-    #case7 $Action dose not match case, it must be internal error
+    #case7 $Action dose not match up to the cases, it must be internal error
     Default {
         Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal Error at Switch Action section. A bug in regex may cause it."
         $returnCode = $InternalErrorReturnCode
@@ -1586,7 +1586,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
         }
 
 
-    #case4 $Action dose not match case, it must be internal error
+    #case4 $Action dose not match up to the cases, it must be internal error
     Default {
         Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal error at Switch PostAction section. A bug in regex may cause it."
         $returnCode = $InternalErrorReturnCode
