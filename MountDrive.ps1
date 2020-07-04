@@ -297,10 +297,10 @@ Param(
 ################# CommonFunctions.ps1 Load  #######################
 # If you want to place CommonFunctions.ps1 in differnt path, modify
 
-Try{
+Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
-Catch [Exception]{
+Catch [Exception] {
     Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
@@ -391,12 +391,10 @@ $psDrive = $MountDrive.Replace(":","")
 
 
 Try {
-
     New-PSDrive -Persist -Name $psDrive -PSProvider FileSystem -Root $TargetPath -Scope Global -ErrorAction Stop > $NULL
     }
 
-    catch [Exception]
-    {
+    catch [Exception] {
     $errorDetail = $ERROR[0] | Out-String
     Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Execution Error Message : $errorDetail"
     Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to mount drive $($MountDrive)"

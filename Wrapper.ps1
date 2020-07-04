@@ -14,7 +14,7 @@ You can process log files or temp files in multiple folders with FileMaintenance
 This script loads a configuration file including arguments, execute the other script with the arguments in every lines.
 The arguments in the configuration file are read in order.
 A line starting with # in the configuration file, it is proccessed as a comment.
-An empty line in the configuration file, it is sikkiped.
+An empty line in the configuration file, it is skipped.
 
 Output log to [Windows Event Log] or [Console] or [Text Log] and specify to suppress or to output individually. 
 
