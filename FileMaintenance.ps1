@@ -887,7 +887,7 @@ $parameter = @{
 <#
 some $Action process Object in order, thus sort the objects
 KeepFilesCount: by last write date
-DeleteEmptyFolders: by depth of the file path hierarchy with counting separator in the path for deleteing deepest folder at first
+DeleteEmptyFolders: by depth of the file path hierarchy with counting separator in the path for deleteing the deepest folder at first
 #>
     Switch -Regex ($Action) {
  
