@@ -13,7 +13,7 @@ You can process files in multiple folders with Wrapper.ps1
 
 .DESCRIPTION
 
-This script finds files and folders that match multiple criteria.
+This script finds files and folders that match up to multiple criteria.
 And processes the files and folders found with multiple methods with PreAction, Action and PostAction.
 
 Methods are
@@ -42,7 +42,7 @@ If you run the scripts on Windows Server 2008 or 2008R2, must install latest WMF
 
 This script can use cmdlet Compress-Archive for '-PreAction compress or archive option'. 
 
-But cmdlet Compress-Archive can not handle wild card characters bracket[] for destination path corectly, you should install 7-Zip. This script can use 7-Zip for compress or archive also.
+But cmdlet Compress-Archive can not handle wild card characters bracket[] for destination path correctly, you should install 7-Zip. This script can use 7-Zip for compress or archive also.
 
 If you want to specify '-PreAction compress or archive' option in FileMaintenance.ps1 without installing 7-Zip, install WMF 5.0 or later, and place '#Requires -Version 5.0' instead of '#Requires -Version 3.0'
 
@@ -118,7 +118,7 @@ FileMaintenace.ps1 -TargetFolder C:\OLD\Log -RegularExpression '^.*\.log$' -Acti
 Find files ending with '.log' recuresively.
 -ParentRegularExpresssion option is specified with regular expression, thus path's backslash\ is escaped with backslash\
 Delete them with '\OLD\' in the rest of the path characters next to the -TargetFolder(C:\OLD\Log)'s strings.
-At the sample blow, 'C:\OLD\Los' is not matched for -ParentRegularExpression.
+At the sample blow, 'C:\OLD\Los' dose not match up to -ParentRegularExpression.
 Thus 'C:\OLD\Log\IIS\Current\Infra.log' , 'C:\OLD\Log\Java\Current\Infra.log' and 'C:\OLD\Log\Infra.log' are not deleted.
 
 C:\OLD\Log\IIS\Current\Infra.log
@@ -214,7 +214,7 @@ e.g. [-Size 10MB] is equal to [-Size 10*1024^6]
 
 .PARAMETER RegularExpression
 
-Specify regular expression to match processing files.
+Specify regular expression to match up to processing files.
 ['.*'] is default, and process all files.
 Argument must be quoted with sigle quote'
 In PowerShell specification, capital and small letter are equal value but, are not (some version?)
@@ -222,7 +222,7 @@ In PowerShell specification, capital and small letter are equal value but, are n
 
 .PARAMETER ParentRegularExpression
 
-Specify regular expression to match processing path of the files excluding -TargetFolder.
+Specify regular expression to match up to processing path of the files excluding -TargetFolder.
 ['.*'] is default, and process all files.
 Argument must be quoted with sigle quote'
 In PowerShell specification, capital and small letter are equal value but, are not (some version?)
@@ -815,11 +815,11 @@ filter ComplexFilter {
 
 .DESCRIPTION
 last write date is older than $Days
-(file|folder) name match $RegularExpression
+(file|folder) name match up to $RegularExpression
 file size is over than $Size
 C:\TargetFolder                    :TargetFolder
 C:\TargetFolder\A\B\C\target.txt   :TargetObject
-part of \A\B\C\ match $ParentRegularExpression
+part of \A\B\C\ match up to $ParentRegularExpression
 
 .INPUT
 PSobject
@@ -1189,13 +1189,13 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
     IF ($Action -eq "DeleteEmptyFolders") {
 
         Write-Log -ID $InfoEventID -Type Information -Message ("Find and Delete empty folders in target folder [$($TargetFolder)], " + 
-            "older than [$($Days)]days, match to regular expression [$($RegularExpression)], recursively[$($Recurse)]")
+            "older than [$($Days)]days, match up to regular expression [$($RegularExpression)], recursively[$($Recurse)]")
         
         } else {
 
         Write-Log -ID $InfoEventID -Type Information -Message ("Find files in the folder [$($TargetFolder)], older than [$($Days)]days, " + 
-            "match to regular expression [$($RegularExpression)], " +
-            "parent path match to regular expression [$($ParentRegularExpression)], " +
+            "match up to regular expression [$($RegularExpression)], " +
+            "parent path match up to regular expression [$($ParentRegularExpression)], " +
             "size is over["+($Size / 1KB)+"]KB")
 
 #PreAction
