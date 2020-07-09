@@ -306,38 +306,6 @@ Specify how many newer files in the folder to keep with -Action KeepFileCount op
 [1] is default.
 
 
-.PARAMETER Compress
-Planed to obsolute.
-use -PreAction Compress
-
-このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction Compressを使用してください。
-対象ファイルを圧縮して別ファイルとして保存します。
-
-.PARAMETER AddTimeStamp
-Planed to obsolute.
-use -PreAction AddTimeStamp
-
-
-このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction AddTimeStampを使用してください。
-対象ファイル名に日時を付加して別ファイルとして保存します。
-
-.PARAMETER MoveNewFile
-Planed to obsolute.
-use -PreAction MoveNewFile
-
-このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction MoveNewFileを使用してください。
--PreAction Compress , AddTimeStampを指定した際に生成される別ファイルを-MoveToFolderの指定先に保存します。
-デフォルトは対象ファイルと同一ディレクトリへ保存します。
-
-.PARAMETER NullOriginalFile
-Planed to obsolute.
-use -PostAction NullClear or -Action NullClear
-
-このパラメータは廃止予定です。後方互換性のために残していますが、-PostAction NullClearまたは-Action NullClearを使用してください。
-対象ファイルの内容消去（ヌルクリア）します。
--PostAction NullClearと等価です。
-
-
 
 .PARAMETER Log2EventLog
 
@@ -831,11 +799,12 @@ PSobject passed the filter
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
     IF ($_.Name -match $RegularExpression) {
     IF ($_.Length -ge $Size) {
-    IF (($_.FullName).Substring($TargetFolder.Length , (Split-Path -Path $_.FullName -Parent).Length - $TargetFolder.Length +1) -match $ParentRegularExpression)
-        {$_}
+    IF (($_.FullName).Substring($TargetFolder.Length, ($_.FullName | Split-Path -Parent).Length - $TargetFolder.Length +1) -match $ParentRegularExpression)
+        {Write-Output $_}
     }
     } 
-    }                                                                              
+    }
+                                                                          
 }
 
  
@@ -889,20 +858,16 @@ some $Action process Object in order, thus sort the objects
 KeepFilesCount: by last write date
 DeleteEmptyFolders: by depth of the file path hierarchy with counting separator in the path for deleteing the deepest folder at first
 #>
-    Switch -Regex ($Action) {
+
+Write-Output $(Switch -Regex ($Action) {
  
-        '^KeepFilesCount$' {
-            Write-Output $objects | Sort-Object -Property Time
-            }
+                    '^KeepFilesCount$'     {$objects | Sort-Object -Property Time}
 
-        '^DeleteEmptyFolders$' {
-            Write-Output $objects | Sort-Object -Property Depth -Descending  
-            }
+                    '^DeleteEmptyFolders$' {$objects | Sort-Object -Property Depth -Descending}
 
-        Default{
-            Write-Output $objects
-            }
-    }
+                    Default                {$objects}
+                
+             })
 }
 end {
 }
@@ -1058,13 +1023,6 @@ IF ($NoRecurse)        {[Boolean]$Script:Recurse = $FALSE}
 IF ($ContinueAsNormal) {[Switch]$Script:Continue = $TRUE}
 IF ($OverRideAsNormal) {[Switch]$Script:OverRide = $TRUE}
 IF ($OverRideForce)    {[Switch]$Script:OverRide = $TRUE}
-
-#For Backward Compatibility
-
-IF ($NullOriginalFile) {[String]$Script:PostAction = 'NullClear'}
-IF ($AddTimeStamp) {$Script:PreAction +='AddTimeStamp'}
-IF ($MoveNewFile)  {$Script:PreAction +='MoveNewFile'}
-IF ($Compress)     {$Script:PreAction +='Compress'}
 
 
 #Start validating parameters
@@ -1300,6 +1258,7 @@ Param(
 [Boolean]$NormalFlag    = $FALSE
 [Boolean]$OverRideFlag  = $FALSE
 [Boolean]$ContinueFlag  = $FALSE
+[Boolean]$WhatIfFlag    = ($NULL -ne $PSBoundParameters['WhatIf'])
 
 [Int]$ErrorCount    = 0
 [Int]$WarningCount  = 0
@@ -1309,9 +1268,8 @@ Param(
 [Int]$InLoopDeletedFilesCount = 0
 
 [String]$DatumPath = $PSScriptRoot
-[Boolean]$WhatIfFlag = ($NULL -ne $PSBoundParameters['WhatIf'])
 
-$Version = "2.1.1"
+[String]$Version = "3.0.0-alpha.1"
 
 [Boolean]$ForceEndloop  = $FALSE          ;#$FALSE for Finalize , $TRUE for Break in the loop
 
@@ -1344,22 +1302,19 @@ $targets = $TargetFolder | Get-Object -FilterType $filterType
 
             Write-Log -ID $WarningEventID -Type Warning -Message ("Specified -NoneTargetAsWarning option, " +
                 "thus terminiate $($ShellName) with a Warning.")
-            $returnCode = $WarningReturnCode            
-            Break main           
-
-            } else {
-            Break main
+            $returnCode = $WarningReturnCode                     
             }
+
+        Break main
     }
 
-Write-Log -ID $InfoEventID -Type Information -Message "[$(@($targets).Length)] [$($filterType)(s)] exist for processing."
+Write-Log -ID $InfoEventID -Type Information -Message "[$(($targets | Measure-Object).Count)] [$($filterType)(s)] exist for processing."
 
-Write-Debug   "[$(@($targets).Length)][$($filterType)(s)] are for processing..."
+Write-Debug   "[$(($targets | Measure-Object).Count)][$($filterType)(s)] are for processing..."
 
 Write-Debug   ("`r`n" + ($targets.Object.fullname | Out-String))
 
-Write-Verbose ("[$(@($targets).Length)][$($filterType)(s)] are for processing..." + "`r`n" + ($targets.Object.fullname | Out-String))
-
+Write-Verbose ("[$(($targets | Measure-Object).Count)][$($filterType)(s)] are for processing..." + "`r`n" + ($targets.Object.fullname | Out-String))
 
 #-PreAction Archive processes files to archive to one file, thus before loop create a destination path of the archive file
 
