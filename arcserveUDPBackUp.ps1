@@ -10,7 +10,7 @@ CommonFunctions.ps1 is required.
 
 .DESCRIPTION
 
-This script start arcserve UDP backup job with arcserve UDP CLI.
+This script starts arcserve UDP backup job with arcserve UDP CLI.
 CommonFunctions.ps1 is required.
 Can specify full or incremental backup.
 Can specify authorization style plain password or password file.
@@ -452,10 +452,10 @@ Param(
 ################# CommonFunctions.ps1 Load  #######################
 # If you want to place CommonFunctions.ps1 in differnt path, modify
 
-Try{
+Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
-Catch [Exception]{
+Catch [Exception] {
     Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
