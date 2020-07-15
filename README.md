@@ -3,11 +3,13 @@
 A set of useful utility scripts written in Powershell for Microsoft Windows Platform.
 
  - [File Maintenance](#filemaintenanceps1)
- - [Windows Service Control](#changeservicestatusps1--stopserviceps1--startserviceps1obsolute)
+ - [Windows Service Control](#changeservicestatusps1)
  - [Internet Information Server Control](#changeiisstateps1)
  - [UNC Path Mount](#mountdriveps1--unmountdriveps1)
  - [Oracle Database](#oracledb2backupmodeps1--oracledb2normalmodeps1--oraclearchivelogdeleteps1--oracleexportps1)
  - [arcserveUDP](#arcserveudpbackupps1)
+ - [Check Flag](#checkflagps1)
+ - [N2WSbackup](#n2wsbackupps1)
 
 ## Functions Detail
 
@@ -19,7 +21,7 @@ You can select files and folders with various creiteria including file size , nu
 At once manage only one folder. With Wrapper.ps1 you can manage multiple folders.
 
 
-### ChangeServiceStatus.ps1 / (StopService.ps1 / StartService.ps1)...obsolute
+### ChangeServiceStatus.ps1
 
 Start and stop Windows service.
 If you need script files StopService.ps1 and StartService.ps1 , change comment line at the parameter section.
@@ -49,6 +51,11 @@ Execute backup software [arcserveUDP](https://www.arcserve.com/data-protection-s
 ### CheckFlag.ps1
 
 Check a Flag File and if the flag file exist(or dose not exist) , delete the flag file(or make a flag file)
+
+### N2WSbackup.ps1
+
+Start backup job and get backup result of [N2WS](https://n2ws.com/) backup appliance for AWS.
+
 
 ### Wrapper.ps1
 
