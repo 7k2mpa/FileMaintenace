@@ -1,6 +1,6 @@
 ## Summary
 
-A set of useful utility scripts written in Powershell for Microsoft Windows Platform.
+A set of useful utility scripts written in PowerShell for Microsoft Windows Platform.
 
  - [File Maintenance](#filemaintenanceps1)
  - [Windows Service Control](#changeservicestatusps1)
