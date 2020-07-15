@@ -57,13 +57,6 @@ Specify Oracle_SID.
 Should set [$Env:ORACLE_SID] by default.
 
 
-.PARAMETER OracleService
-This parameter is planed to obsolute.
-
-RMAN Logを削除する対象のOracleSIDを指定します。
-このパラメータは廃止予定です。
-
-
 .PARAMETER OracleHomeBinPath
 
 Specify Oracle 'BIN' path in the child path Oracle home. 
@@ -76,18 +69,12 @@ Specify path of SQL log file.
 If the file dose not exist, create a new file.
 Can specify relative or absolute path format.
 
+
 .PARAMETER SQLCommandsPath
 
 Specify path of SQLs.ps1.
 Specification is required.
 Can specify relative or absolute path format.
-
-
-.PARAMETER BackUpFlagPath
-planed to be obsolute
-バックアップ中を示すフラグファイルのパスを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
 
 
 .PARAMETER PasswordAuthorization
@@ -347,11 +334,6 @@ Param(
 [Switch]$PasswordAuthorization ,
 
 
-#Planed to obsolute
-[Switch]$NoCheckBackUpFlag = $TRUE ,
-[String]$BackUpFlagPath = '.\Lock\BkUpDB.flg',
-#Planed to obsolute
-
 
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
@@ -397,10 +379,10 @@ Param(
 ################# CommonFunctions.ps1 Load  #######################
 # If you want to place CommonFunctions.ps1 in differnt path, modify
 
-Try{
+Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
-Catch [Exception]{
+Catch [Exception] {
     Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
@@ -518,7 +500,7 @@ Pop-Location
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.1.1"
+$Version = "3.0.0-alpha.1"
 
 
 #initialize, validate parameters, output starting message
@@ -527,21 +509,6 @@ $Version = "2.1.1"
 
 
 Push-Location $OracleHomeBinPath
-
- 
-#planed to be obsolute バックアップ実行中かを確認
-
-    IF ($NoCheckBackUpFlag) {
-
-        Write-Log -EventID $InfoEventID -Type Information -Message "Specified -NoCheckBackUpFlag option, thus skip to check status with backup flag."
-        
-        
-        } elseIF (Test-PathEx -Type Leaf -Path $BackUpFlagPath -Name 'Backup Flag') {
-
-            Write-Log -EventID $ErrorEventID -Type Error -Message "Running Back Up now. Can not start duplicate execution."
-            Finalize $ErrorReturnCode
-            }
-#planed to be obsolute バックアップ実行中かを確認
     
 
 #Export DB session information
@@ -642,7 +609,7 @@ Push-Location $OracleHomeBinPath
 
     [String]$listenerStatus = $returnMessage
 
-    Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
+    Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
 
 
     Switch -Regex ($listenerStatus) { 
