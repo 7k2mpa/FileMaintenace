@@ -9,7 +9,7 @@ A set of useful utility scripts written in PowerShell for Microsoft Windows Plat
  - [Oracle Database](#oracledb2backupmodeps1--oracledb2normalmodeps1--oraclearchivelogdeleteps1--oracleexportps1)
  - [arcserveUDP](#arcserveudpbackupps1)
  - [Check Flag](#checkflagps1)
- - [N2WSbackup](#n2wsbackupps1)
+ - [N2WS Backup](#n2wsbackupps1)
 
 ## Functions Detail
 
