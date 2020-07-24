@@ -452,10 +452,10 @@ Param(
 ################# CommonFunctions.ps1 Load  #######################
 # If you want to place CommonFunctions.ps1 in differnt path, modify
 
-Try{
+Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
-Catch [Exception]{
+Catch [Exception] {
     Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
@@ -581,7 +581,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.1.1"
+$Version = "3.0.0-alpha"
  
  
 #initialize, validate parameters, output starting message
@@ -596,7 +596,7 @@ $Version = "2.1.1"
 
 #Create Invoke Command Strings
 
-    $command = '.\"' + (Split-Path $UDPCLIPath -Leaf ) + '"' 
+    $command = '.\"' + ($UDPCLIPath | Split-Path -Leaf) + '"' 
 
     $command += " -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
 
@@ -627,8 +627,8 @@ $Version = "2.1.1"
     
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Authorization type is [$($AuthorizationType)] Authorize with user name executing and the password file specified."
 
-        $extension                = [System.IO.Path]::GetExtension((Split-Path -Path $ExecUserPasswordFilePath -Leaf))
-        $fileNameWithOutExtention = [System.IO.Path]::GetFileNameWithoutExtension((Split-Path -Path $ExecUserPasswordFilePath -Leaf))
+        $extension                = [System.IO.Path]::GetExtension(($ExecUserPasswordFilePath | Split-Path -Leaf))
+        $fileNameWithOutExtention = [System.IO.Path]::GetFileNameWithoutExtension(($ExecUserPasswordFilePath | Split-Path -Leaf))
 
         $ExecUserPasswordFileName = $fileNameWithOutExtention + "_" + $doUser + $extension
 
@@ -662,8 +662,8 @@ $Version = "2.1.1"
 
 #BackUp Flag Check and Create
 
-     $extension                = [System.IO.Path]::GetExtension((Split-Path -Path $BackupFlagFilePath -Leaf))
-     $fileNameWithOutExtention = [System.IO.Path]::GetFileNameWithoutExtension((Split-Path -Path $BackupFlagFilePath -Leaf))
+     $extension                = [System.IO.Path]::GetExtension(($BackupFlagFilePath | Split-Path -Leaf))
+     $fileNameWithOutExtention = [System.IO.Path]::GetFileNameWithoutExtension(($BackupFlagFilePath | Split-Path -Leaf))
 
      $BackupFlagFileName = $fileNameWithOutExtention + "_" + $Plan + "_" + $Server + $extension
         
@@ -683,13 +683,13 @@ $Version = "2.1.1"
 
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execute arcserveUDP CLI [$($UDPCLIPath)]"
 
-    Push-Location (Split-Path $UDPCLIPath -Parent)
+    Push-Location ($UDPCLIPath | Split-Path -Parent)
 
     Try {
         $return = Invoke-Expression $command 2>$errorMessage -ErrorAction Stop 
         }
 
-        catch [Exception]{
+        catch [Exception] {
 
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute arcserveUDP CLI [$($UDPCLIPath)]"
             $errorDetail = $ERROR[0] | Out-String
