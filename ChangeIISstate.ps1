@@ -232,7 +232,7 @@ Specify the users who are allowed to execute the script in regular expression.
 Parameter must be quoted with single quote'
 Escape the back slash in the separeter of a domain name.
 example [domain\\.*]
-Å@
+
 
 
 .NOTES
@@ -319,10 +319,10 @@ Param(
 ################# CommonFunctions.ps1 Load  #######################
 # If you want to place CommonFunctions.ps1 in differnt path, modify
 
-Try{
+Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
-Catch [Exception]{
+Catch [Exception] {
     Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
