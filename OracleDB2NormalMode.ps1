@@ -54,13 +54,6 @@ Specify Oracle_SID.
 Should set [$Env:ORACLE_SID] by default.
 
 
-.PARAMETER OracleService
-This parameter is planed to obsolute.
-
-RMAN Log‚ðíœ‚·‚é‘ÎÛ‚ÌOracleSID‚ðŽw’è‚µ‚Ü‚·B
-‚±‚Ìƒpƒ‰ƒ[ƒ^‚Í”pŽ~—\’è‚Å‚·B
-
-
 .PARAMETER OracleHomeBinPath
 
 Specify Oracle 'BIN' path in the child path Oracle home. 
@@ -397,10 +390,10 @@ Param(
 ################# CommonFunctions.ps1 Load  #######################
 # If you want to place CommonFunctions.ps1 in differnt path, modify
 
-Try{
+Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
-Catch [Exception]{
+Catch [Exception] {
     Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
@@ -524,7 +517,7 @@ Pop-Location
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.1.1"
+$Version = "3.0.0-alpha.1"
 
 
 #initialize, validate parameters, output starting message
@@ -565,7 +558,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
     IF ($needToStartListener) {
     
-        $returnMessage = LSNRCTL.exe START
+        $returnMessage = LSNRCTL.exe START 2>&1 
 
         Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
     
@@ -612,7 +605,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
     $invokeResult = Invoke-SQL -SQLCommand $DBStatus -SQLName 'DB Status Check' -SQLLogPath $SQLLogPath
 
-    IF (($invokeResult.Status) -OR ($invokeResult.log -match 'ORA-01034')) {
+    IF (($invokeResult.Status) -or ($invokeResult.log -match 'ORA-01034')) {
 
             Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to check Oracle Database Status."
                 
