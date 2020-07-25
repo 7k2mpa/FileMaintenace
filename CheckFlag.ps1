@@ -293,10 +293,6 @@ Param(
 [String][parameter(position = 2)][ValidateSet("Exist","NoExist")]$Status = 'NoExist' ,
 [String][parameter(position = 3)][ValidateSet("Create","Delete")]$PostAction ,
 
-#Planned to obsolute
-[Switch]$CreateFlag ,
-#Planned to obsolute
-
 
 [Boolean]$Log2EventLog = $TRUE ,
 [Switch]$NoLog2EventLog ,
@@ -340,10 +336,10 @@ Param(
 ################# CommonFunctions.ps1 Load  #######################
 # If you want to place CommonFunctions.ps1 in differnt path, modify
 
-Try{
+Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
     }
-Catch [Exception]{
+Catch [Exception] {
     Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
     }
@@ -369,14 +365,6 @@ Output Script Starting messages
 
 
 #If passed PreInitilization, validate only business logics.
-
-
-#For Backward compatibility
-
-    IF ($CreateFlag) {
-            $PostAction = 'Create'
-            } 
-
 
 #Validate parameters
 
@@ -429,7 +417,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.1.1"
+$Version = "3.0.0-alpha1"
 
 
 #initialize, validate parameters, output starting message
