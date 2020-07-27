@@ -622,7 +622,12 @@ Param(
 # If you want to place CommonFunctions.ps1 in differnt path, modify
 
 Try {
-    ."$PSScriptRoot\CommonFunctions.ps1"
+    ."$PSScriptRoot\CommonFunctions.ps1 $CommonConfigPath"
+
+    IF ($LASTEXITCODE -eq 99) {
+        Exit 1
+    }
+
     }
 Catch [Exception] {
     Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."

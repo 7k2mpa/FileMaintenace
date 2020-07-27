@@ -68,41 +68,10 @@ https://github.com/7k2mpa/FileMaintenace
 
 [CmdletBinding()]
 Param(
+[String]$CommonConfigPath = $NULL
 )
-$Script:CommonFunctionsVersion = "2.1.1"
-Write-Verbose "CommonFunctions.ps1 Version $CommonFunctionsVersion"
 
-#[boolean]$Log2EventLog = $TRUE ,
-#[Switch]$NoLog2EventLog ,
-#[String]$ProviderName = "Infra" ,
-#[String][ValidateSet("Application")]$EventLogLogName = 'Application' ,
-
-#[boolean]$Log2Console = $TRUE ,
-#[Switch]$NoLog2Console ,
-#[boolean]$Log2File = $FALSE ,
-#[Switch]$NoLog2File ,
-#[String][ValidatePattern('^(\.+\\|[C-Z]:\\).*')]$LogPath ,
-#[String]$LogDateFormat = "yyyy-MM-dd-HH:mm:ss" ,
-#[String][ValidateSet("Default", "UTF8" , "UTF7" , "UTF32" , "Unicode")]$LogFileEncode = 'Default' , #DefaultŽw’è‚ÍShift-Jis
-
-#[int][ValidateRange(0,2147483647)]$NormalReturnCode        =  0 ,
-#[int][ValidateRange(0,2147483647)]$WarningReturnCode       =  1 ,
-#[int][ValidateRange(0,2147483647)]$ErrorReturnCode         =  8 ,
-#[int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16 ,
-
-#[int][ValidateRange(1,65535)]$InfoEventID          =   1 ,
-#[int][ValidateRange(1,65535)]$StartEventID         =   8 ,
-#[int][ValidateRange(1,65535)]$EndEventID           =   9 ,
-#[int][ValidateRange(1,65535)]$WarningEventID       =  10 ,
-#[int][ValidateRange(1,65535)]$SuccessEventID       =  73 ,
-#[int][ValidateRange(1,65535)]$InternalErrorEventID =  99 ,
-#[int][ValidateRange(1,65535)]$ErrorEventID         = 100 ,
-
-#[Switch]$ErrorAsWarning ,
-#[Switch]$WarningAsNormal ,
-
-#[Regex]$ExecutableUser ='.*'
-
+#[String]$CommonConfigPath = '.\CommonConfig.ps1' ;#MUST specify with relative path format
 
 
 function Write-Log {
@@ -1360,4 +1329,35 @@ end {
 
 #ValidHostnameRegex = "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$";
 
+}
+
+
+
+##### Main ####
+
+$Script:CommonFunctionsVersion = "3.0.0-alpha.1"
+
+Write-Verbose "CommonFunctions.ps1 Version $CommonFunctionsVersion"
+
+IF ([string]::IsNullOrEmpty($CommonConfigPath)) {
+
+    Write-Verbose '$CommonConfigPath is $NULL or empty, thus use arguments in Param section of every PowerShell script.'
+
+    } else {
+
+    $path = "$PSscriptRoot" + '\' + $CommonConfigPath
+
+    Write-Verbose ('$CommonConfigPath is not $NULL or empty, thus override arguments in Param section of every PowerShell script with [' + $path + '].')
+
+    Try {
+    
+        . "$path"
+        Write-Verbose "Success to load CommonConfig file."
+    }
+    Catch [Exception] {
+    
+        Write-Output "Fail to load CommonConfig. Please verify the path of CommonConfig that you specified. Terminate."
+        exit 99
+    }
+    
 }
