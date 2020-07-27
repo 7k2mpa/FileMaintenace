@@ -537,7 +537,7 @@ Write-Verbose $return
         IF ($NULL -eq $return.Status) {
 
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to get backup status."
-            $status = $FLASE
+            $status = $FALSE
             break
             }
 
@@ -596,7 +596,7 @@ $BackUpLogPath = $BackUpLogPath |
         Finalize $ErrorReturnCode
 
         } else {
-        Write-Log -EventID $InfoEventID -EventType Information -EventMessage ("Python exists and the path is [" + ((Get-Command Python.exe).Path) +"]")
+        Write-Log -EventID $InfoEventID -EventType Information -EventMessage ("Python.exe exists and the path is [" + ((Get-Command Python.exe).Path) +"]")
         }
 
     IF ((Test-N2WS -PolicyName $PolicyName).Status -eq "In Progress") {

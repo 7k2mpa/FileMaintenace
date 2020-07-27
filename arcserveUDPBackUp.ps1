@@ -581,7 +581,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.1.1"
+$Version = "3.0.0-alpha"
  
  
 #initialize, validate parameters, output starting message
@@ -596,7 +596,7 @@ $Version = "2.1.1"
 
 #Create Invoke Command Strings
 
-    $command = '.\"' + (Split-Path $UDPCLIPath -Leaf ) + '"' 
+    $command = '.\"' + ($UDPCLIPath | Split-Path -Leaf) + '"' 
 
     $command += " -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
 
@@ -683,7 +683,7 @@ $Version = "2.1.1"
 
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execute arcserveUDP CLI [$($UDPCLIPath)]"
 
-    Push-Location (Split-Path $UDPCLIPath -Parent)
+    Push-Location ($UDPCLIPath | Split-Path -Parent)
 
     Try {
         $return = Invoke-Expression $command 2>$errorMessage -ErrorAction Stop 
