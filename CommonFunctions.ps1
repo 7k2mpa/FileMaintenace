@@ -68,10 +68,7 @@ https://github.com/7k2mpa/FileMaintenace
 
 [CmdletBinding()]
 Param(
-[String]$CommonConfigPath = $NULL
 )
-
-#[String]$CommonConfigPath = '.\CommonConfig.ps1' ;#MUST specify with relative path format
 
 
 function Write-Log {
@@ -1356,7 +1353,7 @@ IF ([string]::IsNullOrEmpty($CommonConfigPath)) {
     }
     Catch [Exception] {
     
-        Write-Output "Fail to load CommonConfig. Please verify the path of CommonConfig that you specified. Terminate."
+        Write-Error "Fail to load CommonConfig. Please verify CommonConfigPath that you specified. Terminate."
         exit 99
     }
     
