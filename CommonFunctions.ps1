@@ -1342,9 +1342,9 @@ IF ([string]::IsNullOrEmpty($CommonConfigPath)) {
 
     } else {
 
-    $path = "$PSscriptRoot" + '\' + $CommonConfigPath
+    $path = [System.IO.Path]::GetFullPath("$PSscriptRoot" + '\' + $CommonConfigPath)
 
-    Write-Verbose ('$CommonConfigPath is not $NULL or empty, thus override arguments in Param section of every PowerShell script with [' + $path + '].')
+    Write-Verbose ('$CommonConfigPath is not $NULL or empty, thus override arguments in Param section of every PowerShell script with [' + $path + ']')
 
     Try {
     
@@ -1355,6 +1355,7 @@ IF ([string]::IsNullOrEmpty($CommonConfigPath)) {
     
         Write-Error "Fail to load CommonConfig. Please verify CommonConfigPath that you specified. Terminate."
         exit 99
-    }
-    
+    }   
 }
+
+exit 0

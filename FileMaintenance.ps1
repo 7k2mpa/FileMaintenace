@@ -571,13 +571,6 @@ Param(
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss' ,
 
 
-#Switches planned to be obsolute please use -PreAction start
-[Switch]$Compress,
-[Switch]$AddTimeStamp,
-[Switch]$MoveNewFile,
-[Switch]$NullOriginalFile,
-#Switches planned to be obsolute please use -PreAction end
-
 
 #[String][ValidatePattern('^(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommonConfigPath = '.\CommonConfig.ps1' , #MUST specify with relative path format
 [String][ValidatePattern('^(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommonConfigPath = $NULL ,
@@ -633,7 +626,6 @@ Try {
     IF ($LASTEXITCODE -eq 99) {
         Exit 1
     }
-
 }
 Catch [Exception] {
     Write-Error "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."

@@ -286,6 +286,11 @@ Param(
 [int][Parameter(position = 5)][ValidateRange(1,120)]$MaxRetry      = 90 ,
 
 
+
+#[String][ValidatePattern('^(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommonConfigPath = '.\CommonConfig.ps1' , #MUST specify with relative path format
+[String][ValidatePattern('^(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommonConfigPath = $NULL ,
+
+
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
 [String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra',
@@ -329,13 +334,17 @@ Param(
 ################# CommonFunctions.ps1 Load  #######################
 # If you want to place CommonFunctions.ps1 in differnt path, modify
 
-Try{
+Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
+
+    IF ($LASTEXITCODE -eq 99) {
+        Exit 1
     }
-Catch [Exception]{
-    Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
+}
+Catch [Exception] {
+    Write-Error "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
-    }
+}
 
 #!!! end of definition !!!
 
