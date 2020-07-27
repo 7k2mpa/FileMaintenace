@@ -65,13 +65,6 @@ Specify Oracle_SID for deleting RMAN log.
 Should set [$Env:ORACLE_SID] by default.
 
 
-.PARAMETER OracleService
-This parameter is planed to obsolute.
-
-RMAN Logを削除する対象のOracleSIDを指定します。
-このパラメータは廃止予定です。
-
-
 .PARAMETER OracleHomeBinPath
 
 Specify Oracle 'BIN' path in the child path Oracle home. 
