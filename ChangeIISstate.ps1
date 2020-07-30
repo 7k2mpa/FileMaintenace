@@ -277,8 +277,8 @@ Param(
 
 
 
-#[String][ValidatePattern('^(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommonConfigPath = '.\CommonConfig.ps1' , #MUST specify with relative path format
-[String][ValidatePattern('^(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommonConfigPath = $NULL ,
+#[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = '.\CommonConfig.ps1' , #MUST specify with relative path format
+[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = $NULL ,
 
 
 [Boolean]$Log2EventLog = $TRUE ,

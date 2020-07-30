@@ -572,8 +572,8 @@ Param(
 
 
 
-#[String][ValidatePattern('^(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommonConfigPath = '.\CommonConfig.ps1' , #MUST specify with relative path format
-[String][ValidatePattern('^(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')]$CommonConfigPath = $NULL ,
+#[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = '.\CommonConfig.ps1' , #MUST specify with relative path format
+[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = $NULL ,
 
 
 [Boolean]$Log2EventLog = $TRUE ,
@@ -1209,11 +1209,11 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
 
     IF ($ContinueAsNormal) {
         Write-Log -ID $InfoEventID -Type Information -Message ("Specified -ContinueAsNormal[$($ContinueAsNormal)] option, " +
-            "thus if file exist in the same name already, will process next file with a NORMAL logging without termination.")
+            "thus if file exist in the same name already, will process next file with logging a NORMAL event without termination.")
         
         } elseIF ($Continue) {
             Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Continue[$($Continue)] option, " +
-                "thus if a file exist in the same name already, will process next file with a WARNING logging and without termination.")
+                "thus if a file exist in the same name already, will process next file with logging a WARNING event without termination.")
             }
 
 }

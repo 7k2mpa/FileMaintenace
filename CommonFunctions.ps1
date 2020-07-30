@@ -1330,7 +1330,7 @@ end {
 
 
 
-##### Main ####
+##### Main #####
 
 $Script:CommonFunctionsVersion = "3.0.0-alpha.1"
 
