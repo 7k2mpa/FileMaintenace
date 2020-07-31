@@ -445,7 +445,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.1.1"
+$Version = "3.0.0-beta.1"
 
 
 #initialize, validate parameters, output starting message
