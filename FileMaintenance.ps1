@@ -1217,7 +1217,7 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
 
     IF ($ContinueAsNormal) {
         Write-Log -ID $InfoEventID -Type Information -Message ("Specified -ContinueAsNormal[$($ContinueAsNormal)] option, " +
-            "thus if file exist with the same name already in the destination, will process next file with logging a NORMAL event without termination.")
+            "thus if a file exist with the same name already in the destination, will process next file with logging a NORMAL event without termination.")
         
         } elseIF ($Continue) {
             Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Continue[$($Continue)] option, " +
