@@ -307,6 +307,14 @@ Specify how many newer files in the folder to keep with -Action KeepFileCount op
 
 
 
+.PARAMETER CommonConfigPath
+
+Specify common configuration file path in relative path format.
+Only this parameter, you can specify the path with only relative path format.
+With this parameter, you can specify same event id for utility scripts with common config file.
+If you want to cancel using common config file specified in Param section of the script, specify this argument with NULL or empty string.
+
+
 .PARAMETER Log2EventLog
 
 Specify if you want to output log to Windows Event Log.
@@ -1204,12 +1212,12 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
 
     IF ($OverRide) {
         Write-Log -ID $InfoEventID -Type Information -Message ("Specified -OverRide[$($OverRide)] option, " +
-            "thus if files exist with the same name, will override them.")
+            "thus if files exist with the same name in the destination, will override them.")
             }
 
     IF ($ContinueAsNormal) {
         Write-Log -ID $InfoEventID -Type Information -Message ("Specified -ContinueAsNormal[$($ContinueAsNormal)] option, " +
-            "thus if file exist in the same name already, will process next file with logging a NORMAL event without termination.")
+            "thus if file exist with the same name already in the destination, will process next file with logging a NORMAL event without termination.")
         
         } elseIF ($Continue) {
             Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Continue[$($Continue)] option, " +
