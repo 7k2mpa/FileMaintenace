@@ -1280,7 +1280,7 @@ Param(
 
 [String]$DatumPath = $PSScriptRoot
 
-[String]$Version = "3.0.0-alpha.1"
+[String]$Version = "3.0.0-beta.1"
 
 [Boolean]$ForceEndloop  = $FALSE          ;#$FALSE for Finalize , $TRUE for Break in the loop
 
