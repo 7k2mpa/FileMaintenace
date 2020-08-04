@@ -1449,75 +1449,76 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
     Switch -Regex ($Action) {
 
-    #case1 do nothing
-    '^none$' {
-        IF ( ($PostAction -eq 'none') -and ($PreAction -contains 'none') ) {
+#case1 do nothing
+        '^none$' {
+            IF ( ($PostAction -eq 'none') -and ($PreAction -contains 'none') ) {
 
-            Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Action [$($Action)] option, " +
-                "thus do not process [$($Target.Object.FullName)]")
-            }
+                Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Action [$($Action)] option, " +
+                    "thus do not process [$($Target.Object.FullName)]")
+                }
         }
 
-    #case2 delete
-    '^Delete$' {
-        Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
+#case2 delete
+        '^Delete$' {
+            Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
         } 
 
-    #case3 move or copyÅ@process after testing existence of the same name file in the destination
-    '^(Move|Copy)$' {
-        $destinationPath = $destinationFolder | Join-Path -ChildPath ($Target.Object.Name)
+#case3 move or copyÅ@process after testing existence of the same name file in the destination
+        '^(Move|Copy)$' {
+            $destinationPath = $destinationFolder | Join-Path -ChildPath ($Target.Object.Name)
 
-        IF ($destinationPath | Test-LeafNotExists) {
+            IF ($destinationPath | Test-LeafNotExists) {
 
-            Invoke-Action -Type $Action -ActionFrom $Target.Object.FullName -ActionTo $destinationPath -ActionError $Target.Object.FullName 
+                Invoke-Action -Type $Action -ActionFrom $Target.Object.FullName -ActionTo $destinationPath -ActionError $Target.Object.FullName 
             }
         }
 
-    #case4 delete empty folder after testing the folder is empty
-    '^DeleteEmptyFolders$' {
-        Write-Log -ID $InfoEventID -Type Information -Message  "Check the folder [$($Target.Object.FullName)] is empty."
+#case4 delete empty folder after testing the folder is empty
+        '^DeleteEmptyFolders$' {
+            Write-Log -ID $InfoEventID -Type Information -Message  "Check the folder [$($Target.Object.FullName)] is empty."
 
-        IF ($Target.Object.GetFileSystemInfos().Count -eq 0) {
+            IF ($Target.Object.GetFileSystemInfos().Count -eq 0) {
 
-            Write-Log -ID $InfoEventID -Type Information -Message  "The folder [$($Target.Object.FullName)] is empty."
-            Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
+                Write-Log -ID $InfoEventID -Type Information -Message  "The folder [$($Target.Object.FullName)] is empty."
+                Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
 
             } else {
-            Write-Log -ID $InfoEventID -Type Information -Message "The folder [$($Target.Object.FullName) is not empty." 
+                Write-Log -ID $InfoEventID -Type Information -Message "The folder [$($Target.Object.FullName) is not empty." 
             }
         }
 
-    #case5 clear with null
-    '^NullClear$' {
-        Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
+#case5 clear with null
+        '^NullClear$' {
+            Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
         }
 
-    #case6 KeepFilesCount
-    '^KeepFilesCount$' {
-        IF ((@($targets).Length - $InLoopDeletedFilesCount) -gt $KeepFiles) {
+#case6 KeepFilesCount
+        '^KeepFilesCount$' {
+            IF ((@($targets).Length - $InLoopDeletedFilesCount) -gt $KeepFiles) {
 
-            Write-Log -ID $InfoEventID -Type Information -Message  ("More than [$($KeepFiles)] files exist in the folder, " +
-                "thus delete the oldest [$($Target.Object.FullName)]")
+                Write-Log -ID $InfoEventID -Type Information -Message  ("More than [$($KeepFiles)] files exist in the folder, " +
+                    "thus delete the oldest [$($Target.Object.FullName)]")
 
-            Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
+                Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
 
 #error occure in $Invoke-Action &-Continue $TRUE, $ContinueFlag switch to $TRUE. In the condtion, jump to the next object.
-            IF ($ContinueFlag) {
-                Break do      
+                IF ($ContinueFlag) {
+                    Break do      
                 }
-            $InLoopDeletedFilesCount++
+                
+                $InLoopDeletedFilesCount++
             
-            } else {
-            Write-Log -ID $InfoEventID -Type Information -Message  ("Less [$($KeepFiles)] files exist in the folder, " +
+            } else {            
+                Write-Log -ID $InfoEventID -Type Information -Message  ("Less [$($KeepFiles)] files exist in the folder, " +
                 "thus do not delete [$($Target.Object.FullName)]")
             }
         }
 
-    #case7 $Action dose not match up to the cases, it must be internal error
-    Default {
-        Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal Error at Switch Action section. A bug in regex may cause it."
-        $returnCode = $InternalErrorReturnCode
-        Break main
+#case7 $Action dose not match up to the cases, it must be internal error
+        Default {
+            Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal Error at Switch Action section. A bug in regex may cause it."
+            $returnCode = $InternalErrorReturnCode
+            Break main
         }
     }
 
@@ -1526,37 +1527,37 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
     Switch -Regex ($PostAction) {
 
-    #case1 do nothing
-    '^none$' {            
-        }
+#case1 do nothing
+        '^none$' {            
+            }
 
-    #case2 Rename after testing existence of a file with new renamed name in the path
-    '^Rename$' {
-        $newFilePath = $Target.Object.DirectoryName |
-                        Join-Path -ChildPath (($Target.Object.Name) -replace "$RegularExpression" , "$RenameToRegularExpression") |
-                        ConvertTo-AbsolutePath -Name 'Filename renamed'
+#case2 Rename after testing existence of a file with new renamed name in the path
+        '^Rename$' {
+            $newFilePath = $Target.Object.DirectoryName |
+                            Join-Path -ChildPath (($Target.Object.Name) -replace "$RegularExpression" , "$RenameToRegularExpression") |
+                            ConvertTo-AbsolutePath -Name 'Filename renamed'
                             
-        IF ($newFilePath | Test-LeafNotExists) {
+            IF ($newFilePath | Test-LeafNotExists) {
 
-            Invoke-Action -Type Rename -ActionFrom $Target.Object.FullName -ActionTo $newFilePath -ActionError $Target.Object.FullName
+                Invoke-Action -Type Rename -ActionFrom $Target.Object.FullName -ActionTo $newFilePath -ActionError $Target.Object.FullName
     
             } else {
-            Write-Log -ID $InfoEventID -Type Information -Message  ("A file [$($newFilePath)] already exists as attempting rename, " +
+                Write-Log -ID $InfoEventID -Type Information -Message  ("A file [$($newFilePath)] already exists as attempting rename, " +
                 "thus do not rename [$($Target.Object.FullName)]")
             }
         }
 
-    #case3 clear with null 
-    '^NullClear$' {
-        Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
+#case3 clear with null 
+        '^NullClear$' {
+            Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
         }
 
 
-    #case4 $Action dose not match up to the cases, it must be internal error
-    Default {
-        Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal error at Switch PostAction section. A bug in regex may cause it."
-        $returnCode = $InternalErrorReturnCode
-        Break main
+#case4 $Action dose not match up to the cases, it must be internal error
+        Default {
+            Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal error at Switch PostAction section. A bug in regex may cause it."
+            $returnCode = $InternalErrorReturnCode
+            Break main
         }
     }
 }
