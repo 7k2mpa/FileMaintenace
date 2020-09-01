@@ -60,6 +60,14 @@ Default is [5]times.
 
 
 
+.PARAMETER CommonConfigPath
+
+Specify common configuration file path in relative path format.
+Only this parameter, you can specify the path with only relative path format.
+With this parameter, you can specify same event id for utility scripts with common config file.
+If you want to cancel using common config file specified in Param section of the script, specify this argument with NULL or empty string.
+
+
 .PARAMETER Log2EventLog
 
 Specify if you want to output log to Windows Event Log.
@@ -409,7 +417,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "3.0.0-beta.1"
+$Version = "3.0.0-beta.2"
 
 
 #initialize, validate parameters, output starting message

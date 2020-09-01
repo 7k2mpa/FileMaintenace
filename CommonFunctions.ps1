@@ -68,6 +68,7 @@ https://github.com/7k2mpa/FileMaintenace
 
 [CmdletBinding()]
 Param(
+[String]$CommonConfigPath = $CommonConfigPath
 )
 
 
@@ -1332,7 +1333,7 @@ end {
 
 ##### Main #####
 
-$Script:CommonFunctionsVersion = "3.0.0-alpha.1"
+$Script:CommonFunctionsVersion = "3.0.0-beta.2"
 
 Write-Verbose "CommonFunctions.ps1 Version $CommonFunctionsVersion"
 

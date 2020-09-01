@@ -20,7 +20,7 @@
 [Int][ValidateRange(0,2147483647)]$ErrorReturnCode         =  8 
 [Int][ValidateRange(0,2147483647)]$InternalErrorReturnCode = 16 
 
-[Int][ValidateRange(1,65535)]$InfoEventID          =   1
+[Int][ValidateRange(1,65535)]$InfoEventID          =   9999
 [Int][ValidateRange(1,65535)]$InfoLoopStartEventID =   2 
 [Int][ValidateRange(1,65535)]$InfoLoopEndEventID   =   3 
 [int][ValidateRange(1,65535)]$StartEventID         =   8 

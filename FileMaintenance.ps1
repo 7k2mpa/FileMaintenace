@@ -128,7 +128,15 @@ C:\OLD\Log\Java\OLD\Infra.log
 C:\OLD\Log\Infra.log
 
 
- 
+.EXAMPLE
+
+FileMaintenace.ps1 -TargetFolder C:\TEST -CommonConfigPath .\CommonConfig.ps1
+
+Find files in C:\TEST and child folders recuresively.
+With CommonCOnfig.ps1 setting, event log's IDs are specified.
+
+
+
 .PARAMETER TargetFolder
 
 Specify a folder of the target files or the folders placed.
@@ -1280,7 +1288,7 @@ Param(
 
 [String]$DatumPath = $PSScriptRoot
 
-[String]$Version = "3.0.0-beta.1"
+[String]$Version = "3.0.0-beta.2"
 
 [Boolean]$ForceEndloop  = $FALSE          ;#$FALSE for Finalize , $TRUE for Break in the loop
 
