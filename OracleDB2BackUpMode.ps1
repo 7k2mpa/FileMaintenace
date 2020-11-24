@@ -433,7 +433,7 @@ $OracleHomeBinPath = $OracleHomeBinPath |
                         ConvertTo-AbsolutePath -Name  '-oracleHomeBinPath' |
                         Test-PathEx -Type Container -Name '-oracleHomeBinPath' -IfFalseFinalize -PassThrough
 
-
+<#
 #Validate BackUpFlag Folder
 
     IF (-not($NoCheckBackUpFlag)) {
@@ -442,7 +442,7 @@ $OracleHomeBinPath = $OracleHomeBinPath |
 
         $BackUpFlagPath | Split-Path -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -BackUpFlagPath' -IfFalseFinalize > $NULL
         }
-
+#>
 
 #Validate SQL Log File
 
