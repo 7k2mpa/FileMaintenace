@@ -485,6 +485,10 @@ Invoke-PostFinalize $ReturnCode
 
 #####################  main  ######################
 
+[int][ValidateRange(0,2147483647)]$ErrorCount = 0
+[int][ValidateRange(0,2147483647)]$WarningCount = 0
+[int][ValidateRange(0,2147483647)]$NormalCount = 0
+
 $DatumPath = $PSScriptRoot
 
 $Version = "3.0.0-beta.2"
