@@ -433,16 +433,6 @@ $OracleHomeBinPath = $OracleHomeBinPath |
                         ConvertTo-AbsolutePath -Name  '-oracleHomeBinPath' |
                         Test-PathEx -Type Container -Name '-oracleHomeBinPath' -IfFalseFinalize -PassThrough
 
-<#
-#Validate BackUpFlag Folder
-
-    IF (-not($NoCheckBackUpFlag)) {
-
-        $BackUpFlagPath = $BackUpFlagPath | ConvertTo-AbsolutePath -Name  '-BackUpFlagPath'
-
-        $BackUpFlagPath | Split-Path -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -BackUpFlagPath' -IfFalseFinalize > $NULL
-        }
-#>
 
 #Validate SQL Log File
 
@@ -474,13 +464,13 @@ $SQLCommandsPath = $SQLCommandsPath |
 
     $targetWindowsOracleService = "OracleService" + $OracleSID
 
-    IF (-not(Test-ServiceStatus -ServiceName $targetWindowsOracleService -Health Running)) {
+    IF (Test-ServiceStatus -ServiceName $targetWindowsOracleService -Health Running) {
 
-        Write-Log -Type Error -EventID $ErrorEventID -Message "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
-        Finalize $ErrorReturnCode
+        Write-Log -EventID $InfoEventID -Type Information -Message "Windows Service [$($targetWindowsOracleService)] is running."
 
         } else {
-        Write-Log -EventID $InfoEventID -Type Information -Message "Windows Service [$($targetWindowsOracleService)] is running."
+        Write-Log -Type Error -EventID $ErrorEventID -Message "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
+        Finalize $ErrorReturnCode
         }
 
 
@@ -511,8 +501,6 @@ Pop-Location
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
-[int][ValidateRange(0,2147483647)]$OverRideCount = 0
-[int][ValidateRange(0,2147483647)]$ContinueCount = 0
 
 $DatumPath = $PSScriptRoot
 

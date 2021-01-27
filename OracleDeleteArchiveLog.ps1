@@ -454,13 +454,15 @@ $ExecRmanPath = $ExecRmanPath |
 
     $targetWindowsOracleService = "OracleService"+$OracleSID
 
-    IF (-not($targetWindowsOracleService | Test-ServiceStatus -Status Running)) {
+    IF (Test-ServiceStatus -ServiceName $targetWindowsOracleService -Health Running) {
 
-        Write-Log -EventID $ErrorEventID -Type Error -Message "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
-        Finalize $ErrorReturnCode
-        } else {
         Write-Log -EventID $InfoEventID -Type Information -Message "Windows Service [$($targetWindowsOracleService)] is running."
+
+        } else {
+        Write-Log -Type Error -EventID $ErrorEventID -Message "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
+        Finalize $ErrorReturnCode
         }
+
 
 
 #output starting messages
