@@ -1,4 +1,4 @@
-﻿[Boolean]$Log2EventLog = $TRUE
+[Boolean]$Log2EventLog = $TRUE
 #[Switch]$NoLog2EventLog
 [String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra' 
 [String][ValidateSet("Application")]$EventLogLogName = 'Application' 

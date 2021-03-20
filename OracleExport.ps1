@@ -462,7 +462,7 @@ Invoke-PostFinalize $ReturnCode
 
 #####################  main  ######################
 
-$Version = "3.0.0-beta.2"
+$Version = "3.0.0"
 
 $DatumPath = $PSScriptRoot
 

@@ -1333,7 +1333,7 @@ end {
 
 ##### Main #####
 
-$Script:CommonFunctionsVersion = "3.0.0-beta.2"
+$Script:CommonFunctionsVersion = "3.0.0"
 
 Write-Verbose "CommonFunctions.ps1 Version $CommonFunctionsVersion"
 

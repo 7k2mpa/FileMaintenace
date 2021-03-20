@@ -1272,6 +1272,10 @@ Param(
 
 #####################  main  ######################
 
+[String]$DatumPath = $PSScriptRoot
+
+$Version = "3.0.0"
+
 [Boolean]$ErrorFlag     = $FALSE
 [Boolean]$WarningFlag   = $FALSE
 [Boolean]$NormalFlag    = $FALSE
@@ -1285,10 +1289,6 @@ Param(
 [Int]$OverRideCount = 0
 [Int]$ContinueCount = 0
 [Int]$InLoopDeletedFilesCount = 0
-
-[String]$DatumPath = $PSScriptRoot
-
-[String]$Version = "3.0.0-beta.2"
 
 [Boolean]$ForceEndloop  = $FALSE          ;#$FALSE for Finalize , $TRUE for Break in the loop
 
