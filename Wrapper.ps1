@@ -81,6 +81,14 @@ If you want to execute script with argument next line in the command file ending
 
 
 
+.PARAMETER CommonConfigPath
+
+Specify common configuration file path in relative path format.
+Only this parameter, you can specify the path with only relative path format.
+With this parameter, you can specify same event id for utility scripts with common config file.
+If you want to cancel using common config file specified in Param section of the script, specify this argument with NULL or empty string.
+
+
 .PARAMETER Log2EventLog
 
 Specify if you want to output log to Windows Event Log.
@@ -253,7 +261,7 @@ Specify the users who are allowed to execute the script in regular expression.
 Parameter must be quoted with single quote'
 Escape the back slash in the separeter of a domain name.
 example [domain\\.*]
-ù@
+
 
 
 .NOTES
@@ -303,6 +311,11 @@ Param(
 [Switch]$Continue ,
 
 
+
+#[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = '.\CommonConfig.ps1' , #MUST specify with relative path format
+[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = $NULL ,
+
+
 [boolean]$Log2EventLog = $TRUE ,
 [Switch]$NoLog2EventLog ,
 [String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra' ,
@@ -346,13 +359,17 @@ Param(
 ################# CommonFunctions.ps1 Load  #######################
 # If you want to place CommonFunctions.ps1 in differnt path, modify
 
-Try{
+Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
+
+    IF ($LASTEXITCODE -eq 99) {
+        Exit 1
     }
-Catch [Exception]{
-    Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
+}
+Catch [Exception] {
+    Write-Error "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
-    }
+}
 
 #!!! end of definition !!!
 
@@ -436,7 +453,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.1.1"
+$Version = "3.0.0"
 
 
 #initialize, validate parameters, output starting message

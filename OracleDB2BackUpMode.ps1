@@ -57,13 +57,6 @@ Specify Oracle_SID.
 Should set [$Env:ORACLE_SID] by default.
 
 
-.PARAMETER OracleService
-This parameter is planed to obsolute.
-
-RMAN Logを削除する対象のOracleSIDを指定します。
-このパラメータは廃止予定です。
-
-
 .PARAMETER OracleHomeBinPath
 
 Specify Oracle 'BIN' path in the child path Oracle home. 
@@ -76,18 +69,12 @@ Specify path of SQL log file.
 If the file dose not exist, create a new file.
 Can specify relative or absolute path format.
 
+
 .PARAMETER SQLCommandsPath
 
 Specify path of SQLs.ps1.
 Specification is required.
 Can specify relative or absolute path format.
-
-
-.PARAMETER BackUpFlagPath
-planed to be obsolute
-バックアップ中を示すフラグファイルのパスを指定します。
-指定は必須です。
-相対、絶対パスで指定可能です。
 
 
 .PARAMETER PasswordAuthorization
@@ -119,6 +106,14 @@ Some backup software use Oracle VSS when starting backup, thus you do not need t
 
 Specify if you do not want to stop listener.
 
+
+
+.PARAMETER CommonConfigPath
+
+Specify common configuration file path in relative path format.
+Only this parameter, you can specify the path with only relative path format.
+With this parameter, you can specify same event id for utility scripts with common config file.
+If you want to cancel using common config file specified in Param section of the script, specify this argument with NULL or empty string.
 
 
 .PARAMETER Log2EventLog
@@ -347,10 +342,9 @@ Param(
 [Switch]$PasswordAuthorization ,
 
 
-#Planed to obsolute
-[Switch]$NoCheckBackUpFlag = $TRUE ,
-[String]$BackUpFlagPath = '.\Lock\BkUpDB.flg',
-#Planed to obsolute
+
+#[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = '.\CommonConfig.ps1' , #MUST specify with relative path format
+[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = $NULL ,
 
 
 [boolean]$Log2EventLog = $TRUE,
@@ -397,13 +391,17 @@ Param(
 ################# CommonFunctions.ps1 Load  #######################
 # If you want to place CommonFunctions.ps1 in differnt path, modify
 
-Try{
+Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
+
+    IF ($LASTEXITCODE -eq 99) {
+        Exit 1
     }
-Catch [Exception]{
-    Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
+}
+Catch [Exception] {
+    Write-Error "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
-    }
+}
 
 #!!! end of difenition !!!
 
@@ -436,16 +434,6 @@ $OracleHomeBinPath = $OracleHomeBinPath |
                         Test-PathEx -Type Container -Name '-oracleHomeBinPath' -IfFalseFinalize -PassThrough
 
 
-#Validate BackUpFlag Folder
-
-    IF (-not($NoCheckBackUpFlag)) {
-
-        $BackUpFlagPath = $BackUpFlagPath | ConvertTo-AbsolutePath -Name  '-BackUpFlagPath'
-
-        $BackUpFlagPath | Split-Path -Parent | Test-PathEx -Type Container -Name 'Parent Folder of -BackUpFlagPath' -IfFalseFinalize > $NULL
-        }
-
-
 #Validate SQL Log File
 
 $SQLLogPath = $SQLLogPath |
@@ -476,13 +464,13 @@ $SQLCommandsPath = $SQLCommandsPath |
 
     $targetWindowsOracleService = "OracleService" + $OracleSID
 
-    IF (-not(Test-ServiceStatus -ServiceName $targetWindowsOracleService -Health Running)) {
+    IF (Test-ServiceStatus -ServiceName $targetWindowsOracleService -Health Running) {
 
-        Write-Log -Type Error -EventID $ErrorEventID -Message "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
-        Finalize $ErrorReturnCode
+        Write-Log -EventID $InfoEventID -Type Information -Message "Windows Service [$($targetWindowsOracleService)] is running."
 
         } else {
-        Write-Log -EventID $InfoEventID -Type Information -Message "Windows Service [$($targetWindowsOracleService)] is running."
+        Write-Log -Type Error -EventID $ErrorEventID -Message "Windows Service [$($targetWindowsOracleService)] is not running or dose not exist."
+        Finalize $ErrorReturnCode
         }
 
 
@@ -513,12 +501,10 @@ Pop-Location
 [int][ValidateRange(0,2147483647)]$ErrorCount = 0
 [int][ValidateRange(0,2147483647)]$WarningCount = 0
 [int][ValidateRange(0,2147483647)]$NormalCount = 0
-[int][ValidateRange(0,2147483647)]$OverRideCount = 0
-[int][ValidateRange(0,2147483647)]$ContinueCount = 0
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.1.1"
+$Version = "3.0.0"
 
 
 #initialize, validate parameters, output starting message
@@ -527,21 +513,6 @@ $Version = "2.1.1"
 
 
 Push-Location $OracleHomeBinPath
-
- 
-#planed to be obsolute バックアップ実行中かを確認
-
-    IF ($NoCheckBackUpFlag) {
-
-        Write-Log -EventID $InfoEventID -Type Information -Message "Specified -NoCheckBackUpFlag option, thus skip to check status with backup flag."
-        
-        
-        } elseIF (Test-PathEx -Type Leaf -Path $BackUpFlagPath -Name 'Backup Flag') {
-
-            Write-Log -EventID $ErrorEventID -Type Error -Message "Running Back Up now. Can not start duplicate execution."
-            Finalize $ErrorReturnCode
-            }
-#planed to be obsolute バックアップ実行中かを確認
     
 
 #Export DB session information
@@ -642,7 +613,7 @@ Push-Location $OracleHomeBinPath
 
     [String]$listenerStatus = $returnMessage
 
-    Write-Output $ReturnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
+    Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
 
 
     Switch -Regex ($listenerStatus) { 

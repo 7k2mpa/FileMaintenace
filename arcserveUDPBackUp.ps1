@@ -10,7 +10,7 @@ CommonFunctions.ps1 is required.
 
 .DESCRIPTION
 
-This script start arcserve UDP backup job with arcserve UDP CLI.
+This script starts arcserve UDP backup job with arcserve UDP CLI.
 CommonFunctions.ps1 is required.
 Can specify full or incremental backup.
 Can specify authorization style plain password or password file.
@@ -169,6 +169,14 @@ _ and script running user name are inserted to the path specificated.
 
 Specify arcserve UDP console server's host name or IP address.
 
+
+
+.PARAMETER CommonConfigPath
+
+Specify common configuration file path in relative path format.
+Only this parameter, you can specify the path with only relative path format.
+With this parameter, you can specify same event id for utility scripts with common config file.
+If you want to cancel using common config file specified in Param section of the script, specify this argument with NULL or empty string.
 
 
 .PARAMETER Log2EventLog
@@ -409,6 +417,11 @@ Param(
 [int]$UDPConsolePort = 8015 ,
 
 
+
+#[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = '.\CommonConfig.ps1' , #MUST specify with relative path format
+[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = $NULL ,
+
+
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
 [String][ValidateNotNullOrEmpty()]$ProviderName = "Infra",
@@ -452,13 +465,17 @@ Param(
 ################# CommonFunctions.ps1 Load  #######################
 # If you want to place CommonFunctions.ps1 in differnt path, modify
 
-Try{
+Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
+
+    IF ($LASTEXITCODE -eq 99) {
+        Exit 1
     }
-Catch [Exception]{
-    Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
+}
+Catch [Exception] {
+    Write-Error "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
-    }
+}
 
 #!!! end of definition !!!
 
@@ -581,7 +598,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.1.1"
+$Version = "3.0.0"
  
  
 #initialize, validate parameters, output starting message
@@ -596,7 +613,7 @@ $Version = "2.1.1"
 
 #Create Invoke Command Strings
 
-    $command = '.\"' + (Split-Path $UDPCLIPath -Leaf ) + '"' 
+    $command = '.\"' + ($UDPCLIPath | Split-Path -Leaf) + '"' 
 
     $command += " -UDPConsoleServerName $UDPConsoleServerName -Command Backup -BackupJobType $BackUpJobType -UDPConsoleProtocol $PROTOCOL -UDPConsolePort $UDPConsolePort -AgentBasedJob False"
 
@@ -627,8 +644,8 @@ $Version = "2.1.1"
     
         Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Authorization type is [$($AuthorizationType)] Authorize with user name executing and the password file specified."
 
-        $extension                = [System.IO.Path]::GetExtension((Split-Path -Path $ExecUserPasswordFilePath -Leaf))
-        $fileNameWithOutExtention = [System.IO.Path]::GetFileNameWithoutExtension((Split-Path -Path $ExecUserPasswordFilePath -Leaf))
+        $extension                = [System.IO.Path]::GetExtension(($ExecUserPasswordFilePath | Split-Path -Leaf))
+        $fileNameWithOutExtention = [System.IO.Path]::GetFileNameWithoutExtension(($ExecUserPasswordFilePath | Split-Path -Leaf))
 
         $ExecUserPasswordFileName = $fileNameWithOutExtention + "_" + $doUser + $extension
 
@@ -662,8 +679,8 @@ $Version = "2.1.1"
 
 #BackUp Flag Check and Create
 
-     $extension                = [System.IO.Path]::GetExtension((Split-Path -Path $BackupFlagFilePath -Leaf))
-     $fileNameWithOutExtention = [System.IO.Path]::GetFileNameWithoutExtension((Split-Path -Path $BackupFlagFilePath -Leaf))
+     $extension                = [System.IO.Path]::GetExtension(($BackupFlagFilePath | Split-Path -Leaf))
+     $fileNameWithOutExtention = [System.IO.Path]::GetFileNameWithoutExtension(($BackupFlagFilePath | Split-Path -Leaf))
 
      $BackupFlagFileName = $fileNameWithOutExtention + "_" + $Plan + "_" + $Server + $extension
         
@@ -683,13 +700,13 @@ $Version = "2.1.1"
 
     Write-Log -EventID $InfoEventID -EventType Information -EventMessage "Execute arcserveUDP CLI [$($UDPCLIPath)]"
 
-    Push-Location (Split-Path $UDPCLIPath -Parent)
+    Push-Location ($UDPCLIPath | Split-Path -Parent)
 
     Try {
         $return = Invoke-Expression $command 2>$errorMessage -ErrorAction Stop 
         }
 
-        catch [Exception]{
+        catch [Exception] {
 
             Write-Log -EventID $ErrorEventID -EventType Error -EventMessage "Failed to execute arcserveUDP CLI [$($UDPCLIPath)]"
             $errorDetail = $ERROR[0] | Out-String

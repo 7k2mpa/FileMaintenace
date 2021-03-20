@@ -54,13 +54,6 @@ Specify Oracle_SID.
 Should set [$Env:ORACLE_SID] by default.
 
 
-.PARAMETER OracleService
-This parameter is planed to obsolute.
-
-RMAN Logを削除する対象のOracleSIDを指定します。
-このパラメータは廃止予定です。
-
-
 .PARAMETER OracleHomeBinPath
 
 Specify Oracle 'BIN' path in the child path Oracle home. 
@@ -120,6 +113,14 @@ Should use OS authentification.
 Specify Oracle user Password to connect. 
 Should use OS authentification.
 
+
+
+.PARAMETER CommonConfigPath
+
+Specify common configuration file path in relative path format.
+Only this parameter, you can specify the path with only relative path format.
+With this parameter, you can specify same event id for utility scripts with common config file.
+If you want to cancel using common config file specified in Param section of the script, specify this argument with NULL or empty string.
 
 
 .PARAMETER Log2EventLog
@@ -354,6 +355,11 @@ Param(
 #[String]$TimeStampFormat = "_yyyyMMdd_HHmmss" ,
 
 
+
+#[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = '.\CommonConfig.ps1' , #MUST specify with relative path format
+[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = $NULL ,
+
+
 [boolean]$Log2EventLog = $TRUE,
 [Switch]$NoLog2EventLog,
 [String][ValidateNotNullOrEmpty()]$ProviderName = 'Infra',
@@ -397,13 +403,17 @@ Param(
 ################# CommonFunctions.ps1 Load  #######################
 # If you want to place CommonFunctions.ps1 in differnt path, modify
 
-Try{
+Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
+
+    IF ($LASTEXITCODE -eq 99) {
+        Exit 1
     }
-Catch [Exception]{
-    Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
+}
+Catch [Exception] {
+    Write-Error "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
-    }
+}
 
 #!!! end of definition !!!
 
@@ -524,7 +534,7 @@ Pop-Location
 
 $DatumPath = $PSScriptRoot
 
-$Version = "2.1.1"
+$Version = "3.0.0"
 
 
 #initialize, validate parameters, output starting message
@@ -565,7 +575,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
     IF ($needToStartListener) {
     
-        $returnMessage = LSNRCTL.exe START
+        $returnMessage = LSNRCTL.exe START 2>&1 
 
         Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $LogFileEncode
     
@@ -612,7 +622,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
     $invokeResult = Invoke-SQL -SQLCommand $DBStatus -SQLName 'DB Status Check' -SQLLogPath $SQLLogPath
 
-    IF (($invokeResult.Status) -OR ($invokeResult.log -match 'ORA-01034')) {
+    IF (($invokeResult.Status) -or ($invokeResult.log -match 'ORA-01034')) {
 
             Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to check Oracle Database Status."
                 

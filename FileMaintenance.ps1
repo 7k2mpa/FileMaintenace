@@ -128,7 +128,15 @@ C:\OLD\Log\Java\OLD\Infra.log
 C:\OLD\Log\Infra.log
 
 
- 
+.EXAMPLE
+
+FileMaintenace.ps1 -TargetFolder C:\TEST -CommonConfigPath .\CommonConfig.ps1
+
+Find files in C:\TEST and child folders recuresively.
+With CommonCOnfig.ps1 setting, event log's IDs are specified.
+
+
+
 .PARAMETER TargetFolder
 
 Specify a folder of the target files or the folders placed.
@@ -306,37 +314,13 @@ Specify how many newer files in the folder to keep with -Action KeepFileCount op
 [1] is default.
 
 
-.PARAMETER Compress
-Planed to obsolute.
-use -PreAction Compress
 
-このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction Compressを使用してください。
-対象ファイルを圧縮して別ファイルとして保存します。
+.PARAMETER CommonConfigPath
 
-.PARAMETER AddTimeStamp
-Planed to obsolute.
-use -PreAction AddTimeStamp
-
-
-このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction AddTimeStampを使用してください。
-対象ファイル名に日時を付加して別ファイルとして保存します。
-
-.PARAMETER MoveNewFile
-Planed to obsolute.
-use -PreAction MoveNewFile
-
-このパラメータは廃止予定です。後方互換性のために残していますが、-PreAction MoveNewFileを使用してください。
--PreAction Compress , AddTimeStampを指定した際に生成される別ファイルを-MoveToFolderの指定先に保存します。
-デフォルトは対象ファイルと同一ディレクトリへ保存します。
-
-.PARAMETER NullOriginalFile
-Planed to obsolute.
-use -PostAction NullClear or -Action NullClear
-
-このパラメータは廃止予定です。後方互換性のために残していますが、-PostAction NullClearまたは-Action NullClearを使用してください。
-対象ファイルの内容消去（ヌルクリア）します。
--PostAction NullClearと等価です。
-
+Specify common configuration file path in relative path format.
+Only this parameter, you can specify the path with only relative path format.
+With this parameter, you can specify same event id for utility scripts with common config file.
+If you want to cancel using common config file specified in Param section of the script, specify this argument with NULL or empty string.
 
 
 .PARAMETER Log2EventLog
@@ -603,12 +587,9 @@ Param(
 [String][ValidatePattern('^(?!.*(\\|\/|:|\?|`"|<|>|\|)).*$')]$TimeStampFormat = '_yyyyMMdd_HHmmss' ,
 
 
-#Switches planned to be obsolute please use -PreAction start
-[Switch]$Compress,
-[Switch]$AddTimeStamp,
-[Switch]$MoveNewFile,
-[Switch]$NullOriginalFile,
-#Switches planned to be obsolute please use -PreAction end
+
+#[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = '.\CommonConfig.ps1' , #MUST specify with relative path format
+[String][ValidatePattern('^(|\0|(\.+\\)(?!.*(\/|:|\?|`"|<|>|\||\*))).*$')]$CommonConfigPath = $NULL ,
 
 
 [Boolean]$Log2EventLog = $TRUE ,
@@ -648,6 +629,8 @@ Param(
 
 [Regex]$ExecutableUser = '.*'
 
+
+
 )
 
 ################# CommonFunctions.ps1 Load  #######################
@@ -655,11 +638,15 @@ Param(
 
 Try {
     ."$PSScriptRoot\CommonFunctions.ps1"
+
+    IF ($LASTEXITCODE -eq 99) {
+        Exit 1
     }
+}
 Catch [Exception] {
-    Write-Output "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
+    Write-Error "Fail to load CommonFunctions.ps1 Please verify existence of CommonFunctions.ps1 in the same folder."
     Exit 1
-    }
+}
 
 #!!! end of definition !!!
 
@@ -831,11 +818,12 @@ PSobject passed the filter
     IF ($_.LastWriteTime -lt (Get-Date).AddDays(-$Days)) {
     IF ($_.Name -match $RegularExpression) {
     IF ($_.Length -ge $Size) {
-    IF (($_.FullName).Substring($TargetFolder.Length , (Split-Path -Path $_.FullName -Parent).Length - $TargetFolder.Length +1) -match $ParentRegularExpression)
-        {$_}
+    IF (($_.FullName).Substring($TargetFolder.Length, ($_.FullName | Split-Path -Parent).Length - $TargetFolder.Length +1) -match $ParentRegularExpression)
+        {Write-Output $_}
     }
     } 
-    }                                                                              
+    }
+                                                                          
 }
 
  
@@ -889,20 +877,16 @@ some $Action process Object in order, thus sort the objects
 KeepFilesCount: by last write date
 DeleteEmptyFolders: by depth of the file path hierarchy with counting separator in the path for deleteing the deepest folder at first
 #>
-    Switch -Regex ($Action) {
+
+Write-Output $(Switch -Regex ($Action) {
  
-        '^KeepFilesCount$' {
-            Write-Output $objects | Sort-Object -Property Time
-            }
+                    '^KeepFilesCount$'     {$objects | Sort-Object -Property Time}
 
-        '^DeleteEmptyFolders$' {
-            Write-Output $objects | Sort-Object -Property Depth -Descending  
-            }
+                    '^DeleteEmptyFolders$' {$objects | Sort-Object -Property Depth -Descending}
 
-        Default{
-            Write-Output $objects
-            }
-    }
+                    Default                {$objects}
+                
+             })
 }
 end {
 }
@@ -1058,13 +1042,6 @@ IF ($NoRecurse)        {[Boolean]$Script:Recurse = $FALSE}
 IF ($ContinueAsNormal) {[Switch]$Script:Continue = $TRUE}
 IF ($OverRideAsNormal) {[Switch]$Script:OverRide = $TRUE}
 IF ($OverRideForce)    {[Switch]$Script:OverRide = $TRUE}
-
-#For Backward Compatibility
-
-IF ($NullOriginalFile) {[String]$Script:PostAction = 'NullClear'}
-IF ($AddTimeStamp) {$Script:PreAction +='AddTimeStamp'}
-IF ($MoveNewFile)  {$Script:PreAction +='MoveNewFile'}
-IF ($Compress)     {$Script:PreAction +='Compress'}
 
 
 #Start validating parameters
@@ -1243,16 +1220,16 @@ Write-Log -ID $InfoEventID -Type Information -Message "All parameters are valid.
 
     IF ($OverRide) {
         Write-Log -ID $InfoEventID -Type Information -Message ("Specified -OverRide[$($OverRide)] option, " +
-            "thus if files exist with the same name, will override them.")
+            "thus if files exist with the same name in the destination, will override them.")
             }
 
     IF ($ContinueAsNormal) {
         Write-Log -ID $InfoEventID -Type Information -Message ("Specified -ContinueAsNormal[$($ContinueAsNormal)] option, " +
-            "thus if file exist in the same name already, will process next file with a NORMAL logging without termination.")
+            "thus if a file exist with the same name already in the destination, will process next file with logging a NORMAL event without termination.")
         
         } elseIF ($Continue) {
             Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Continue[$($Continue)] option, " +
-                "thus if a file exist in the same name already, will process next file with a WARNING logging and without termination.")
+                "thus if a file exist with the same name already in the destination, will process next file with logging a WARNING event without termination.")
             }
 
 }
@@ -1295,11 +1272,16 @@ Param(
 
 #####################  main  ######################
 
+[String]$DatumPath = $PSScriptRoot
+
+$Version = "3.0.0"
+
 [Boolean]$ErrorFlag     = $FALSE
 [Boolean]$WarningFlag   = $FALSE
 [Boolean]$NormalFlag    = $FALSE
 [Boolean]$OverRideFlag  = $FALSE
 [Boolean]$ContinueFlag  = $FALSE
+[Boolean]$WhatIfFlag    = ($NULL -ne $PSBoundParameters['WhatIf'])
 
 [Int]$ErrorCount    = 0
 [Int]$WarningCount  = 0
@@ -1307,11 +1289,6 @@ Param(
 [Int]$OverRideCount = 0
 [Int]$ContinueCount = 0
 [Int]$InLoopDeletedFilesCount = 0
-
-[String]$DatumPath = $PSScriptRoot
-[Boolean]$WhatIfFlag = ($NULL -ne $PSBoundParameters['WhatIf'])
-
-$Version = "2.1.1"
 
 [Boolean]$ForceEndloop  = $FALSE          ;#$FALSE for Finalize , $TRUE for Break in the loop
 
@@ -1344,22 +1321,19 @@ $targets = $TargetFolder | Get-Object -FilterType $filterType
 
             Write-Log -ID $WarningEventID -Type Warning -Message ("Specified -NoneTargetAsWarning option, " +
                 "thus terminiate $($ShellName) with a Warning.")
-            $returnCode = $WarningReturnCode            
-            Break main           
-
-            } else {
-            Break main
+            $returnCode = $WarningReturnCode                     
             }
+
+        Break main
     }
 
-Write-Log -ID $InfoEventID -Type Information -Message "[$(@($targets).Length)] [$($filterType)(s)] exist for processing."
+Write-Log -ID $InfoEventID -Type Information -Message "[$(($targets | Measure-Object).Count)] [$($filterType)(s)] exist for processing."
 
-Write-Debug   "[$(@($targets).Length)][$($filterType)(s)] are for processing..."
+Write-Debug   "[$(($targets | Measure-Object).Count)][$($filterType)(s)] are for processing..."
 
 Write-Debug   ("`r`n" + ($targets.Object.fullname | Out-String))
 
-Write-Verbose ("[$(@($targets).Length)][$($filterType)(s)] are for processing..." + "`r`n" + ($targets.Object.fullname | Out-String))
-
+Write-Verbose ("[$(($targets | Measure-Object).Count)][$($filterType)(s)] are for processing..." + "`r`n" + ($targets.Object.fullname | Out-String))
 
 #-PreAction Archive processes files to archive to one file, thus before loop create a destination path of the archive file
 
@@ -1483,75 +1457,76 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
     Switch -Regex ($Action) {
 
-    #case1 do nothing
-    '^none$' {
-        IF ( ($PostAction -eq 'none') -and ($PreAction -contains 'none') ) {
+#case1 do nothing
+        '^none$' {
+            IF ( ($PostAction -eq 'none') -and ($PreAction -contains 'none') ) {
 
-            Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Action [$($Action)] option, " +
-                "thus do not process [$($Target.Object.FullName)]")
-            }
+                Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Action [$($Action)] option, " +
+                    "thus do not process [$($Target.Object.FullName)]")
+                }
         }
 
-    #case2 delete
-    '^Delete$' {
-        Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
+#case2 delete
+        '^Delete$' {
+            Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
         } 
 
-    #case3 move or copy　process after testing existence of the same name file in the destination
-    '^(Move|Copy)$' {
-        $destinationPath = $destinationFolder | Join-Path -ChildPath ($Target.Object.Name)
+#case3 move or copy　process after testing existence of the same name file in the destination
+        '^(Move|Copy)$' {
+            $destinationPath = $destinationFolder | Join-Path -ChildPath ($Target.Object.Name)
 
-        IF ($destinationPath | Test-LeafNotExists) {
+            IF ($destinationPath | Test-LeafNotExists) {
 
-            Invoke-Action -Type $Action -ActionFrom $Target.Object.FullName -ActionTo $destinationPath -ActionError $Target.Object.FullName 
+                Invoke-Action -Type $Action -ActionFrom $Target.Object.FullName -ActionTo $destinationPath -ActionError $Target.Object.FullName 
             }
         }
 
-    #case4 delete empty folder after testing the folder is empty
-    '^DeleteEmptyFolders$' {
-        Write-Log -ID $InfoEventID -Type Information -Message  "Check the folder [$($Target.Object.FullName)] is empty."
+#case4 delete empty folder after testing the folder is empty
+        '^DeleteEmptyFolders$' {
+            Write-Log -ID $InfoEventID -Type Information -Message  "Check the folder [$($Target.Object.FullName)] is empty."
 
-        IF ($Target.Object.GetFileSystemInfos().Count -eq 0) {
+            IF ($Target.Object.GetFileSystemInfos().Count -eq 0) {
 
-            Write-Log -ID $InfoEventID -Type Information -Message  "The folder [$($Target.Object.FullName)] is empty."
-            Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
+                Write-Log -ID $InfoEventID -Type Information -Message  "The folder [$($Target.Object.FullName)] is empty."
+                Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
 
             } else {
-            Write-Log -ID $InfoEventID -Type Information -Message "The folder [$($Target.Object.FullName) is not empty." 
+                Write-Log -ID $InfoEventID -Type Information -Message "The folder [$($Target.Object.FullName) is not empty." 
             }
         }
 
-    #case5 clear with null
-    '^NullClear$' {
-        Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
+#case5 clear with null
+        '^NullClear$' {
+            Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
         }
 
-    #case6 KeepFilesCount
-    '^KeepFilesCount$' {
-        IF ((@($targets).Length - $InLoopDeletedFilesCount) -gt $KeepFiles) {
+#case6 KeepFilesCount
+        '^KeepFilesCount$' {
+            IF ((@($targets).Length - $InLoopDeletedFilesCount) -gt $KeepFiles) {
 
-            Write-Log -ID $InfoEventID -Type Information -Message  ("More than [$($KeepFiles)] files exist in the folder, " +
-                "thus delete the oldest [$($Target.Object.FullName)]")
+                Write-Log -ID $InfoEventID -Type Information -Message  ("More than [$($KeepFiles)] files exist in the folder, " +
+                    "thus delete the oldest [$($Target.Object.FullName)]")
 
-            Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
+                Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
 
 #error occure in $Invoke-Action &-Continue $TRUE, $ContinueFlag switch to $TRUE. In the condtion, jump to the next object.
-            IF ($ContinueFlag) {
-                Break do      
+                IF ($ContinueFlag) {
+                    Break do      
                 }
-            $InLoopDeletedFilesCount++
+                
+                $InLoopDeletedFilesCount++
             
-            } else {
-            Write-Log -ID $InfoEventID -Type Information -Message  ("Less [$($KeepFiles)] files exist in the folder, " +
+            } else {            
+                Write-Log -ID $InfoEventID -Type Information -Message  ("Less [$($KeepFiles)] files exist in the folder, " +
                 "thus do not delete [$($Target.Object.FullName)]")
             }
         }
 
-    #case7 $Action dose not match up to the cases, it must be internal error
-    Default {
-        Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal Error at Switch Action section. A bug in regex may cause it."
-        $returnCode = $InternalErrorReturnCode
-        Break main
+#case7 $Action dose not match up to the cases, it must be internal error
+        Default {
+            Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal Error at Switch Action section. A bug in regex may cause it."
+            $returnCode = $InternalErrorReturnCode
+            Break main
         }
     }
 
@@ -1560,37 +1535,37 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
     Switch -Regex ($PostAction) {
 
-    #case1 do nothing
-    '^none$' {            
-        }
+#case1 do nothing
+        '^none$' {            
+            }
 
-    #case2 Rename after testing existence of a file with new renamed name in the path
-    '^Rename$' {
-        $newFilePath = $Target.Object.DirectoryName |
-                        Join-Path -ChildPath (($Target.Object.Name) -replace "$RegularExpression" , "$RenameToRegularExpression") |
-                        ConvertTo-AbsolutePath -Name 'Filename renamed'
+#case2 Rename after testing existence of a file with new renamed name in the path
+        '^Rename$' {
+            $newFilePath = $Target.Object.DirectoryName |
+                            Join-Path -ChildPath (($Target.Object.Name) -replace "$RegularExpression" , "$RenameToRegularExpression") |
+                            ConvertTo-AbsolutePath -Name 'Filename renamed'
                             
-        IF ($newFilePath | Test-LeafNotExists) {
+            IF ($newFilePath | Test-LeafNotExists) {
 
-            Invoke-Action -Type Rename -ActionFrom $Target.Object.FullName -ActionTo $newFilePath -ActionError $Target.Object.FullName
+                Invoke-Action -Type Rename -ActionFrom $Target.Object.FullName -ActionTo $newFilePath -ActionError $Target.Object.FullName
     
             } else {
-            Write-Log -ID $InfoEventID -Type Information -Message  ("A file [$($newFilePath)] already exists as attempting rename, " +
+                Write-Log -ID $InfoEventID -Type Information -Message  ("A file [$($newFilePath)] already exists as attempting rename, " +
                 "thus do not rename [$($Target.Object.FullName)]")
             }
         }
 
-    #case3 clear with null 
-    '^NullClear$' {
-        Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
+#case3 clear with null 
+        '^NullClear$' {
+            Invoke-Action -Type NullClear -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName          
         }
 
 
-    #case4 $Action dose not match up to the cases, it must be internal error
-    Default {
-        Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal error at Switch PostAction section. A bug in regex may cause it."
-        $returnCode = $InternalErrorReturnCode
-        Break main
+#case4 $Action dose not match up to the cases, it must be internal error
+        Default {
+            Write-Log -ID $InternalErrorEventID -Type Error -Message "Internal error at Switch PostAction section. A bug in regex may cause it."
+            $returnCode = $InternalErrorReturnCode
+            Break main
         }
     }
 }
