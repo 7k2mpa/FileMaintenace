@@ -300,7 +300,9 @@ process {
 
         '^(Archive|ArchiveAndAddTimeStamp)$' {
 #           $ActionTo = $ActionTo -replace "\[" , "````["
-            Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Update > $NULL  -ErrorAction Stop
+#            Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Update > $NULL  -ErrorAction Stop
+            Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Force > $NULL  -ErrorAction Stop
+
             }                  
 
         '^((7z|7zZip)(Archive|Compress)($|AndAddTimeStamp))$' {
@@ -318,12 +320,14 @@ process {
             Switch -Regex ($ActionType){
             
                 'Compress' {
-                    [String]$errorDetail = .\7z.exe a $ActionTo $ActionFrom -t"$7zType" 2>&1
+#                    [String]$errorDetail = .\7z.exe a $ActionTo $ActionFrom -t"$7zType"  2>&1
+                    [String]$errorDetail = .\7z.exe u -ms on $ActionTo $ActionFrom -t"$7zType"  2>&1
                     Break
                     }
 
                 'Archive' {
-                    [String]$errorDetail = .\7z.exe u $ActionTo $ActionFrom -t"$7zType" 2>&1
+#                    [String]$errorDetail = .\7z.exe u $ActionTo $ActionFrom -t"$7zType"  2>&1
+                    [String]$errorDetail = .\7z.exe a -ms on $ActionTo $ActionFrom -t"$7zType"  2>&1 
                     Break
                     }
             
