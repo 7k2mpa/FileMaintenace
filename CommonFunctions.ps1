@@ -321,13 +321,13 @@ process {
             
                 'Compress' {
 #                    [String]$errorDetail = .\7z.exe a $ActionTo $ActionFrom -t"$7zType"  2>&1
-                    [String]$errorDetail = .\7z.exe u -ms on $ActionTo $ActionFrom -t"$7zType"  2>&1
+                    [String]$errorDetail = .\7z.exe u -mmt on $ActionTo $ActionFrom -t"$7zType"  2>&1
                     Break
                     }
 
                 'Archive' {
 #                    [String]$errorDetail = .\7z.exe u $ActionTo $ActionFrom -t"$7zType"  2>&1
-                    [String]$errorDetail = .\7z.exe a -ms on $ActionTo $ActionFrom -t"$7zType"  2>&1 
+                    [String]$errorDetail = .\7z.exe a -mmt on $ActionTo $ActionFrom -t"$7zType"  2>&1 
                     Break
                     }
             
