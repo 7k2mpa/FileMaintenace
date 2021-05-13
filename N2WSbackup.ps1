@@ -396,7 +396,7 @@ Pop-Location
 
         $id = $return | ConvertFrom-Json
 
-#N2WS 2.5 return typo messeage!! [Cound not find policy] , thus do not match 'Could not find policy' orz
+#N2WS 2.5 return typo message!! [Cound not find policy] , thus do not match 'Could not find policy' orz
 
         IF (($id.Message -match 'not find policy') -or ($id."backup-id" -eq -1)) {
 
