@@ -1274,7 +1274,7 @@ Param(
 
 [String]$DatumPath = $PSScriptRoot
 
-$Version = "3.0.0"
+$Version = "3.0.1"
 
 [Boolean]$ErrorFlag     = $FALSE
 [Boolean]$WarningFlag   = $FALSE
@@ -1491,7 +1491,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
                 Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
 
             } else {
-                Write-Log -ID $InfoEventID -Type Information -Message "The folder [$($Target.Object.FullName) is not empty." 
+                Write-Log -ID $InfoEventID -Type Information -Message "The folder [$($Target.Object.FullName)] is not empty." 
             }
         }
 
