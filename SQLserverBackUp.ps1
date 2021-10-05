@@ -17,7 +17,7 @@ Output log to [Windows Event Log] or [Console] or [Text Log] and specify to supp
 
 .EXAMPLE
 
-.\SQLserverBackUp.ps1 -BackUpFile '\NAS\SQLfull.bk' -ServerInstance 'SQLserver\Instance' -DBname 'testDB' -Type Full 
+.\SQLserverBackUp.ps1 -BackUpFile '\\NAS\SQLfull.bk' -ServerInstance 'SQLserver\Instance' -DBname 'testDB' -Type Full 
 
 
 .PARAMETER BackUpFile
@@ -393,7 +393,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "3.0.0"
+$Version = "3.0.1"
 
 
 #initialize, validate parameters, output starting message
