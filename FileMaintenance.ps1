@@ -1,4 +1,4 @@
-#Requires -Version 3.0
+Ôªø#Requires -Version 3.0
 #If you want to use '-PreAction compress or archive' option in FileMaintenance.ps1, install WMF 5.0 or later, and place '#Requires -Version 5.0' insted of '#Requires -Version 3.0'
 #If you want to use '-PreAction compress or archive' option with 7-Zip in FileMaintenance.ps1, do not need to replace.
 
@@ -664,10 +664,10 @@ function Test-LeafNotExists {
  Check the path specified that a file or folder dose NOT exist in the path, and return $TRUE or $FALSE
  
 .INPUT
-Å@Strings of File Path
+„ÄÄStrings of File Path
 
 .OUTPUT
-Å@Boolean
+„ÄÄBoolean
 
 .NOTE
 Cases in the destination path....
@@ -798,7 +798,7 @@ filter ComplexFilter {
 
 <#
 .SYNOPSIS
-Å@filter objects with criteria
+„ÄÄfilter objects with criteria
 
 .DESCRIPTION
 last write date is older than $Days
@@ -831,7 +831,7 @@ function Get-Object {
 
 <#
 .SYNOPSIS
-Å@find objects(files or folders) in the specified folder
+„ÄÄfind objects(files or folders) in the specified folder
 
 .INPUT
 System.String. Path of the folder to get objects
@@ -947,7 +947,7 @@ begin {
 process {
     IF (($PreAction -match '^(Compress|Archive)$')) {
 
-#Switch find all elements in [Array]$PreAction
+#Switch to find all elements in [Array]$PreAction
 #Find an element  '7z' or '7zZip' in the array till finding one. 
 
         Switch -Regex ($PreAction) {    
@@ -1245,6 +1245,8 @@ Param(
 [int]$ErrorCount = $ErrorCount ,
 [boolean]$OverRide = $OverRide ,
 [int]$OverRideCount = $OverRideCount ,
+
+[Boolean]$ErrorFlag     = $FALSE ,
 [boolean]$Continue = $Continue ,
 [int]$ContinueCount = $ContinueCount
 )
@@ -1274,9 +1276,7 @@ Param(
 
 [String]$DatumPath = $PSScriptRoot
 
-$Version = "3.0.1"
-
-[Boolean]$ErrorFlag     = $FALSE
+$Version = "3.1.0 beta-1"
 [Boolean]$WarningFlag   = $FALSE
 [Boolean]$NormalFlag    = $FALSE
 [Boolean]$OverRideFlag  = $FALSE
@@ -1335,7 +1335,8 @@ Write-Debug   ("`r`n" + ($targets.Object.fullname | Out-String))
 
 Write-Verbose ("[$(($targets | Measure-Object).Count)][$($filterType)(s)] are for processing..." + "`r`n" + ($targets.Object.fullname | Out-String))
 
-#-PreAction Archive processes files to archive to one file, thus before loop create a destination path of the archive file
+
+#-PreAction Archive processes files to archive to one file, thus before loop create an archived file
 
 IF ($PreAction -contains 'Archive') {
 
@@ -1346,14 +1347,27 @@ IF ($PreAction -contains 'Archive') {
 
     $archive = $ArchiveFileName | ConvertTo-PreActionPath -DestinationPath $destination
  
-    IF (-not($archive.Path | Test-LeafNotExists)) {
+    IF ($archive.Path | Test-LeafNotExists) {
+
+        Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start PRE-processing to [$($PreAction)] all files to one file [$($archive.Path)]  ---"
+
+        ForEach ($Target in $targets) {
+    
+            Invoke-Action -Type $archive.Type -ActionFrom $Target.Object.FullName -ActionTo $archive.Path -ActionError $Target.Object.FullName
         
+        }
+
+        Write-Log -ID $InfoLoopEndEventID -Type Information -Message "--- End PRE-processing to [$($PreAction)] all files to one file [$($archive.Path)]  ---"
+            
+    } else {
+
         Write-Log -ID $ErrorEventID -Type Error -Message ("File/Folder exists in the path [$($archive.Path)] already, " +
             "thus terminate $($ShellName) with an Error.")
 
-        $returnCode = $ErrorReturnCode        
+        $returnCode = $ErrorReturnCode
         Break main
         }
+    
 }
 
 #Start loop to process objects(Files or Folders)
@@ -1397,7 +1411,6 @@ Write-Log -ID $InfoLoopStartEventID -Type Information -Message "--- Start proces
 Create a destinationFolder(child folder of the MoveToFolder) with Target.Object.FullName
 If NoRecurse, destinationFolder will be, thus skip
 Without Action[(Move|Copy)] , dose not need to checke existence of destinationPath
-With PreAction[Archive] & MoveNewFile[TRUE] only MoveToFolder is needed, destinationFolder(s) are not needed, thus skip
 
 C:\TargetFolder                    :TargetFolder
 C:\TargetFolder\A\B\C              :Target.Object.DirectoryName
@@ -1408,8 +1421,8 @@ D:\MoveToFolder\A\B\C              :destinationFolder
 D:\MoveToFolder\A\B\C\target.txt   :destinationPath
 
 To create a destinationFolder, extract \A\B\C\ from TargetFolder and Join-Path MoveToFolder
-String.Substring method extract from argument to the end in the string
-Even if NoRecurse, destinationFolder is needed in Move or Copy action
+String.Substring method extract from the argument to the end in the string
+Even if NoRecurse, a destinationFolder is needed in Move or Copy action
 #>
     IF (($Action -match "^(Move|Copy)$") -or  (($PreAction -contains 'MoveNewFile') -and ($PreAction -notcontains 'Archive')) ) {
 
@@ -1433,7 +1446,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
 #Pre Action
 
-    IF (($PreAction -match '^(Compress|AddTimeStamp)$') -and ($PreAction -notcontains 'Archive')) {
+    IF (($PreAction -match '^(Compress|AddTimeStamp)$')) {
 
         $destination = $(IF ($PreAction -contains 'MoveNewFile') {$destinationFolder}
 
@@ -1446,12 +1459,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
             Invoke-Action -Type $archive.Type -ActionFrom $Target.Object.FullName -ActionTo $archive.Path -ActionError $Target.Object.FullName
             }
-        
-    } elseIF ($PreAction -contains 'Archive') {
-       
-        Invoke-Action -Type $archive.Type -ActionFrom $Target.Object.FullName -ActionTo $archive.Path -ActionError $Target.Object.FullName
-        }
-
+    }
 
 #Main Action
 
@@ -1459,8 +1467,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
 
 #case1 do nothing
         '^none$' {
-            IF ( ($PostAction -eq 'none') -and ($PreAction -contains 'none') ) {
-
+            IF ( ($PostAction -eq 'none') -and ($PreAction -match '(none|Archive)') ) {
                 Write-Log -ID $InfoEventID -Type Information -Message ("Specified -Action [$($Action)] option, " +
                     "thus do not process [$($Target.Object.FullName)]")
                 }
@@ -1471,7 +1478,7 @@ Even if NoRecurse, destinationFolder is needed in Move or Copy action
             Invoke-Action -Type Delete -ActionFrom $Target.Object.FullName -ActionError $Target.Object.FullName
         } 
 
-#case3 move or copyÅ@process after testing existence of the same name file in the destination
+#case3 move or copy„ÄÄprocess after testing existence of the same name file in the destination
         '^(Move|Copy)$' {
             $destinationPath = $destinationFolder | Join-Path -ChildPath ($Target.Object.Name)
 
