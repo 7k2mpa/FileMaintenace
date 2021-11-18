@@ -533,10 +533,10 @@ System.Int. Return Code.
 
 #!!! start of definition !!!#
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = "High")]
+
 Param(
 
-[String]
-[parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify a folder to process (ex. D:\Logs)  or Get-Help FileMaintenance.ps1')]
+[String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName, HelpMessage = 'Specify a folder to process (ex. D:\Logs)  or Get-Help FileMaintenance.ps1')]
 [ValidatePattern('^(\\\\|\.+\\|[c-zC-Z]:\\)(?!.*(\/|:|\?|`"|<|>|\||\*)).*$')][Alias("Path","LiteralPath","FullName" , "SourcePath")]$TargetFolder ,
 
 #[String]$TargetFolder,  #for Validation debug
@@ -708,7 +708,7 @@ Do {
     IF (-not(Test-Path -LiteralPath $Path)) {
 
         Write-Log -ID $InfoEventID -Type Information -Message "File [$($Path)] dose not exist."
-        $noExistFlag = $TRUE
+        $ObjectDoseNotExist = $TRUE
         Break
         }
 
@@ -732,12 +732,12 @@ Write-Verbose  "Source      LastWriteTime[$($Target.Object.LastWriteTime)] Size[
             
             Write-Log -ID $WarningEventID -Type Warning -Message "Last write time of [$($Path)] is equal or newer than [$($Target.Object.FullName)] , thus does no override."
             $Script:WarningFlag = $TRUE
-            $noExistFlag = $FALSE
+            $ObjectDoseNotExist = $FALSE
             Break
             }
 
         $Script:OverRideFlag = $TRUE
-        $noExistFlag = $TRUE
+        $ObjectDoseNotExist = $TRUE
 
         IF ($OverRideAsNormal) {
 
@@ -757,7 +757,7 @@ Write-Verbose  "Source      LastWriteTime[$($Target.Object.LastWriteTime)] Size[
     IF ($Continue) {
         
         $Script:ContinueFlag = $TRUE
-        $noExistFlag = $FALSE
+        $ObjectDoseNotExist = $FALSE
 
         IF ($ContinueAsNormal) {
 
@@ -780,14 +780,14 @@ Write-Verbose  "Source      LastWriteTime[$($Target.Object.LastWriteTime)] Size[
         } else {
         $Script:ErrorFlag = $TRUE
         $Script:ForceFinalize = $TRUE
-        $noExistFlag = $FALSE
+        $ObjectDoseNotExist = $FALSE
         Break 
         }
 }
 
 While ($FALSE)
 
-Write-Output $noExistFlag
+Write-Output $ObjectDoseNotExist
 }
 end {
 }

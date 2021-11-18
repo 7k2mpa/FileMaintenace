@@ -48,7 +48,7 @@ Specify Windows 'Service name' to switch status.
 'Service name' is diffent from 'Display name'.
 
 Sample
-Serivce Name:Spooker
+Serivce Name:Spooler
 Display Name:Print Spooler
  
 Specification is required.
