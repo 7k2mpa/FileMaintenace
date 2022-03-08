@@ -272,7 +272,7 @@ Param(
 
 [String][parameter(position=2, mandatory)][ValidateNotNullOrEmpty()]$DBname ,
 
-[String][parameter(position=3, mandatory)][ValidateSet("Full", "Diff" , "Trun")]$Type,
+[String][parameter(position=3, mandatory)][ValidateSet("Full", "Diff" , "Tran")]$Type,
 
 
 
@@ -393,7 +393,7 @@ Param(
 
 $DatumPath = $PSScriptRoot
 
-$Version = "3.0.1"
+$Version = "3.0.2"
 
 
 #initialize, validate parameters, output starting message
@@ -419,7 +419,7 @@ $Version = "3.0.1"
                 }
             }
 
-        'Trun' {
+        'Tran' {
             $parameter = @{
                 BackUpAction = 'Log'
                 Incremental  = $FALSE

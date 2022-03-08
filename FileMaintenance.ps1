@@ -708,7 +708,7 @@ Do {
     IF (-not(Test-Path -LiteralPath $Path)) {
 
         Write-Log -ID $InfoEventID -Type Information -Message "File [$($Path)] dose not exist."
-        $ObjectDoseNotExist = $TRUE
+        $objectDoseNotExist = $TRUE
         Break
         }
 
@@ -732,12 +732,12 @@ Write-Verbose  "Source      LastWriteTime[$($Target.Object.LastWriteTime)] Size[
             
             Write-Log -ID $WarningEventID -Type Warning -Message "Last write time of [$($Path)] is equal or newer than [$($Target.Object.FullName)] , thus does no override."
             $Script:WarningFlag = $TRUE
-            $ObjectDoseNotExist = $FALSE
+            $objectDoseNotExist = $FALSE
             Break
             }
 
         $Script:OverRideFlag = $TRUE
-        $ObjectDoseNotExist = $TRUE
+        $objectDoseNotExist = $TRUE
 
         IF ($OverRideAsNormal) {
 
@@ -757,7 +757,7 @@ Write-Verbose  "Source      LastWriteTime[$($Target.Object.LastWriteTime)] Size[
     IF ($Continue) {
         
         $Script:ContinueFlag = $TRUE
-        $ObjectDoseNotExist = $FALSE
+        $objectDoseNotExist = $FALSE
 
         IF ($ContinueAsNormal) {
 
@@ -780,14 +780,14 @@ Write-Verbose  "Source      LastWriteTime[$($Target.Object.LastWriteTime)] Size[
         } else {
         $Script:ErrorFlag = $TRUE
         $Script:ForceFinalize = $TRUE
-        $ObjectDoseNotExist = $FALSE
+        $objectDoseNotExist = $FALSE
         Break 
         }
 }
 
 While ($FALSE)
 
-Write-Output $ObjectDoseNotExist
+Write-Output $objectDoseNotExist
 }
 end {
 }
@@ -844,7 +844,7 @@ PSObject
 [CmdletBinding()]
 Param(
 [String][parameter(position = 0, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)][Alias("TargetFolder" , "FullName")]$Path ,
-[String][parameter(position = 1, mandatory)][ValidateSet("File" , "Folder")]$filterType ,
+[String][parameter(position = 1, mandatory)][ValidateSet("File" , "Folder")]$FilterType ,
 
 [Switch]$Recurse = $Recurse ,
 [String]$Action = $Action
@@ -858,8 +858,8 @@ $parameter = @{
     LiteralPath = $Path
     Recurse     = $Recurse
     Include     = '*'    
-    File        = ($filterType -eq 'File')
-    Directory   = ($filterType -eq 'Folder')
+    File        = ($FilterType -eq 'File')
+    Directory   = ($FilterType -eq 'Folder')
 }
 
     $objects = @()

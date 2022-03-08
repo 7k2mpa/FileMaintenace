@@ -233,8 +233,8 @@ Param(
 [String][parameter(position = 3)][Alias("ErrorPath" , "Error")]$ActionError,
 [String][parameter(position = 4)]$FileValue,
 
-$WhatIfFlag = $WhatIfFlag ,
-$OverRideFlag = $OverRideFlag ,
+$whatIfWasSpecified = $WhatIfFlag ,
+$overRideWasSpecified = $OverRideFlag ,
 $ForceEndLoop = $ForceEndLoop ,
 $Continue = $Continue ,
 $7zFolder = $7zFolder 
@@ -252,12 +252,12 @@ begin {
         }
 }
 process {
-    IF ($WhatIfFlag -and ($ActionType -match "(Compress|Archive)") ) {
+    IF ($whatIfWasSpecified -and ($ActionType -match "(Compress|Archive)") ) {
     
-        Write-Log -Id $WarningEventID -Type Warning -Message "Specified -WhatIf[$($WhatIfFlag)] option, thus do not execute [$($ActionType)] [$($ActionError)]"
+        Write-Log -Id $WarningEventID -Type Warning -Message "Specified -WhatIf[$($whatIfWasSpecified)] option, thus do not execute [$($ActionType)] [$($ActionError)]"
         $Script:NormalFlag = $TRUE
 
-        IF ($OverRideFlag) {
+        IF ($overRideWasSpecified) {
             $Script:OverRideCount++
             $Script:InLoopOverRideCount++
             $Script:OverRideFlag = $FALSE            
@@ -337,7 +337,7 @@ process {
 
             IF ($LASTEXITCODE -ne 0) {
 
-                $processErrorFlag = $TRUE
+                $errorOccurredINexe = $TRUE
                 Throw "error occure in 7-Zip"            
                 }
             }
@@ -360,7 +360,7 @@ process {
 
                 Write-log -Id $ErrorEventID -Type Error -Message "Archive is corrupted."
 
-                [String]$errorDetail = $testResult
+                $errorDetail = $testResult
 
                 Throw "error occure in 7-Zip" 
             }
@@ -368,7 +368,7 @@ process {
 
         IF ($LASTEXITCODE -ne 0) {
 
-            $processErrorFlag = $TRUE
+            $errorOccurredINexe = $TRUE
             Throw "error occure in 7-Zip"            
             }                
 
@@ -387,7 +387,7 @@ process {
     catch [Exception] {
        
         Write-Log -Id $ErrorEventID -Type Error -Message ("Failed to execute [$($ActionType)] [$($ActionError)]" + $addMessage)
-        IF (-not($processErrorFlag)) {
+        IF (-not($errorOccurredINexe)) {
             $errorDetail = $Error[0] | Out-String
             }
         Write-Log -Id $ErrorEventID -Type Error -Message "Execution Error Message : $errorDetail"
@@ -411,7 +411,7 @@ process {
             }   
     }
 
-    IF ($OverRideFlag) {
+    IF ($overRideWasSpecified) {
         $Script:OverRideCount ++
         $Script:InLoopOverRideCount ++
         $Script:OverRideFlag = $FALSE
