@@ -223,7 +223,7 @@ function Invoke-Action {
 [CmdletBinding()]    
 Param(
 [String][parameter(position = 0, mandatory)]
-[ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|MakeNew(FileWithValue|Folder)|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$")]
+[ValidatePattern("^(Move|Copy|Delete|AddTimeStamp|NullClear|Rename|MakeNew(FileWithValue|Folder)|TestArchive|(7z|7zZip|^)(Compress|Archive)(AndAddTimeStamp|$))$")]
 [Alias("Type")]$ActionType,
 
 [String][parameter(position = 1, mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
@@ -233,15 +233,15 @@ Param(
 [String][parameter(position = 3)][Alias("ErrorPath" , "Error")]$ActionError,
 [String][parameter(position = 4)]$FileValue,
 
-$WhatIfFlag = $WhatIfFlag ,
-$OverRideFlag = $OverRideFlag ,
+$whatIfWasSpecified = $WhatIfFlag ,
+$overRideWasSpecified = $OverRideFlag ,
 $ForceEndLoop = $ForceEndLoop ,
 $Continue = $Continue ,
 $7zFolder = $7zFolder 
 
 )
 begin {
-    IF (-not($ActionType -match "^(Delete|NullClear|MakeNewFolder|Rename)$" ) -and ($NULL -eq $ActionTo)) {
+    IF (-not($ActionType -match "^(Delete|NullClear|MakeNewFolder|Rename|TestArchive)$" ) -and ($NULL -eq $ActionTo)) {
 
         Write-Log -Id $InternalErrorEventID -Type Error -Message "Internal Error at Function Invoke-Action  [$($ActionType)] requires [$($ActionTo)]"
         Finalize $InternalErrorReturnCode
@@ -252,12 +252,12 @@ begin {
         }
 }
 process {
-    IF ($WhatIfFlag -and ($ActionType -match "(Compress|Archive)") ) {
+    IF ($whatIfWasSpecified -and ($ActionType -match "(Compress|Archive)") ) {
     
-        Write-Log -Id $WarningEventID -Type Warning -Message "Specified -WhatIf[$($WhatIfFlag)] option, thus do not execute [$($ActionType)] [$($ActionError)]"
+        Write-Log -Id $WarningEventID -Type Warning -Message "Specified -WhatIf[$($whatIfWasSpecified)] option, thus do not execute [$($ActionType)] [$($ActionError)]"
         $Script:NormalFlag = $TRUE
 
-        IF ($OverRideFlag) {
+        IF ($overRideWasSpecified) {
             $Script:OverRideCount++
             $Script:InLoopOverRideCount++
             $Script:OverRideFlag = $FALSE            
@@ -286,7 +286,6 @@ process {
             }
 
         '^(Compress|CompressAndAddTimeStamp)$' {
-#           $ActionTo = $ActionTo -replace "\[" , "````["
             Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Force > $NULL  -ErrorAction Stop
             }                  
                                        
@@ -299,10 +298,7 @@ process {
             }
 
         '^(Archive|ArchiveAndAddTimeStamp)$' {
-#           $ActionTo = $ActionTo -replace "\[" , "````["
-#            Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Update > $NULL  -ErrorAction Stop
             Compress-Archive -LiteralPath $ActionFrom -DestinationPath $ActionTo -Force > $NULL  -ErrorAction Stop
-
             }                  
 
         '^((7z|7zZip)(Archive|Compress)($|AndAddTimeStamp))$' {
@@ -338,13 +334,47 @@ process {
                 }
 
             Pop-Location
-            $processErrorFlag = $TRUE
+
             IF ($LASTEXITCODE -ne 0) {
 
+                $errorOccurredINexe = $TRUE
                 Throw "error occure in 7-Zip"            
                 }
             }
-                                           
+ 
+        '^(TestArchive)$' {
+
+
+            Push-Location -LiteralPath $7zFolder
+
+
+            [String]$testResult = .\7z.exe t $ActionFrom 2>&1 
+
+            Pop-Location
+            
+            If ($testResult -match '(.+OK)(.+)') {
+
+                Write-log -Id $SuccessEventID -Type Information -Message "Archive OK"
+
+            } elese {
+
+                Write-log -Id $ErrorEventID -Type Error -Message "Archive is corrupted."
+
+                $errorDetail = $testResult
+
+                Throw "error occure in 7-Zip" 
+            }
+
+
+        IF ($LASTEXITCODE -ne 0) {
+
+            $errorOccurredINexe = $TRUE
+            Throw "error occure in 7-Zip"            
+            }                
+
+        }    
+
+
         Default {
             Write-Log -Id $InternalErrorEventID -Type Error -Message "Internal Error at Function Invoke-Action. Switch ActionType exception has occurred. "
             Finalize $InternalErrorReturnCode
@@ -357,7 +387,7 @@ process {
     catch [Exception] {
        
         Write-Log -Id $ErrorEventID -Type Error -Message ("Failed to execute [$($ActionType)] [$($ActionError)]" + $addMessage)
-        IF (-not($processErrorFlag)) {
+        IF (-not($errorOccurredINexe)) {
             $errorDetail = $Error[0] | Out-String
             }
         Write-Log -Id $ErrorEventID -Type Error -Message "Execution Error Message : $errorDetail"
@@ -381,7 +411,7 @@ process {
             }   
     }
 
-    IF ($OverRideFlag) {
+    IF ($overRideWasSpecified) {
         $Script:OverRideCount ++
         $Script:InLoopOverRideCount ++
         $Script:OverRideFlag = $FALSE
