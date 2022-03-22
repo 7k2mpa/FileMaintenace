@@ -1276,7 +1276,7 @@ Param(
 
 [String]$DatumPath = $PSScriptRoot
 
-$Version = "3.1.0 beta-1"
+$Version = "3.0.1 beta-1"
 [Boolean]$WarningFlag   = $FALSE
 [Boolean]$NormalFlag    = $FALSE
 [Boolean]$OverRideFlag  = $FALSE
