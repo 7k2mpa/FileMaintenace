@@ -1,6 +1,6 @@
 ﻿#Requires -Version 3.0
 
-$Script:SQLsVersion = '2.0.0'
+$Script:SQLsVersion = '3.1.0'
 
 [String]$DBStart = @'
 
@@ -81,14 +81,14 @@ exit
 
 '@
 
-[String]$RegistListener = @'
+[String]$RegisterListener = @'
 
 alter system register;
 exit
 
 '@
 
-[String]$SessionCheck = @'
+[String]$CheckSession = @'
 
 SELECT sid,serial#,username,status,machine,program,sql_id FROM v$session WHERE username IS NOT NULL and sid != USERENV('SID');
 exit
@@ -100,6 +100,13 @@ exit
 
 WHENEVER SQLERROR EXIT 1
 alter system archive log current;
+exit
+
+'@
+
+[String]$DBCheckArchiveLogMode = @'
+
+select log_mode from v$database;
 exit
 
 '@

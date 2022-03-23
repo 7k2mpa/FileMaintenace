@@ -1242,6 +1242,80 @@ end {
 }
 
 
+function Test-OracleArchiveLogMode {
+
+    [OutputType([PSObject])]
+    [CmdletBinding()]
+     Param(
+     [String]$DBCheckArchiveLogMode = $DBCheckArchiveLogMode ,
+     [String]$SQLLogPath = $SQLLogPath
+     )
+    
+     begin {
+     }
+     process {
+        Write-Log -Id $InfoEventID -Type Information -Message "Get the archive log mode status of Oracle Database"
+        
+        $invokeResult = Invoke-SQL -SQLCommand $DBCheckBackUpMode -SQLName "DBCheckArchiveLogMode" -SQLLogPath $SQLLogPath
+    
+       
+        #•¶Žš—ñ”z—ñ‚É•ÏŠ·‚·‚é
+        $sqlLog = $invokeResult.Log -replace "`r","" |  ForEach-Object {$_ -split "`n"}
+    
+        $archiveLogModeCount = 0
+        $noArchiveLogModeCount = 0
+    
+        $dbStatus = New-Object PSObject -Property @{
+        ArchiveLog = $FALSE
+        NoArchiveLog = $FALSE
+        }
+    
+        $i = 1
+    
+        foreach ($line in $sqlLog) {
+    
+            IF ($line -match '^NOARCHIVELOG$') {
+                $noArchiveLogModeCount ++
+                Write-Log -Id $InfoEventID -Type Information -Message "[$line] line[$i] No Archive Log Mode"
+     
+     
+                } elseIF ($line -match '^ARCHIVELOG') {
+                $archiveLogModeCount ++
+                Write-Log -Id $InfoEventID -Type Information -Message "[$line] line[$i] Archive Log Mode"
+                }
+     
+        $i ++
+        }
+    
+    
+        Write-Log -Id $InfoEventID -Type Information -Message "Oracle Database is running in...."
+    
+        IF (($noArchiveLogModeCount -eq 0) -and ($archiveLogModeCount -gt 0)) {
+     
+            Write-Log -Id $InfoEventID -Type Information -Message "Archive Log Mode"
+            $dbStatus.ArchiveLog = $TRUE
+            $dbStatus.NoArchiveLog = $FALSE
+    
+        } elseIF (($noArchiveLogModeCount -gt 0) -and ($archiveLogModeCount -eq 0)) {
+       
+            Write-Log -Id $InfoEventID -Type Information -Message "No Archive Log Mode"
+            $dbStatus.ArchiveLog = $FALSE
+            $dbStatus.NoArchiveLog = $TRUE
+    
+        } else {
+    
+            Write-Log -Id $InfoEventID -Type Information -Message "??? Mode ???"
+            $dbStatus.ArchiveLog = $FALSE
+            $dbStatus.NoArchiveLog = $FALSE
+        }
+    
+        Write-Output $dbStatus
+    }
+    end {
+    }
+    }
+    
+
 function Test-UserName {
 
 [OutputType([Boolean])]

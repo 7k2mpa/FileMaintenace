@@ -534,7 +534,7 @@ Pop-Location
 
 $DatumPath = $PSScriptRoot
 
-$Version = "3.0.0"
+$Version = "3.1.0"
 
 
 #initialize, validate parameters, output starting message
@@ -569,6 +569,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
         Default {
             Write-Log -EventID $WarningEventID -Type Warning -Message "Listener status is unknown."
             $needToStartListener = $TRUE
+            $WarningCount ++
             }     
      }
 
@@ -628,19 +629,25 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
                 
             } else {
             Write-Log -EventID $InfoEventID -Type Information -Message "Failed to check Oracle Database Status."
+            $WarningCount ++
             }
 
 
-        IF ($invokeResult.log -match 'OPEN') {
-            Write-Log -EventID $InfoEventID -Type Information -Message "Oracle instance SID [$($OracleSID)] is already OPEN."
-         
-  
-        }elseIF ($invokeResult.log -match '(STARTED|MOUNTED)') {
-            
-            Write-Log -EventID $ErrorEventID -Type Error -Message "Oracle instance SID [$($OracleSID)] is MOUNT or NOMOUNT. Shutdown and start up manually."
-            Finalize $ErrorReturnCode
+    Switch ($invokeResult) {
 
-        } else {
+        {($_.log -match 'OPEN')} {
+
+            Write-Log -EventID $InfoEventID -Type Information -Message "Oracle instance SID [$($OracleSID)] is already OPEN."            
+            }
+       
+        {($_.log -match '(STARTED|MOUNTED)')} {
+
+            Write-Log -EventID $ErrorEventID -Type Error -Message "Oracle instance SID [$($OracleSID)] is MOUNT or NOMOUNT. Shutdown and start up manually."
+            Finalize $ErrorReturnCode            
+            } 
+
+        default {
+
             Write-Log -EventID $InfoEventID -Type Information -Message "Oracle instance SID [$($OracleSID)] is not OPEN."        
             Write-Log -EventID $InfoEventID -Type Information -Message "Switch Oracle instance SID [$($OracleSID)] to OPEN."
 
@@ -656,7 +663,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
                     }
             }
 
-
+        }
 
 
 #Get status in which BackUp/Normal Mode
@@ -668,38 +675,42 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
       IF ($LASTEXITCODE -ne 0) {
 
         Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to Check Back Up Mode."
-
         Finalize $ErrorReturnCode
+
         } else { 
         Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to Check Back Up Mode."
         }
 
 
- IF (-not($status.BackUp) -and ($status.Normal)) {
- 
-    Write-Log -EventID $InfoEventID -Type Information -Message "Oracle Database is running in Normal Mode(ending backup mode)"
-    }
+    Switch ($status) {
 
- IF (-not( ($status.BackUp) -xor ($status.Normal) )) {
+            {($_.Normal) -and -not($_.Backup)} {
 
-    Write-Log -EventID $ErrorEventID -Type Error -Message "Oracle Database is running in UNKNOWN mode."
-    $ErrorCount ++
- 
-    } elseIF (($status.BackUp) -and (-not($status.Normal))) {
- 
-        Write-Log -EventID $InfoEventID -Type Information -Message "Oracle Database is running in Backup Mode. Switch to Normal Mode(Ending Backup Mode)"
-
-        $invokeResult = Invoke-SQL -SQLCommand $DBBackUpModeOff -SQLName "Switch to Normal Mode" -SQLLogPath $SQLLogPath
-
-        IF ($invokeResult.Status) {
-
-            Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to switch to Normal Mode(Ending Backup Mode)"
-
-            } else {        
-            Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to switch to Normal Mode(Ending Backup Mode)"
-            $ErrorCount ++
+                Write-Log -EventID $InfoEventID -Type Information -Message "Oracle Database is running in Normal Mode(ending backup mode)"
             }
- }
+
+            {($_.Backup) -and -not($_.Normal)} {
+
+                Write-Log -EventID $InfoEventID -Type Information -Message "Oracle Database is running in Backup Mode. Switch to Normal Mode(Ending Backup Mode)"
+
+                $invokeResult = Invoke-SQL -SQLCommand $DBBackUpModeOff -SQLName "Switch to Normal Mode" -SQLLogPath $SQLLogPath
+
+                IF ($invokeResult.Status) {
+        
+                    Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to switch to Normal Mode(Ending Backup Mode)"
+        
+                    } else {        
+                    Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to switch to Normal Mode(Ending Backup Mode)"
+                    $ErrorCount ++
+                    }                
+            }
+
+            Default {
+
+                Write-Log -EventID $ErrorEventID -Type Error -Message "Oracle Database is running in UNKNOWN mode."
+                $ErrorCount ++                
+            }
+    }
 
 
 #Export control file
