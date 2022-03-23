@@ -504,7 +504,7 @@ Pop-Location
 
 $DatumPath = $PSScriptRoot
 
-$Version = "3.0.0"
+$Version = "3.1.0"
 
 
 #initialize, validate parameters, output starting message
@@ -519,7 +519,7 @@ Push-Location $OracleHomeBinPath
 
     Write-Log -EventID $InfoEventID -Type Information -Message "Export Session Info."
 
-    $invokeResult = Invoke-SQL -SQLCommand $SessionCheck -SQLName "Check Sessions" -SQLLogPath $SQLLogPath
+    $invokeResult = Invoke-SQL -SQLCommand $CheckSession -SQLName "Check Sessions" -SQLLogPath $SQLLogPath
  
     IF ($invokeResult.Status) {
 
@@ -563,26 +563,27 @@ Push-Location $OracleHomeBinPath
         }
 
 
+    Switch ($status) {
 
+        {($_.Normal) -and -not($_.BackUp)} {
 
-    IF (($status.BackUp) -and (-not($status.Normal))) {
- 
-        Write-Log -EventID $WarningEventID -Type Warning -Message "Oracle Database running status is Backup Mode already."
-        $WarningCount ++
- 
-        } elseIF (-not(($status.BackUp) -xor ($status.Normal))) {
- 
-            Write-Log -EventID $ErrorEventID -Type Error -Message "Oracle Database running status is unknown."
-            Finalize $ErrorReturnCode
-            }
-
-
-
-    IF (-not($status.BackUp) -and ($status.Normal)) {
- 
-        Write-Log -EventID $InfoEventID -Type Information -Message "Oracle Database running status is Normal Mode."
+            Write-Log -EventID $InfoEventID -Type Information -Message "Oracle Database running status is Normal Mode."
         }
 
+        {($_.BackUp) -and -not($_.Normal)} {
+
+            Write-Log -EventID $WarningEventID -Type Warning -Message "Oracle Database running status is Backup Mode already."
+            $WarningCount ++
+
+        }  
+
+        Default {
+
+            Write-Log -EventID $ErrorEventID -Type Error -Message "Oracle Database running status is unknown."
+            Finalize $ErrorReturnCode            
+        }
+
+    }
 
 
 #Switch to Back Up Mode
