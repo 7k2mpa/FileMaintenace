@@ -534,7 +534,7 @@ Pop-Location
 
 $DatumPath = $PSScriptRoot
 
-$Version = "3.1.0"
+$Version = "3.1.1"
 
 
 #initialize, validate parameters, output starting message
@@ -571,7 +571,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
             $needToStartListener = $TRUE
             $WarningCount ++
             }     
-     }
+    }
 
 
     IF ($needToStartListener) {
@@ -589,7 +589,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
             Finalize $ErrorReturnCode
             }
 
-    }
+        }
 
 
 #Test Oracle Windows serivce, and start   
@@ -613,9 +613,9 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
             }            
             
         IF ($LASTEXITCODE -ne 0) {
-                Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to start Windows service [$($targetWindowsOracleService)]"
-                Finalize $ErrorReturnCode
-                }
+            Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to start Windows service [$($targetWindowsOracleService)]"
+            Finalize $ErrorReturnCode
+            }
         }
 
 
@@ -633,14 +633,14 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
             }
 
 
-    Switch ($invokeResult) {
+    Switch -Regex ($invokeResult.log) {
 
-        {($_.log -match 'OPEN')} {
+        'OPEN' {
 
             Write-Log -EventID $InfoEventID -Type Information -Message "Oracle instance SID [$($OracleSID)] is already OPEN."            
             }
        
-        {($_.log -match '(STARTED|MOUNTED)')} {
+        '(STARTED|MOUNTED)' {
 
             Write-Log -EventID $ErrorEventID -Type Error -Message "Oracle instance SID [$($OracleSID)] is MOUNT or NOMOUNT. Shutdown and start up manually."
             Finalize $ErrorReturnCode            
@@ -662,8 +662,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
                     $ErrorCount ++
                     }
             }
-
-        }
+    }
 
 
 #Get status in which BackUp/Normal Mode
@@ -687,7 +686,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
             {($_.Normal) -and -not($_.Backup)} {
 
                 Write-Log -EventID $InfoEventID -Type Information -Message "Oracle Database is running in Normal Mode(ending backup mode)"
-            }
+                }
 
             {($_.Backup) -and -not($_.Normal)} {
 
@@ -703,13 +702,13 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
                     Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to switch to Normal Mode(Ending Backup Mode)"
                     $ErrorCount ++
                     }                
-            }
+                }
 
             Default {
 
                 Write-Log -EventID $ErrorEventID -Type Error -Message "Oracle Database is running in UNKNOWN mode."
                 $ErrorCount ++                
-            }
+                }
     }
 
 
