@@ -1,13 +1,13 @@
 @echo off
 
 rem ========================================================
-rem ƒ\[ƒX‚ğ“o˜^‚·‚é‚Ì‚ÅA1‰ñ‚¾‚¯ŠÇ—ÒŒ ŒÀ‚ÅÀs‚·‚é‚±‚Æ
-rem “o˜^Œã‚Í‹N“®•s—v
+rem ã‚½ãƒ¼ã‚¹ã‚’ç™»éŒ²ã™ã‚‹ã®ã§ã€1å›ã ã‘ç®¡ç†è€…æ¨©é™ã§å®Ÿè¡Œã™ã‚‹ã“ã¨
+rem ç™»éŒ²å¾Œã¯èµ·å‹•ä¸è¦
 rem To register event source, execute with administrator priviledge once.
 rem After registration, no need to execute this script.
 rem ========================================================
 
-eventcreate /L Application /T INFORMATION /SO Infra /ID 1000 /D "regist a new source in event log"
+eventcreate /L Application /T INFORMATION /SO Infra /ID 1000 /D "register a new source in event log"
 
 pause
 
