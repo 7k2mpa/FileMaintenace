@@ -490,8 +490,7 @@ Param(
 
 Pop-Location
 
- Invoke-PostFinalize $ReturnCode
-
+Invoke-PostFinalize $ReturnCode
 
 }
 
@@ -504,7 +503,7 @@ Pop-Location
 
 $DatumPath = $PSScriptRoot
 
-$Version = "3.1.0"
+$Version = "3.1.1"
 
 
 #initialize, validate parameters, output starting message
@@ -531,80 +530,95 @@ Push-Location $OracleHomeBinPath
         }
 
 
+    Write-Log -EventID $InfoEventID -Type Information -Message "Check Oracle is running in which mode archive log or no archive log."
+
+    $oracleIsRunningIn = Test-OracleArchiveLogMode
+
+    IF ($LASTEXITCODE -ne 0) {
+
+        Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to check Oracle is running in which mode archive log or no archive log."
+        Finalize $ErrorReturnCode
+
+        } else { 
+        Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to check Oracle is running in which mode archive log or no archive log."
+        }
+
+
 #Output Redo Log
 
-  Write-Log -EventID $InfoEventID -Type Information -Message "Export Redo Log."
-
-    $invokeResult = Invoke-SQL -SQLCommand $ExportRedoLog -SQLName "Export Redo Log" -SQLLogPath $SQLLogPath
-
-    IF ($invokeResult.Status) {
-
-        Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to Export Redo Log."
+    IF (($oracleIsRunningIn.NoArchiveLogMode) -and -not($oracleIsRunningIn.ArchiveLogMode)) {
+        
+        Write-Log -EventID $InfoEventID -Type Information -Message "Oracle Database is running in no archive log mode, thus skipping to export redo log and to check Oracle is running in which back up or normal mode."
         
         } else {
-        Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to Export Redo Log."
-        Finalize $ErrorReturnCode
-        }
+        Write-Log -EventID $InfoEventID -Type Information -Message "Export Redo Log."
 
-
-#get status in which BackUp/Normal Mode
-
-    Write-Log -EventID $InfoEventID -Type Information -Message "Check Database running status in which mode"
-
-    $status = Test-OracleBackUpMode
-
-      IF ($LASTEXITCODE -ne 0) {
-
-        Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to Check Database running status."
-        Finalize $ErrorReturnCode
-        
-        } else {
-        Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to Check Database running status."
-        }
-
-
-    Switch ($status) {
-
-        {($_.Normal) -and -not($_.BackUp)} {
-
-            Write-Log -EventID $InfoEventID -Type Information -Message "Oracle Database running status is Normal Mode."
-        }
-
-        {($_.BackUp) -and -not($_.Normal)} {
-
-            Write-Log -EventID $WarningEventID -Type Warning -Message "Oracle Database running status is Backup Mode already."
-            $WarningCount ++
-
-        }  
-
-        Default {
-
-            Write-Log -EventID $ErrorEventID -Type Error -Message "Oracle Database running status is unknown."
-            Finalize $ErrorReturnCode            
-        }
-
-    }
-
-
-#Switch to Back Up Mode
-
-    IF ($NoChangeToBackUpMode) {
-
-        Write-Log -EventID $InfoEventID -Type Information -Message "Specified -NoChangeToBackUpMode option, thus do not switch to BackUpMode."
-
-        } else {
-        Write-Log -EventID $InfoEventID -Type Information -Message "Switch to Back Up Mode"
-
-        $invokeResult = Invoke-SQL -SQLCommand $DBBackUpModeOn -SQLName "Switch to Back Up Mode" -SQLLogPath $SQLLogPath
+        $invokeResult = Invoke-SQL -SQLCommand $ExportRedoLog -SQLName "Export Redo Log" -SQLLogPath $SQLLogPath
 
         IF ($invokeResult.Status) {
 
-            Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to switch to Back Up Mode."
-            
+            Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to Export Redo Log."
+        
             } else {
-            Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to switch to Back Up Mode."
-            Finalize $ErrorReturnCode            
+            Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to Export Redo Log."
+            Finalize $ErrorReturnCode
             }
+
+#get status in which mode BackUp or Normal
+
+        $status = Test-OracleBackUpMode
+
+        IF ($LASTEXITCODE -ne 0) {
+
+            Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to Check Database running status."
+            Finalize $ErrorReturnCode
+        
+            } else {
+            Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to Check Database running status."
+            }
+
+
+        Switch ($status) {
+
+            {($_.BackUp) -and -not($_.Normal)} {
+
+                Write-Log -EventID $WarningEventID -Type Warning -Message "Oracle Database is running in Backup Mode already."
+                $WarningCount ++
+            }  
+
+
+            {($_.Normal) -and -not($_.BackUp)} {
+
+                Write-Log -EventID $InfoEventID -Type Information -Message "Oracle Database is running in Normal Mode."
+
+                IF ($NoChangeToBackUpMode) {
+
+                    Write-Log -EventID $InfoEventID -Type Information -Message "Specified -NoChangeToBackUpMode option, thus do not switch to BackUpMode."
+
+                    } else {
+                    Write-Log -EventID $InfoEventID -Type Information -Message "Switch to Back Up Mode"
+
+                    $invokeResult = Invoke-SQL -SQLCommand $DBBackUpModeOn -SQLName "Switch to Back Up Mode" -SQLLogPath $SQLLogPath
+
+                    IF ($invokeResult.Status) {
+
+                        Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to switch to Back Up Mode."
+            
+                        } else {
+                        Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to switch to Back Up Mode."
+                        Finalize $ErrorReturnCode            
+                        }
+                }
+            }
+
+
+            Default {
+
+                Write-Log -EventID $ErrorEventID -Type Error -Message "Oracle Database is running in neither backup mode nor normal mode."
+                Finalize $ErrorReturnCode            
+            }
+
+        }
     }
 
 

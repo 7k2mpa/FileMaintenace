@@ -1151,7 +1151,7 @@ Write-Output $invokeResult.log | Out-File -FilePath $SQLLogPath -Append  -Encodi
 
         Write-Log -Id $ErrorEventID -Type Error -Message "Failed to execute SQL Command[$($SQLName)]"
    
-            IF ($IfErrorFinalize) {
+        IF ($IfErrorFinalize) {
             Finalize $ErrorReturnCode
             }
    
@@ -1256,18 +1256,17 @@ function Test-OracleArchiveLogMode {
      process {
         Write-Log -Id $InfoEventID -Type Information -Message "Get the archive log mode status of Oracle Database"
         
-        $invokeResult = Invoke-SQL -SQLCommand $DBCheckBackUpMode -SQLName "DBCheckArchiveLogMode" -SQLLogPath $SQLLogPath
-    
+        $invokeResult = Invoke-SQL -SQLCommand $DBCheckArchiveLogMode -SQLName "DBCheckArchiveLogMode" -SQLLogPath $SQLLogPath
        
         #•¶Žš—ñ”z—ñ‚É•ÏŠ·‚·‚é
         $sqlLog = $invokeResult.Log -replace "`r","" |  ForEach-Object {$_ -split "`n"}
-    
+
         $archiveLogModeCount = 0
         $noArchiveLogModeCount = 0
     
         $dbStatus = New-Object PSObject -Property @{
-        ArchiveLog = $FALSE
-        NoArchiveLog = $FALSE
+        ArchiveLogMode = $FALSE
+        NoArchiveLogMode = $FALSE
         }
     
         $i = 1
@@ -1276,12 +1275,12 @@ function Test-OracleArchiveLogMode {
     
             IF ($line -match '^NOARCHIVELOG$') {
                 $noArchiveLogModeCount ++
-                Write-Log -Id $InfoEventID -Type Information -Message "[$line] line[$i] No Archive Log Mode"
+                Write-Log -Id $InfoEventID -Type Information -Message "in SQL log line[$i] No Archive Log Mode"
      
      
                 } elseIF ($line -match '^ARCHIVELOG') {
                 $archiveLogModeCount ++
-                Write-Log -Id $InfoEventID -Type Information -Message "[$line] line[$i] Archive Log Mode"
+                Write-Log -Id $InfoEventID -Type Information -Message "in SQL log line[$i] Archive Log Mode"
                 }
      
         $i ++
@@ -1293,20 +1292,20 @@ function Test-OracleArchiveLogMode {
         IF (($noArchiveLogModeCount -eq 0) -and ($archiveLogModeCount -gt 0)) {
      
             Write-Log -Id $InfoEventID -Type Information -Message "Archive Log Mode"
-            $dbStatus.ArchiveLog = $TRUE
-            $dbStatus.NoArchiveLog = $FALSE
+            $dbStatus.ArchiveLogMode = $TRUE
+            $dbStatus.NoArchiveLogMode = $FALSE
     
         } elseIF (($noArchiveLogModeCount -gt 0) -and ($archiveLogModeCount -eq 0)) {
        
             Write-Log -Id $InfoEventID -Type Information -Message "No Archive Log Mode"
-            $dbStatus.ArchiveLog = $FALSE
-            $dbStatus.NoArchiveLog = $TRUE
+            $dbStatus.ArchiveLogMode = $FALSE
+            $dbStatus.NoArchiveLogMode = $TRUE
     
         } else {
     
             Write-Log -Id $InfoEventID -Type Information -Message "??? Mode ???"
-            $dbStatus.ArchiveLog = $FALSE
-            $dbStatus.NoArchiveLog = $FALSE
+            $dbStatus.ArchiveLogMode = $FALSE
+            $dbStatus.NoArchiveLogMode = $FALSE
         }
     
         Write-Output $dbStatus
@@ -1341,7 +1340,7 @@ process {
             Write-Log -Id $ErrorEventID -Type Error -Message "$($ObjectName) [$($CheckUserName)] is invalid user name."
             Write-Output $FALSE
 
-            IF($IfInvalidFinalize){
+            IF($IfInvalidFinalize) {
 
                 Finalize $ErrorReturnCode
                 }
@@ -1441,7 +1440,7 @@ end {
 
 ##### Main #####
 
-$Script:CommonFunctionsVersion = "3.0.1 beta-1"
+$Script:CommonFunctionsVersion = "3.1.1 beta-1"
 
 Write-Verbose "CommonFunctions.ps1 Version $CommonFunctionsVersion"
 

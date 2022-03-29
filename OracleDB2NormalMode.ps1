@@ -589,7 +589,7 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
             Finalize $ErrorReturnCode
             }
 
-        }
+    }
 
 
 #Test Oracle Windows serivce, and start   
@@ -613,15 +613,15 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
             }            
             
         IF ($LASTEXITCODE -ne 0) {
-            Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to start Windows service [$($targetWindowsOracleService)]"
-            Finalize $ErrorReturnCode
-            }
+                Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to start Windows service [$($targetWindowsOracleService)]"
+                Finalize $ErrorReturnCode
+                }
         }
 
 
 #Get status of DB instance
 
-    $invokeResult = Invoke-SQL -SQLCommand $DBStatus -SQLName 'DB Status Check' -SQLLogPath $SQLLogPath
+    $invokeResult = Invoke-SQL -SQLCommand $DBStatus -SQLName 'Check DB Status' -SQLLogPath $SQLLogPath
 
     IF (($invokeResult.Status) -or ($invokeResult.log -match 'ORA-01034')) {
 
@@ -633,14 +633,14 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
             }
 
 
-    Switch -Regex ($invokeResult.log) {
+    Switch ($invokeResult) {
 
-        'OPEN' {
+        {($_.log -match 'OPEN')} {
 
             Write-Log -EventID $InfoEventID -Type Information -Message "Oracle instance SID [$($OracleSID)] is already OPEN."            
             }
        
-        '(STARTED|MOUNTED)' {
+        {($_.log -match '(STARTED|MOUNTED)')} {
 
             Write-Log -EventID $ErrorEventID -Type Error -Message "Oracle instance SID [$($OracleSID)] is MOUNT or NOMOUNT. Shutdown and start up manually."
             Finalize $ErrorReturnCode            
@@ -653,40 +653,61 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
             $invokeResult = Invoke-SQL -SQLCommand $DBStart -SQLName 'Oracle DB Instance OPEN' -SQLLogPath $SQLLogPath
 
-                IF ($invokeResult.Status) {
+            IF ($invokeResult.Status) {
 
-                    Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to switch Oracle instance to OPEN."
+                Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to switch Oracle instance to OPEN."
                 
-                    } else {
-                    Write-Log -EventID $InfoEventID -Type Information -Message "Failed to switch Oracle instance to OPEN."
-                    $ErrorCount ++
-                    }
+                } else {
+                Write-Log -EventID $InfoEventID -Type Information -Message "Failed to switch Oracle instance to OPEN."
+                $ErrorCount ++
+                }
             }
-    }
 
-
-#Get status in which BackUp/Normal Mode
-
-    Write-Log -EventID $InfoEventID -Type Information -Message "Check Back Up Mode"
-
-    $status = Test-OracleBackUpMode
-
-      IF ($LASTEXITCODE -ne 0) {
-
-        Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to Check Back Up Mode."
-        Finalize $ErrorReturnCode
-
-        } else { 
-        Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to Check Back Up Mode."
         }
 
 
-    Switch ($status) {
+    Write-Log -EventID $InfoEventID -Type Information -Message "Check Oracle is running in which mode archive log or no archive log."
+
+    $oracleIsRunningIn = Test-OracleArchiveLogMode
+
+      IF ($LASTEXITCODE -ne 0) {
+
+        Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to check Oracle is running in which mode archive log or no archive log."
+        Finalize $ErrorReturnCode
+
+        } else { 
+        Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to check Oracle is running in which mode archive log or no archive log."
+        }
+
+    
+    IF (($oracleIsRunningIn.NoArchiveLogMode) -and -not($oracleIsRunningIn.ArchiveLogMode)) {
+        
+        Write-Log -EventID $InfoEventID -Type Information -Message "Oracle Database is running in no archive log mode, thus skipping to switch to normal mode."        
+        
+        } else {
+
+#Get status in which BackUp/Normal Mode
+
+        Write-Log -EventID $InfoEventID -Type Information -Message "Check Back Up Mode"
+
+        $status = Test-OracleBackUpMode
+
+        IF ($LASTEXITCODE -ne 0) {
+
+            Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to Check Back Up Mode."
+            Finalize $ErrorReturnCode
+
+            } else { 
+            Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to Check Back Up Mode."
+            }
+
+
+        Switch ($status) {
 
             {($_.Normal) -and -not($_.Backup)} {
 
                 Write-Log -EventID $InfoEventID -Type Information -Message "Oracle Database is running in Normal Mode(ending backup mode)"
-                }
+            }
 
             {($_.Backup) -and -not($_.Normal)} {
 
@@ -702,13 +723,15 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
                     Write-Log -EventID $ErrorEventID -Type Error -Message "Failed to switch to Normal Mode(Ending Backup Mode)"
                     $ErrorCount ++
                     }                
-                }
+            }
 
             Default {
 
                 Write-Log -EventID $ErrorEventID -Type Error -Message "Oracle Database is running in UNKNOWN mode."
                 $ErrorCount ++                
-                }
+            }
+        }
+
     }
 
 
@@ -733,16 +756,23 @@ Write-Output $returnMessage | Out-File -FilePath $SQLLogPath -Append -Encoding $
 
 #export Redo Log
 
-    $invokeResult = Invoke-SQL -SQLCommand $ExportRedoLog  -SQLName 'ExportRedoLog'  -SQLLogPath $SQLLogPath 
 
-    IF ($invokeResult.Status) {
-
-        Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to export Redo Log."
+    IF (($oracleIsRunningIn.NoArchiveLogMode) -and -not($oracleIsRunningIn.ArchiveLogMode)) {
+        
+        Write-Log -EventID $InfoEventID -Type Information -Message "Oracle Database is running in no archive log mode, thus skipping to export redo log."
         
         } else {
-        Write-Log -EventID $WarningEventID -Type Warning -Message "Failed to export Redo Log."
-        $WarningCount ++
-        }
+        $invokeResult = Invoke-SQL -SQLCommand $ExportRedoLog  -SQLName 'ExportRedoLog'  -SQLLogPath $SQLLogPath 
 
+        IF ($invokeResult.Status) {
+
+            Write-Log -EventID $SuccessEventID -Type Success -Message "Successfully complete to export Redo Log."
+        
+            } else {
+            Write-Log -EventID $WarningEventID -Type Warning -Message "Failed to export Redo Log."
+            $WarningCount ++
+            }
+
+        }
 
 Finalize -ReturnCode $NormalReturnCode
