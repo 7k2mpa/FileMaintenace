@@ -13,7 +13,7 @@ Place this script in the same directory of FileMaintenance.ps1.
 
 This script uses cmdlet Compress-Archive in Invoke-Action function for compression.
 
-But cmdlet Compress-Archive can not handle wild card characters bracket[] for destination path corectly, you should install 7-Zip. This script can use 7-Zip for compress or archive also.
+But cmdlet Compress-Archive can not handle wild card characters bracket[] for destination path correctly, you should install 7-Zip. This script can use 7-Zip for compress or archive also.
 
 If you want to use '-PreAction compress or archive' option in FileMaintenance.ps1 without installing 7-Zip, install WMF 5.0 or later, and place '#Requires -Version 5.0' insted of '#Requires -Version 3.0'
 
@@ -400,7 +400,7 @@ process {
             Return
             }
 
-        #Continue‚µ‚È‚¢ê‡‚ÍI—¹ˆ—‚Öi‚Ş
+        #Continueï¿½ï¿½ï¿½È‚ï¿½ï¿½ê‡ï¿½ÍIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öiï¿½ï¿½
         IF ($ForceEndLoop) {
             $Script:ErrorFlag = $TRUE
             $Script:ForceFinalize = $TRUE
@@ -1103,10 +1103,10 @@ begin {
     $scriptExecUser = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).Name
     $logFormattedDate = (Get-Date).ToString($LogDateFormat)
 
-#PowerShell‚Å‚ÍƒqƒAƒhƒLƒ…ƒƒ“ƒg‚Ì‰üs‚ÍLF‚Æ‚µ‚Äˆ—‚³‚ê‚é
-#‚µ‚©‚µ‚È‚ª‚çA‘¼‚ÌOracle‚©‚ç‚Ìo—Í‚ÍLF&CR‚Ì‚½‚ßAWindowsƒƒ‚’ ‚ÅŠJ‚­‚Æ‰üsƒR[ƒh‚ª¬İ‚µ‚Ä³‚µ‚­ˆ—‚³‚ê‚È‚¢
-#‚æ‚Á‚ÄA–¾¦“I‚ÉCR‚ğ’Ç‰Á‚µ‚ÄSQLLog‚Å‰üsƒR[ƒh‚ª¬İ‚µ‚È‚¢‚æ‚¤‚É‚·‚é
-#Sakura Editor“™‚Å‚Í‰üsƒR[ƒh¬İ‚à³‚µ‚­ˆ—‚³‚ê‚é
+#PowerShellï¿½Å‚Íƒqï¿½Aï¿½hï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½Ì‰ï¿½ï¿½sï¿½ï¿½LFï¿½Æ‚ï¿½ï¿½Äï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½Oracleï¿½ï¿½ï¿½ï¿½Ìoï¿½Í‚ï¿½LF&CRï¿½Ì‚ï¿½ï¿½ßAWindowsï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÅŠJï¿½ï¿½ï¿½Æ‰ï¿½ï¿½sï¿½Rï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½İ‚ï¿½ï¿½Äï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½
+#ï¿½ï¿½ï¿½ï¿½ÄAï¿½ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½CRï¿½ï¿½Ç‰ï¿½ï¿½ï¿½ï¿½ï¿½SQLLogï¿½Å‰ï¿½ï¿½sï¿½Rï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½İ‚ï¿½ï¿½È‚ï¿½ï¿½æ‚¤ï¿½É‚ï¿½ï¿½ï¿½
+#Sakura Editorï¿½ï¿½ï¿½Å‚Í‰ï¿½ï¿½sï¿½Rï¿½[ï¿½hï¿½ï¿½ï¿½İ‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 $logWrite = @"
 `r
@@ -1185,7 +1185,7 @@ function Test-OracleBackUpMode {
     $invokeResult = Invoke-SQL -SQLCommand $DBCheckBackUpMode -SQLName "DBCheckBackUpMode" -SQLLogPath $SQLLogPath
 
    
-    #•¶š—ñ”z—ñ‚É•ÏŠ·‚·‚é
+    #ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½zï¿½ï¿½É•ÏŠï¿½ï¿½ï¿½ï¿½ï¿½
     $sqlLog = $invokeResult.Log -replace "`r","" |  ForEach-Object {$_ -split "`n"}
 
     $normalModeCount = 0
@@ -1259,7 +1259,7 @@ function Test-OracleArchiveLogMode {
         $invokeResult = Invoke-SQL -SQLCommand $DBCheckBackUpMode -SQLName "DBCheckArchiveLogMode" -SQLLogPath $SQLLogPath
     
        
-        #•¶š—ñ”z—ñ‚É•ÏŠ·‚·‚é
+        #ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½zï¿½ï¿½É•ÏŠï¿½ï¿½ï¿½ï¿½ï¿½
         $sqlLog = $invokeResult.Log -replace "`r","" |  ForEach-Object {$_ -split "`n"}
     
         $archiveLogModeCount = 0
